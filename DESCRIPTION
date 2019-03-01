@@ -1,0 +1,14 @@
+Package: MicrobitaProcess
+Type: Package
+Title: Dropping Species with Few abundance and Few Occurrences 
+Version: 1.0
+Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
+Description: What the package does (one paragraph).
+Depends: R (>= 3.4.1)
+Imports:
+	plyr	
+	tidyr
+License: GPL (>= 2.0) 
+Encoding: UTF-8
+LazyData: false
+RoxygenNote: 6.1.1
