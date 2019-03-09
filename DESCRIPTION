@@ -1,13 +1,15 @@
 Package: MicrobitaProcess
 Type: Package
-Title: Dropping Species with Few abundance and Few Occurrences 
+Title: an package for processing and analysis of microbiome data. 
 Version: 1.0
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
+Authors@R: person("First", "Last", email = "xshuangbin@163.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
-Depends: R (>= 3.4.1)
+Depends: 
+  R (>= 3.4.1)
 Imports:
-	plyr	
-	tidyr
+  plyr ,	
+  tidyr ,
+  agricolae ,
 License: GPL (>= 2.0) 
 Encoding: UTF-8
 LazyData: false
