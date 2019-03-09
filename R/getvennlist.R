@@ -6,15 +6,15 @@
 #' @param da dataframe; a dataframe contained one character column and others is numeric 
 #' if sampleinfo is NULL, else a numeirc dataframe.
 #' @param sampleinfo dataframe; a sample information.
-#' @param 
-#' @param 
+#' @param ...; Additional arguments passed to \code{\link[MicrobitaProcess]{CountOrRatios}}. 
 #'
 #' @author Shuangbin Xu
 #' @export
 #' @importFrom MicrobitaProcess CountOrRatios 
 
 getvennlist <- function(da,
-			   sampleinfo
+			   sampleinfo=NULL,
+			   ...
 			   ){
     	data <- da
 	data <- CountOrRatios(data, 
