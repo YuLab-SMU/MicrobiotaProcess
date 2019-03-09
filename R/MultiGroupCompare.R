@@ -15,8 +15,8 @@ MultiGroupCompare <- function(data,
                          measure,
                          padj="fdr", ...){
 	colnames(data) <- make.names(colnames(data))
-    nums <- !unlist(lapply(data, is.numeric))
-	variable <- names(data[,nums,drop=FALSE])
+    numstmp <- !unlist(lapply(data, is.numeric))
+	variable <- names(data[,numstmp, drop=FALSE])
 	measure <- make.names(measure)
     compare <- with(data, agricolae::kruskal(eval(parse(text=measure)),
 											 eval(parse(text=variable)),
@@ -36,8 +36,9 @@ MultiGroupCompare <- function(data,
 #' Multiple comparision for multiple measures with Kruskal Wallis test. which 
 #' based on the \code{\link[MicrobitaProcess]{MultiGroupCompare}}
 #' @param data data frame; n(row) sample * m(col) feature and a factor col.
-#' @param measure vector character; must be the names of feature.
-#' @param MultiGroupCompare character; Method for adjusting p values, see 
+#' @param measurelist vector character; must be the names of feature, 
+#' default is NULL,which perform the test for the total features.
+#' @param padjust character; Method for adjusting p values, see 
 #' p.adjust, default is `fdr`.
 #' @param ...; Additional arguments passed to 
 #' \code{\link[MicrobitaProcess]{MultiGroupCompare}}.
@@ -47,14 +48,16 @@ MultiGroupCompare <- function(data,
 #' @importFrom MicrobitaProcess MultiGroupCompare
 
 
-mapplyMultiGroupCompare <- function(data, padjust="fdr",...){
+mapplyMultiGroupCompare <- function(data, measurelist=NULL, padjust="fdr", ...){
 	colnames(data) <- make.names(colnames(data))       
 	nums <- unlist(lapply(data, is.numeric))   
-	measurelist <- names(data[,nums,drop=FALSE])
+	if (is.null(measurelist)){
+		measurelist <- names(data[,nums,drop=FALSE])
+	}
 	multiMeasureTest <- mapply(MultiGroupCompare, 
 		   measurelist,
 		   MoreArgs=list(data=data,
-						 p.adj=padjust,
+						 padj=padjust,
 						 ...),
 		   SIMPLIFY=FALSE
 		   )
