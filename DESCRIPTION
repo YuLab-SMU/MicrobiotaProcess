@@ -3,6 +3,7 @@ Type: Package
 Title: an package for processing and analysis of microbiome data. 
 Version: 1.0
 Authors@R: person("First", "Last", email = "xshuangbin@163.com", role = c("aut", "cre"))
+Maintainer: Shuangbin Xu <xshuangbin@163.com>
 Description: What the package does (one paragraph).
 Depends: 
   R (>= 3.4.1)
