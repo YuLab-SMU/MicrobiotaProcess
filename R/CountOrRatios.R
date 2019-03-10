@@ -12,7 +12,8 @@
 #' @param rownamekeep boolean; whether you return a dataframe contained the rownames,default is FALSE.
 #' @export 
 #' @author Shuangbin Xu
-#' @importFrom plyr ddply numcolwise
+#' @importFrom plyr ddply 
+#' @importFrom plyr numcolwise
 CountOrRatios <- function(da, 
 			     featurelist=NULL, 
 			     countmode=FALSE, 

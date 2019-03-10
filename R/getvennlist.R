@@ -10,7 +10,6 @@
 #'
 #' @author Shuangbin Xu
 #' @export
-#' @importFrom MicrobitaProcess CountOrRatios 
 
 getvennlist <- function(da,
 			   sampleinfo=NULL,

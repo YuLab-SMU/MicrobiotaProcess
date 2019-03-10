@@ -45,7 +45,6 @@ MultiGroupCompare <- function(data,
 #'
 #' @export
 #' @author Shuangbin Xu
-#' @importFrom MicrobitaProcess MultiGroupCompare
 
 
 mapplyMultiGroupCompare <- function(data, measurelist=NULL, padjust="fdr", ...){
