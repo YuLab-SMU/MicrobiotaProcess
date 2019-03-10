@@ -23,17 +23,6 @@ a list contained feature dataframe dropped, and the call, arguments.
 Drop species or features from the feature data frame that occur fewer than or equal to a threshold number of 
 occurrences and fewer abundance than to a threshold abundance.
 }
-\examples{
-
-library("microproccess")
-data <- read.csv(system.file("data", package="microproccess", "Baxter_16_crc_genera_group.csv.gz"))
-data$Group <- NULL
-dim(data)
-head(data)
-newdat <- droptax(data, rmode=FALSE, minocc=0.2, minabu=0)
-dim(newdat)
-head(newdat)
-}
 \author{
 Shuangbin Xu
 }

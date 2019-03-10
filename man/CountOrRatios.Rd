@@ -15,7 +15,7 @@ if featurelist is NULL, else a numeirc dataframe.}
 
 \item{countmode}{boolean; whether return the count results (FALSE),or relative abundance (TRUE).}
 
-\item{percentmode}{boolean; whether return the 100% percent (FALSE),or (0.1) percent(TRUE).}
+\item{percentmode}{boolean; whether return the percent (FALSE),or between 0 and 1(TRUE).}
 
 \item{multiplenum}{numeric; the multiple you want to increase,default is 1.}
 
