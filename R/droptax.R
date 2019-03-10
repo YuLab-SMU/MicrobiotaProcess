@@ -12,16 +12,6 @@
 #' @return a list contained feature dataframe dropped, and the call, arguments.
 #' @export
 #' @author Shuangbin Xu
-#' @examples
-#' 
-#' library("microproccess")
-#' data <- read.csv(system.file("data", package="microproccess", "Baxter_16_crc_genera_group.csv.gz"))
-#' data$Group <- NULL
-#' dim(data)
-#' head(data)
-#' newdat <- droptax(data, rmode=FALSE, minocc=0.2, minabu=0)
-#' dim(newdat)
-#' head(newdat)
 
 droptax <- function(taxtab, rmode=FALSE, minocc=0, minabu=0){
 	if (isTRUE(rmode)){
