@@ -11,7 +11,7 @@
 
 <meta name="author" content="Shuangbin Xu" />
 
-<meta name="date" content="2019-03-09" />
+<meta name="date" content="2019-03-10" />
 
 <title>The Documentation of MicrobitaProcess package</title>
 
@@ -309,7 +309,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">The Documentation of MicrobitaProcess package</h1>
 <h4 class="author"><em>Shuangbin Xu</em></h4>
-<h4 class="date"><em>2019-03-09</em></h4>
+<h4 class="date"><em>2019-03-10</em></h4>
 
 </div>
 
@@ -402,6 +402,62 @@ head(totalFeatureTest)</code></pre>
 ## 5    OTU_1   1.333333 0.6722                D - N
 ## 6    OTU_1  -3.000000 0.6722                M - N</code></pre>
 </div>
+</div>
+<div id="the-example-of-twogrouptest-function" class="section level1">
+<h1>The example of <code>TwoGroupTest</code> function</h1>
+<pre class="r"><code>source(&quot;../R/TwoGroupTest.R&quot;)
+newsample &lt;- read.table(&quot;../data/sample_group.txt&quot;, header=T, row.names=1, check.names=F, sep=&quot;\t&quot;)
+newotumeta &lt;- merge(otuda, newsample, by=0)
+rownames(newotumeta) &lt;- newotumeta$Row.names
+newotumeta$Row.names &lt;- NULL
+head(newotumeta[,1:10])</code></pre>
+<pre><code>##     OTU_1 OTU_10 OTU_100 OTU_1000 OTU_1001 OTU_1003 OTU_1004 OTU_1005
+## B1    524     11     406        0        0        0        0        3
+## B11  3995    605      57        0        5        1        0        0
+## B6  22531   1647      94        0        1        1        0        1
+## D1   9991   6275     184        0        0        1        0        0
+## D3   6177   1843     311        0        1        0        0        0
+## D6  13746   7624      47        0        3       10       12        0
+##     OTU_1007 OTU_101
+## B1         0     363
+## B11        0      34
+## B6         2      22
+## D1         1      44
+## D3         0      23
+## D6         0     105</code></pre>
+<pre class="r"><code>twotest &lt;- TwoGroupTest(measure=&quot;OTU_1&quot;,
+             methodnames=&quot;kruskal.test&quot;,
+             data=newotumeta)
+print(twotest)</code></pre>
+<pre><code>## 
+##  Kruskal-Wallis rank sum test
+## 
+## data:  OTU_1 by group
+## Kruskal-Wallis chi-squared = 0.41026, df = 1, p-value = 0.5218</code></pre>
+</div>
+<div id="the-example-of-mapplytwogrouptest-function" class="section level1">
+<h1>The example of <code>mapplyTwoGroupTest</code> function</h1>
+<pre class="r"><code> source(&quot;../R/TwoGroupTest.R&quot;)
+ multitest &lt;- mapplyTwoGroupTest(methodnames=&quot;kruskal.test&quot;, 
+                                     measurelist=c(&quot;OTU_1&quot;, &quot;OTU_10&quot;),
+                                     data=newotumeta)
+print (multitest)</code></pre>
+<pre><code>## $OTU_1
+## 
+##  Kruskal-Wallis rank sum test
+## 
+## data:  OTU_1 by group
+## Kruskal-Wallis chi-squared = 0.41026, df = 1, p-value = 0.5218
+## 
+## 
+## $OTU_10
+## 
+##  Kruskal-Wallis rank sum test
+## 
+## data:  OTU_10 by group
+## Kruskal-Wallis chi-squared = 0.92308, df = 1, p-value = 0.3367</code></pre>
+<pre class="r"><code># for the total features list.
+multitest &lt;- mapplyTwoGroupTest(methodnames=&quot;kruskal.test&quot;, data=newotumeta)</code></pre>
 </div>
 <div id="the-example-of-splitstrtolist-function" class="section level1">
 <h1>The example of <code>splitStrtoList</code> function</h1>
