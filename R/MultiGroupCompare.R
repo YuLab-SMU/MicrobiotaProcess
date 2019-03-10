@@ -8,8 +8,8 @@
 #' @param padj character; Method for adjusting p values, see p.adjust, default is `fdr`.
 #' @param ...; Additional arguments passed to \code{\link[agricolae]{kruskal}}.
 #'
-#' @export
 #' @author Shuangbin Xu
+#' @export
 #' @importFrom agricolae kruskal
 MultiGroupCompare <- function(data,
                          measure,
