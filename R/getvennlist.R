@@ -20,7 +20,7 @@ getvennlist <- function(da,
 				featurelist=sampleinfo, 
 				countmode=FALSE,
 				percentmode=FALSE,
-			      	multiplenum=1,
+				multiplenum=1,
    				rownamekeep=FALSE)
 	vennlist <- apply(data, 1, function(data){names(data[data>0])})
 	return(vennlist)
