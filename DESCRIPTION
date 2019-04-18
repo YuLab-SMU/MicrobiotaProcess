@@ -8,6 +8,7 @@ Description: What the package does (one paragraph).
 Depends: 
   R (>= 3.4.1)
 Imports:
+  ape,
   plyr ,	
   tidyr ,
   agricolae ,
