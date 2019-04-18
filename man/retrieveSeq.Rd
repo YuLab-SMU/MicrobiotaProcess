@@ -4,12 +4,19 @@
 \alias{retrieveSeq}
 \title{Retriveing Sequencing from NCBI}
 \usage{
-retrieveSeq(ids, files, times = 3, checkids = FALSE)
+retrieveSeq(ids, files, databases = "protein", type = "fasta",
+  times = 3, checkids = FALSE)
 }
 \arguments{
 \item{ids}{vector, the accession number or accession.}
 
 \item{files}{character, the file name specified by a double-quoted string.}
+
+\item{databases}{character, the name of databases to use, default is `protein`,
+if nucleotide sequences to retrieve set nuccore,see \code{\link[rentrez]{entrez_fetch}}.}
+
+\item{type}{character, the format in which to get data,such as fasta, xml ...,
+see \code{\link[rentrez]{entrez_fetch}}.}
 
 \item{times}{integer, the time of sleeping, default is 3, 
 meaning 3 seconds.}
