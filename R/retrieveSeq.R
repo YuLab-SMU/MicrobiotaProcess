@@ -4,18 +4,28 @@
 #' Retriveing sequences from NCBI with the accession ids.
 #' @param ids vector, the accession number or accession.
 #' @param files character, the file name specified by a double-quoted string.
+#' @param databases character, the name of databases to use, default is `protein`,
+#' if nucleotide sequences to retrieve set nuccore,see \code{\link[rentrez]{entrez_fetch}}.
+#' @param type character, the format in which to get data,such as fasta, xml ...,
+#' see \code{\link[rentrez]{entrez_fetch}}.
 #' @param times integer, the time of sleeping, default is 3, 
 #' meaning 3 seconds.
 #' @param checkids bool, whether check the sequence of ids has been retrieved.
 #' default is FALSE.
-#' @importFrom ape read.FASTA read.GenBank
+#' @importFrom Biostrings readBStringSet
+#' @importFrom rentrez entrez_fetch
+#' @importFrom stringr str_trim
 #' @author ShuangbinXu
 #' @export
 
-retrieveSeq <- function(ids, files, times=3, checkids=FALSE){
+retrieveSeq <- function(ids, files, 
+						databases="protein", 
+						type="fasta", 
+						times=3, checkids=FALSE){
 	if (file.exists(files) && checkids){
-		seqobj <- read.FASTA(files)
+		seqobj <- readBStringSet(files)
 		tmpid <- names(seqobj)
+		tmpid <- unlist(sapply(strsplit(tmpid, " "),function(x){x[1]}))
 		ids <- setdiff(ids, tmpid)
 	}
 	if (length(ids)>400){
@@ -26,13 +36,12 @@ retrieveSeq <- function(ids, files, times=3, checkids=FALSE){
 	}
 	cat(ids)
 	cat("\n")
-	tryCatch({tmpGenBanks <- read.GenBank(ids)
-	 	   write.dna(tmpGenBanks, 
+	tryCatch({tmprecs <- entrez_fetch(db=databases, ids, rettype=type)
+		    tmprecs <- gsub("\n\n", "\n", tmprecs)
+			tmprecs <- str_trim(tmprecs)
+	 	   write(tmprecs, 
 			      files,
-			      format="fasta", 
-			      nbcol=1,
-		             append=TRUE, 
-			      colw=100)},
+		          append=TRUE)},
 		error=function(e){do.call("retrieveSeq", 
 					     args=list(ids=ids,
 							 files=files,
@@ -48,22 +57,28 @@ retrieveSeq <- function(ids, files, times=3, checkids=FALSE){
 #' Retriveing sequences from NCBI with the accession ids.
 #' @param ids list, the accession number or accession.
 #' @param files character, the file name specified by a double-quoted string.
+#' @param databases character, the name of databases to use, default is `protein`,
+#' if nucleotide sequences to retrieve set nuccore,see \code{\link[rentrez]{entrez_fetch}}.
+#' @param type character, the format in which to get data,such as fasta, xml ...,
+#' see \code{\link[rentrez]{entrez_fetch}}.
 #' @param times integer, the time of sleeping, default is 3, 
 #' meaning 3 seconds.
 #' @param checkids bool, whether check the sequence of ids has been retrieved.
 #' default is FALSE.
-#' @importFrom ape read.FASTA read.GenBank
 #' @seealso [retrieveSeq]
 #' @author ShuangbinXu
 #' @export
 
 mapplyretrieveSeq <- function(idlist, files, 
-				  times=3, checkids=TRUE){
+							  databases="protein", 
+							  type="fasta", 
+				              times=3, checkids=TRUE){
 	invisible(mapply(retrieveSeq, 
 			   idlist, 
 	  	 	   MoreArgs=list(files=files,
+						  databases=databases,
+						  type=type,
 				          times=times,
-                                      checkids=checkids),
+                          checkids=checkids),
 			   SIMPLIFY=FALSE))
 }
-
