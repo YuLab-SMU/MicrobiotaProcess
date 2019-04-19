@@ -43,12 +43,13 @@ splitData <- function(x,
 seedind <- function(l, n, random=FALSE, seed=TRUE){
     tmpind <- rep(1:(trunc(l/n)+1),n)
     if (random){
-	if ((l%%n)==0){
-		tmpind <- tmpind[!tmpind %in% max(tmpind)]
-	}
+	#if ((l%%n)==0){
+	#	tmpind <- tmpind[!tmpind %in% max(tmpind)]
+	#}
 	tmpind <- sample(sort(tmpind)[1:l])
     }else{
     	tmpind <- sort(tmpind)[1:l]
     }
+    return(tmpind)
 }
 
