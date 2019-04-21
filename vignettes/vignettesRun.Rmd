@@ -13,7 +13,7 @@ output:
 
 # The example of `CountOrRatios` function
 
-```{r, CountOrRatios}
+```{r, error=TRUE, CountOrRatios}
 source("../R/CountOrRatios.R")
 otuda <- read.table("../data/otu_tax_table.txt",
                   sep="\t", header=T, row.names=1, check.names=F, comment.char="",skip=1)
@@ -33,7 +33,7 @@ head(dat[,1:10])
 
 ## The multiple group compare for single feature.
 
-```{r, MultiGroupCompare}
+```{r, error=TRUE, MultiGroupCompare}
 source("../R/MultiGroupCompare.R")
 otumeta <- merge(otuda, sampleda, by=0)
 rownames(otumeta) <- otumeta$Row.names
@@ -46,7 +46,7 @@ print(OneFeatureTest)
 
 ## The multiple group compare for multiple feature. 
 
-```{r, warning=FALSE, mapplyMultiGroupCompare}
+```{r, warning=FALSE, error=TRUE, mapplyMultiGroupCompare}
 multiFeatureTest <- mapplyMultiGroupCompare(data=otumeta,
 											measurelist=c("OTU_1","OTU_10"),
 											padjust="fdr")
@@ -59,7 +59,7 @@ head(totalFeatureTest)
 
 # The example of `TwoGroupTest` function
 
-```{r, TwoGroupTest}
+```{r, error=TRUE, TwoGroupTest}
 source("../R/TwoGroupTest.R")
 newsample <- read.table("../data/sample_group.txt", header=T, row.names=1, check.names=F, sep="\t")
 newotumeta <- merge(otuda, newsample, by=0)
@@ -74,7 +74,7 @@ print(twotest)
 
 # The example of `mapplyTwoGroupTest` function
 
-```{r, mapplyTwoGroupTest}
+```{r, error=TRUE, mapplyTwoGroupTest}
  source("../R/TwoGroupTest.R")
  multitest <- mapplyTwoGroupTest(methodnames="kruskal.test", 
 									 measurelist=c("OTU_1", "OTU_10"),
@@ -88,7 +88,7 @@ multitest <- mapplyTwoGroupTest(methodnames="kruskal.test", data=newotumeta)
 
 # The example of `splitStrtoList` function
 
-```{r, splitStrtoList}
+```{r, error=TRUE, splitStrtoList}
 source("../R/splitStrtoList.R")
 head(tax, 3)
 taxdat <- splitStrtoList(tax, prefix="tax", sep="; ")
@@ -97,7 +97,7 @@ head(taxdat, 3)
 
 # The example of `droptax` function
 
-```{r, droptax}
+```{r, error=TRUE, droptax}
 source("../R/droptax.R")
 tax6da <- taxdat[,"tax6",drop=FALSE]
 #genustab <- merge(t(otuda), tax6da, by=0)
@@ -117,7 +117,7 @@ dim(newgenustab)
 
 # The example of `getvennlist` function 
 
-```{r, getvennlist}
+```{r, error=TRUE, getvennlist}
 source("../R/getvennlist.R")
 source("../R/CountOrRatios.R")
 #otuda <- read.table("../data/otu_tax_table.txt",
