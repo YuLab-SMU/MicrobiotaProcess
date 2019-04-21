@@ -172,9 +172,8 @@ setfactorlevels <- function(data, factorlist){
 
 
 #' @importFrom ggplot2 theme
-
 taxbartheme <- function(){
-	theme(axis.text.x = element_text(angle = 45, hjust = 1, size=8),
+	theme(axis.text.x = element_text(angle = -45, hjust = 1, size=8),
 		  panel.grid = element_blank(),
 		  #panel.border = element_blank(),
 		  #axis.line = element_line(size=0.5, colour = "black"),
@@ -203,6 +202,8 @@ taxbarguildes <- function(keywidth=0.6, keyheight=0.6, ncol=5, ...){
 							 keyheight = keyheight,
 							 ncol=ncol),...)
 }
+
+#' @author GhuangChuangYu
 #' @importFrom grDevices colorRampPalette
 # this is from `ggtree`
 getCols <- function (n) {
