@@ -64,6 +64,8 @@ ggrarecurve <- function(data,
 		p <- p + facet_wrap(~ Alpha, 
 				      scales="free", 
 				      nrow=nrows)
+	}else{
+		p <- p + facet_wrap(~ Alpha, scales="free")
 	}
 	return(p)
 }
