@@ -12,8 +12,7 @@ alphaindex <- function(data,
        if (is.data.frame(data)){
               data <- data[,colSums(data)>0,drop=FALSE]
        }else{
-              data <- data[data>0]
-       }
+              data <- data[data>0]}
        x <- as.matrix(data)
        if (!identical(all.equal(x, round(x)),TRUE)){
               stop("the data should be integer (counts)")
