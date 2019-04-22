@@ -21,7 +21,7 @@
 #' @author ShuangbinXu
 #' @importFrom ggplot2 ggplot aes_ stat_smooth facet_wrap
 #' @importFrom dplyr filter
-
+#' @export
 ggrarecurve <- function(data,
 			   nrows=2,
 			   mapping=NULL,
@@ -84,7 +84,7 @@ ggrarecurve <- function(data,
 #' @importFrom dplyr bind_rows
 #' @importFrom reshape melt
 #' @importFrom magrittr %>%
-
+#' @export
 stat_rare <- function(data, 
 					  chunks=400, 
 					  sampleda,
