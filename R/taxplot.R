@@ -159,24 +159,22 @@ mappingtaxda <- function(data, topn=30,
 }
 
 
-setfactorlevels <- function(data, factorlist){
-	factornames <- intersect(colnames(dat), names(factorlist))
-	if (length(factornames)>0){
-		for(i in factornames){
-				   data[[i]] <- factor(data[[i]], 
-									 levels=as.vector(factorlist[[i]]))
-		}
-	}
-	return(data)
-}
+#setfactorlevels <- function(data, factorlist){
+#	factornames <- intersect(colnames(dat), names(factorlist))
+#	if (length(factornames)>0){
+#		for(i in factornames){
+#				   data[[i]] <- factor(data[[i]], 
+#									 levels=as.vector(factorlist[[i]]))
+#		}
+#	}
+#	return(data)
+#}
 
 
 #' @importFrom ggplot2 theme
 taxbartheme <- function(){
 	theme(axis.text.x = element_text(angle = -45, hjust = 1, size=8),
 		  panel.grid = element_blank(),
-		  #panel.border = element_blank(),
-		  #axis.line = element_line(size=0.5, colour = "black"),
 		  legend.position = "bottom", 
 		  legend.box = "horizontal", 
 		  legend.text = element_text(size = 8), 
@@ -201,21 +199,5 @@ taxbarguildes <- function(keywidth=0.6, keyheight=0.6, ncol=5, ...){
 	guides(fill=guide_legend(keywidth = keywidth, 
 							 keyheight = keyheight,
 							 ncol=ncol),...)
-}
-
-#' @author GhuangChuangYu
-#' @importFrom grDevices colorRampPalette
-# this is from `ggtree`
-getCols <- function (n) {
-     col <- c("#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3",
-              "#fdb462", "#b3de69", "#fccde5", "#d9d9d9", "#bc80bd",
-              "#ccebc5", "#ffed6f")
-     col2 <- c("#1f78b4", "#ffff33", "#c2a5cf", "#ff7f00", "#810f7c",
-               "#a6cee3", "#006d2c", "#4d4d4d", "#8c510a", "#d73027",
-               "#78c679", "#7f0000", "#41b6c4", "#e7298a", "#54278f")
-     col3 <- c("#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99",
-               "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a",
-               "#ffff99", "#b15928")
-	 colorRampPalette(col2)(n)
 }
 
