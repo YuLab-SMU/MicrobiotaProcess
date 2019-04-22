@@ -6,7 +6,8 @@
 #' @param data data.frame, (nrow sample * ncol taxonomy(feature))
 #' @param mindepth integer, Subsample size for rarefying community.
 #' @author ShuangbinXu
-#' @importFrom vegan rrarefy estimateR diversity specnumber                                                                                       
+#' @importFrom vegan rrarefy estimateR diversity specnumber
+#' @export
 alphaindex <- function(data,
                                       mindepth=NULL){
        if (is.data.frame(data)){
