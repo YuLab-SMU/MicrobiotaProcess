@@ -9,7 +9,7 @@ alphaindex(data, mindepth = NULL)
 \arguments{
 \item{data}{data.frame, (nrow sample * ncol taxonomy(feature))}
 
-\item{mindepth}{integer, Subsample size for rarefying community.}
+\item{mindepth}{numeric, Subsample size for rarefying community.}
 }
 \description{
 caculate the alpha index (Obseve,Chao1,Shannon,Simpson) of sample
