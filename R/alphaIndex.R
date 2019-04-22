@@ -4,7 +4,7 @@
 #' caculate the alpha index (Obseve,Chao1,Shannon,Simpson) of sample
 #' with \code{\link[vegan]}
 #' @param data data.frame, (nrow sample * ncol taxonomy(feature))
-#' @param mindepth integer, Subsample size for rarefying community.
+#' @param mindepth numeric, Subsample size for rarefying community.
 #' @author ShuangbinXu
 #' @importFrom vegan rrarefy estimateR diversity specnumber
 #' @export
