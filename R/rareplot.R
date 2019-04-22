@@ -68,6 +68,9 @@ ggrarecurve <- function(data,
 	return(p)
 }
 
+#' @title mapping data of ggrarecurve
+#' @description
+#' generating the data of ggrarecurve.
 #' @param data data.frame,(nrow sample * ncol taxonomy 
 #' (feature) or and factor)
 #' @param chunks integer, the number of subsample in a sample,
