@@ -109,6 +109,10 @@ stat_rare <- function(data,
 			out <- melt(out, id.vars=c("sample", "readsNums", tmpfactor),
 						variable_name="Alpha")
 		}
+		if (missing(sample)&&length(tmpfactor) == 0){
+			out <- melt(out, id.vars=c("sample", "readsNums"),
+				     variable_name="Alpha")
+		}		
 	}else{
 		if (!missing(sampleda)){
 			sampleda$sample <- rownames(sampleda)
