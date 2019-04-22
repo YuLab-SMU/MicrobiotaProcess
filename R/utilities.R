@@ -14,7 +14,7 @@ getCols <- function (n){
          colorRampPalette(col2)(n)
 }
 
-#' @keyword internal 
+#' @keywords internal 
 setfactorlevels <- function(data, factorlist){
         factornames <- intersect(colnames(dat), names(factorlist))
         if (length(factornames)>0){
