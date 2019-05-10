@@ -173,12 +173,13 @@ mappingtaxda <- function(data, topn=30,
 
 #' @importFrom ggplot2 theme
 taxbartheme <- function(){
-	theme(axis.text.x = element_text(angle = -45, hjust = 1, size=8),
+	theme(axis.text.x = element_text(angle = -45, hjust = 0, size=7),
 		  panel.grid = element_blank(),
 		  legend.position = "bottom", 
 		  legend.box = "horizontal", 
 		  legend.text = element_text(size = 8), 
 		  legend.title=element_blank(),
+		  plot.margin=unit(c(0.2,1,0.2,0.2),"cm"),
 	      panel.spacing = unit(0.2, "mm"),
 	      strip.text.x = element_text(size=12, face="bold"),
 	      strip.background = element_rect(colour="white", fill="grey"))
