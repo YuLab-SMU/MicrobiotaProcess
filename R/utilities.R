@@ -16,7 +16,7 @@ getCols <- function (n){
 
 #' @keywords internal 
 setfactorlevels <- function(data, factorlist){
-        factornames <- intersect(colnames(dat), names(factorlist))
+        factornames <- intersect(colnames(data), names(factorlist))
         if (length(factornames)>0){
                 for(i in factornames){
                         data[[i]] <- factor(data[[i]], 
