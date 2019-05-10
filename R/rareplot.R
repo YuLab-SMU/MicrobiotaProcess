@@ -23,7 +23,7 @@
 #' @importFrom dplyr filter
 #' @export
 ggrarecurve <- function(data,
-			   nrows=2,
+			   nrows,
 			   mapping=NULL,
 			   linesize=0.5,	
 			   chunks=400,
