@@ -4,7 +4,7 @@
 \alias{ggrarecurve}
 \title{Rarefaction alpha index}
 \usage{
-ggrarecurve(data, nrows = 2, mapping = NULL, linesize = 0.5,
+ggrarecurve(data, nrows, mapping = NULL, linesize = 0.5,
   chunks = 400, sampleda, factorNames, factorlevels, facetNames = NULL,
   se = FALSE, method = "lm", formula = y ~ log(x), ...)
 }
