@@ -60,7 +60,7 @@ ggbartax <- function(data,
 	tmpfactor <- setdiff(colnames(data), c("feature", "sample", "value"))
 	if (is.null(facetNames) && length(tmpfactor)>0){
 		tmpformula <- as.formula(paste0("~ ",tmpfactor[1]))
-		p <- p + facet_wrap(tmpformula , scales="free_x", nrow=1)
+		p <- p + facet_wrap(tmpformula, scales="free_x", space="free_x", nrow=1)
 	}
 	if(setColors){
 		tmpn <- length(levels(data$feature))
@@ -68,7 +68,7 @@ ggbartax <- function(data,
 	}
 	if (!is.null(facetNames)){
 		tmpformula <- as.formula(paste0("~ ", facetNames))
-		p <- p + facet_wrap(tmpformula , scales="free_x", nrow=1)
+		p <- p + facet_wrap(tmpformula, scales="free_x", space="free_x", nrow=1)
 	}
 	if (settheme){
 		p <- p + taxbartheme()
