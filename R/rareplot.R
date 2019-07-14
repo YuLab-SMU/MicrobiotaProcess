@@ -4,7 +4,7 @@
 #' building curve of alpha index in Rarefied samples.
 #' @param data data.frame,(nrow sample * ncol feature (factor)) or
 #' the data.frame for stat_smooth.
-#' @param nrows, the nrow of facet, default is 2.
+#' @param nrows, the nrow of facet.
 #' @param mapping, set of aesthetic mapping of ggplot2, default is NULL,
 #' if the data is the data.frame for stat_smooth, the mapping should be set.
 #' @param linesize integer, default is 0.5.
@@ -14,7 +14,7 @@
 #' @param factorNames character, default is missing. 
 #' @param factorlevels list, the levels of the factors, default is NULL,
 #' if you want to order the levels of factor, you can set this.
-#' @param facetNames vector character, default is NULL.
+#' @param indexNames vector character, default is "Observe".
 #' @param se boolean, default is FALSE.
 #' @param method character, default is lm.
 #' @param formula formula, default is `y ~ log(x)`
@@ -22,7 +22,7 @@
 #' @importFrom ggplot2 ggplot aes_ stat_smooth facet_wrap
 #' @importFrom dplyr filter
 #' @export
-ggrarecurve <- function(data,
+ggrarecurve.default <- function(data,
 			   nrows,
 			   mapping=NULL,
 			   linesize=0.5,	
@@ -30,7 +30,7 @@ ggrarecurve <- function(data,
 			   sampleda,
 			   factorNames,
 			   factorlevels,
-			   facetNames=NULL,
+			   indexNames="Observe",
 			   se=FALSE,
 			   method="lm",			   
 			   formula=y ~ log(x),
@@ -43,15 +43,15 @@ ggrarecurve <- function(data,
 						  plotda=TRUE)
 		mapping <- aes_(~readsNums, ~value, color=~sample)
 		if (!missing(factorNames)){
-		    	tmpcolor <- as.formula(paste0("~", factorNames))
+		    tmpcolor <- as.formula(paste0("~", factorNames))
 			mapping <- modifyList(mapping,
 						 aes_(~readsNums,
 						      ~value, 
 						      color=tmpcolor))
 		}
 	}
-	if (!is.null(facetNames)){
-		data <- data %>% filter(Alpha %in% facetNames)
+	if (!is.null(indexNames)){
+		data <- data %>% filter(Alpha %in% indexNames)
 	}
 	p <- ggplot(data=data,
 		     mapping=mapping) +
@@ -93,8 +93,8 @@ stat_rare <- function(data,
 					  factorlevels,
 					  plotda=TRUE){
 	tmpfeature <- colnames(data)[sapply(data,is.numeric)]
-    	tmpfactor <- colnames(data)[!sapply(data,is.numeric)]
-	dat <- data[ , tmpfeature, drop=FALSE]
+   	tmpfactor <- colnames(data)[!sapply(data,is.numeric)]
+	dat <- data[ , match(tmpfeature, colnames(data)), drop=FALSE]
 	out <- apply(dat, 1, samplealpha, chunks=chunks) %>% 
 		bind_rows(,.id="sample")
 	if (plotda){
@@ -132,16 +132,17 @@ stat_rare <- function(data,
 	return(out)
 }
 
-# @keyword internal
+#' @keywords internal
 samplealpha <- function(data, chunks=200){
 	sdepth <- sum(data)
 	step <- trunc(sdepth/chunks)
 	n <- seq(0, sdepth, by=step)[-1]
-	n <- c(n, sdepth)	
+	n <- c(n, sdepth)
 	out <- lapply(n, function(x){
 			tmp <- alphaindex(data, mindepth=x)
+			#tmp <- tmp$indexs
 			tmp$readsNums <- x
-		    return(tmp)}) 
+		    return(tmp)})
 	out <- do.call("rbind", c(out, make.row.names=FALSE))
 	out[is.na(out)] <- 0
 	return (out)
