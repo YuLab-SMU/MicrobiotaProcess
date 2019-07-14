@@ -1,5 +1,6 @@
 #' @author GhuangChuangYu
 #' @importFrom grDevices colorRampPalette
+#' @keywords internal
 # this is from `ggtree`
 getCols <- function (n){
      col <- c("#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3",
@@ -26,3 +27,41 @@ setfactorlevels <- function(data, factorlist){
         return(data)
 }
 
+#' @keywords internal
+getotudata <- function(obj){
+	if(taxa_are_rows(obj)){
+		otudata <- data.frame(t(otu_table(obj)), check.names=FALSE)
+	}else{
+		otudata <- data.frame(otu_table(obj), check.names=FALSE)
+	}
+}
+
+#' @keywords internal
+checkotu <- function(obj){
+	if (is.null(obj@otu_table)){
+		stop("The otu table is empty!")
+	}else{
+		otuda <- getotudata(obj)
+		return(otuda)
+	}
+}
+
+#' @keywords internal
+checksample <- function(obj){
+	if (is.null(obj@sam_data)){
+		stop("The sample_data is empty")
+	}else{
+		sampleda <- getsample(obj)
+		return(sampleda)
+	}
+}
+
+#' @keywords internal.
+getsample <- function(obj){
+	if (is.null(obj@sam_data)){
+		sampleda <- NULL
+	}else{
+		sampleda <- sample_data(obj)
+	}
+	return(sampleda)
+}
