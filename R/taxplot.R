@@ -25,7 +25,7 @@
 #' @importFrom ggplot2 ggplot aes_ geom_bar
 #' @export
 
-ggbartax <- function(data,
+ggbartax.default <- function(data,
 				  mapping=NULL,
 				  position = "stack",
 				  stat="identity",
@@ -55,13 +55,12 @@ ggbartax <- function(data,
 		geom_bar(position = position, 
 				 stat=stat,
 				 width=width) + 
-		theme_bw() +
-		scale_y_continuous(expand=c(0,0))
+		theme_bw() 
 	tmpfactor <- setdiff(colnames(data), c("feature", "sample", "value"))
-	if (is.null(facetNames) && length(tmpfactor)>0){
-		tmpformula <- as.formula(paste0("~ ",tmpfactor[1]))
-		p <- p + facet_grid(tmpformula, scales="free_x", space="free_x")
-	}
+	#if (is.null(facetNames) && length(tmpfactor)>0){
+	#	tmpformula <- as.formula(paste0("~ ",tmpfactor[1]))
+	#	p <- p + facet_grid(tmpformula, scales="free_x", space="free_x")
+	#}
 	if(setColors){
 		tmpn <- length(levels(data$feature))
 		p <- p + scale_fill_manual(values=getCols(tmpn))
