@@ -32,6 +32,8 @@ alphaindex <- function(data,
                            Shannon,
                            Simpson,
                            J)
+	   #attr(alpha, "indexs") <- alpha
+	   #attr(alpha, "class") <- "Alpha"
        return(alpha)
 }     
 
