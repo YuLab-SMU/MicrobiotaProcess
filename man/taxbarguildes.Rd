@@ -4,7 +4,7 @@
 \alias{taxbarguildes}
 \title{legend guides for ggbartax}
 \usage{
-taxbarguildes(keywidth = 0.6, keyheight = 0.6, ncol = 5, ...)
+taxbarguildes(keywidth = 0.4, keyheight = 0.4, ncol = 5, ...)
 }
 \arguments{
 \item{keywidth}{numeric, the keywidth of `guide_legend`.}
