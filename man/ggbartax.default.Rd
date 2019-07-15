@@ -6,7 +6,7 @@
 \usage{
 \method{ggbartax}{default}(data, mapping = NULL, position = "stack",
   stat = "identity", width = 0.7, topn = 30, count = FALSE,
-  sampleda = NULL, factorlevels = NULL, settheme = TRUE,
+  sampleda = NULL, factorLevels = NULL, settheme = TRUE,
   facetNames = NULL, setColors = TRUE, ...)
 }
 \arguments{
@@ -29,7 +29,7 @@ if the data is the data.frame for geom_bar, the mapping should be set.}
 \item{sampleda}{data.frame, (nrow sample * ncol factor), the sample 
 information, if the data doesn't contain the information.}
 
-\item{factorlevels}{list, the levels of the factors, default is NULL,
+\item{factorLevels}{list, the levels of the factors, default is NULL,
 if you want to order the levels of factor, you can set this.}
 
 \item{settheme}{boolean, default is TRUE, or you can set FALSE, then
