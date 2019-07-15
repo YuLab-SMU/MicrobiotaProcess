@@ -45,9 +45,28 @@ ggordpoint <- function(obj, ...){
 	UseMethod("ggordpoint")
 }
 
-#' @title
-#' @param 
-#' @param
+#' @title ggordpoint
+#' @param obj prcomp or pcasample class
+#' @param pc integer vector, the component index.
+#' @param mapping set of aesthetic mapping of ggplot2, default is NULL.
+#' @param sampleda data.frame, nrow sample * ncol factors, default is NULL.
+#' @param factorNames vector, the names of factors contained sampleda.
+#' @param factorLevels list, the levels of the factors, default is NULL,
+#' if you want to order the levels of factor, you can set this.
+#' @param poinsize numeric, the size of point, default is 2.
+#' @param linesize numeric, the line size of segment, default is 0.3.
+#' @param arrowsize numeric, the size of arrow, default is 1.5.
+#' @param arrowlinecolour character, the color of segment, default is grey.
+#' @param biplot logical, whether plot the species, default is TRUE.
+#' @param topn integer, the number species have top important contribution, 
+#' default is 5.
+#' @param settheme logical, whether set the theme for the plot, default is TRUE.
+#' @param speciesannot logical, whether plot the species, default is TRUE.
+#' @param textsize numeric, the size of text, default is 2.5.
+#' @param fontface character, the font face, default is "blod.italic".
+#' @param fontfamily character, the font family, default is "sans".
+#' @param textlinesize numeric, the segment size in \code{\link[ggrepel]{geom_text_repel}}.
+#' @param ... additional parameters, see \code{\link[ggrepel]{geom_text_repel}}.
 #' @importFrom ggplot2 ggplot geom_point geom_segment aes_ 
 #' @importFrom ggrepel geom_text_repel
 #' @export
@@ -59,7 +78,7 @@ ggordpoint.default <-  function(obj,
 						   factorLevels=NULL,
 						   poinsize=2,
 						   linesize=0.3,
-						   arrowsize=1,
+						   arrowsize=1.5,
 						   arrowlinecolour="grey",
 						   biplot=TRUE,
 						   topn=5,
@@ -136,7 +155,6 @@ ggordpoint.default <-  function(obj,
 	return(p)	
 }
 
-#' @title
 #' @export
 ggordpoint.pcasample <- function(obj,...){
 	pcaobj <- obj@pca
