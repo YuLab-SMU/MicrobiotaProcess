@@ -13,7 +13,7 @@ alphaindex(data, mindepth = NULL)
 }
 \description{
 caculate the alpha index (Obseve,Chao1,Shannon,Simpson) of sample
-with \code{\link[vegan]}
+with \code{\link[vegan]{diversity}}
 }
 \author{
 ShuangbinXu
