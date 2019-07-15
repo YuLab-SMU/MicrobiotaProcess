@@ -4,22 +4,23 @@
 \alias{CountOrRatios}
 \title{caculate the count or relative abundance of replicate element with a speficify column}
 \usage{
-CountOrRatios(da, featurelist = NULL, countmode = FALSE,
-  percentmode = FALSE, multiplenum = 1, rownamekeep = FALSE)
+CountOrRatios(da, featurelist, countmode = TRUE, multiplenum = 1,
+  rownamekeep = FALSE)
 }
 \arguments{
-\item{da}{dataframe; a dataframe contained one character column and others is numeric 
-if featurelist is NULL, else a numeirc dataframe.}
+\item{da}{dataframe; a dataframe contained one character column and others is numeric,
+if featurelist is NULL. Or a numeirc dataframe, if featurelist is non't NULL, all columns 
+should be numeric.}
 
 \item{featurelist}{dataframe; a dataframe contained one chatacter column, default is NULL.}
 
-\item{countmode}{boolean; whether return the count results (FALSE),or relative abundance (TRUE).}
-
-\item{percentmode}{boolean; whether return the percent (FALSE),or between 0 and 1(TRUE).}
+\item{countmode}{boolean; whether return the count results (TRUE),or relative abundance (FALSE).}
 
 \item{multiplenum}{numeric; the multiple you want to increase,default is 1.}
 
 \item{rownamekeep}{boolean; whether you return a dataframe contained the rownames,default is FALSE.}
+
+\item{percentmode}{boolean; whether return the percent (FALSE),or between 0 and 1(TRUE).}
 }
 \description{
 Caculate the count or relative abundance of replicate element with a speficify columns
