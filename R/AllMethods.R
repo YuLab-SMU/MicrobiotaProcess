@@ -30,7 +30,7 @@ ggbartax.phyloseq <- function(obj, ...){
 }
 
 #' @title gettaxdf
-#' @param obj the phyloseq object
+#' @param obj the R object
 #' @param ... additional parameters.
 #' @export
 gettaxdf <- function(obj,...){
@@ -66,6 +66,7 @@ gettaxdf.phyloseq <- function(obj, taxlevel="Phylum", ...){
 	return(taxdf)
 }
 
+#' @title gettaxdf
 #' @param otuda data.frame, otu table.
 #' @param taxda data.frame, the dataframe of taxonomy.
 #' @param taxlevel character, the column names of taxda that you want to get.
@@ -103,6 +104,7 @@ ggrarecurve <- function(obj, ...){
 	UseMethod("ggrarecurve")
 }
 
+#' @title ggrarecurve
 #' @param obj the phyloseq object.
 #' @param ... additional parameters.
 #' @export
@@ -113,6 +115,7 @@ ggrarecurve.phyloseq <- function(obj, ...){
 	return(p)	
 }
 
+
 #' @title getvennlist
 #' @param obj the phyloseq object.
 #' @param ... additional parameters.
@@ -121,6 +124,7 @@ getvennlist <- function(obj,...){
 	UseMethod("getvennlist")
 }
 
+#' @title getvennlist
 #' @param obj the phyloseq object.
 #' @param factorNamesIndex integer, the index of column names of sample_data.
 #' @param ... additional parameters.
