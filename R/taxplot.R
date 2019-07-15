@@ -84,7 +84,7 @@ ggbartax.default <- function(data,
 #' @param count boolean, default is FALSE.
 #' @param sampleda data.frame, (nrow sample * ncol factor) the 
 #' sample information, if the data doesn't contain the information.
-#' @param factorlevels list, the levels of the factors, default is NULL,
+#' @param factorLevels list, the levels of the factors, default is NULL,
 #' if you want to order the levels of factor, you can set this. 
 #' @param plotda boolean, default is TRUE, whether build the data.frame for
 #' `geom_bar` of `ggplot2`.
@@ -96,7 +96,7 @@ ggbartax.default <- function(data,
 mappingtaxda <- function(data, topn=30, 
 						 count=FALSE,
 						 sampleda=NULL, 
-						 factorlevels=NULL,
+						 factorLevels=NULL,
 						 plotda=TRUE){
 	tmpfeature <- colnames(data)[sapply(data,is.numeric)]
 	tmpfactor <- colnames(data)[!sapply(data,is.numeric)]
@@ -151,8 +151,8 @@ mappingtaxda <- function(data, topn=30,
 		colnames(dat)[1] <- "sample"
 		
 	}
-	if (!is.null(factorlevels)){
-		dat <- setfactorlevels(dat, factorlevels)	
+	if (!is.null(factorLevels)){
+		dat <- setfactorlevels(dat, factorLevels)	
 	}
 	return(dat)
 }
