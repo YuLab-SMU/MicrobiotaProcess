@@ -1,11 +1,17 @@
-#' @name phyloseq-class
-#' @rdname phyloseq-class
-#' @importClassesFrom phyloseq phyloseq
-setOldClass("phyloseq")
+# #' @name phyloseq-class
+# #' @rdname phyloseq-class
+# #' @importClassesFrom phyloseq phyloseq
+#setOldClass("phyloseq")
 
-#' @importClassesFrom stats prcomp
+#' @title prcomp class
+#' @seealso \code{\link[stats]{prcomp}}
+#' @name prcomp-class
+#' @rdname prcomp-class
+#' @keywords internal
+#prcomp <- structure(list(), class = "prcomp")
 setOldClass("prcomp")
 
+#' @title pcasample class
 #' @name pcasample-class
 #' @rdname pcasample-class
 #' @exportClass pcasample
