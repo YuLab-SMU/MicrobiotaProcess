@@ -5,7 +5,7 @@
 \title{generate the mapping data}
 \usage{
 mappingtaxda(data, topn = 30, count = FALSE, sampleda = NULL,
-  factorlevels = NULL, plotda = TRUE)
+  factorLevels = NULL, plotda = TRUE)
 }
 \arguments{
 \item{data}{data.frame, (nrow sample * ncol feature (factor))}
@@ -17,7 +17,7 @@ mappingtaxda(data, topn = 30, count = FALSE, sampleda = NULL,
 \item{sampleda}{data.frame, (nrow sample * ncol factor) the 
 sample information, if the data doesn't contain the information.}
 
-\item{factorlevels}{list, the levels of the factors, default is NULL,
+\item{factorLevels}{list, the levels of the factors, default is NULL,
 if you want to order the levels of factor, you can set this.}
 
 \item{plotda}{boolean, default is TRUE, whether build the data.frame for
