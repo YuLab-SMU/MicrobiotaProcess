@@ -2,7 +2,7 @@
 #' 
 #' @description
 #' caculate the alpha index (Obseve,Chao1,Shannon,Simpson) of sample
-#' with \code{\link[vegan]}
+#' with \code{\link[vegan]{diversity}}
 #' @param data data.frame, (nrow sample * ncol taxonomy(feature))
 #' @param mindepth numeric, Subsample size for rarefying community.
 #' @author ShuangbinXu
