@@ -13,7 +13,7 @@
 #' @param count, whether show the relative abundance.
 #' @param sampleda data.frame, (nrow sample * ncol factor), the sample 
 #' information, if the data doesn't contain the information.
-#' @param factorlevels list, the levels of the factors, default is NULL,
+#' @param factorLevels list, the levels of the factors, default is NULL,
 #' if you want to order the levels of factor, you can set this.
 #' @param settheme boolean, default is TRUE, or you can set FALSE, then
 #' set the theme by youself.
@@ -33,7 +33,7 @@ ggbartax.default <- function(data,
 				  topn=30,
 				  count=FALSE,
 				  sampleda=NULL,
-				  factorlevels=NULL,
+				  factorLevels=NULL,
 				  settheme=TRUE,
 				  facetNames=NULL,
 				  setColors=TRUE,
@@ -44,7 +44,7 @@ ggbartax.default <- function(data,
 							 topn=topn, 
 							 count=count,
 							 sampleda=sampleda, 
-							 factorlevels=factorlevels,
+							 factorLevels=factorLevels,
 							 plotda=TRUE)
 	}else{
 		mapping <- mapping
