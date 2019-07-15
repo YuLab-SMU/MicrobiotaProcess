@@ -171,6 +171,7 @@ mappingtaxda <- function(data, topn=30,
 
 
 #' @importFrom ggplot2 theme
+#' @keywords internal
 taxbartheme <- function(){
 	theme(axis.text.x = element_text(angle = -45, hjust = 0, size=7),
 		  panel.grid = element_blank(),
@@ -195,7 +196,7 @@ taxbartheme <- function(){
 #' @importFrom ggplot2 guides
 #' @export
 
-taxbarguildes <- function(keywidth=0.6, keyheight=0.6, ncol=5, ...){
+taxbarguildes <- function(keywidth=0.4, keyheight=0.4, ncol=5, ...){
 	guides(fill=guide_legend(keywidth = keywidth, 
 							 keyheight = keyheight,
 							 ncol=ncol),...)
