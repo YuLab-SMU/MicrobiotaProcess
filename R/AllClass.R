@@ -1,10 +1,11 @@
 #' @name phyloseq-class
 #' @rdname phyloseq-class
 #' @importClassesFrom phyloseq phyloseq
-#setOldClass("phyloseq")
+setOldClass("phyloseq")
 
 #' @importClassesFrom stats prcomp
 setOldClass("prcomp")
+
 #' @name pcasample-class
 #' @rdname pcasample-class
 #' @exportClass pcasample
@@ -14,4 +15,5 @@ setClass("pcasample",
 					#varcontrib="VarContrib",
 					sampleda="data.frame"),
 		 prototype=prototype(pca=NULL, sampleda=NULL))
+
 
