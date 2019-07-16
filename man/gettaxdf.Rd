@@ -2,15 +2,36 @@
 % Please edit documentation in R/AllMethods.R
 \name{gettaxdf}
 \alias{gettaxdf}
-\title{gettaxdf}
+\alias{gettaxdf.phyloseq}
+\alias{gettaxdf.default}
+\title{get the data of specified taxonomy}
 \usage{
 gettaxdf(obj, ...)
+
+\method{gettaxdf}{phyloseq}(obj, taxlevel = "Phylum", ...)
+
+\method{gettaxdf}{default}(otuda, taxda, taxlevel, sampleda = NULL, ...)
 }
 \arguments{
-\item{obj}{the R object}
+\item{obj}{phyloseq class or data.frame (default), the shape of data.frame should be
+row sample * column feature.}
 
-\item{...}{additional parameters.}
+\item{...}{additional parameters, see also \code{\link[MicrobiotaProcess]{CountOrRatios}}}
+
+\item{taxlevel}{character, the column names of taxda that you want to get.
+when the input is phyloseq class, default is "Phylum", and options is "Kingdom", 
+"Phylum", "Class", "Order", "Family", "Genus", "Species".}
+
+\item{taxda}{data.frame, the classifies of feature contained in obj.}
+
+\item{sampleda}{data.frame, the sample information.}
+}
+\value{
+phyloseq class contained tax data.frame and sample information.
 }
 \description{
-gettaxdf
+get the data of specified taxonomy
+}
+\author{
+ShuangbinXu
 }

@@ -4,7 +4,7 @@
 \alias{stat_rare}
 \title{mapping data of ggrarecurve}
 \usage{
-stat_rare(data, chunks = 400, sampleda, factorlevels, plotda = TRUE)
+stat_rare(data, chunks = 400, sampleda, factorLevels, plotda = TRUE)
 }
 \arguments{
 \item{data}{data.frame,(nrow sample * ncol taxonomy 
@@ -15,7 +15,7 @@ default is 400.}
 
 \item{sampleda}{data.frame, (nrow sample * ncol factor)}
 
-\item{factorlevels}{list, the levels of the factors, default is NULL,
+\item{factorLevels}{list, the levels of the factors, default is NULL,
 if you want to order the levels of factor, you can set this.}
 
 \item{plotda}{boolean, default is TRUE, whether build the data.frame for

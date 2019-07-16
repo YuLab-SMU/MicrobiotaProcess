@@ -2,15 +2,29 @@
 % Please edit documentation in R/getpca.R
 \name{getpca}
 \alias{getpca}
-\title{getpca}
+\alias{getpca.default}
+\alias{getpca.phyloseq}
+\title{Performs a principal components analysis}
 \usage{
 getpca(obj, ...)
+
+\method{getpca}{default}(data, sampleda = NULL, method = "log", ...)
+
+\method{getpca}{phyloseq}(obj, ...)
 }
 \arguments{
-\item{obj}{the phyloseq object}
+\item{obj}{data.frame or phyloseq class,shape of data.frame is nrow sample * ncol feature}
 
-\item{...}{additional parameters}
+\item{...}{additional parameters, see\code{\link[stat]{prcomp}}.}
+
+\item{sampleda}{data.frame, nrow sample * ncol factors.}
+
+\item{method}{character, the standardization methods for
+community ecologists. see \code{\link[vegan]{decostand}}.}
+}
+\value{
+pcasample class, contained prcomp class and sample information.
 }
 \description{
-getpca
+Performs a principal components analysis
 }
