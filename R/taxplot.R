@@ -1,30 +1,7 @@
-#' @title taxonomy barplot 
-#'
-#' @description
-#' taxonomy barplot
-#' @param data data.frame, (nrow sample * ncol feature (factor)) or 
-#' the data.frame for geom_bar.
-#' @param mapping set of aesthetic mapping of ggplot2, default is NULL,
-#' if the data is the data.frame for geom_bar, the mapping should be set.
-#' @param position, default is `stack`.
-#' @param stat, default is `identity`.
-#' @param width, the width of bar, default is 0.7.
-#' @param topn, the top number of abundance taxonomy(feature).
-#' @param count, whether show the relative abundance.
-#' @param sampleda data.frame, (nrow sample * ncol factor), the sample 
-#' information, if the data doesn't contain the information.
-#' @param factorLevels list, the levels of the factors, default is NULL,
-#' if you want to order the levels of factor, you can set this.
-#' @param settheme boolean, default is TRUE, or you can set FALSE, then
-#' set the theme by youself.
-#' @param facetNames character, default is NULL.
-#' @param setColors boolean, default is TRUE, or you can set FALSE, then
-#' set colors by `scale_fill_manual` of `ggplot2`.
-#' @param ..., additional parameter.
-#' @author ShuangbinXu
+#' @method ggbartax default
+#' @rdname ggbartax
 #' @importFrom ggplot2 ggplot aes_ geom_bar
 #' @export
-
 ggbartax.default <- function(data,
 				  mapping=NULL,
 				  position = "stack",

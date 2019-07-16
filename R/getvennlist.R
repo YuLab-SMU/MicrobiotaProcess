@@ -1,18 +1,7 @@
-#' @title generate a vennlist for VennDiagram
-#'
-#' @description
-#' generate a vennlist as the input of \code{[VennDiagram]}.
-#'
-#' @param da dataframe; a dataframe contained one character column and the others are numeric.
-#' all columns should be numeric if sampleinfo isn't NULL.
-#' @param sampleinfo dataframe; a sample information, default is NULL.
-#' @param factorNames character, a column name of sampleinfo,
-#' when sampleinfo isn't NULL, factorNames shouldn't be NULL, default is NULL.
-#' @param ...; Additional arguments passed to \code{\link[MicrobitaProcess]{CountOrRatios}}. 
-#'
+#' @method getvennlist default
+#' @rdname getvennlist
 #' @author Shuangbin Xu
 #' @export
-
 getvennlist.default <- function(da,
 			   sampleinfo=NULL,
 			   factorNames=NULL,

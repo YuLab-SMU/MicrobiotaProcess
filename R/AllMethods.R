@@ -1,18 +1,34 @@
-#' @title ggbartax
-#'
-#' @param obj data.frame or phyloseq.
-#' @param ... additional parameters
+#' @title taxonomy barplot
+#' @param obj data.frame or phyloseq class. data.frame should be 
+#' (nrow sample * ncol feature (factor)) or the data.frame for geom_bar.
+#' @param mapping set of aesthetic mapping of ggplot2, default is NULL,
+#' if the data is the data.frame for geom_bar, the mapping should be set.
+#' @param position, default is `stack`. 
+#' @param stat, default is `identity`.
+#' @param width, the width of bar, default is 0.7.
+#' @param topn, the top number of abundance taxonomy(feature).
+#' @param count, whether show the relative abundance.  
+#' @param sampleda data.frame, (nrow sample * ncol factor), the sample 
+#' information, if the data doesn't contain the information.
+#' @param factorLevels list, the levels of the factors, default is NULL,
+#' if you want to order the levels of factor, you can set this.
+#' @param settheme logical, default is TRUE, or you can set FALSE, then
+#' set the theme by youself.
+#' @param facetNames character, default is NULL.
+#' @param setColors logical, default is TRUE, or you can set FALSE, then 
+#' set colors by `scale_fill_manual` of `ggplot2`.
+#' @param ... additional parameters, see \code{\link[ggplot2]{ggplot}}
+#' @rdname ggbartax
 #' @return barplot of tax
+#' @author ShuangbinXu
 #' @export
 ggbartax <- function(obj,...){
 	UseMethod("ggbartax")
 }
 
-#' @title ggbartax
-#' @param obj the phyloseq object.
-#' @param sampleda data.frame, nrow sample * ncol factor. 
-#' @param ... additional parameters.
+#' @method ggbartax phyloseq
 #' @importFrom phyloseq otu_table taxa_are_rows
+#' @rdname ggbartax
 #' @export
 ggbartax.phyloseq <- function(obj, ...){
 	if (is.null(obj@otu_table)){
@@ -29,20 +45,26 @@ ggbartax.phyloseq <- function(obj, ...){
 	return(p)	
 }
 
-#' @title gettaxdf
-#' @param obj the R object
-#' @param ... additional parameters.
+#' @title get the data of specified taxonomy
+#' @param obj phyloseq class or data.frame (default), the shape of data.frame should be
+#' row sample * column feature.
+#' @param taxda data.frame, the classifies of feature contained in obj.
+#' @param taxlevel character, the column names of taxda that you want to get.
+#' when the input is phyloseq class, default is "Phylum", and options is "Kingdom", 
+#' "Phylum", "Class", "Order", "Family", "Genus", "Species".
+#' @param sampleda data.frame, the sample information.
+#' @param ... additional parameters, see also \code{\link[MicrobiotaProcess]{CountOrRatios}}
+#' @return phyloseq class contained tax data.frame and sample information.
+#' @author ShuangbinXu
+#' @rdname gettaxdf
 #' @export
 gettaxdf <- function(obj,...){
 	UseMethod("gettaxdf")
 }
 
-#' @title gettaxdf
-#' @param obj the phyloseq object.
-#' @param taxlevel character, default is "Phylum", options is "Kingdom",
-#' "Phylum", "Class", "Order", "Family", "Genus", "Species".
-#' @param ...  additional parameters.
+#' @method gettaxdf phyloseq
 #' @importFrom phyloseq otu_table tax_table taxa_are_rows
+#' @rdname gettaxdf
 #' @export
 gettaxdf.phyloseq <- function(obj, taxlevel="Phylum", ...){
 	if (is.null(obj@tax_table)){
@@ -57,21 +79,12 @@ gettaxdf.phyloseq <- function(obj, taxlevel="Phylum", ...){
 							  taxda=taxdf, 
 							  taxlevel=taxlevel,
 							  sampleda=sampleda,...)
-	#tmptax <- taxdf[,match(taxlevel,colnames(taxdf)), drop=FALSE]
-	#taxdf <- otu_table(CountOrRatios(otuda, tmptax, rownamekeep=FALSE, ...), 
-	#				   taxa_are_rows=TRUE)
-	#taxdf <- new("phyloseq", 
-	#			 otu_table=taxdf,
-	#			 sam_data=sampleda)
 	return(taxdf)
 }
 
-#' @title gettaxdf
-#' @param otuda data.frame, otu table.
-#' @param taxda data.frame, the dataframe of taxonomy.
-#' @param taxlevel character, the column names of taxda that you want to get.
-#' @param sampleda data.frame, the sample information.
+#' @method gettaxdf default
 #' @importFrom phyloseq otu_table tax_table
+#' @rdname gettaxdf
 #' @export 
 gettaxdf.default <- function(otuda, taxda, 
 							 taxlevel,
@@ -95,18 +108,33 @@ gettaxdf.default <- function(otuda, taxda,
 
 }
 
-
-#' @title ggrarecurve
-#' @param obj the phyloseq object.
-#' @param ... additional parameters.
+#' @title Rarefaction alpha index
+#' @param obj data.frame or phyloseq class, shape of data.frame (nrow sample * ncol feature (factor)) or
+#' the data.frame for stat_smooth.
+#' @param nrows, the nrow of facet.
+#' @param mapping, set of aesthetic mapping of ggplot2, default is NULL,
+#' if the data is the data.frame for stat_smooth, the mapping should be set. 
+#' @param linesize integer, default is 0.5. 
+#' @param chunks integer, the number of subsample in a sample,
+#'  default is 400.
+#' @param sampleda, data.frame, (nrow sample * ncol factor)
+#' @param factorNames character, default is missing.
+#' @param factorLevels list, the levels of the factors, default is NULL,
+#' if you want to order the levels of factor, you can set this.
+#' @param indexNames vector character, default is "Observe".
+#' @param se logical, default is FALSE.
+#' @param method character, default is lm. 
+#' @param formula formula, default is `y ~ log(x)`
+#' @param ... additional parameters, see \code{\link{ggplot2}{ggplot}}.
+#' @author ShuangbinXu
+#' @rdname ggrarecurve
 #' @export
 ggrarecurve <- function(obj, ...){
 	UseMethod("ggrarecurve")
 }
 
-#' @title ggrarecurve
-#' @param obj the phyloseq object.
-#' @param ... additional parameters.
+#' @method ggrarecurve phyloseq
+#' @rdname ggrarecurve
 #' @export
 ggrarecurve.phyloseq <- function(obj, ...){
 	otuda <- checkotu(obj)
@@ -116,18 +144,24 @@ ggrarecurve.phyloseq <- function(obj, ...){
 }
 
 
-#' @title getvennlist
-#' @param obj the phyloseq object.
-#' @param ... additional parameters.
+#' @title generate a vennlist for VennDiagram 
+#' @param obj data.frame or phyloseq class, a dataframe contained one character column and the others are numeric.
+#' all columns should be numeric if sampleinfo isn't NULL.
+#' @param sampleinfo dataframe; a sample information, default is NULL.
+#' @param  factorNames character, a column name of sampleinfo, 
+#' when sampleinfo isn't NULL, factorNames shouldn't be NULL, default is NULL. 
+#' @param ... additional parameters, see \code{\link[MicrobitaProcess]{CountOrRatios}}.
+#' @return return a list for VennDiagram.
+#' @author ShuangbinXu
+#' @rdname getvennlist
 #' @export 
 getvennlist <- function(obj,...){
 	UseMethod("getvennlist")
 }
 
-#' @title getvennlist
-#' @param obj the phyloseq object.
-#' @param factorNamesIndex integer, the index of column names of sample_data.
-#' @param ... additional parameters.
+#' @title generate a vennlist for VennDiagram 
+#' @method getvennlist phyloseq
+#' @rdname getvennlist
 #' @export 
 getvennlist.phyloseq <- function(obj, factorNames, ...){
 	otuda <- checkotu(obj)

@@ -1,26 +1,7 @@
-#' @title Rarefaction alpha index
-#'
-#' @description
-#' building curve of alpha index in Rarefied samples.
-#' @param data data.frame,(nrow sample * ncol feature (factor)) or
-#' the data.frame for stat_smooth.
-#' @param nrows, the nrow of facet.
-#' @param mapping, set of aesthetic mapping of ggplot2, default is NULL,
-#' if the data is the data.frame for stat_smooth, the mapping should be set.
-#' @param linesize integer, default is 0.5.
-#' @param chunks integer, the number of subsample in a sample, 
-#'  default is 400.
-#' @param sampleda, data.frame, (nrow sample * ncol factor)
-#' @param factorNames character, default is missing. 
-#' @param factorlevels list, the levels of the factors, default is NULL,
-#' if you want to order the levels of factor, you can set this.
-#' @param indexNames vector character, default is "Observe".
-#' @param se boolean, default is FALSE.
-#' @param method character, default is lm.
-#' @param formula formula, default is `y ~ log(x)`
-#' @author ShuangbinXu
+#' @method ggrarecurve default
 #' @importFrom ggplot2 ggplot aes_ stat_smooth facet_wrap
 #' @importFrom dplyr filter
+#' @rdname ggrarecurve
 #' @export
 ggrarecurve.default <- function(data,
 			   nrows,
@@ -29,7 +10,7 @@ ggrarecurve.default <- function(data,
 			   chunks=400,
 			   sampleda,
 			   factorNames,
-			   factorlevels,
+			   factorLevels,
 			   indexNames="Observe",
 			   se=FALSE,
 			   method="lm",			   
@@ -39,7 +20,7 @@ ggrarecurve.default <- function(data,
 		data <- stat_rare(data,
 						  chunks=chunks,
 						  sampleda=sampleda,
-						  factorlevels=factorlevels,
+						  factorLevels=factorLevels,
 						  plotda=TRUE)
 		mapping <- aes_(~readsNums, ~value, color=~sample)
 		if (!missing(factorNames)){
@@ -78,7 +59,7 @@ ggrarecurve.default <- function(data,
 #' @param chunks integer, the number of subsample in a sample,
 #' default is 400.
 #' @param sampleda data.frame, (nrow sample * ncol factor)
-#' @param factorlevels list, the levels of the factors, default is NULL,
+#' @param factorLevels list, the levels of the factors, default is NULL,
 #' if you want to order the levels of factor, you can set this.
 #' @param plotda boolean, default is TRUE, whether build the data.frame for
 #' `geom_bar` of `ggplot2`.
@@ -90,7 +71,7 @@ ggrarecurve.default <- function(data,
 stat_rare <- function(data, 
 					  chunks=400, 
 					  sampleda,
-					  factorlevels,
+					  factorLevels,
 					  plotda=TRUE){
 	tmpfeature <- colnames(data)[sapply(data,is.numeric)]
    	tmpfactor <- colnames(data)[!sapply(data,is.numeric)]
@@ -126,8 +107,8 @@ stat_rare <- function(data,
 			out <- merge(out, tmpsample)
 		}
 	}
-	if (!missing(factorlevels)){
-		out <- setfactorlevels(out, factorlevels)
+	if (!missing(factorLevels)){
+		out <- setfactorlevels(out, factorLevels)
 	}
 	return(out)
 }
