@@ -95,11 +95,11 @@ ggordpoint.default <-  function(obj,
 						   fontfamily="sans",
 						   textlinesize=0.02,
 						   ...){
-	plotcoord <- getcoord(obj)[,pc]
-	ev <- obj$sdev^2
-	vp <- ev*100/sum(ev)
-	xlab_text <- paste("PC",pc[1], "(", round(vp[pc[1]], 2), "%)")
-	ylab_text <- paste("PC",pc[2], "(", round(vp[pc[2]], 2), "%)")
+	plotcoordclass <- getcoord(obj,pc)
+	plotcoord <- plotcoordclass@coord
+	xlab_text <- plotcoordclass@xlab	
+	ylab_text <- plotcoordclass@ylab
+	title_text <- plotcoordclass@title
 	if(is.null(mapping)){
 		mapping <- aes_(x=as.formula(paste0("~",colnames(plotcoord)[1])), 
 						y=as.formula(paste0("~", colnames(plotcoord)[2])))
@@ -120,8 +120,9 @@ ggordpoint.default <-  function(obj,
 		 geom_point(data=plotcoord, 
 					mapping=mapping, 
 					size=poinsize) + 
-		 xlab(xlab_text) + 
-		 ylab(ylab_text)
+		 labs(x=xlab_text,
+			  y=ylab_text,
+			  title=title_text)
 	if (biplot){
 		varcontrib <- getvarct(obj)
 		varcontr <- varcontrib$VarContribution[,pc]
@@ -156,7 +157,8 @@ ggordpoint.default <-  function(obj,
 			 geom_vline(xintercept = 0,linetype='dashed',size=0.3,alpha=0.7)+
 			 geom_hline(yintercept = 0,linetype='dashed',size=0.3,alpha=0.7)+
 			 theme_bw() +
-			 theme(panel.grid=element_blank())
+			 theme(panel.grid=element_blank(),
+				   plot.title = element_text(face="bold",lineheight=25,hjust=0.5))
 	}
 	return(p)	
 }
@@ -174,9 +176,10 @@ ggordpoint.pcasample <- function(obj,...){
 
 #' @title get ordination coordinates.
 #' @param obj prcomp object
+#' @param pc integer vector, the component index.
 #' @rdname getcoord
 #' @export
-getcoord <- function(obj){
+getcoord <- function(obj, pc){
 	UseMethod("getcoord")
 }
 
@@ -184,10 +187,23 @@ getcoord <- function(obj){
 #' @method getcoord prcomp
 #' @rdname getcoord
 #' @export
-getcoord.prcomp <- function(obj){
-	coord <- obj$x
-	return(coord)
+getcoord.prcomp <- function(obj, pc){
+	coord <- obj$x[,pc]
+	ev <- obj$sdev^2
+	vp <- ev*100/sum(ev)
+	tmpvp1 <- round(vp[pc[1]],2)
+	tmpvp2 <- round(vp[pc[2]],2)
+	xlab_text <- paste0("PC",pc[1], "(", tmpvp1, "%)")
+	ylab_text <- paste0("PC",pc[2], "(", tmpvp2, "%)")
+	title_text <- paste0("PCA - ","PC",pc[1], " VS PC",pc[2])
+	ordplotclass <- new("ordplotClass",
+						coord=coord,
+						xlab=xlab_text,
+						ylab=ylab_text,
+						title=title_text)
+	return(ordplotclass)
 }
+
 
 #' @importFrom ggplot2 aes_
 #' @keywords internal
