@@ -22,4 +22,16 @@ setClass("pcasample",
 					sampleda="data.frame"),
 		 prototype=prototype(pca=NULL, sampleda=NULL))
 
-
+#' @title ordplotClass class
+#' @name ordplotClass-class
+#' @rdname ordplotClass-class
+#' @exportClass ordplotClass
+setClass("ordplotClass",
+		 representation=representation(coord="matrix",
+									   xlab="character",
+									   ylab="character",
+									   title="character"),
+		 prototype=prototype(coord=NULL, 
+							 xlab=NULL, 
+							 ylab=NULL, 
+							 title=NULL))
