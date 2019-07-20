@@ -12,7 +12,7 @@
 setOldClass("prcomp")
 
 #' @keywords internal
-setClassUnion("prcompOrNull", c("prcomp", "NULL"))
+setClassUnion("prcompOrNull", c("prcomp", "pcoa", "NULL"))
 
 #' @keywords internal
 setClassUnion("dataframeOrNull", c("data.frame", "NULL"))
