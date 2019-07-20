@@ -3,11 +3,11 @@
 #' (nrow sample * ncol feature (factor)) or the data.frame for geom_bar.
 #' @param mapping set of aesthetic mapping of ggplot2, default is NULL,
 #' if the data is the data.frame for geom_bar, the mapping should be set.
-#' @param position, default is `stack`. 
-#' @param stat, default is `identity`.
-#' @param width, the width of bar, default is 0.7.
-#' @param topn, the top number of abundance taxonomy(feature).
-#' @param count, whether show the relative abundance.  
+#' @param position character, default is `stack`. 
+#' @param stat character, default is `identity`.
+#' @param width numeric, the width of bar, default is 0.7.
+#' @param topn integer, the top number of abundance taxonomy(feature).
+#' @param count logical, whether show the relative abundance.  
 #' @param sampleda data.frame, (nrow sample * ncol factor), the sample 
 #' information, if the data doesn't contain the information.
 #' @param factorLevels list, the levels of the factors, default is NULL,
