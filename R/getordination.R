@@ -14,7 +14,7 @@ getdist <- function(obj,...){
 #' @rdname getdist
 #' @importFrom vegan decostand
 #' @importFrom phyloseq otu_table 
-
+#' @export
 getdist.default <- function(data, 
 							distmethod="euclidean",
 						    taxa_are_rows=FALSE,	
@@ -44,7 +44,7 @@ getdist.default <- function(data,
 }
 
 #' @method getdist phyloseq
-#' @importFrom phylosq distance taxa_are_rows
+#' @importFrom phyloseq distance taxa_are_rows
 #' @seealso \code{\link[phyloseq]{distance}}
 #' @rdname getdist
 #' @export
@@ -63,7 +63,7 @@ getdist.phyloseq <- function(obj, distmethod="euclidean", type="sample", method=
 	return(disres)
 }
 
-#' @method getpcoa
+#' @title performs principal coordinate analysis (PCoA)
 #' @rdname getpcoa
 #' @export
 getpcoa <- function(obj, ...){
@@ -128,7 +128,5 @@ getcoord.pcoa <- function(obj, pc){
 	coord <- obj$vector[,pc]
 	
 }
-
-
 
 
