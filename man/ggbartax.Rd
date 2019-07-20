@@ -24,15 +24,15 @@ ggbartax(obj, ...)
 \item{mapping}{set of aesthetic mapping of ggplot2, default is NULL,
 if the data is the data.frame for geom_bar, the mapping should be set.}
 
-\item{position, }{default is `stack`.}
+\item{position}{character, default is `stack`.}
 
-\item{stat, }{default is `identity`.}
+\item{stat}{character, default is `identity`.}
 
-\item{width, }{the width of bar, default is 0.7.}
+\item{width}{numeric, the width of bar, default is 0.7.}
 
-\item{topn, }{the top number of abundance taxonomy(feature).}
+\item{topn}{integer, the top number of abundance taxonomy(feature).}
 
-\item{count, }{whether show the relative abundance.}
+\item{count}{logical, whether show the relative abundance.}
 
 \item{sampleda}{data.frame, (nrow sample * ncol factor), the sample 
 information, if the data doesn't contain the information.}
