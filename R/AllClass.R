@@ -11,26 +11,38 @@
 #prcomp <- structure(list(), class = "prcomp")
 setOldClass("prcomp")
 
+#' @keywords internal
+setClassUnion("prcompOrNull", c("prcomp", "NULL"))
+
+#' @keywords internal
+setClassUnion("dataframeOrNull", c("data.frame", "NULL"))
+
 #' @title pcasample class
 #' @name pcasample-class
 #' @rdname pcasample-class
 #' @exportClass pcasample
 setClass("pcasample",
 		 representation=representation(
-					pca="prcomp",
+					pca="prcompOrNull",
 					#varcontrib="VarContrib",
-					sampleda="data.frame"),
+					sampleda="dataframeOrNull"),
 		 prototype=prototype(pca=NULL, sampleda=NULL))
+
+#' @keywords internal
+setClassUnion("matrixOrNull", c("matrix", "NULL"))
+
+#' @keywords internal
+setClassUnion("characterOrNull", c("character", "NULL"))
 
 #' @title ordplotClass class
 #' @name ordplotClass-class
 #' @rdname ordplotClass-class
 #' @exportClass ordplotClass
 setClass("ordplotClass",
-		 representation=representation(coord="matrix",
-									   xlab="character",
-									   ylab="character",
-									   title="character"),
+		 representation=representation(coord="matrixOrNull",
+									   xlab="characterOrNull",
+									   ylab="characterOrNull",
+									   title="characterOrNull"),
 		 prototype=prototype(coord=NULL, 
 							 xlab=NULL, 
 							 ylab=NULL, 
