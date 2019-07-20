@@ -8,8 +8,14 @@
 #' @name prcomp-class
 #' @rdname prcomp-class
 #' @keywords internal
-#prcomp <- structure(list(), class = "prcomp")
 setOldClass("prcomp")
+
+#' @title pcoa class
+#' @seealso \code{\link[ape]{pcoa}}
+#' @name pcoa-class
+#' @rdname pcoa-class
+#' @keywords internal
+setOldClass("pcoa")
 
 #' @keywords internal
 setClassUnion("prcompOrNull", c("prcomp", "pcoa", "NULL"))
