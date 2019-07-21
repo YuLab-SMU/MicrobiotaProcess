@@ -126,10 +126,12 @@ ggordpoint.default <-  function(obj,
 	if (biplot){
 		varcontrib <- getvarct(obj)
 		varcontr <- varcontrib$VarContribution[,pc]
-		varlist <- names(sort(rowSums(varcontr), decreasing=T))[1:topn]
+		tmpvars <- names(sort(rowSums(varcontr), decreasing=T))
+		varlist <- getvarlist(namevector=tmpvars, n=topn)
 		biplotcoord <- varcontrib$VarCoordinates[match(varlist, 
 												rownames(varcontrib$VarCoordinates)),
 												pc, drop=FALSE]
+		biplotcoord <- data.frame(biplotcoord, check.names=FALSE)
 		biplotmapping <- aes_(x=0, 
 							  y=0, 
 							  xend=as.formula(paste0("~",colnames(biplotcoord)[1])), 
@@ -161,6 +163,29 @@ ggordpoint.default <-  function(obj,
 				   plot.title = element_text(face="bold",lineheight=25,hjust=0.5))
 	}
 	return(p)	
+}
+
+#' @keywords internal
+getvarlist <- function(namevector, n){
+	if (inherits(n, "integer") || inherits(n, "numeric")){
+		if (length(n)==2){
+			varnames <- namevector[n[1]:n[2]]
+		}
+		if (length(n)> 2){
+			varnames <- namevector[n]
+		}
+		if (length(n)==1){
+			varnames <- namevector[1:n]
+		}
+	}
+	if (inherits(n, "character")){
+		if (length(n)>1){
+			varnames <- n[match(n, namevector)]
+		}else{
+			stop("the n should be a character vector, integer  or integer vector")
+		}
+	}
+	return(varnames)
 }
 
 #' @method ggordpoint pcasample
