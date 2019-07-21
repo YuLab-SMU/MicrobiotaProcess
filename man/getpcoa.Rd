@@ -11,9 +11,10 @@ getpcoa(obj, ...)
 
 \method{getpca}{default}(data, distmethod = "euclidean",
   taxa_are_rows = FALSE, sampleda = NULL, tree = NULL,
-  type = "sample", ...)
+  type = "sample", method = "hellinger", ...)
 
-\method{getpcoa}{dist}(obj, distmethod, sampleda = NULL, ...)
+\method{getpcoa}{dist}(obj, distmethod, data = NULL, sampleda = NULL,
+  method = "hellinger", ...)
 
 \method{getpcoa}{phyloseq}(obj, distmethod = "euclidean", ...)
 }
