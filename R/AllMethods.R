@@ -71,7 +71,7 @@ gettaxdf.phyloseq <- function(obj, taxlevel="Phylum", ...){
 		stop("The tax table is empty!")
 	}else{
 		taxdf <- tax_table(obj)
-		taxdf[is.na(taxdf)] <- "Unknown"
+		taxdf <- fillNAtax(taxdf)
 	}
 	otuda <- checkotu(obj)
 	sampleda <- getsample(obj)
