@@ -65,3 +65,49 @@ getsample <- function(obj){
 	}
 	return(sampleda)
 }
+
+#' @keywords internal
+taxlevel <- c("k", "p", "c", "o", "f", "g", "s")
+
+#' @importFrom zoo na.locf
+#' @keywords internal
+filltaxname <- function(taxdf){
+	tmprownames <- rownames(taxdf)
+	indexmark <- apply(taxdf, 2, function(x){nchar(x, keepNA = TRUE)})==3
+	taxdf[indexmark] <- NA
+	indextmp <- apply(is.na(taxdf), 1, which) 
+	taxdf <- apply(taxdf, 1, na.locf)
+	taxdf <- lapply(seq_len(ncol(taxdf)), function(i) taxdf[,i])
+	newtaxname <- function(x, y){
+		y <- as.vector(y)
+		x[y] <- paste(taxlevel[y], x[y], sep="__un_")
+		x
+	}
+	taxdf <- data.frame(t(mapply(newtaxname, taxdf, indextmp)), 
+						stringsAsFactors=FALSE)
+	rownames(taxdf) <- tmprownames
+	return(taxdf)
+}
+
+#' @keywords internal
+addtaxlevel <- function(taxdf){
+	#taxlevel <- c("k", "p", "c", "o", "f", "g", "s")
+	paste(taxlevel, taxdf, sep="__")
+}
+
+#' @keywords internal
+fillNAtax <- function(taxdf){
+	if (!grepl(taxdf[1,1], "k_")){
+		tmprownames <- rownames(taxdf)
+		tmpcolnames <- colnames(taxdf)
+		taxdf <- t(apply(taxdf, 1, as.character))
+		taxdf[is.na(taxdf)] <- ""
+		taxdf <- data.frame(t(apply(taxdf, 1, addtaxlevel)),
+							stringsAsFactors=FALSE)
+		rownames(taxdf) <- tmprownames
+		colnames(taxdf) <- tmpcolnames
+	}
+	taxdf <- filltaxname(taxdf)
+	return(taxdf)
+}
+
