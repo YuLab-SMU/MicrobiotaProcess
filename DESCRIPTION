@@ -22,7 +22,8 @@ Imports:
   stringr,
   vegan,
   rentrez,
-  reshape
+  reshape,
+  zoo
 License: GPL (>= 2.0) 
 Encoding: UTF-8
 LazyData: false
