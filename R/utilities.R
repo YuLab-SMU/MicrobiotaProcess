@@ -75,7 +75,11 @@ filltaxname <- function(taxdf){
 	tmprownames <- rownames(taxdf)
 	indexmark <- apply(taxdf, 2, function(x){nchar(x, keepNA = TRUE)})==3
 	taxdf[indexmark] <- NA
-	indextmp <- apply(is.na(taxdf), 1, which) 
+	indextmp <- apply(is.na(taxdf), 1, which)
+	if(length(indextmp)==0){
+		return(taxdf)
+		break
+	}
 	taxdf <- apply(taxdf, 1, na.locf)
 	taxdf <- lapply(seq_len(ncol(taxdf)), function(i) taxdf[,i])
 	newtaxname <- function(x, y){

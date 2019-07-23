@@ -96,7 +96,8 @@ gettaxdf.default <- function(otuda, taxda,
 	if(!is.null(sampleda) && !inherits(sampleda, "sample_data")){
 		sampleda <- sample_data(sampleda)
 	}
-	tmptax <- taxdf[,match(taxlevel, colnames(taxdf)), drop=FALSE]
+	taxda <- fillNAtax(taxda)
+	tmptax <- taxda[,match(taxlevel, colnames(taxda)), drop=FALSE]
 	taxdf <- otu_table(CountOrRatios(otuda, 
 									 tmptax, 
 									 rownamekeep=FALSE,...), 
