@@ -78,7 +78,6 @@ filltaxname <- function(taxdf){
 	indextmp <- apply(is.na(taxdf), 1, which)
 	if(length(indextmp)==0){
 		return(taxdf)
-		break
 	}
 	taxdf <- apply(taxdf, 1, na.locf)
 	taxdf <- lapply(seq_len(ncol(taxdf)), function(i) taxdf[,i])
@@ -101,7 +100,7 @@ addtaxlevel <- function(taxdf){
 
 #' @keywords internal
 fillNAtax <- function(taxdf){
-	if (!grepl(taxdf[1,1], "k_")){
+	if (!grepl("^k__", taxdf[1,1])){
 		tmprownames <- rownames(taxdf)
 		tmpcolnames <- colnames(taxdf)
 		taxdf <- t(apply(taxdf, 1, as.character))
