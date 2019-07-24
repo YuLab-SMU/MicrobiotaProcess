@@ -29,8 +29,6 @@ return a list for VennDiagram.
 }
 \description{
 generate a vennlist for VennDiagram
-
-generate a vennlist for VennDiagram
 }
 \author{
 ShuangbinXu
