@@ -5,7 +5,6 @@
 #' community ecologists. see \code{\link[vegan]{decostand}}.
 #' @param ... additional parameters, see\code{\link[stat]{prcomp}}.
 #' @return pcasample class, contained prcomp class and sample information.
-#' @rdname getpca
 #' @export
 getpca <- function(obj,...){
 	UseMethod("getpca")
@@ -43,7 +42,6 @@ getpca.phyloseq <- function(obj,...){
 
 #' @title ordination plotter based on ggplot2.
 #' @param obj prcomp class or pcasample class,
-#' @param ... additional parameters.
 #' @param pc integer vector, the component index. 
 #' @param mapping set of aesthetic mapping of ggplot2, default is NULL.
 #' @param sampleda data.frame, nrow sample * ncol factors, default is NULL. 
@@ -65,7 +63,6 @@ getpca.phyloseq <- function(obj,...){
 #' @param textlinesize numeric, the segment size in \code{\link[ggrepel]{geom_text_repel}}.
 #' @param ... additional parameters, see \code{\link[ggrepel]{geom_text_repel}}. 
 #' @author ShuangbinXu
-#' @rdname ggordpoint
 #' @export
 ggordpoint <- function(obj, ...){
 	UseMethod("ggordpoint")
@@ -202,7 +199,6 @@ ggordpoint.pcasample <- function(obj,...){
 #' @title get ordination coordinates.
 #' @param obj prcomp object
 #' @param pc integer vector, the component index.
-#' @rdname getcoord
 #' @export
 getcoord <- function(obj, pc){
 	UseMethod("getcoord")
@@ -237,7 +233,7 @@ getfactormap <- function(namelist){
 		tmpfactormap <- aes_(color=as.formula(paste0("~", namelist[1])),
 							 shape=as.formula(paste0("~", namelist[1])))
 	}else{
-		tmpfactormap <- aes_(color=as.formula(paste0("~", namelist[2])),
+		tmpfactormap <- aes_(color=as.formula(paste0("~", namelist[1])),
 							 shape=as.formula(paste0("~", namelist[2])))
 	}
 	return(tmpfactormap)
@@ -245,7 +241,6 @@ getfactormap <- function(namelist){
 
 #' @title get the contribution of variables
 #' @param obj prcomp class or pcasample class
-#' @rdname getvarct
 #' @export
 getvarct <- function(obj,...){
 	UseMethod("getvarct")
