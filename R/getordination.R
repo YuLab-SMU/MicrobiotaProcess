@@ -65,7 +65,6 @@ getdist.phyloseq <- function(obj, distmethod="euclidean", type="sample", method=
 }
 
 #' @title performs principal coordinate analysis (PCoA)
-#' @rdname getpcoa
 #' @export
 getpcoa <- function(obj, ...){
 	UseMethod("getpcoa")
