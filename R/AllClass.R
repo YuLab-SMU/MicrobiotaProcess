@@ -1,8 +1,3 @@
-# #' @name phyloseq-class
-# #' @rdname phyloseq-class
-# #' @importClassesFrom phyloseq phyloseq
-#setOldClass("phyloseq")
-
 #' @title prcomp class
 #' @seealso \code{\link[stats]{prcomp}}
 #' @name prcomp-class
@@ -53,3 +48,22 @@ setClass("ordplotClass",
 							 xlab=NULL, 
 							 ylab=NULL, 
 							 title=NULL))
+
+#' @importClassesFrom phyloseq phylo
+#' @keywords internal 
+setClassUnion("phyloOrNULL", c("phylo", "NULL"))
+
+
+#' @title clustplotClass class
+#' @name clustplotClass-clcass
+#' @rdname clustplotClass-class
+#' @exportClass clustplotClass
+setClass("clustplotClass",
+		 representation=representation(hclustphylo="phyloOrNULL",
+									   sampleda="dataframeOrNull",
+									   distmethod="characterOrNull"
+									   ),
+		 prototype=prototype(hclustphylo=NULL,
+							 sampleda=NULL,
+							 distmethod=NULL))
+
