@@ -18,7 +18,6 @@
 #' @param setColors logical, default is TRUE, or you can set FALSE, then 
 #' set colors by `scale_fill_manual` of `ggplot2`.
 #' @param ... additional parameters, see \code{\link[ggplot2]{ggplot}}
-#' @rdname ggbartax
 #' @return barplot of tax
 #' @author ShuangbinXu
 #' @export
@@ -56,7 +55,6 @@ ggbartax.phyloseq <- function(obj, ...){
 #' @param ... additional parameters, see also \code{\link[MicrobiotaProcess]{CountOrRatios}}
 #' @return phyloseq class contained tax data.frame and sample information.
 #' @author ShuangbinXu
-#' @rdname gettaxdf
 #' @export
 gettaxdf <- function(obj,...){
 	UseMethod("gettaxdf")
@@ -71,7 +69,6 @@ gettaxdf.phyloseq <- function(obj, taxlevel="Phylum", ...){
 		stop("The tax table is empty!")
 	}else{
 		taxdf <- tax_table(obj)
-		taxdf <- fillNAtax(taxdf)
 	}
 	otuda <- checkotu(obj)
 	sampleda <- getsample(obj)
@@ -128,7 +125,6 @@ gettaxdf.default <- function(otuda, taxda,
 #' @param formula formula, default is `y ~ log(x)`
 #' @param ... additional parameters, see \code{\link{ggplot2}{ggplot}}.
 #' @author ShuangbinXu
-#' @rdname ggrarecurve
 #' @export
 ggrarecurve <- function(obj, ...){
 	UseMethod("ggrarecurve")
@@ -154,13 +150,11 @@ ggrarecurve.phyloseq <- function(obj, ...){
 #' @param ... additional parameters, see \code{\link[MicrobitaProcess]{CountOrRatios}}.
 #' @return return a list for VennDiagram.
 #' @author ShuangbinXu
-#' @rdname getvennlist
 #' @export 
 getvennlist <- function(obj,...){
 	UseMethod("getvennlist")
 }
 
-#' @title generate a vennlist for VennDiagram 
 #' @method getvennlist phyloseq
 #' @rdname getvennlist
 #' @export 
@@ -174,5 +168,3 @@ getvennlist.phyloseq <- function(obj, factorNames, ...){
 									...)
 	return(vennlist)
 }
-
-
