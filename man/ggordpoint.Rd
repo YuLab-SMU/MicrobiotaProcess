@@ -21,7 +21,7 @@ ggordpoint(obj, ...)
 \arguments{
 \item{obj}{prcomp class or pcasample class,}
 
-\item{...}{additional parameters.}
+\item{...}{additional parameters, see \code{\link[ggrepel]{geom_text_repel}}.}
 
 \item{pc}{integer vector, the component index.}
 
@@ -58,8 +58,6 @@ default is 5.}
 \item{fontfamily}{character, the font family, default is "sans".}
 
 \item{textlinesize}{numeric, the segment size in \code{\link[ggrepel]{geom_text_repel}}.}
-
-\item{...}{additional parameters, see \code{\link[ggrepel]{geom_text_repel}}.}
 }
 \description{
 ordination plotter based on ggplot2.
