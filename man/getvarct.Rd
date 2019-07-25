@@ -20,8 +20,4 @@ getvarct(obj, ...)
 }
 \description{
 get the contribution of variables
-
-get the contribution of variables
-
-get the contribution of variables
 }
