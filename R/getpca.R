@@ -52,9 +52,11 @@ getpca.phyloseq <- function(obj,...){
 #' @param linesize numeric, the line size of segment, default is 0.3. 
 #' @param arrowsize numeric, the size of arrow, default is 1.5.
 #' @param arrowlinecolour character, the color of segment, default is grey.
+#' @param ellipse logical, whether add confidence ellipse to ordinary plot, default is FALSE.
+#' @param ellipse_pro numeric, confidence value for the ellipse, default is 0.9.
+#' @param ellipse_alpha numeric, the alpha of ellipse, default is 0.2.
 #' @param biplot logical, whether plot the species, default is TRUE.
-#' @param topn integer, the number species have top important contribution,
-#' default is 5.
+#' @param topn integer or vector, the number species have top important contribution, default is 5.
 #' @param settheme logical, whether set the theme for the plot, default is TRUE.
 #' @param speciesannot logical, whether plot the species, default is FALSE. 
 #' @param textsize numeric, the size of text, default is 2.5.
@@ -83,6 +85,9 @@ ggordpoint.default <-  function(obj,
 						   linesize=0.3,
 						   arrowsize=1.5,
 						   arrowlinecolour="grey",
+						   ellipse=FALSE,
+						   ellipse_pro=0.9, 
+						   ellipse_alpha=0.2,
 						   biplot=TRUE,
 						   topn=5,
 						   settheme=TRUE,
@@ -91,6 +96,7 @@ ggordpoint.default <-  function(obj,
 						   fontface="bold.italic",
 						   fontfamily="sans",
 						   textlinesize=0.02,
+
 						   ...){
 	plotcoordclass <- getcoord(obj,pc)
 	plotcoord <- plotcoordclass@coord
@@ -105,10 +111,13 @@ ggordpoint.default <-  function(obj,
 		plotcoord <- merge(plotcoord, sampleda, by=0)
 		if (!is.null(factorNames)){
 			tmpfactormap <- getfactormap(factorNames)
+			ellipsemapping <- getellipsemap(factorNames)
 		} else{
 			tmpfactormap <- getfactormap(colnames(sampleda))
+			ellipsemapping <- getellipsemap(colnames(sampleda))
 		}
 		mapping <- modifyList(mapping, tmpfactormap)
+		ellipsemapping <- modifyList(mapping, ellipsemapping)
 		if (!is.null(factorLevels)){
 			plotcoord <- setfactorlevels(plotcoord, factorLevels)
 		}
@@ -120,6 +129,13 @@ ggordpoint.default <-  function(obj,
 		 labs(x=xlab_text,
 			  y=ylab_text,
 			  title=title_text)
+	if (ellipse){
+		p <- p + geom_ord_ellipse(data=plotcoord,
+								  mapping=ellipsemapping,
+								  ellipse_pro=ellipse_pro,
+								  alpha=ellipse_alpha, 
+								  show.legend=FALSE)
+	}
 	if (biplot){
 		varcontrib <- getvarct(obj)
 		varcontr <- varcontrib$VarContribution[,pc]
@@ -230,14 +246,22 @@ getcoord.prcomp <- function(obj, pc){
 #' @keywords internal
 getfactormap <- function(namelist){
 	if (length(namelist)==1){
-		tmpfactormap <- aes_(color=as.formula(paste0("~", namelist[1])),
-							 shape=as.formula(paste0("~", namelist[1])))
+		tmpfactormap <- aes_(color=as.formula(paste0("~", namelist[1])))
 	}else{
 		tmpfactormap <- aes_(color=as.formula(paste0("~", namelist[1])),
 							 shape=as.formula(paste0("~", namelist[2])))
 	}
 	return(tmpfactormap)
 }
+
+#' @importFrom ggplot2 aes_
+#' @keywords internal
+getellipsemap <- function(namelist){
+	tmpellipsemap <- aes_(fill=as.formula(paste0("~", namelist[1])),
+						  group=as.formula(paste0("~", namelist[1])))
+	return(tmpellipsemap)
+} 
+
 
 #' @title get the contribution of variables
 #' @param obj prcomp class or pcasample class
@@ -246,7 +270,6 @@ getvarct <- function(obj,...){
 	UseMethod("getvarct")
 }
 
-#' @title get the contribution of variables
 #' @method getvarct prcomp
 #' @rdname getvarct
 #' @export
@@ -255,7 +278,6 @@ getvarct.prcomp <- function(obj){
 						  check.names=FALSE)
 	varcorr2 <- varcorr^2
 	componentcos <- apply(varcorr2, 2, sum)
-	#print(componentcos)
 	varcontrib <- data.frame(t(apply(varcorr2, 
 									 1, 
 									 contribution, 
@@ -267,7 +289,6 @@ getvarct.prcomp <- function(obj){
 	return(res)
 }
 
-#' @title get the contribution of variables
 #' @method getvarct pcasample
 #' @rdname getvarct
 #' @export 
