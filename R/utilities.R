@@ -61,7 +61,7 @@ getsample <- function(obj){
 	if (is.null(obj@sam_data)){
 		sampleda <- NULL
 	}else{
-		sampleda <- sample_data(obj)
+		sampleda <- data.frame(sample_data(obj), check.names=FALSE)
 	}
 	return(sampleda)
 }
