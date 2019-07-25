@@ -11,10 +11,10 @@ ggordpoint(obj, ...)
 \method{ggordpoint}{default}(obj, pc = c(1, 2), mapping = NULL,
   sampleda = NULL, factorNames = NULL, factorLevels = NULL,
   poinsize = 2, linesize = 0.3, arrowsize = 1.5,
-  arrowlinecolour = "grey", biplot = TRUE, topn = 5,
-  settheme = TRUE, speciesannot = FALSE, textsize = 2.5,
-  fontface = "bold.italic", fontfamily = "sans", textlinesize = 0.02,
-  ...)
+  arrowlinecolour = "grey", ellipse = FALSE, ellipse_pro = 0.9,
+  ellipse_alpha = 0.2, biplot = TRUE, topn = 5, settheme = TRUE,
+  speciesannot = FALSE, textsize = 2.5, fontface = "bold.italic",
+  fontfamily = "sans", textlinesize = 0.02, ...)
 
 \method{ggordpoint}{pcasample}(obj, ...)
 }
@@ -42,10 +42,15 @@ if you want to order the levels of factor, you can set this.}
 
 \item{arrowlinecolour}{character, the color of segment, default is grey.}
 
+\item{ellipse}{logical, whether add confidence ellipse to ordinary plot, default is FALSE.}
+
+\item{ellipse_pro}{numeric, confidence value for the ellipse, default is 0.9.}
+
+\item{ellipse_alpha}{numeric, the alpha of ellipse, default is 0.2.}
+
 \item{biplot}{logical, whether plot the species, default is TRUE.}
 
-\item{topn}{integer, the number species have top important contribution,
-default is 5.}
+\item{topn}{integer or vector, the number species have top important contribution, default is 5.}
 
 \item{settheme}{logical, whether set the theme for the plot, default is TRUE.}
 
