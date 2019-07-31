@@ -31,7 +31,7 @@ generalizedFC.default <- function(x, y, base=10, steps=0.05, pseudo=0.00001, ...
 	y.mean <- mean(y)
 	y.med <- median(y)
 	fc <- sum(x.q - y.q)/length(x.q)
-	res <- list(x.mean=x.mean, x.median=x.median, y.mean=y.mean, y.median=y.med, gfc=fc)
+	res <- list(x.mean=x.mean, x.median=x.med, y.mean=y.mean, y.median=y.med, gfc=fc)
 	attr(res, "class") <- "gFC"
 	return(res)
 }
