@@ -3,7 +3,8 @@
 getcladedf <- function(ggtree, node){
 	data <- ggtree$data 
 	if ("nodeClass" %in% colnames(data)){
-		tmpnum <- 9 - as.numeric(data$nodeClass)
+		levelsnum <- levels(data$nodeClass) + 1
+		tmpnum <- levelsnum - as.numeric(data$nodeClass)
 		data$extend <- get_extend(tmpnum)
 	}
 	df <-lapply(node, function(x)ggtree:::get_clade_position_(data, x))
@@ -19,7 +20,8 @@ getcladedf <- function(ggtree, node){
 getlabeldf <- function(ggtree, node){
 	data <- ggtree$data 
 	if ("nodeClass" %in% colnames(data)){
-		tmpnum <- 9 - as.numeric(data$nodeClass)
+		levelsnum <- levels(data$nodeClass) + 1
+		tmpnum <- levelsnum - as.numeric(data$nodeClass)
 		data$levelindex <- tmpnum
 		data$extend <- get_extend(tmpnum)*0.9
 	}
