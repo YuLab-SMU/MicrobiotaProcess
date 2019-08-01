@@ -8,7 +8,11 @@
 diffAnalysis(x, ...)
 
 \method{diffAnalysis}{data.frame}(data, sampleda, class, subclass = NULL,
-  padjust = "fdr", ...)
+  firstcomfun = "kruskal.test", padjust = "fdr",
+  filtermod = "pvalue", firstalpha = 0.05, strictmod = TRUE,
+  fcfun = "generalizedFC", secondcomfun = "wilcox.test", clmin = 5,
+  clwilc = TRUE, submin = 5, subclwilc = TRUE, secondalpha = 0.05,
+  ...)
 }
 \description{
 Differential expression analysis based on kruskal.test, generalized fold change and wilcox.test
