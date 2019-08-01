@@ -52,8 +52,10 @@ diffclass <- function(datasample,
 					  features,
 					  comclass,
 					  class,
+					  fcfun="generalizedFC",
+					  secondcomfun="wilcox.test",
 					  classmin=5,
-					  clwil=TRUE,
+					  clwilc=TRUE,
 					  pfold=0.05,
 					  ...){
 	keepfeature <- list()
@@ -63,11 +65,13 @@ diffclass <- function(datasample,
 		datatmp[[class]] <- factor(datatmp[[class]], levels=classtmp)
 		clsize <- table(datatmp[[class]])
 		resgfoldC <- getgfcwilc(datasample=datatmp,
+								fun1=fcfun,
 								classlevelsnum=clsize,
 								vars=features,
 								classname=class,
 								minnum=classmin,
-								wilc=clwil)
+								fun2=secondcomfun, 
+								wilc=clwilc)
 		resgfoldC <- getcompareres(resgfoldC, pfold=pfold)
 		keepfeature[[paste(classtmp, collapse="-vs-")]] <- resgfoldC[resgfoldC$Freq==1,]
 	}
@@ -80,8 +84,10 @@ diffsubclass <- function(datasample,
 						 comsubclass, 
 						 class, 
 						 subclass, 
+						 fcfun="generalizedFC",
+						 secondcomfun="wilcox.test",
 						 submin=5,
-						 subclwil=TRUE,
+						 subclwilc=TRUE,
 						 pfold=0.05,
 						 ...){
 	keepfeature <- list()
@@ -95,10 +101,12 @@ diffsubclass <- function(datasample,
 			subclsize <- table(datatmp[[subclass]])
 			resgfoldC <- getgfcwilc(datasample=datatmp, 
 									classlevelsnum=subclsize,
+									fun1=fcfun,
 									vars=features,
 									classname=subclass,
 									minnum=submin,
-									wilc=subclwil)
+									fun2=secondcomfun,
+									wilc=subclwilc)
 			}
 			reslist[[j]] <- resgfoldC
 		}
@@ -109,14 +117,15 @@ diffsubclass <- function(datasample,
 }
 
 #' @keywords internal
-getgfcwilc <- function(datasample, classlevelsnum, vars, classname, minnum, wilc){
-	resgfoldC <- multi.compare(fun=generalizedFC, data=datasample,
+getgfcwilc <- function(datasample, classlevelsnum, fun1='generalizedFC', 
+					   vars, classname, minnum, fun2='wilcox.test', wilc){
+	resgfoldC <- multi.compare(fun=fun1, data=datasample,
 							   feature=vars, factorNames=classname)
 	resgfoldC <- lapply(resgfoldC, function(x)x$gfc)
 	resgfoldC <- do.call("rbind", resgfoldC)
-	if (min(classlevelsnum)>= minnum &&  subclwil){
-		tmpres <- multi.compare(fun=wilcox.test, data=datasample,
-								feature=features, factorNames=classname)
+	if (min(classlevelsnum)>= minnum &&  wilc){
+		tmpres <- multi.compare(fun=fun2, data=datasample,
+								feature=vars, factorNames=classname)
 		pvaluetmp <- lapply(tmpres, function(x)x$p.value)
 		pvaluetmp <- do.call("rbind", pvaluetmp)
 		resgfoldC <- merge(resgfoldC, pvaluetmp, by=0)
@@ -143,6 +152,7 @@ getcompareres <- function(relist, pfold){
 
 #' @keywords internal
 getconsistentfeatures <- function(diffsubclassfeature, 
+								  class,
 								  classlevels, ...){
 	leftfeature <- list()
 	for (i in classlevels){
@@ -158,6 +168,7 @@ getconsistentfeatures <- function(diffsubclassfeature,
 		tmpkeepfeature <- do.call("rbind", tmpkeepfeature) 
 		tmpkeepfeature <- data.frame(table(tmpkeepfeature[,colnames(tmpkeepfeature) %in% c("f", "gfc")]))
 		tmpkeepfeature <- tmpkeepfeature[tmpkeepfeature$Freq==length(tmpindex),]
+		tmpkeepfeature[[class]] <- i
 		leftfeature[[i]] <- tmpkeepfeature
 	}
 	return(leftfeature)
