@@ -67,3 +67,24 @@ setClass("clustplotClass",
 							 sampleda=NULL,
 							 distmethod=NULL))
 
+#' @keywords internal
+setClassUnion("listOrNull", c("list", "NULL"))
+
+#' @title diffAnalysisClass class
+#' @name diffAnalysisClass-class
+#' @rdname diffAnalysisClass-class
+#' @exportClass diffAnalysisClass
+setClass("diffAnalysisClass",
+		 representation=representation(originalD="dataframeOrNull",
+									   sampleda="dataframeOrNull",
+									   taxda="dataframeOrNull",
+									   kwres="dataframeOrNull",
+									   secondvars="listOrNull",
+									   mlres="dataframeOrNull"
+									   ),
+		 prototype=prototype(originalD=NULL,
+							 sampleda=NULL,
+							 taxda=NULL,
+							 kwres=NULL,
+							 secondvars=NULL,
+							 mlres=NULL))
