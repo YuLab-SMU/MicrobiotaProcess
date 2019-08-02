@@ -3,16 +3,69 @@
 \name{diffAnalysis}
 \alias{diffAnalysis}
 \alias{diffAnalysis.data.frame}
+\alias{diffAnalysis.phyloseq}
 \title{Differential expression analysis based on kruskal.test, generalized fold change and wilcox.test}
 \usage{
 diffAnalysis(x, ...)
 
 \method{diffAnalysis}{data.frame}(data, sampleda, class, subclass = NULL,
+  taxda = NULL, alltax = TRUE, mlfun = "lda", ratio = 0.7,
   firstcomfun = "kruskal.test", padjust = "fdr",
   filtermod = "pvalue", firstalpha = 0.05, strictmod = TRUE,
   fcfun = "generalizedFC", secondcomfun = "wilcox.test", clmin = 5,
-  clwilc = TRUE, submin = 5, subclwilc = TRUE, secondalpha = 0.05,
-  ...)
+  clwilc = TRUE, secondalpha = 0.05, normalization = 1e+06,
+  bootnums = 30, ...)
+
+\method{diffAnalysis}{phyloseq}(obj, class, subclass = NULL, ...)
+}
+\arguments{
+\item{data}{data.frame, (nrow sample * ncol features)}
+
+\item{sampleda}{data.frame, nrow sample * ncol factor, the sample names of sampleda and data should be the same.}
+
+\item{class}{character, the factor name in sampleda.}
+
+\item{subclass}{character, the factor name in sampleda, default is NULL, 
+meaning no subclass compare.}
+
+\item{taxda}{data.frame, the classification of the feature in data. default is NULL.}
+
+\item{alltax}{logical, whether to set all classification as features if taxda is not NULL, 
+default is TRUE.}
+
+\item{mlfun}{character, the method for calculating the effect size of features, 
+choose "lda" or "rf", default is "lda".}
+
+\item{ratio}{numeric, range from 0 to 1, the proportion of samples for calculating the effect 
+size of features, default is 0.7.}
+
+\item{firstcomfun}{character, the method for first test, "oneway.test" for normal distributions, 
+suggested choosing "kruskal.test" for uneven distributions, default is "kruskal.test".}
+
+\item{padjust}{character, the correction method, default is "fdr".}
+
+\item{filtermod}{character, the method to filter, default is "pvalue".}
+
+\item{firstalpha}{numeric, the alpha value for the first test, default is 0.05.}
+
+\item{strictmod}{logical, whether to performed in one-against-one, default is TRUE (strict).}
+
+\item{fcfun}{character, default is "generalizedFC", it can't be set another at the present time.}
+
+\item{secondcomfun}{character, the method for one-against-one, default is "wilcox.test" for uneven distributions.}
+
+\item{clmin}{integer, the minimum number of samples per class or suclass for performing test, default is 5.}
+
+\item{clwilc}{logical, whether to perform test of per class or subclass, default is TRUE.}
+
+\item{secondalpha}{numeric, the alpha value for the second test, default is 0.05.}
+
+\item{normalization}{integer, set the normalization value, set a big number if to get more meaningful values 
+for the LDA score, or you can set NULL for no normalization, default is 1000000.}
+
+\item{bootnums}{integer, set the number of bootstrap iteration for lda or rf, default is 30.}
+
+\item{obj}{object,a phyloseq class contained otu_table, sample_data, taxda.}
 }
 \description{
 Differential expression analysis based on kruskal.test, generalized fold change and wilcox.test
