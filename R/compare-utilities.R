@@ -4,6 +4,7 @@
 #' @param feature vector, the features wanted to test.
 #' @param factorNames character, the name of a factor giving the corresponding groups.
 #' @param ..., additional arguments for fun.
+#' @importFrom rlang new_formula
 #' @author ShuangbinXu
 #' @export
 multi.compare <- function(fun = wilcox.test, 
@@ -12,7 +13,7 @@ multi.compare <- function(fun = wilcox.test,
 						factorNames, ...){ 
 	sapply(feature,
 		   function(x){
-		   tmpformula <- as.formula(paste(x, factorNames, sep="~"))
+		   tmpformula <- new_formula(as.name(x), as.name(factorNames))
 		   do.call(fun,list(tmpformula,data=data, ...))}, 
 		   simplify = FALSE)
 }	 
@@ -130,7 +131,7 @@ getgfcwilc <- function(datasample, classlevelsnum, fun1='generalizedFC',
 	resgfoldC <- do.call("rbind", resgfoldC)
 	if (classlevelsnum>= minnum &&  wilc){
 		tmpres <- multi.compare(fun=fun2, data=datasample,
-								feature=vars, factorNames=classname)
+								feature=vars, factorNames=classname, exact=FALSE)
 		pvaluetmp <- lapply(tmpres, function(x)x$p.value)
 		pvaluetmp <- do.call("rbind", pvaluetmp)
 		resgfoldC <- merge(resgfoldC, pvaluetmp, by=0)
