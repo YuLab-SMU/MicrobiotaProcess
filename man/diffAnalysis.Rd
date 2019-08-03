@@ -13,8 +13,8 @@ diffAnalysis(x, ...)
   firstcomfun = "kruskal.test", padjust = "fdr",
   filtermod = "pvalue", firstalpha = 0.05, strictmod = TRUE,
   fcfun = "generalizedFC", secondcomfun = "wilcox.test", clmin = 5,
-  clwilc = TRUE, secondalpha = 0.05, normalization = 1e+06,
-  bootnums = 30, ...)
+  clwilc = TRUE, secondalpha = 0.05, subclmin = 3,
+  subclwilc = TRUE, normalization = 1e+06, bootnums = 30, ...)
 
 \method{diffAnalysis}{phyloseq}(obj, class, subclass = NULL, ...)
 }
@@ -54,11 +54,15 @@ suggested choosing "kruskal.test" for uneven distributions, default is "kruskal.
 
 \item{secondcomfun}{character, the method for one-against-one, default is "wilcox.test" for uneven distributions.}
 
-\item{clmin}{integer, the minimum number of samples per class or suclass for performing test, default is 5.}
+\item{clmin}{integer, the minimum number of samples per class for performing test, default is 5.}
 
-\item{clwilc}{logical, whether to perform test of per class or subclass, default is TRUE.}
+\item{clwilc}{logical, whether to perform test of per class, default is TRUE.}
 
 \item{secondalpha}{numeric, the alpha value for the second test, default is 0.05.}
+
+\item{subclmin}{integer, the minimum number of samples per suclass for performing test, default is 3.}
+
+\item{subclwilc}{logical, whether to perform test of per subclass, default is TRUE, meaning more strict.}
 
 \item{normalization}{integer, set the normalization value, set a big number if to get more meaningful values 
 for the LDA score, or you can set NULL for no normalization, default is 1000000.}
