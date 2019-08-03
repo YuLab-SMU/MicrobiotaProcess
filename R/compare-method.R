@@ -20,9 +20,11 @@
 #' @param strictmod logical, whether to performed in one-against-one, default is TRUE (strict).
 #' @param fcfun character, default is "generalizedFC", it can't be set another at the present time.
 #' @param secondcomfun character, the method for one-against-one, default is "wilcox.test" for uneven distributions.
-#' @param clmin integer, the minimum number of samples per class or suclass for performing test, default is 5.
-#' @param clwilc logical, whether to perform test of per class or subclass, default is TRUE.
+#' @param clmin integer, the minimum number of samples per class for performing test, default is 5.
+#' @param clwilc logical, whether to perform test of per class, default is TRUE.
 #' @param secondalpha numeric, the alpha value for the second test, default is 0.05.
+#' @param subclmin integer, the minimum number of samples per suclass for performing test, default is 3.
+#' @param subclwilc logical, whether to perform test of per subclass, default is TRUE, meaning more strict. 
 #' @param normalization integer, set the normalization value, set a big number if to get more meaningful values 
 #' for the LDA score, or you can set NULL for no normalization, default is 1000000.
 #' @param bootnums integer, set the number of bootstrap iteration for lda or rf, default is 30.
@@ -56,12 +58,16 @@ diffAnalysis.data.frame <- function(data,
 									clmin=5,
 									clwilc=TRUE,
 									secondalpha=0.05,
+									subclmin=3,
+									subclwilc=TRUE,
 									normalization=1000000,
 									bootnums=30,
 									...){
-	if (!is.null(taxda) && alltax){
+	if (!is.null(taxda)){
 		taxda <- fillNAtax(taxda)
-		data <- getalltaxdf(data, taxda)
+		if (alltax){
+			data <- getalltaxdf(data, taxda)
+		}
 	}
 	vars <- colnames(data)
 	datameta <- merge(data, sampleda, by=0)
@@ -82,6 +88,8 @@ diffAnalysis.data.frame <- function(data,
 	classlevels <- getclasslevels(sampleda, class)
 	compareclass <- getcompareclass(classlevels)
 	if (!is.null(subclass) && strictmod){
+		sampleda[[subclass]] <- paste(sampleda[[class]], sampleda[[subclass]], sep="_")
+		datameta[[subclass]] <- as.vector(sampleda[[subclass]])
 		class2sub <- getclass2sub(sampleda, class, subclass)
 		comsubclass <- apply(compareclass,1,
 							 function(x)getcomparesubclass(x[1],x[2],class2sub))
@@ -92,8 +100,8 @@ diffAnalysis.data.frame <- function(data,
 					 	subclass=subclass,
 					 	fcfun=fcfun,
 					 	secondcomfun=secondcomfun,
-					 	submin=clmin,
-					 	subclwilc=clwilc,
+					 	submin=subclmin,
+					 	subclwilc=subclwilc,
 					 	pfold=secondalpha)
 
 	}else{
@@ -134,7 +142,8 @@ diffAnalysis.data.frame <- function(data,
 		taxda=taxda,
 		kwres=kwres,
 		secondvars=secondvars,
-		mlres=mlres)
+		mlres=mlres,
+		classname=class)
 	return(res)
 }
 
@@ -151,6 +160,7 @@ diffAnalysis.phyloseq <- function(obj, class, subclass=NULL,...){
 							sampleda=sampleda, 
 							class=class,
 							subclass=subclass,
+							taxda=taxda,
 							...)
 	return(res)
 }
@@ -158,18 +168,16 @@ diffAnalysis.phyloseq <- function(obj, class, subclass=NULL,...){
 
 #' @importFrom dplyr bind_rows
 #' @importFrom magrittr %>%
-#' @importFrom tibble column_to_rownames
 #' @keywords internal
 getalltaxdf <- function(data, taxda){
 	data <- data.frame(t(data), check.names=FALSE)
-	dat <- suppressWarnings(mapply(CountOrRatios, 
-							   taxda, 
-							   MoreArgs=list(da=otuda,
-											 countmode=FALSE,
-											 rownamekeep=TRUE),
-							SIMPLIFY=FALSE) %>% bind_rows()) %>%
-	       column_to_rownames(var="feature")
-   return(dat)
-
+	dt <- list()
+	for (i in 1:ncol(taxda)){
+		dat <- CountOrRatios(data, taxda[,i,drop=FALSE], countmode=FALSE, rownamekeep=FALSE)
+		dt[[i]] <- dat
+	}
+	dt <- do.call("rbind", dt)
+	dt <- data.frame(t(dt), check.names=FALSE)
+   return(dt)
 }
 
