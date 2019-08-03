@@ -21,10 +21,6 @@ droptax <- function(taxtab, rmode=FALSE, minocc=0, minabu=0){
 		minocc <- round(dim(taxtab)[1]*minocc, 0)
 	}
 	taxtab <- taxtab[,apply(taxtab>minabu,2,sum)>=minocc]
-	attr(taxtab, "call") <- match.call()
-	attr(taxtab, "rmode") <- rmode
-	attr(taxtab, "minocc") <- minocc
-	attr(taxtab, "minabu") <- minabu
 	return (taxtab)
 }
 
