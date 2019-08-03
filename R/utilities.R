@@ -98,6 +98,7 @@ addtaxlevel <- function(taxdf){
 	paste(taxlevel, taxdf, sep="__")
 }
 
+#' @importFrom tibble column_to_rownames
 #' @keywords internal
 fillNAtax <- function(taxdf){
 	if (!grepl("^k__", taxdf[1,1])){
@@ -111,6 +112,25 @@ fillNAtax <- function(taxdf){
 		colnames(taxdf) <- tmpcolnames
 	}
 	taxdf <- filltaxname(taxdf)
+	taxdf <- duplicatedtaxcheck(taxdf) %>% column_to_rownames(var="rowname")
+	return(taxdf)
+}
+
+#' @importFrom magrittr %>%
+#' @importFrom tibble rownames_to_column
+#' @keywords internal
+duplicatedtaxcheck <- function(taxdf){
+	taxdf <- taxdf %>% rownames_to_column()
+	for (i in ncol(taxdf):3){
+		tmp <- split(taxdf,taxdf[,i])
+		for (j in 1:length(tmp)){
+			flag <- length(unique(as.vector(tmp[[j]][,i-1])))
+			if (flag > 1){
+				tmp[[j]][,i] <- paste(tmp[[j]][,i],tmp[[j]][,i-1],sep="_")
+			}
+		}
+		taxdf <- do.call("rbind",c(tmp, make.row.names=FALSE)) 
+	}
 	return(taxdf)
 }
 
