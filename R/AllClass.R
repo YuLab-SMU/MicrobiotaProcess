@@ -80,11 +80,13 @@ setClass("diffAnalysisClass",
 									   taxda="dataframeOrNull",
 									   kwres="dataframeOrNull",
 									   secondvars="listOrNull",
-									   mlres="dataframeOrNull"
+									   mlres="dataframeOrNull",
+									   classname="characterOrNull"
 									   ),
 		 prototype=prototype(originalD=NULL,
 							 sampleda=NULL,
 							 taxda=NULL,
 							 kwres=NULL,
 							 secondvars=NULL,
-							 mlres=NULL))
+							 mlres=NULL,
+							 classname=NULL))
