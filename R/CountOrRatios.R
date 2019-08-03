@@ -3,7 +3,7 @@
 #' @description
 #' Caculate the count or relative abundance of replicate element with a speficify columns
 #' 
-#' @param da dataframe; a dataframe contained one character column and others is numeric,
+#' @param data dataframe; a dataframe contained one character column and others is numeric,
 #' if featurelist is NULL. Or a numeirc dataframe, if featurelist is non't NULL, all columns 
 #' should be numeric.
 #' @param featurelist dataframe; a dataframe contained one chatacter column, default is NULL.
@@ -15,15 +15,14 @@
 #' @author Shuangbin Xu
 #' @importFrom plyr ddply 
 #' @importFrom plyr numcolwise
-CountOrRatios <- function(da, 
+CountOrRatios <- function(data, 
 			     featurelist, 
 			     countmode=TRUE, 
 			     #percentmode=FALSE,
 			     multiplenum=1, 
 			     rownamekeep=FALSE){
-	data <- da
     if (!is.null(featurelist)){
-		data <- merge(da, featurelist, by=0)
+		data <- merge(data, featurelist, by=0)
 		rownames(data) <- data$Row.names
     	data$Row.names <- NULL
 	}
