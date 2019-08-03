@@ -4,11 +4,11 @@
 \alias{CountOrRatios}
 \title{caculate the count or relative abundance of replicate element with a speficify column}
 \usage{
-CountOrRatios(da, featurelist, countmode = TRUE, multiplenum = 1,
+CountOrRatios(data, featurelist, countmode = TRUE, multiplenum = 1,
   rownamekeep = FALSE)
 }
 \arguments{
-\item{da}{dataframe; a dataframe contained one character column and others is numeric,
+\item{data}{dataframe; a dataframe contained one character column and others is numeric,
 if featurelist is NULL. Or a numeirc dataframe, if featurelist is non't NULL, all columns 
 should be numeric.}
 
