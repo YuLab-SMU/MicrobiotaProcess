@@ -64,8 +64,9 @@ diffclass <- function(datasample,
 		classtmp <- as.vector(comclass[i,])
 		#clsize <- min(table(datasample[[class]]))
 		datatmp <- datasample %>% filter(eval(parse(text=class)) %in% classtmp)
-		datatmp[[class]] <- factor(datatmp[[class]], levels=classtmp)
-		clsize <- min(table(datatmp[[class]]))
+		datatmp[[match(class, colnames(datatmp))]] <- factor(datatmp[[match(class,colnames(datatmp))]], 
+															 levels=classtmp)
+		clsize <- min(table(datatmp[[match(class,colnames(datatmp))]]))
 		resgfoldC <- getgfcwilc(datasample=datatmp,
 								fun1=fcfun,
 								classlevelsnum=clsize,
@@ -100,8 +101,9 @@ diffsubclass <- function(datasample,
 			subclasstmp <- as.vector(unlist(comsubclass[[i]][j,])) 
 			#subclsize <- min(table(datasample[[subclass]]))
 			datatmp <- datasample %>% filter(eval(parse(text=class)) %in% classtmp & eval(parse(text=subclass)) %in%subclasstmp)
-			datatmp[[subclass]] <- factor(datatmp[[subclass]], levels=subclasstmp)
-			subclsize <- min(table(datatmp[[subclass]]))
+			datatmp[[match(subclass, colnames(datatmp))]] <- factor(datatmp[[match(subclass,colnames(datatmp))]],
+																   	levels=subclasstmp)
+			subclsize <- min(table(datatmp[[match(subclass,colnames(datatmp))]]))
 			resgfoldC <- getgfcwilc(datasample=datatmp, 
 									classlevelsnum=subclsize,
 									fun1=fcfun,
