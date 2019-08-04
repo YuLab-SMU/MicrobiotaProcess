@@ -25,6 +25,7 @@
 #' @param secondalpha numeric, the alpha value for the second test, default is 0.05.
 #' @param subclmin integer, the minimum number of samples per suclass for performing test, default is 3.
 #' @param subclwilc logical, whether to perform test of per subclass, default is TRUE, meaning more strict. 
+#' @param ldascore numeric, the threshold on the absolute value of the logarithmic LDA score, default is 2.
 #' @param normalization integer, set the normalization value, set a big number if to get more meaningful values 
 #' for the LDA score, or you can set NULL for no normalization, default is 1000000.
 #' @param bootnums integer, set the number of bootstrap iteration for lda or rf, default is 30.
@@ -39,6 +40,7 @@ diffAnalysis <- function(x, ...){
 
 #' @method diffAnalysis data.frame
 #' @rdname diffAnalysis
+#' @importFrom tibble column_to_rownames
 #' @export
 diffAnalysis.data.frame <- function(data, 
 									sampleda, 
@@ -60,6 +62,7 @@ diffAnalysis.data.frame <- function(data,
 									secondalpha=0.05,
 									subclmin=3,
 									subclwilc=TRUE,
+									ldascore=2,
 									normalization=1000000,
 									bootnums=30,
 									...){
@@ -69,6 +72,9 @@ diffAnalysis.data.frame <- function(data,
 			data <- getalltaxdf(data, taxda)
 		}
 	}
+	sampleda <- sampleda %>% select(c(class, subclass))
+	sampleda <- duplicatedtaxcheck(sampleda) %>% 
+			column_to_rownames(var="rowname") 
 	vars <- colnames(data)
 	datameta <- merge(data, sampleda, by=0)
 	kwres <- multi.compare(fun=firstcomfun,
@@ -88,8 +94,6 @@ diffAnalysis.data.frame <- function(data,
 	classlevels <- getclasslevels(sampleda, class)
 	compareclass <- getcompareclass(classlevels)
 	if (!is.null(subclass) && strictmod){
-		sampleda[[subclass]] <- paste(sampleda[[class]], sampleda[[subclass]], sep="_")
-		datameta[[subclass]] <- as.vector(sampleda[[subclass]])
 		class2sub <- getclass2sub(sampleda, class, subclass)
 		comsubclass <- apply(compareclass,1,
 							 function(x)getcomparesubclass(x[1],x[2],class2sub))
@@ -131,7 +135,7 @@ diffAnalysis.data.frame <- function(data,
 	dameta <- split(dameta, dameta[[class]])
 	dameta <- sampledflist(dameta, bootnums=bootnums, ratio=ratio)
 	if (mlfun=="lda"){
-		mlres <- LDAeffectsize(dameta, compareclass, class, bootnums=bootnums) 
+		mlres <- LDAeffectsize(dameta, compareclass, class, bootnums=bootnums, LDA=ldascore) 
 	}
 	if (mlfun=="rf"){
 		mlres <- rfimportance(dameta, class, bootnums=bootnums)
@@ -143,7 +147,8 @@ diffAnalysis.data.frame <- function(data,
 		kwres=kwres,
 		secondvars=secondvars,
 		mlres=mlres,
-		classname=class)
+		classname=class,
+		normalization=normalization)
 	return(res)
 }
 
