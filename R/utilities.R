@@ -120,6 +120,7 @@ fillNAtax <- function(taxdf){
 #' @importFrom tibble rownames_to_column
 #' @keywords internal
 duplicatedtaxcheck <- function(taxdf){
+	if (ncol(taxdf)==1){return(taxdf)}
 	taxdf <- taxdf %>% rownames_to_column()
 	for (i in ncol(taxdf):3){
 		tmp <- split(taxdf,taxdf[,i])
