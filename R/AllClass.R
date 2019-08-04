@@ -70,6 +70,9 @@ setClass("clustplotClass",
 #' @keywords internal
 setClassUnion("listOrNull", c("list", "NULL"))
 
+#' @keywords internal
+setClassUnion("numericOrNull", c("numeric", "NULL"))
+
 #' @title diffAnalysisClass class
 #' @name diffAnalysisClass-class
 #' @rdname diffAnalysisClass-class
@@ -81,7 +84,8 @@ setClass("diffAnalysisClass",
 									   kwres="dataframeOrNull",
 									   secondvars="listOrNull",
 									   mlres="dataframeOrNull",
-									   classname="characterOrNull"
+									   classname="characterOrNull",
+									   normalization="numericOrNull"
 									   ),
 		 prototype=prototype(originalD=NULL,
 							 sampleda=NULL,
@@ -89,4 +93,5 @@ setClass("diffAnalysisClass",
 							 kwres=NULL,
 							 secondvars=NULL,
 							 mlres=NULL,
-							 classname=NULL))
+							 classname=NULL,
+							 normalization=NULL))
