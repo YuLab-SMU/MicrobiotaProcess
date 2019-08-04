@@ -14,7 +14,8 @@ diffAnalysis(x, ...)
   filtermod = "pvalue", firstalpha = 0.05, strictmod = TRUE,
   fcfun = "generalizedFC", secondcomfun = "wilcox.test", clmin = 5,
   clwilc = TRUE, secondalpha = 0.05, subclmin = 3,
-  subclwilc = TRUE, normalization = 1e+06, bootnums = 30, ...)
+  subclwilc = TRUE, ldascore = 2, normalization = 1e+06,
+  bootnums = 30, ...)
 
 \method{diffAnalysis}{phyloseq}(obj, class, subclass = NULL, ...)
 }
@@ -63,6 +64,8 @@ suggested choosing "kruskal.test" for uneven distributions, default is "kruskal.
 \item{subclmin}{integer, the minimum number of samples per suclass for performing test, default is 3.}
 
 \item{subclwilc}{logical, whether to perform test of per subclass, default is TRUE, meaning more strict.}
+
+\item{ldascore}{numeric, the threshold on the absolute value of the logarithmic LDA score, default is 2.}
 
 \item{normalization}{integer, set the normalization value, set a big number if to get more meaningful values 
 for the LDA score, or you can set NULL for no normalization, default is 1000000.}
