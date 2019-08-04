@@ -1,7 +1,7 @@
 #' @importFrom dplyr select
 #' @importFrom MASS lda
 #' @keywords internal
-LDAeffectsize <- function(datalist, compareclass, class, bootnums=30){
+LDAeffectsize <- function(datalist, compareclass, class, bootnums=30, LDA=2){
 	res <- list()
 	tmpformula <- as.formula(paste0(class, " ~. "))
 	for (i in 1:bootnums){
@@ -31,6 +31,9 @@ LDAeffectsize <- function(datalist, compareclass, class, bootnums=30){
 	res <- apply(res/bootnums, 2, function(x)max(x))
 	res <- log(1+res,10)
 	res <- data.frame(f=names(res), LDA=res)
+	res$f <- gsub("`", "", as.vector(res$f))
+	res <- res[res$LDA>=LDA,]
+	if (!nrow(res)>0){stop("No features with significant differences after LDA analysis.")}
 	rownames(res) <- NULL
 	return(res)
 }
