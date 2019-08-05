@@ -10,8 +10,8 @@ ggdiffclade(obj, ...)
 
 \method{ggdiffclade}{data.frame}(taxda, nodedf, factorName,
   layout = "circular", size = 0.6, alpha = 0.4, taxlevel = 6,
-  cladetext = 2, setColors = TRUE, settheme = TRUE,
-  setlegend = TRUE, ...)
+  cladetext = 2, factorLevels = NULL, setColors = TRUE,
+  settheme = TRUE, setlegend = TRUE, ...)
 
 \method{ggdiffclade}{diffAnalysisClass}(obj, ...)
 }
@@ -35,6 +35,9 @@ default is circular.}
 \item{taxlevel}{positive integer, the full text of clade, default is 5.}
 
 \item{cladetext}{numeric, the size of text of clade, default is 2.}
+
+\item{factorLevels}{list, the levels of the factors, default is NULL,
+if you want to order the levels of factor, you can set this.}
 
 \item{setColors}{logical, whether set the color of clade, default is TRUE, 
 or set FALSE,then use 'scale_fill_manual' setting.}
