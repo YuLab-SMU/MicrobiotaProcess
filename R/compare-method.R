@@ -186,3 +186,28 @@ getalltaxdf <- function(data, taxda){
    return(dt)
 }
 
+#' @title get the table of diffAnalysisClass
+#' @param obj object, diffAnalysisClass
+#' @export
+tidydiffAnalysis <- function(obj){
+	efres <- tidyEffectSize(obj)
+	kwres <- obj@kwres
+	difftb <- merge(efres, kwres, by.x="f", by.y="f")
+	return(difftb)
+}
+
+#' @keywords internal
+tidyEffectSize <- function(obj){
+	secondvars <- do.call("rbind",c(obj@secondvars,
+									make.row.names=FALSE))
+	secondvars <- secondvars %>% filter(gfc=="TRUE")
+	efres <- merge(obj@mlres, secondvars, by.x="f", by.y="f") %>%
+			select (-c("gfc", "Freq"))
+	if ("LDA" %in% colnames(efres)){
+		efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=obj@classname)), LDA)]))
+	}else{
+		efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=obj@classname)),
+															   MeanDecreaseAccuracy)]))
+	}
+	return(efres)
+}
