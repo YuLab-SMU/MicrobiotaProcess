@@ -6,6 +6,7 @@ tidytree::as.treedata
 #' @method as.treedata data.frame
 #' @rdname as.treedata
 #' @author Shuangbin Xu
+#' @importFrom tibble as_tibble
 #' @export
 as.treedata.data.frame <- function(data,...){
 	data <- fillNAtax(data)
