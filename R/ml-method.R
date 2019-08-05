@@ -14,8 +14,8 @@ LDAeffectsize <- function(datalist, compareclass, class, bootnums=30, LDA=2){
 			w.unit <- w/sqrt(sum(w^2))
 			ss <- df %>% select(-c(class)) %>% as.matrix()
 			LD <- ss %*% w.unit
-			tmpp1 <- df[[class]]==tmppairs[1]
-			tmpp2 <- df[[class]]==tmppairs[2]
+			tmpp1 <- df[[match(class, colnames(df))]]==tmppairs[1]
+			tmpp2 <- df[[match(class, colnames(df))]]==tmppairs[2]
 			effect.size <- abs(mean(LD[tmpp1,])-mean(LD[tmpp2,]))
 			wfinal <- w.unit * effect.size
 			coeff <- abs(wfinal)
