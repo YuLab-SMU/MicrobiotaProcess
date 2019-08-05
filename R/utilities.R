@@ -20,8 +20,8 @@ setfactorlevels <- function(data, factorlist){
         factornames <- intersect(colnames(data), names(factorlist))
         if (length(factornames)>0){
                 for(i in factornames){
-                        data[[i]] <- factor(data[[i]], 
-                                   levels=as.vector(factorlist[[i]]))
+                        data[[match(i,colnames(data))]] <- factor(data[[match(i, colnames(data))]], 
+                                   levels=as.vector(factorlist[[match(i,names(factorlist))]]))
                 }
         }
         return(data)
@@ -56,6 +56,7 @@ checksample <- function(obj){
 	}
 }
 
+#' @importFrom phyloseq sample_data
 #' @keywords internal.
 getsample <- function(obj){
 	if (is.null(obj@sam_data)){
