@@ -11,20 +11,19 @@ Imports:
   ape,
   plyr,	
   tidyr,
-  agricolae,
   ggplot2,
   phyloseq,
   magrittr,
   dplyr,
   Biostrings,
   ggrepel,
-  magrittr,
   stringr,
   vegan,
   rentrez,
   reshape,
   zoo,
-  ggtree
+  ggtree,
+  tidytree
 License: GPL (>= 2.0) 
 Encoding: UTF-8
 LazyData: false
