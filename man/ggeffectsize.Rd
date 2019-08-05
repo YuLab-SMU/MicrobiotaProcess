@@ -9,7 +9,7 @@
 ggeffectsize(obj, ...)
 
 \method{ggeffectsize}{data.frame}(data, factorName, effectsizename,
-  setColors = TRUE, settheme = TRUE, ...)
+  factorLevels = NULL, setColors = TRUE, settheme = TRUE, ...)
 
 \method{ggeffectsize}{diffAnalysisClass}(obj, ...)
 }
