@@ -4,9 +4,11 @@
 #' @param obj object, diffAnalysisClass, the results of diffAnalysis \code{\link[MicrobiotaProcess]{diffAnalysis}}.
 #' @param nodedf data.frame, contained the tax and the factor information and(or pvalue).
 #' @param factorName character, the names of factor in nodedf.
+#' @param removeUnkown logical, whether do not show unkown taxonomy, default is TRUE.
 #' @param layout character, the layout of ggtree, but only "rectangular" and "circular" in here, 
 #' default is circular.
 #' @param size numeric, the size of segment of ggtree, default is 0.6.
+#' @param skpointsize numeric, the point size of skeleton of tree, default is 0.8 .
 #' @param alpha numeric, the alpha of clade, default is 0.4.
 #' @param taxlevel positive integer, the full text of clade, default is 5.
 #' @param cladetext numeric, the size of text of clade, default is 2.
@@ -34,6 +36,7 @@ ggdiffclade.data.frame <- function(taxda,
 					 factorName,
 					 layout="circular", 
 					 size=0.6, 
+					 skpointsize=0.8,
 					 alpha=0.4,
 					 taxlevel=6,
 					 cladetext=2,
@@ -50,7 +53,8 @@ ggdiffclade.data.frame <- function(taxda,
 	nodedf <- getnode(treedata, nodedf)
 	p <- treeskeleton(treedata,
 				layout=layout,
-				size=size)
+				size=size,
+				pointsize=skpointsize)
 	cladecoord <- getcladedf(p, nodedf$node)
 	cladecoord <- merge(cladecoord, nodedf, by.x="node", by.y="node")
 	labelannotcoord <- getlabeldf(p, nodedf$node)
@@ -107,7 +111,7 @@ ggdiffclade.data.frame <- function(taxda,
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter select
 #' @export
-ggdiffclade.diffAnalysisClass <- function(obj,...){
+ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
 	taxda <- obj@taxda
 	secondvars <- obj@secondvars
 	secondvars <- do.call("rbind", 
@@ -116,6 +120,12 @@ ggdiffclade.diffAnalysisClass <- function(obj,...){
 	nodedfres <- merge(obj@kwres, secondvars, by.x="f", by.y="f") %>% 
 				select(-c("gfc", "Freq"))
 	nodedfres <- nodedfres[as.vector(nodedfres$f)%in%as.vector(obj@mlres$f),]
+	if (removeUnkown){
+		tmpflag <- grep("__un_",as.vector(nodedfres$f))
+		if (length(tmpflag)>0){
+			nodedfres <- nodedfres[-tmpflag,,drop=FALSE]
+		}
+	}
 	p <- ggdiffclade.data.frame(taxda=taxda,
 								nodedf=nodedfres,
 								factorName=obj@classname,
@@ -129,6 +139,7 @@ ggdiffclade.diffAnalysisClass <- function(obj,...){
 #' or featureMeanMedian see also \code{\link[MicrobiotaProcess]{getMeanMedian}}.
 #' @param filepath character, default is NULL, meaning current path. 
 #' @param output character, the output dir name, default is "biomarker_barplot".
+#' @param removeUnkown logical, whether do not show unkown taxonomy, default is TRUE.
 #' @param figwidth numeric, the width of figures, default is 6.
 #' @param figheight numeric, the height of figures, default is 3.
 #' @param featurename character, the feature name, contained at the objet.
@@ -153,6 +164,7 @@ setGeneric("ggdifftaxbar")
 setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
 										   filepath=NULL,
 										   output="biomarker_barplot",
+										   removeUnkown=TRUE,
 										   figwidth=6,
 										   figheight=3,
 										   ...){
@@ -164,6 +176,9 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
 	featureda <- merge(featureda, sampleda, by=0) %>%
 			column_to_rownames(var="Row.names")
 	featurelist <- as.vector(obj@mlres$f)
+	if (removeUnkown && length(grep("__un_", featurelist))>0){
+			featurelist <- featurelist[-grep("__un_", featurelist)]
+	}
 	if (ncol(obj@sampleda)>1){
 		subclass <- colnames(sampleda)[-match(obj@classname, colnames(sampleda))]
 	}else{
@@ -214,9 +229,11 @@ ggdifftaxbar.featureMeanMedian <- function(feMeanMedian,
 						  ymax=~value,
 						  ymin=~value,
 						  linetype=~statistic),
-					  size=0.5, width=1)+
-		facet_wrap(as.formula(paste0("~",class)),
-				   nrow=1, scale="free_x") + 
+					  size=0.5, width=1, 
+					  inherit.aes=FALSE)+
+		scale_linetype_manual(values=c("solid", "dotted"))+
+		facet_grid(as.formula(paste0("~",class)),
+				   space="free_x", scales="free_x") + 
 		labs(title=featurename) + xlab(NULL)+
 		scale_y_continuous(expand=c(0,0),
 						   limits=c(0,max(data$RelativeAbundance)*1.05))
@@ -274,6 +291,7 @@ getMeanMedian <- function(datameta, feature, subclass){
 
 #' @title visualization of effect size by the Linear Discriminant Analysis or randomForest
 #' @param obj object, diffAnalysisClass see \code{\link[MicrobiotaProcess]{diffAnalysis}}
+#' @param removeUnkown logical, whether do not show unkown taxonomy, default is TRUE.
 #' @param data data.frame, data.frame contained effect size and the group information. 
 #' @param factorName character, the column name contained group information in data.frame.
 #' @param effectsizename character, the column name contained effect size information.
@@ -337,8 +355,11 @@ ggeffectsize.data.frame <- function(data,
 #' @method ggeffectsize diffAnalysisClass
 #' @rdname ggeffectsize
 #' @export
-ggeffectsize.diffAnalysisClass <- function(obj, ...){
+ggeffectsize.diffAnalysisClass <- function(obj, removeUnkown=TRUE,...){
 	efres <- tidyEffectSize(obj)
+	if (removeUnkown && length(grep("__un_",efres$f))){
+		efres <- efres[-grep("__un_",efres$f),,drop=FALSE]
+	}
 	if ("LDA" %in% colnames(obj@mlres)){
 		effectsizename <- "LDA"
 	}else{
@@ -369,11 +390,11 @@ getnode <- function(treedata, nodedf){
 
 #' @importFrom ggtree ggtree
 #' @keywords internal
-treeskeleton <- function(treedata, layout, size){
+treeskeleton <- function(treedata, layout, size, pointsize=1){
 	 p <- ggtree(treedata,
 				layout=layout,
 				size=size) +
-		 geom_point(size=1,
+		 geom_point(size=pointsize,
 					shape=21, 
 					fill="white",
 					color="black")
@@ -385,14 +406,17 @@ treeskeleton <- function(treedata, layout, size){
 ggdiffcladeguides <- function(...){
 	guides(fill= guide_legend(keywidth = 0.5, keyheight = 0.5, order=1),
 		   size=guide_legend(keywidth = 0.5, keyheight = 0.5, order=2),
-		   color = guide_legend(keywidth = 0.1, keyheight = 0.6, order = 3),...)
+		   color = guide_legend(keywidth = 0.1, ncol=1, keyheight = 0.6, order = 3),...)
 }
 
 #' @importFrom ggplot2 theme
 #' @keywords internal
 ggdiffcladetheme <- function(...){
-	theme(legend.position=c(0.91, 0.5),
-		  legend.text = element_text(size=6.5),
-		  legend.title=element_text(size=7),
+	theme(legend.position="right",
+		  legend.margin=margin(0,0,0,0),
+		  legend.spacing.y = unit(0.02, "cm"),
+		  legend.box.spacing=unit(0.02,"cm"),
+		  legend.text = element_text(size=5),
+		  legend.title=element_text(size=6),
 		  legend.background=element_rect(fill=NA))
 }
