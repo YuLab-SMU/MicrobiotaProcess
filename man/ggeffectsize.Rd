@@ -11,7 +11,7 @@ ggeffectsize(obj, ...)
 \method{ggeffectsize}{data.frame}(data, factorName, effectsizename,
   factorLevels = NULL, setColors = TRUE, settheme = TRUE, ...)
 
-\method{ggeffectsize}{diffAnalysisClass}(obj, ...)
+\method{ggeffectsize}{diffAnalysisClass}(obj, removeUnkown = TRUE, ...)
 }
 \arguments{
 \item{obj}{object, diffAnalysisClass see \code{\link[MicrobiotaProcess]{diffAnalysis}}}
@@ -27,6 +27,8 @@ use scale_color_manual setting.}
 
 \item{settheme}{logical, whether set the theme, default is TRUE, or FALSE, then
 use theme and guides setting.}
+
+\item{removeUnkown}{logical, whether do not show unkown taxonomy, default is TRUE.}
 }
 \description{
 visualization of effect size by the Linear Discriminant Analysis or randomForest
