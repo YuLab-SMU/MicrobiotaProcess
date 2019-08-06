@@ -28,7 +28,7 @@ getlabeldf <- function(ggtree, node){
 	df <- lapply(node, function(x)getcladelabelposition(data, x, angle="auto", angleoff=90))
 	df <- do.call("rbind", df)
 	df$node <- node
-	df$y <- as.numeric(apply(df[,c("y", "yend")], 1, mean)) 
+	df$y <- as.numeric(apply(df[,match(c("y", "yend"), colnames(df))], 1, mean)) 
 	data <- data %>% dplyr::select(-c("x", "y", "angle"))
 	df <- merge(df, data, by.x="node", by.y="node")
 	df$x <- df$x + df$extend
