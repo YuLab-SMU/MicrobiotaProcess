@@ -73,8 +73,10 @@ diffAnalysis.data.frame <- function(data,
 		}
 	}
 	sampleda <- sampleda %>% select(c(class, subclass))
-	sampleda <- duplicatedtaxcheck(sampleda) %>% 
-			column_to_rownames(var="rowname") 
+	if (ncol(sampleda)>1){
+		sampleda <- duplicatedtaxcheck(sampleda) %>% 
+				column_to_rownames(var="rowname")
+	}
 	vars <- colnames(data)
 	datameta <- merge(data, sampleda, by=0)
 	kwres <- multi.compare(fun=firstcomfun,
@@ -86,9 +88,9 @@ diffAnalysis.data.frame <- function(data,
 	kwres <- data.frame(f=rownames(kwres),pvalue=kwres[,1])
 	kwres$fdr <- p.adjust(kwres$pvalue, method=padjust)
 	if (!filtermod=="pvalue"){
-		varsfirst <- as.vector(kwres[kwres$fdr <= firstalpha,,drop=FALSE]$f)
+		varsfirst <- as.vector(kwres[kwres$fdr<=firstalpha& !is.na(kwres$fdr),,drop=FALSE]$f)
 	}else{
-		varsfirst <- as.vector(kwres[kwres$pvalue<=firstalpha,,drop=FALSE]$f)
+		varsfirst <- as.vector(kwres[kwres$pvalue<=firstalpha&!is.na(kwres$pvalue),,drop=FALSE]$f)
 	}
 	if (!length(varsfirst)>0){stop("There are not significantly discriminative features before internal wilcoxon!")}
 	classlevels <- getclasslevels(sampleda, class)
