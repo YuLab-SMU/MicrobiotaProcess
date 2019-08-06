@@ -9,11 +9,11 @@
 ggdiffclade(obj, ...)
 
 \method{ggdiffclade}{data.frame}(taxda, nodedf, factorName,
-  layout = "circular", size = 0.6, alpha = 0.4, taxlevel = 6,
-  cladetext = 2, factorLevels = NULL, setColors = TRUE,
-  settheme = TRUE, setlegend = TRUE, ...)
+  layout = "circular", size = 0.6, skpointsize = 0.8, alpha = 0.4,
+  taxlevel = 6, cladetext = 2, factorLevels = NULL,
+  setColors = TRUE, settheme = TRUE, setlegend = TRUE, ...)
 
-\method{ggdiffclade}{diffAnalysisClass}(obj, ...)
+\method{ggdiffclade}{diffAnalysisClass}(obj, removeUnkown = TRUE, ...)
 }
 \arguments{
 \item{obj}{object, diffAnalysisClass, the results of diffAnalysis \code{\link[MicrobiotaProcess]{diffAnalysis}}.}
@@ -29,6 +29,8 @@ such like the tax_data of phyloseq.}
 default is circular.}
 
 \item{size}{numeric, the size of segment of ggtree, default is 0.6.}
+
+\item{skpointsize}{numeric, the point size of skeleton of tree, default is 0.8 .}
 
 \item{alpha}{numeric, the alpha of clade, default is 0.4.}
 
@@ -47,6 +49,8 @@ or set FALSE, then use 'theme' setting.}
 
 \item{setlegend}{logical, whether set the legend, default is TRUE,
 or set FALSE, then use 'guides' or 'theme' setting.}
+
+\item{removeUnkown}{logical, whether do not show unkown taxonomy, default is TRUE.}
 }
 \description{
 plot the clade tree results of different analysis
