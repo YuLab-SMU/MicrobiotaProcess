@@ -11,7 +11,8 @@
 ggdifftaxbar(obj, ...)
 
 \S4method{ggdifftaxbar}{diffAnalysisClass}(obj, filepath = NULL,
-  output = "biomarker_barplot", figwidth = 6, figheight = 3, ...)
+  output = "biomarker_barplot", removeUnkown = TRUE, figwidth = 6,
+  figheight = 3, ...)
 
 \method{ggdifftaxbar}{featureMeanMedian}(feMeanMedian, featurename, class,
   subclass, factorLevels = NULL, setColors = TRUE, coloslist = NULL,
@@ -24,6 +25,8 @@ or featureMeanMedian see also \code{\link[MicrobiotaProcess]{getMeanMedian}}.}
 \item{filepath}{character, default is NULL, meaning current path.}
 
 \item{output}{character, the output dir name, default is "biomarker_barplot".}
+
+\item{removeUnkown}{logical, whether do not show unkown taxonomy, default is TRUE.}
 
 \item{figwidth}{numeric, the width of figures, default is 6.}
 
