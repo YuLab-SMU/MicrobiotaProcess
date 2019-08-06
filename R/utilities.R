@@ -113,12 +113,12 @@ fillNAtax <- function(taxdf){
 		colnames(taxdf) <- tmpcolnames
 	}
 	taxdf <- filltaxname(taxdf)
-	taxdf <- duplicatedtaxcheck(taxdf) %>% column_to_rownames(var="rowname")
+	taxdf <- repduplicatedtaxcheck(taxdf) #%>% column_to_rownames(var="rowname")
 	return(taxdf)
 }
 
 #' @importFrom magrittr %>%
-#' @importFrom tibble rownames_to_column
+#' @importFrom tibble rownames_to_column column_to_rownames
 #' @keywords internal
 duplicatedtaxcheck <- function(taxdf){
 	if (ncol(taxdf)==1){return(taxdf)}
@@ -132,6 +132,15 @@ duplicatedtaxcheck <- function(taxdf){
 			}
 		}
 		taxdf <- do.call("rbind",c(tmp, make.row.names=FALSE)) 
+	}
+	taxdf #%>% column_to_rownames(var="rowname")
+	return(taxdf)
+}
+
+#' @keywords internal
+repduplicatedtaxcheck <- function(taxdf){
+	for (i in 1:7){
+		taxdf <- duplicatedtaxcheck(taxdf) %>% column_to_rownames(var="rowname")
 	}
 	return(taxdf)
 }
