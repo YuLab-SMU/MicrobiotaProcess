@@ -35,7 +35,7 @@ as.treedata.data.frame <- function(data,...){
 	childnode <- mapping[match(as.vector(datalist$child), as.vector(mapping$labelnames)),]$node
 	edges <- cbind(parentnode, childnode) 
 	colnames(edges) <- NULL
-	edges[is.na(edges)] <- sum(isTip) + 1 
+	edges[is.na(edges)] <- sum(isTip) + 1
 	root <- data.frame(node=sum(isTip)+1,
 					   labelnames="r__root",
 					   isTip=FALSE,
