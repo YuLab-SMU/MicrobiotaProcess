@@ -153,7 +153,7 @@ getcompareres <- function(reslist, pfold){
 	}else{
 		reslist <- data.frame(reslist, stringsAsFactors =FALSE)
 		colnames(reslist) <- c("f", "gfc", "pvalue")
-		reslist <- reslist[reslist$pvalue <= pfold,,drop=FALSE]
+		reslist <- reslist[reslist$pvalue <= pfold &!is.na(reslist$pvalue),,drop=FALSE]
 		reslist$pvalue <- NULL
 		reslist$gfc <- reslist$gfc > 0 
 		reslist <- data.frame(table(reslist),stringsAsFactors =FALSE)
