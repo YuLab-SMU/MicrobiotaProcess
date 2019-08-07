@@ -200,9 +200,7 @@ tidydiffAnalysis <- function(obj){
 
 #' @keywords internal
 tidyEffectSize <- function(obj){
-	secondvars <- do.call("rbind",c(obj@secondvars,
-									make.row.names=FALSE))
-	secondvars <- secondvars %>% filter(gfc=="TRUE")
+	secondvars <- getsecondTRUEvar(obj)
 	efres <- merge(obj@mlres, secondvars, by.x="f", by.y="f") %>%
 			select (-c("gfc", "Freq"))
 	if ("LDA" %in% colnames(efres)){
@@ -212,4 +210,12 @@ tidyEffectSize <- function(obj){
 															   MeanDecreaseAccuracy)]))
 	}
 	return(efres)
+}
+
+#' @keywords internal
+getsecondTRUEvar <- function(obj){
+	secondvars <- do.call("rbind",c(obj@secondvars,
+									make.row.names=FALSE))
+	secondvars <- secondvars %>% filter(gfc=="TRUE")
+	return(secondvars)
 }
