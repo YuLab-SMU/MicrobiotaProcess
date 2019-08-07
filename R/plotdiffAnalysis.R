@@ -113,13 +113,12 @@ ggdiffclade.data.frame <- function(taxda,
 #' @export
 ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
 	taxda <- obj@taxda
-	secondvars <- obj@secondvars
-	secondvars <- do.call("rbind", 
-						  c(secondvars, make.row.names=FALSE))
-	secondvars <- secondvars %>% filter(gfc=="TRUE")
-	nodedfres <- merge(obj@kwres, secondvars, by.x="f", by.y="f") %>% 
-				select(-c("gfc", "Freq"))
-	nodedfres <- nodedfres[as.vector(nodedfres$f)%in%as.vector(obj@mlres$f),]
+	#secondvars <- getsecondTRUEvar(obj)
+	#nodedfres <- merge(obj@kwres, secondvars, by.x="f", by.y="f") %>% 
+	#			select(-c("gfc", "Freq"))
+	#nodedfres <- nodedfres[as.vector(nodedfres$f)%in%as.vector(obj@mlres$f),]
+	#nodedfres <- merge(nodedfres, obj@mlres$f, by.x="f", by.y="f")
+	nodedfres <- tidydiffAnalysis(obj)
 	if (removeUnkown){
 		tmpflag <- grep("__un_",as.vector(nodedfres$f))
 		if (length(tmpflag)>0){
@@ -175,11 +174,12 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
 	sampleda <- obj@sampleda
 	featureda <- merge(featureda, sampleda, by=0) %>%
 			column_to_rownames(var="Row.names")
-	featurelist <- as.vector(obj@mlres$f)
+	nodedfres <- tidydiffAnalysis(obj)
+	featurelist <- as.vector(nodedfres$f)
 	if (removeUnkown && length(grep("__un_", featurelist))>0){
 			featurelist <- featurelist[-grep("__un_", featurelist)]
 	}
-	if (ncol(obj@sampleda)>1){
+	if (ncol(sampleda)>1){
 		subclass <- colnames(sampleda)[-match(obj@classname, colnames(sampleda))]
 	}else{
 		subclass <- obj@classname
