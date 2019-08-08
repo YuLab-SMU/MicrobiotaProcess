@@ -1,0 +1,13 @@
+sample	group
+B11	B
+B1	B
+B6	B
+D1	D
+D3	D
+D6	D
+M10	M
+M1	M
+M2	M
+N3	N
+N6	N
+N7	N
