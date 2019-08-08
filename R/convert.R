@@ -1,14 +1,9 @@
-#' @importFrom tidytree as.treedata
-#' @export
-tidytree::as.treedata
-
 #' @title convert dataframe contained hierarchical relationship or other classes to treedata class
-#' @method as.treedata data.frame
-#' @rdname as.treedata
+#' @param data data.frame, such like the tax_table of phyloseq.
 #' @author Shuangbin Xu
 #' @importFrom tibble as_tibble
 #' @export
-as.treedata.data.frame <- function(data,...){
+convert_to_treedata <- function(data,...){
 	data <- fillNAtax(data)
 	data <- data.frame(root=rep("r__root", nrow(data)), data)
 	datalist <- list()
@@ -28,9 +23,7 @@ as.treedata.data.frame <- function(data,...){
 						  isTip)
 	mapping$nodeClass <- unlist(lapply(as.vector(mapping$labelnames),
 									   function(x)(unlist(strsplit(x,"__"))[1])))
-	#if (is.null(nodeSize)){
 	mapping$nodeSize <- 1
-	#}
 	parentnode <- mapping[match(as.vector(datalist$parent), as.vector(mapping$labelnames)),]$node 
 	childnode <- mapping[match(as.vector(datalist$child), as.vector(mapping$labelnames)),]$node
 	edges <- cbind(parentnode, childnode) 
