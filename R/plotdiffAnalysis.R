@@ -45,7 +45,7 @@ ggdiffclade.data.frame <- function(taxda,
 					 settheme=TRUE,
 					 setlegend=TRUE,
 					   ...){
-	treedata <- as.treedata(taxda)
+	treedata <- convert_to_treedata(taxda)
 	layout %<>% match.arg(c("rectangular", "circular"))
 	if (!is.null(factorLevels)){
 		nodedf <- setfactorlevels(nodedf, factorLevels)
