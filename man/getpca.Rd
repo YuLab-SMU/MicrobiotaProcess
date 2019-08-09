@@ -8,9 +8,10 @@
 \usage{
 getpca(obj, ...)
 
-\method{getpca}{default}(data, sampleda = NULL, method = "log", ...)
+\method{getpca}{default}(data, sampleda = NULL, method = "hellinger",
+  ...)
 
-\method{getpca}{phyloseq}(obj, ...)
+\method{getpca}{phyloseq}(obj, method = "hellinger", ...)
 }
 \arguments{
 \item{obj}{data.frame or phyloseq class,shape of data.frame is nrow sample * ncol feature}
