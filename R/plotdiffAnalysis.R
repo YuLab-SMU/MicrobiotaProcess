@@ -138,6 +138,7 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
 #' or featureMeanMedian see also \code{\link[MicrobiotaProcess]{getMeanMedian}}.
 #' @param filepath character, default is NULL, meaning current path. 
 #' @param output character, the output dir name, default is "biomarker_barplot".
+#' @param xtextsize numeric, the size of axis x label, default is 3.
 #' @param removeUnkown logical, whether do not show unkown taxonomy, default is TRUE.
 #' @param figwidth numeric, the width of figures, default is 6.
 #' @param figheight numeric, the height of figures, default is 3.
@@ -208,6 +209,7 @@ ggdifftaxbar.featureMeanMedian <- function(feMeanMedian,
 									featurename, 
 									class, 
 									subclass,
+									xtextsize=3,
 									factorLevels=NULL,
 									setColors=TRUE, 
 									coloslist=NULL,
@@ -247,7 +249,7 @@ ggdifftaxbar.featureMeanMedian <- function(feMeanMedian,
 					  legend.text = element_text(size=6.5),
 					  legend.title=element_text(size=7),
 					  legend.background=element_rect(fill=NA),
-					  axis.text.x=element_text(angle=-45, hjust = 0, size=4),
+					  axis.text.x=element_text(angle=-45, hjust = 0, size=xtextsize),
 					  panel.spacing = unit(0.2, "mm"), 
 					  strip.background = element_rect(colour=NA,fill="grey"))
 	}
