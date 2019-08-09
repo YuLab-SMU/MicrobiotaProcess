@@ -8,7 +8,7 @@
 \usage{
 getvennlist(obj, ...)
 
-\method{getvennlist}{phyloseq}(obj, factorNames, ...)
+\method{getvennlist}{phyloseq}(obj, ...)
 
 \method{getvennlist}{default}(da, sampleinfo = NULL,
   factorNames = NULL, ...)
@@ -19,10 +19,11 @@ all columns should be numeric if sampleinfo isn't NULL.}
 
 \item{...}{additional parameters, see \code{\link[MicrobitaProcess]{CountOrRatios}}.}
 
-\item{factorNames}{character, a column name of sampleinfo, 
-when sampleinfo isn't NULL, factorNames shouldn't be NULL, default is NULL.}
-
 \item{sampleinfo}{dataframe; a sample information, default is NULL.}
+
+\item{factorNames}{character, a column name of sampleinfo, 
+when sampleinfo isn't NULL, factorNames shouldn't be NULL, default is NULL,
+when the input is phyloseq, the factorNames should be provided.}
 }
 \value{
 return a list for VennDiagram.
