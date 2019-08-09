@@ -8,7 +8,7 @@
 \usage{
 gettaxdf(obj, ...)
 
-\method{gettaxdf}{phyloseq}(obj, taxlevel = "Phylum", ...)
+\method{gettaxdf}{phyloseq}(obj, taxlevel = 2, ...)
 
 \method{gettaxdf}{default}(otuda, taxda, taxlevel, sampleda = NULL, ...)
 }
@@ -19,8 +19,8 @@ row sample * column feature.}
 \item{...}{additional parameters, see also \code{\link[MicrobiotaProcess]{CountOrRatios}}}
 
 \item{taxlevel}{character, the column names of taxda that you want to get.
-when the input is phyloseq class, default is "Phylum", and options is "Kingdom", 
-"Phylum", "Class", "Order", "Family", "Genus", "Species".}
+when the input is phyloseq class, the common names of tax rank is "Kingdom", 
+"Phylum", "Class", "Order", "Family", "Genus", "Species", but you can use 1 to 7.}
 
 \item{taxda}{data.frame, the classifies of feature contained in obj.}
 
