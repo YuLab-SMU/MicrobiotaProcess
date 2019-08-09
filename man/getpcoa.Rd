@@ -18,6 +18,28 @@ getpcoa(obj, ...)
 
 \method{getpcoa}{phyloseq}(obj, distmethod = "euclidean", ...)
 }
+\arguments{
+\item{obj}{phyloseq, the phyloseq class or dist class.}
+
+\item{..., }{additional parameter, see \code{\link[MicrobiotaProcess]{getdist}}.}
+
+\item{data}{data.frame, numeric data.frame nrow sample * ncol features.}
+
+\item{taxa_are_rows}{logical, if feature of data is column, it should be set FALSE.}
+
+\item{sampleda}{data.frame, nrow sample * ncol factor, default is NULL.}
+
+\item{tree}{phylo, the phylo class, default is NULL, when use unifrac method, it should be
+required.}
+
+\item{type}{character, default is sample.}
+
+\item{method}{character, the standardization method for community ecologists, default is hellinger,
+if the data has be normlized, it shound be set NULL.}
+}
 \description{
 performs principal coordinate analysis (PCoA)
+}
+\author{
+Shuangbin Xu
 }
