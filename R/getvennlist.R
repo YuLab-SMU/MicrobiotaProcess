@@ -20,7 +20,7 @@ getvennlist.default <- function(da,
 				multiplenum=1,
    				rownamekeep=FALSE,
 				...)
-	vennlist <- apply(data, 1, function(data){names(data[data>0])})
+	vennlist <- apply(data, 1, function(x){names(x[x>0])})
 	return(vennlist)
 	
 }
