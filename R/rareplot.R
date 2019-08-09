@@ -4,14 +4,14 @@
 #' @rdname ggrarecurve
 #' @export
 ggrarecurve.default <- function(data,
-			   nrows,
-			   mapping=NULL,
-			   linesize=0.5,	
-			   chunks=400,
 			   sampleda,
+			   indexNames="Observe",
+			   linesize=0.5,
+		   	   facetnrow=1,
+			   mapping=NULL,	   
+			   chunks=400,
 			   factorNames,
 			   factorLevels,
-			   indexNames="Observe",
 			   se=FALSE,
 			   method="lm",			   
 			   formula=y ~ log(x),
@@ -41,13 +41,11 @@ ggrarecurve.default <- function(data,
 		 		size=linesize,
 		  		formula = formula,
 				...) 
-	if (!missing(nrows)){
-		p <- p + facet_wrap(~ Alpha, 
-				      scales="free", 
-				      nrow=nrows)
-	}else{
-		p <- p + facet_wrap(~ Alpha, scales="free")
-	}
+	#if (!missing(nrows)){
+	p <- p + facet_wrap(~ Alpha, scales="free", nrow=facetnrow)
+	#}else{
+	#	p <- p + facet_wrap(~ Alpha, scales="free")
+	#}
 	return(p)
 }
 
