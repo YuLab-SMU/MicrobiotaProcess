@@ -23,6 +23,7 @@ ggbartax.default <- function(data,
 							 sampleda=sampleda, 
 							 factorLevels=factorLevels,
 							 plotda=TRUE)
+		#ymax <- max(data$value)*1.05
 	}else{
 		mapping <- mapping
 	}
@@ -87,7 +88,7 @@ mappingtaxda <- function(data, topn=30,
 	dat <- dat[order(dat$sum, decreasing = TRUE),,drop=FALSE]
 	dat$sums <- NULL
 	tmpsums <- matrix(colSums(dat),nrow=1) %>% data.frame()
-	if (!missing(topn)){
+	if (topn < nrow(dat)){
 		dat <- dat[1:topn,,drop=FALSE]
 		if (!count){
 			others <- 100 - (matrix(apply(dat,2,sum),nrow=1) %>% 
@@ -173,7 +174,7 @@ taxbartheme <- function(){
 #' @importFrom ggplot2 guides
 #' @export
 
-taxbarguildes <- function(keywidth=0.4, keyheight=0.4, ncol=5, ...){
+taxbarguildes <- function(keywidth=0.3, keyheight=0.3, ncol=5, ...){
 	guides(fill=guide_legend(keywidth = keywidth, 
 							 keyheight = keyheight,
 							 ncol=ncol),...)
