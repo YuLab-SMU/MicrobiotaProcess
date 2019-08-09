@@ -49,8 +49,8 @@ ggbartax.phyloseq <- function(obj, ...){
 #' row sample * column feature.
 #' @param taxda data.frame, the classifies of feature contained in obj.
 #' @param taxlevel character, the column names of taxda that you want to get.
-#' when the input is phyloseq class, default is "Phylum", and options is "Kingdom", 
-#' "Phylum", "Class", "Order", "Family", "Genus", "Species".
+#' when the input is phyloseq class, the common names of tax rank is "Kingdom", 
+#' "Phylum", "Class", "Order", "Family", "Genus", "Species", but you can use 1 to 7.
 #' @param sampleda data.frame, the sample information.
 #' @param ... additional parameters, see also \code{\link[MicrobiotaProcess]{CountOrRatios}}
 #' @return phyloseq class contained tax data.frame and sample information.
@@ -64,7 +64,7 @@ gettaxdf <- function(obj,...){
 #' @importFrom phyloseq otu_table tax_table taxa_are_rows
 #' @rdname gettaxdf
 #' @export
-gettaxdf.phyloseq <- function(obj, taxlevel="Phylum", ...){
+gettaxdf.phyloseq <- function(obj, taxlevel=2, ...){
 	if (is.null(obj@tax_table)){
 		stop("The tax table is empty!")
 	}else{
@@ -72,6 +72,15 @@ gettaxdf.phyloseq <- function(obj, taxlevel="Phylum", ...){
 	}
 	otuda <- checkotu(obj)
 	sampleda <- getsample(obj)
+	if (inherits(taxlevel, 'numeric')){taxlevel <- rank_names(obj)[taxlevel]}
+	if (inherits(taxlevel, 'character')){
+		if (!taxlevel %in% rank_names(obj)){
+			stop("the taxlevel should be among the values of rank_names(phyloseq)")
+		}else{
+			taxlevel <- rank_names(obj)[match(taxlevel,rank_names(obj))]
+		}
+	}
+	#taxlevel <- rank_names(obj)[taxlevel]
 	taxdf <- gettaxdf.default(otuda, 
 							  taxda=taxdf, 
 							  taxlevel=taxlevel,
@@ -109,7 +118,6 @@ gettaxdf.default <- function(otuda, taxda,
 #' @title Rarefaction alpha index
 #' @param obj data.frame or phyloseq class, shape of data.frame (nrow sample * ncol feature (factor)) or
 #' the data.frame for stat_smooth.
-#' @param nrows, the nrow of facet.
 #' @param mapping, set of aesthetic mapping of ggplot2, default is NULL,
 #' if the data is the data.frame for stat_smooth, the mapping should be set. 
 #' @param linesize integer, default is 0.5. 
@@ -117,9 +125,11 @@ gettaxdf.default <- function(otuda, taxda,
 #'  default is 400.
 #' @param sampleda, data.frame, (nrow sample * ncol factor)
 #' @param factorNames character, default is missing.
+#' @param facetnrow, the nrow of facet, default is 1.
 #' @param factorLevels list, the levels of the factors, default is NULL,
 #' if you want to order the levels of factor, you can set this.
-#' @param indexNames vector character, default is "Observe".
+#' @param indexNames vector character, default is "Observe", only for "Observe",
+#' "Chao1", "ACE", "Shannon", "Simpson", "J".
 #' @param se logical, default is FALSE.
 #' @param method character, default is lm. 
 #' @param formula formula, default is `y ~ log(x)`
@@ -146,7 +156,8 @@ ggrarecurve.phyloseq <- function(obj, ...){
 #' all columns should be numeric if sampleinfo isn't NULL.
 #' @param sampleinfo dataframe; a sample information, default is NULL.
 #' @param  factorNames character, a column name of sampleinfo, 
-#' when sampleinfo isn't NULL, factorNames shouldn't be NULL, default is NULL. 
+#' when sampleinfo isn't NULL, factorNames shouldn't be NULL, default is NULL,
+#' when the input is phyloseq, the factorNames should be provided. 
 #' @param ... additional parameters, see \code{\link[MicrobitaProcess]{CountOrRatios}}.
 #' @return return a list for VennDiagram.
 #' @author ShuangbinXu
@@ -158,13 +169,13 @@ getvennlist <- function(obj,...){
 #' @method getvennlist phyloseq
 #' @rdname getvennlist
 #' @export 
-getvennlist.phyloseq <- function(obj, factorNames, ...){
+getvennlist.phyloseq <- function(obj, ...){
 	otuda <- checkotu(obj)
 	sampleda <- checksample(obj)
 	#tmpfactors <- colnames(sampleda)[factorNamesIndex]
 	vennlist <- getvennlist.default(da=otuda,
 									sampleinfo=sampleda,
-									factorNames=factorNames,
+									#factorNames=factorNames,
 									...)
 	return(vennlist)
 }
