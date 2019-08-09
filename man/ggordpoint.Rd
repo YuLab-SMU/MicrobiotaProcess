@@ -12,7 +12,7 @@ ggordpoint(obj, ...)
   sampleda = NULL, factorNames = NULL, factorLevels = NULL,
   poinsize = 2, linesize = 0.3, arrowsize = 1.5,
   arrowlinecolour = "grey", ellipse = FALSE, ellipse_pro = 0.9,
-  ellipse_alpha = 0.2, biplot = TRUE, topn = 5, settheme = TRUE,
+  ellipse_alpha = 0.2, biplot = FALSE, topn = 5, settheme = TRUE,
   speciesannot = FALSE, textsize = 2.5, fontface = "bold.italic",
   fontfamily = "sans", textlinesize = 0.02, ...)
 
@@ -48,7 +48,7 @@ if you want to order the levels of factor, you can set this.}
 
 \item{ellipse_alpha}{numeric, the alpha of ellipse, default is 0.2.}
 
-\item{biplot}{logical, whether plot the species, default is TRUE.}
+\item{biplot}{logical, whether plot the species, default is FALSE.}
 
 \item{topn}{integer or vector, the number species have top important contribution, default is 5.}
 
