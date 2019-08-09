@@ -1,6 +1,5 @@
 #' @method getvennlist default
 #' @rdname getvennlist
-#' @author Shuangbin Xu
 #' @export
 getvennlist.default <- function(da,
 			   sampleinfo=NULL,
