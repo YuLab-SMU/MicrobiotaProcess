@@ -10,9 +10,9 @@ ggrarecurve(obj, ...)
 
 \method{ggrarecurve}{phyloseq}(obj, ...)
 
-\method{ggrarecurve}{default}(data, nrows, mapping = NULL,
-  linesize = 0.5, chunks = 400, sampleda, factorNames, factorLevels,
-  indexNames = "Observe", se = FALSE, method = "lm", formula = y ~
+\method{ggrarecurve}{default}(data, sampleda, indexNames = "Observe",
+  linesize = 0.5, facetnrow = 1, mapping = NULL, chunks = 400,
+  factorNames, factorLevels, se = FALSE, method = "lm", formula = y ~
   log(x), ...)
 }
 \arguments{
@@ -21,24 +21,25 @@ the data.frame for stat_smooth.}
 
 \item{...}{additional parameters, see \code{\link{ggplot2}{ggplot}}.}
 
-\item{nrows, }{the nrow of facet.}
+\item{sampleda, }{data.frame, (nrow sample * ncol factor)}
+
+\item{indexNames}{vector character, default is "Observe", only for "Observe",
+"Chao1", "ACE", "Shannon", "Simpson", "J".}
+
+\item{linesize}{integer, default is 0.5.}
+
+\item{facetnrow, }{the nrow of facet, default is 1.}
 
 \item{mapping, }{set of aesthetic mapping of ggplot2, default is NULL,
 if the data is the data.frame for stat_smooth, the mapping should be set.}
 
-\item{linesize}{integer, default is 0.5.}
-
 \item{chunks}{integer, the number of subsample in a sample,
 default is 400.}
-
-\item{sampleda, }{data.frame, (nrow sample * ncol factor)}
 
 \item{factorNames}{character, default is missing.}
 
 \item{factorLevels}{list, the levels of the factors, default is NULL,
 if you want to order the levels of factor, you can set this.}
-
-\item{indexNames}{vector character, default is "Observe".}
 
 \item{se}{logical, default is FALSE.}
 
