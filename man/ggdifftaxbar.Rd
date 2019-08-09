@@ -15,8 +15,8 @@ ggdifftaxbar(obj, ...)
   figheight = 3, ...)
 
 \method{ggdifftaxbar}{featureMeanMedian}(feMeanMedian, featurename, class,
-  subclass, factorLevels = NULL, setColors = TRUE, coloslist = NULL,
-  settheme = TRUE, ...)
+  subclass, xtextsize = 3, factorLevels = NULL, setColors = TRUE,
+  coloslist = NULL, settheme = TRUE, ...)
 }
 \arguments{
 \item{obj}{object, diffAnalysisClass see also \code{\link[MicrobiotaProcess]{diffAnalysis}} 
@@ -37,6 +37,8 @@ or featureMeanMedian see also \code{\link[MicrobiotaProcess]{getMeanMedian}}.}
 \item{class}{character, factor name.}
 
 \item{subclass}{character, factor name.}
+
+\item{xtextsize}{numeric, the size of axis x label, default is 3.}
 
 \item{setColors}{logical, whether set the colors, default is TRUE, or FALSE,then
 use scale_color_manual setting.}
