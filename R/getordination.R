@@ -65,6 +65,17 @@ getdist.phyloseq <- function(obj, distmethod="euclidean", type="sample", method=
 }
 
 #' @title performs principal coordinate analysis (PCoA)
+#' @param data data.frame, numeric data.frame nrow sample * ncol features.
+#' @param obj phyloseq, the phyloseq class or dist class.
+#' @param sampleda data.frame, nrow sample * ncol factor, default is NULL.
+#' @param taxa_are_rows logical, if feature of data is column, it should be set FALSE.
+#' @param tree phylo, the phylo class, default is NULL, when use unifrac method, it should be
+#' required.
+#' @param type character, default is sample.
+#' @param method character, the standardization method for community ecologists, default is hellinger,
+#' if the data has be normlized, it shound be set NULL.
+#' @param ..., additional parameter, see \code{\link[MicrobiotaProcess]{getdist}}.
+#' @author Shuangbin Xu
 #' @export
 getpcoa <- function(obj, ...){
 	UseMethod("getpcoa")
