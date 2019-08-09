@@ -16,7 +16,7 @@ getpca <- function(obj,...){
 #' @export
 getpca.default <- function(data,
 				   sampleda=NULL,
-				   method="log",
+				   method="hellinger",
 				   ...){
 	if (!is.null(method)){
 		data <- decostand(data, method=method)
@@ -33,10 +33,10 @@ getpca.default <- function(data,
 #' @method getpca phyloseq
 #' @rdname getpca
 #' @export
-getpca.phyloseq <- function(obj,...){
+getpca.phyloseq <- function(obj, method="hellinger", ...){
 	otuda <- checkotu(obj)
 	sampleda <- checksample(obj)
-	pca <- getpca.default(otuda, sampleda=sampleda,...)
+	pca <- getpca.default(otuda, sampleda=sampleda, method=method, ...)
 	return(pca)
 }
 
@@ -55,7 +55,7 @@ getpca.phyloseq <- function(obj,...){
 #' @param ellipse logical, whether add confidence ellipse to ordinary plot, default is FALSE.
 #' @param ellipse_pro numeric, confidence value for the ellipse, default is 0.9.
 #' @param ellipse_alpha numeric, the alpha of ellipse, default is 0.2.
-#' @param biplot logical, whether plot the species, default is TRUE.
+#' @param biplot logical, whether plot the species, default is FALSE.
 #' @param topn integer or vector, the number species have top important contribution, default is 5.
 #' @param settheme logical, whether set the theme for the plot, default is TRUE.
 #' @param speciesannot logical, whether plot the species, default is FALSE. 
@@ -88,7 +88,7 @@ ggordpoint.default <-  function(obj,
 						   ellipse=FALSE,
 						   ellipse_pro=0.9, 
 						   ellipse_alpha=0.2,
-						   biplot=TRUE,
+						   biplot=FALSE,
 						   topn=5,
 						   settheme=TRUE,
 						   speciesannot=FALSE,
