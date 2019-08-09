@@ -33,6 +33,4 @@ generate a vennlist for VennDiagram
 }
 \author{
 ShuangbinXu
-
-Shuangbin Xu
 }
