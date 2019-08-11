@@ -1,10 +1,10 @@
 Package: MicrobiotaProcess
 Type: Package
-Title: an package for processing and analysis of microbiome data. 
+Title: an package for analysis, visualization and biomarker discovery of microbiome. 
 Version: 1.0
-Authors@R: person("Shuangbin", "Xu", email = "xshuangbin@163.com", role = c("aut", "cre"))
+Authors@R: c(person("Shuangbin", "Xu", email = "xshuangbin@163.com", role = c("aut", "cre")),person("Guangchuang", "Yu", email = "guangchuangyu@gmail.com", role = c("aut", "ctb"))
 Maintainer: Shuangbin Xu <xshuangbin@163.com>
-Description: What the package does (one paragraph).
+Description: MicrobiotaProcess is an R package for analysis, visualization and biomarker discovery of microbial datasets. It supports calculating alpha index and provides functions to visualize rarefaction curves. Moreover, it also supports visualizing the abundance of taxonomy of samples. And It also provides functions to perform the PCA, PCoA and hierarchical cluster analysis. More importantly, MicrobiotaProcess also provides a method for the biomarker discovery of metagenome or other datasets. We also validated this method on several microbiomes from available public datasets.
 Depends: 
   R (>= 3.4.1)
 Imports:
@@ -23,6 +23,7 @@ Imports:
   reshape,
   zoo,
   ggtree,
+  treeio,
   tidytree
 License: GPL (>= 2.0) 
 Encoding: UTF-8
