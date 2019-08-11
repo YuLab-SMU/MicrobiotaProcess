@@ -140,7 +140,7 @@ classbar <- ggbartax(classtax, facetNames="group", count=FALSE) +
 classbar
 ```
 
-## 4.3 PCA and PCoA analsis
+## 4.3 PCA and PCoA analysis
 
 `PCA` (Principal component analysis) and `PCoA` (Principal Coordinate Analysis) are general statistical procedures to compare groups of samples. And `PCoA` can based on the phylogenetic or count-based distance metrics, such as `Bray-Curtis`, `Jaccard`, `Unweighted-UniFrac` and `weighted-UniFrac`. `MicrobiotaProcess` presents the `getpca`, `getpcoa` and `ggordpoint` for the analysis. In this section, we use the `GlobalPatterns` from `phyloseq`[@Paul2013phyloseq] as example. The data was from a article in [PNAS](https://www.pnas.org/content/108/Supplement_1/4516.short), used to compare the microbial communities of various environmental samples[@caporaso2011global].
 
