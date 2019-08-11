@@ -1,0 +1,357 @@
+---
+title: "MicrobiotaProcess: an R package for analysis, visualization and biomarker discovery of microbiome."
+author: "Shuangbin Xu \\
+
+School of Basic Medical Sciences, Southern Medical University"
+date: "`r Sys.Date()`"
+bibliography: MicrobiotaProcess.bib
+biblio-style: apalike
+output:
+  prettydoc::html_pretty:
+    toc: true
+    theme: cayman
+    highlight: vignette
+  pdf_document:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{ MicrobiotaProcess: an R package for analysis, visualization and biomarker discovery of microbiome.}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo=FALSE, results="asis", message=FALSE, KnitrSetUp}
+knitr::opts_chunk$set(tidy=FALSE,warning=FALSE,message=FALSE)
+Biocpkg <- function (pkg){
+	sprintf("[%s](http://bioconductor.org/packages/%s)", pkg, pkg)
+}
+
+CRANpkg <- function(pkg){
+	cran <- "https://CRAN.R-project.org/package" 
+	fmt <- "[%s](%s=%s)"
+	sprintf(fmt, pkg, cran, pkg) 
+}
+```
+
+```{r, echo=FALSE, results="hide", message=FALSE, Loadpackages}
+library(ggplot2)
+library(DT)
+library(tidyverse)
+library(phyloseq)
+library(ggtree)
+library(treeio)
+library(tidytree)
+library(MicrobiotaProcess)
+```
+
+
+# 1 Abstact
+
+`MicrobiotaProcess` is an R package for analysis, visualization and biomarker discovery of microbial datasets. It supports calculating alpha index and provides functions to visualize rarefaction curves. Moreover, it also supports visualizing the abundance of taxonomy of samples. And It also provides functions to perform the `PCA`, `PCoA` and hierarchical cluster analysis. More importantly, `MicrobiotaProcess` also provides a method for the biomarker discovery of metagenome or other datasets. We also validated this method on several microbiomes from available public datasets.
+
+# 2 Citation
+
+to do
+
+# 3 Introduction
+
+With the development of sequencing technologies, we had a capacity for investigating the composition of complex microbial communities from various environment[@knight2018best]. There are currently different methods for surveying microbial communities, including marker gene, metagenome and metatranscriptome sequencing. And These methods can also produce various and big data. How to integrate, analyze and visualize the different type of data. It is currently one of challenges for investigating microbial communities. There were also some tools for performing these analyses, such as `r Biocpkg("phylosq")`[@Paul2013phyloseq], which is a tool to import, store, analyze, and visualize phylogenetic sequencing data. However, it can not perform the different analysis. `qiime`[@caporaso2010qiime], `mothur`[@schloss2009introducing], `dada2`[@callahan2016dada2], which are leaning to upstream analysis, such as clustering `OTU` or sequencing error correction. But they don't perform downstream analysis or can't generate publication-quality graphics.
+
+One the other hand, The biomarker discovery maybe a important analysis. It has proven to be capacity to convert genomic data into clinical practice[@tothill2008novel; @banerjee2015computed]. And many metagenomic assays have shown that the microbial communities can be used as biomarkers for human disease. Such as colorectal cancer[@kostic2012genomic; @yu2017metagenomic], liver cancer[@ren2019gut]. However, Tools specifically for different analysis of microbial datasets are scare. `r Biocpkg("DESeq2")`[@love2014moderated], which is developed specifically for RNA-Seq datasets, was often applied for the different analysis of microbial datasets. But It has proven that RNA-Seq approaches are unsuitable for microbial datasets[@fernandes2014unifying; @weiss2017normalization]. `metagenomeSeq`[@paulson2013differential] and `ANCOM`[@mandal2015analysis] were developed specifically for microbial datasets, but `metagenomeSeq`[@paulson2013differential] used probability models, and the nature of metagenomic data, in most cases, will violate the main assumption of typical parametric tests[@Nicola2011LEfSe]. And the `ANCOM`[@mandal2015analysis] makes no distributional assumptions by using the Mann-Whitney test or Kruskal-Wallis rank sum test, but it just was a statistical framework, it didn't provided visual methods. `LEfSe`[@Nicola2011LEfSe] was widely applied in the different analysis of microbial datasets. LEfSe[@Nicola2011LEfSe] first use the non-parametric factorial Kruskal-Walls sum-rank test[@William1952kruskal]. Then the resulting features violating the null hypothesis are tested by Wilcoxon rank-sum test[@wilcoxon1945individual]. Last, the differentially abundance features are estimated by LDA(Linear Discriminant Analysis)[@fisher1936the]. It achieved a very low false positive rate in some cases[@Nicola2011LEfSe]. However, when few samples are available, the Wilcoxon have reduced power to detect differences[@weiss2017normalization]. In the situation, it can not choose method by customer, but median comparison was substituted for the Wilcoxon test.
+
+Here, We implemented `MicrobiotaProcess`, an R package for analysis, visualization and biomarker discovery of microbial datasets. `MicrobiotaProcess` can use `phyloseq` class which widely used as input. Certainly, `MicrobiotaProcess` also support the appropriate matrix data as input. `MicrobiotaProcess` presents `diffAnalysis` for the biomarker discovery. And It also provided the `ggdiffclade`, based on the `ggtree`[@yu2018two], to visualize the results of `diffAnalysis`. The rule of `diffAnalysis` is similar with the `LEfSe`[@Nicola2011LEfSe]. However, `diffAnalysis` is more flexible. The test method of two step can be set with the distribution of datasets by customer, and we used the general fold change[@wirbel2019meta] and `wilcox.test`(default) to test whether all pairwise comparisons between subclass in different classes distinctly consistent with the class trend. So in theory, `diffAnalysis` can be applied on the other datasets. Moreover, `MicrobiotaProcess` implements more flexible and convenient tools, (`ggdiffclade`, `ggeffectsize` and `ggdifftaxbar`) to produce publication-quality figures. We believed that `MicrobiotaProcess` can remove a major obstacle for scientists to perform the analysis of microbial datasets with other available pipelines or packages.
+
+
+```{r}
+library(MicrobiotaProcess)
+library(phyloseq)
+```
+
+# 4 MicrobiotaProcess profiling
+
+In this vignette, We used several datasets to facilitate testing and exploration of tools in `MicrobiotaProcess`. Such as `kostic2012crc` from `r Biocpkg("phyloseq")`[@Paul2013phyloseq], which used the publicly available data from a study on colorectal cancer[@kostic2012genomic]. A small subset of the HMP 16S dataset from [LEfSe](http://huttenhower.sph.harvard.edu)[@Nicola2011LEfSe]. A `test_otu_data` from simulative dataset. And `GlobalPatterns` from `r Biocpkg("pbyloseq")`[@Paul2013phyloseq], which was from a study on comparison of different environment samples[@caporaso2011global].
+
+## 4.1 performing alpha rarefaction
+
+Rarefaction, based on sampling technique, was used to compensate for the effect of sample size on the number of units observed in a sample[@siegel2004rarefaction]. It can be important in comparisons of the diversity of microbial communities. `MicrobiotaProcess` provided `ggrarecurve` to plot the curves, based on `rrarefy` of `r CRANpkg("vegan")`[@Jari2019vegan].
+
+```{r, fig.cap="Rarefaction curve(1)", fig.align="center", fig.height=3.2, fig.width=8}
+data(test_otu_data)
+prare <- ggrarecurve(test_otu_data,
+					 indexNames=c("Observe","Chao1","ACE"), 
+					 chunks=300) + 
+		 theme(legend.spacing.y=unit(0.02,"cm"),
+			   legend.text=element_text(size=6))
+prare
+```
+
+If you don't want to use `phyloseq` class, `ggrarecurve` also support the data.frame as input. We used the raw data of `test_otu_data` as example.
+
+```{r, error=TRUE, fig.align="center", fig.height=3.2, fig.width=8, fig.cap="Rarefaction curve(2)"}
+otudafile <- system.file("extdata", "otu_tax_table.txt", package="MicrobiotaProcess")
+samplefile <- system.file("extdata", "sample_info.txt", package="MicrobiotaProcess")
+otuda <- read.table(otudafile, sep="\t", header=TRUE, row.names=1, check.names=FALSE, skip=1, comment.char="")
+# remove the taxonomy column.
+otuda <- otuda[,sapply(otuda, is.numeric), drop=FALSE] %>% t() %>% 
+		data.frame(check.names=FALSE)
+#datatable(otuda, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+sampleda <- read.table(samplefile, sep="\t", header=TRUE, row.names=1)
+#datatable(sampleda)
+prare2 <- ggrarecurve(data=otuda, 
+					  sampleda=sampleda, 
+					  indexNames = c("Observe","Chao1","ACE")) + 
+		  geom_point(size=0.01) + 
+		  theme(legend.spacing.y=unit(0.02,"cm"),
+				legend.text=element_text(size=6))
+prare2
+```
+
+## 4.2 The visualization of taxonomy abundance
+
+The visualization of taxonomy abundance is common to investigate the composition of complex microbial communities. Although some tools support the function, they couldn't easily produce publication-quality graphics. `MicrobiotaProcess` presents the `ggbartax` for the visualization of composition of microbial communities.
+
+```{r, error=TRUE, fig.align="center", fig.height=4.5, fig.width=7, OTUrelativeabundance}
+otubar <- ggbartax(test_otu_data) + 
+		scale_y_continuous(expand=c(0,0), limits=c(0, 105))+
+		xlab(NULL) + 
+		ylab("relative abundance (%)")
+otubar
+```
+
+If you want to get the abundance of specific levels of class, You can use `gettaxdf` then use `ggbartax` to visualize.
+
+```{r, error=TRUE, fig.align="center", fig.height=4.5, fig.width=7, phylumAbundance}
+phytax <- gettaxdf(test_otu_data, taxlevel=2)
+phybar <- ggbartax(phytax) + 
+		scale_y_continuous(expand=c(0,0), limits=c(0, 105))+ 
+		xlab(NULL) + ylab("relative abundance (%)")
+phybar
+```
+
+Moreover, the absolute abundance of taxonomy also can be visualized by setting `count` to `TRUE`, and the facet of plot can be showed by setting the `facetNames`.
+
+```{r, error=TRUE, fig.align="center", fig.height=4.5, fig.width=7, classAbundance}
+phybar2 <- ggbartax(phytax, facetNames="group", count=TRUE) + xlab(NULL) + ylab("abundance")
+phybar2
+classtax <- gettaxdf(test_otu_data, taxlevel=3)
+classbar <- ggbartax(classtax, facetNames="group", count=FALSE) +
+		scale_y_continuous(expand=c(0,0), limits=c(0, 105))+ 
+		xlab(NULL) + ylab("relative abundance (%)")
+classbar
+```
+
+## 4.3 PCA and PCoA analsis
+
+`PCA` (Principal component analysis) and `PCoA` (Principal Coordinate Analysis) are general statistical procedures to compare groups of samples. And `PCoA` can based on the phylogenetic or count-based distance metrics, such as `Bray-Curtis`, `Jaccard`, `Unweighted-UniFrac` and `weighted-UniFrac`. `MicrobiotaProcess` presents the `getpca`, `getpcoa` and `ggordpoint` for the analysis. In this section, we use the `GlobalPatterns` from `phyloseq`[@Paul2013phyloseq] as example. The data was from a article in [PNAS](https://www.pnas.org/content/108/Supplement_1/4516.short), used to compare the microbial communities of various environmental samples[@caporaso2011global].
+
+```{r, fig.align="center", fig.height=4.5, fig.width=6, error=TRUE, pcaAndpcoaAnalysis}
+library(phyloseq)
+data(GlobalPatterns)
+datatable(sample_data(GlobalPatterns),options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+# We extracted the samples from the four different environmental.
+subGlobal <- subset_samples(GlobalPatterns, SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+
+# get the results of `pca`, the method was designed for choosing standardization method for community ecologists.
+pcares <- getpca(subGlobal, method="hellinger")
+pcaplot <- ggordpoint(pcares, biplot=TRUE, speciesannot=TRUE,
+					  factorNames=c("SampleType"), ellipse=TRUE)
+
+pcaplot
+
+pcoares <- getpcoa(subGlobal, distmethod="euclidean", method="hellinger")
+pcoaplot <- ggordpoint(pcoares, biplot=TRUE, speciesannot=TRUE,
+					   factorNames=c("SampleType"), ellipse=TRUE)
+pcoaplot
+```
+
+The `biplot` and `speciesannot` can be set if you want to show the features of the most important contributions. In this datasets, we found the `12812` and `557211` are from *Actinobacteria* and *Prochlorococcus*, which mainly inhabit the sea. This is consistent with the Ocean sample type.
+
+```{r, error=TRUE, showTax}
+tax_table(GlobalPatterns)[match(c("12812","557211"),rownames(tax_table(GlobalPatterns))),]
+```
+
+## 4.4 Hierarchical cluster analysis
+
+Beta diversity metrics can assess the differences between microbial communities. It can be visualized with `PCA` or `PCoA`, this can also be visualized with hierarchical clustering. `MicrobiotaProcess` also implements the analysis based on ggtree[@yu2017ggtree].
+
+```{r, fig.align="center", fig.height=5, fig.width=6, error=TRUE, hclustAnalysis}
+library(ggtree)
+hcsample <- getclust(subGlobal, distmethod="jaccard", 
+					 method="hellinger", hclustmethod="average")
+clustplot1 <- ggclust(hcsample,
+					 layout = "rectangular",
+					 pointsize=1,
+					 fontsize=0,
+					 factorNames=c("SampleType")) +
+			 theme_tree2(legend.position="right", 
+						 plot.title = element_text(face="bold", lineheight=25,hjust=0.5))
+clustplot1
+
+clustplot2 <- ggclust(hcsample,
+					  layout = "circular",
+					  pointsize=1,
+					  fontsize=2,
+					  factorNames=c("SampleType")) +
+			 theme(legend.position="right")
+clustplot2
+```
+
+As show in the results, we found the samples clearly cluster according to sample type. This is consistent with the reality.
+
+## 4.5 Biomarker discovery
+Biomarker discovery has proven to be capacity to convert genomic data into clinical practice[@tothill2008novel; @banerjee2015computed]. And many metagenomic assays have shown that the microbial communities can be used as biomarkers for human disease[@kostic2012genomic; @zhang2019leveraging; @yu2017metagenomic; @ren2019gut]. `MicrobiotaProcess` presents `diffAnalysis` for the biomarker discovery. And It also provided the `ggdiffclade`, based on the `ggtree`[@yu2018two], to visualize the results of `diffAnalysis`. The rule of `diffAnalysis` is similar with the `LEfSe`[@Nicola2011LEfSe]. First, all features are tested whether values in different classes are differentially distributed. Second, the significantly different features are tested whether all pairwise comparisons between subclass in different classes distinctly consistent with the class trend. Finally, the significantly discriminative features are assessed by `LDA` (`linear discriminant analysis`) or `rf`(`randomForest`). However, `diffAnalysis` is more flexible. The test method of two step can be set by customer, and we used the general fold change[@wirbel2019meta] and `wilcox.test`(default) to test whether all pairwise comparisons between subclass in different classes distinctly consistent with the class trend. Moreover, `MicrobiotaProcess` implements more flexible and convenient tools, (`ggdiffclade`, `ggeffectsize` and `ggdifftaxbar`) to produce publication-quality figures. Here, we present several examples to demonstrate how to perform different analysis with `MicrobiotaProcess`.
+
+### 4.5.1 colorectal cancer dataset.
+
+```{r, error=TRUE, KosticCRCdata}
+data(kostic2012crc)
+kostic2012crc
+datatable(sample_data(kostic2012crc), options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
+table(sample_data(kostic2012crc)$DIAGNOSIS)
+```
+
+This datasets contained 86 Colorectal Carcinoma samples and 91 Control samples(remove the none sample information and low depth sample).In the research, they found the *Fusobacterium* sequences were enriched in carcinomas, confirmed by quantitative PCR and 16S rDNA, while the *Firmicutes* and *Bacteroidetes* phyla were depleted in tumors[@kostic2012genomic].
+
+```{r, error=TRUE, KosticCRCdiffAnalysis}
+diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
+						mlfun="lda",
+						filtermod="fdr",
+						firstcomfun = "kruskal.test",
+						firstalpha=0.05,
+						strictmod=TRUE,
+						secondcomfun = "wilcox.test",
+						submin=3,
+						subclwilc=TRUE,
+						secondalpha=0.01, 
+						lda=3)
+diffres
+```
+
+The results of `diffAnalysis` is a `S4` class, contained the original feature datasets, results of first test, results of second test, results of `LDA` or `rf` assessed and the record of some arguments. It can be visualized by `ggeffectsize`. The horizontal ordinate represents the effect size (`LDA` or `MeanDecreaseAccuracy`), the vertical ordinate represents the feature of significantly discriminative. And the colors represent the class that the relevant feature is positive.
+
+```{r, fig.align="center", fig.height=5, fig.width=6, error=TRUE, KosticCRCplotEffectSize}
+plotes <- ggeffectsize(diffres)
+plotes
+```
+
+If the `taxda` was provided, it also can be visualized by `ggdiffclade`. The colors represent the relevant features enriched in the relevant class. The size of point colored represent the `-log10(pvalue)`.
+
+```{r, fig.width=7, fig.height=7, fig.align="center", error=TRUE, KosticCRCdiffclade}
+diffcladeplot <- ggdiffclade(diffres,
+							 alpha=0.3, size=0.2, 
+							 skpointsize=0.6,
+							 taxlevel=3,
+							 settheme=FALSE, 
+							 setColors=FALSE) +
+				scale_fill_manual(values=c("#00AED7", "#FD9347"))+
+				guides(color = guide_legend(keywidth = 0.1,
+				 							 keyheight = 0.6,
+				 							 order = 3, 
+				 							 ncol=1)) + 
+				theme(panel.background=element_rect(fill=NA),
+				 	   legend.position="right",
+				 	   legend.margin=margin(0,0,0,0), 
+				 	   legend.spacing.y = unit(0.02, "cm"),
+				 	   legend.title=element_text(size=7),
+				 	   legend.text=element_text(size=6),
+				 	   legend.box.spacing=unit(0.02,"cm"))
+diffcladeplot
+```
+
+Moreover, the abundance of the features can be visualized by `ggdifftaxbar`. This will generate the figures in specific directory. And the horizontal ordinate of figures represent the sample of different class, the vertical ordinate represent relative abundance of relevant features (sum is 1).
+
+```{r, error=TRUE, KosticCRCdifftaxbar}
+ggdifftaxbar(diffres, xtextsize=1.5, output="./kostic2012crc_biomarkder_barplot")
+```
+
+And we also provided `tidydiffAnalysis` to produce the table of results of `diffAnalysis`.
+
+```{r, KosticCRCdiffTab}
+crcdiffTab <- tidydiffAnalysis(diffres)
+datatable(crcdiffTab, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+```
+
+As show in the results of `diffAnalysis`, we also found *Fusobacterium* sequences were enriched in carcinomas, and *Firmicutes*, *Bacteroides*, *Clostridiales* were depleted in tumors. These results were consistent with the original article[@kostic2012genomic]. In addition, we also found *Campylobacter* were enriched in tumors, but the relative abundance of it is lower than *Fusobacterium*. And the species of *Campylobacter* has been proven to associated with the colorectal cancer[@He289; @wu2013dysbiosis; @amer2017microbiome].
+
+### 4.5.2 a small subset of HMP dataset.
+
+```{r, hmpdatasets}
+data(hmp_aerobiosis_small)
+# contained "featureda" "sampleda"  "taxda" datasets.
+datatable(featureda, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+datatable(sampleda, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+datatable(taxda, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+```
+
+This dataset is from a small subset of the `HMP` 16S dataset[@Nicola2011LEfSe], contained 55 samples from 6 body sites. The dataset isn't `phyloseq` class, because `diffAnalysis` also supported the matrix datasets as input. The `featureda` contained the relative abundance of different levels features. The `sampleda` contained the information of the samples. And the `taxda` contained the information of the hierarchical relationship of taxonomy. We set the `oxygen_availability` in `sampleda` as `class`, and `body_site` also in `sampleda` as `subclass`.
+
+```{r, hmpdiffAnalysis}
+hmpdiffres <- diffAnalysis(data=featureda, 
+						   sampleda=sampleda, 
+						   taxda=taxda, 
+						   alltax=FALSE, 
+						   class="oxygen_availability",
+						   subclass="body_site",
+						   filtermod="fdr",
+						   firstalpha=0.01,
+						   strictmod=TRUE,
+						   submin=3,
+						   subclwilc=TRUE,
+						   secondalpha=0.05,
+						   ldascore=2)
+hmpdiffres
+```
+
+```{r, fig.align="center", fig.height=6, fig.width=5.5, error=TRUE, hmpplotEffectSize}
+hmpeffetsieze <- ggeffectsize(hmpdiffres, 
+							  setColors=FALSE,
+							  settheme=FALSE) + 
+				scale_color_manual(values=c('#00AED7', '#FD9347', '#C1E168'))+
+				theme_bw()+
+				theme(strip.background=element_rect(fill=NA),
+					  panel.spacing = unit(0.2, "mm"),
+					  panel.grid=element_blank(),
+					  strip.text.y=element_blank())
+hmpeffetsieze
+```
+
+The explanation of figures refer to the previous section.
+
+```{r, fig.width=7, fig.height=7, fig.align="center", error=TRUE, hmpdiffclade}
+hmpdiffclade <- ggdiffclade(hmpdiffres, alpha=0.3, size=0.2, 
+							skpointsize=0.4, taxlevel=3,
+							settheme=TRUE,
+							setColors=FALSE) +
+				scale_fill_manual(values=c('#00AED7', '#FD9347', '#C1E168'))
+hmpdiffclade
+```
+
+The explanation of figures refer to the previous section. 
+
+```{r, hmpdifftaxbar}
+ggdifftaxbar(hmpdiffres, output="./hmp_biomarker_barplot")
+```
+
+Finally, we found the *Staphylococcus*, *Propionibacterium* and some species of *Actinobacteria* was enriched in `High_O2`, these species mainly live in high oxygen environment. Some species of *Bacteroides*, species of *Clostridia* and species of *Erysipelotrichi* was enriched in `Low_O2`, these species mainly inhabit in the gut of human. These results were consistent with the reality.
+
+```{r, hmpdiffTab}
+hmpdiffTab <- tidydiffAnalysis(hmpdiffres)
+datatable(hmpdiffTab, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+```
+
+# 5 Need helps?
+
+If you have questions/issues, please visit [github issue tracker](https://github.com/YuLab-SMU/MicrobiotaProcess/issues).
+
+# 6 Session information
+
+Here is the output of `sessionInfo()` on the system on which this document was compiled:
+
+```{r, echo=FALSE}
+sessionInfo()
+```
+
+
+# 7 References
+
