@@ -125,7 +125,7 @@ duplicatedtaxcheck <- function(taxdf){
 	taxdf <- taxdf %>% rownames_to_column()
 	for (i in ncol(taxdf):3){
 		tmp <- split(taxdf,taxdf[,i])
-		for (j in 1:length(tmp)){
+		for (j in seq_len(length(tmp))){
 			flag <- length(unique(as.vector(tmp[[j]][,i-1])))
 			if (flag > 1){
 				tmp[[j]][,i] <- paste(tmp[[j]][,i],tmp[[j]][,i-1],sep="_")
@@ -139,7 +139,7 @@ duplicatedtaxcheck <- function(taxdf){
 
 #' @keywords internal
 repduplicatedtaxcheck <- function(taxdf){
-	for (i in 1:7){
+	for (i in seq_len(7)){
 		taxdf <- duplicatedtaxcheck(taxdf) %>% column_to_rownames(var="rowname")
 	}
 	return(taxdf)
