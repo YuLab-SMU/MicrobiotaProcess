@@ -28,8 +28,9 @@ ggdiffclade <- function(obj,...){
 
 #' @method ggdiffclade data.frame
 #' @rdname ggdiffclade
-#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 geom_point geom_rect geom_text scale_size_continuous scale_fill_manual 
 #' @importFrom magrittr %<>%
+#' @importFrom stats as.formula
 #' @export
 ggdiffclade.data.frame <- function(taxda, 
 					 nodedf,
@@ -203,7 +204,8 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
 
 #' @method ggdifftaxbar featureMeanMedian
 #' @rdname ggdifftaxbar
-#' @importFrom ggplot2 aes geom_errorbar 
+#' @importFrom ggplot2 aes geom_errorbar scale_linetype_manual unit theme_bw scale_y_continuous labs xlab facet_grid
+#' @importFrom ggplot2 guide_legend element_text element_rect element_blank scale_fill_manual
 #' @export
 ggdifftaxbar.featureMeanMedian <- function(feMeanMedian, 
 									featurename, 
@@ -271,6 +273,7 @@ ggdifftaxbar.featureMeanMedian <- function(feMeanMedian,
 #' @param subclass character, factor name.
 #' @importFrom dplyr rename group_by_ mutate
 #' @importFrom magrittr %>%
+#' @importFrom stats median
 #' @author Shuangbin Xu
 #' @export
 getMeanMedian <- function(datameta, feature, subclass){
@@ -309,6 +312,8 @@ ggeffectsize <- function(obj,...){
 
 #' @method ggeffectsize data.frame
 #' @rdname ggeffectsize
+#' @importFrom ggplot2 facet_grid scale_x_continuous ylab xlab scale_color_manual theme_bw element_text element_blank unit element_rect
+#' @importFrom ggplot2 geom_segment
 #' @export 
 ggeffectsize.data.frame <- function(data, 
 									factorName, 
@@ -375,7 +380,7 @@ ggeffectsize.diffAnalysisClass <- function(obj, removeUnkown=TRUE,...){
 }
 
 
-#' @importFrom dplyr rename
+#' @importFrom dplyr rename_
 #' @keywords internal
 getnode <- function(treedata, nodedf){
 	if (is.null(treedata@data)){stop("The data slot of treedata should't be NULL.")}
@@ -383,7 +388,7 @@ getnode <- function(treedata, nodedf){
 	if (!"node" %in% colnames(nodedf)){
 		nodedf$node <- nodelist
 	}else{
-		nodedf %>% rename(nodetmp=node)
+		nodedf %>% rename_(nodetmp=~node)
 		nodedf$node <- nodelist
 	}
 	return(nodedf)
@@ -403,7 +408,7 @@ treeskeleton <- function(treedata, layout, size, pointsize=1){
 	return(p)
 }
 
-#' @importFrom ggplot2 guides
+#' @importFrom ggplot2 guides guide_legend
 #' @keywords internal
 ggdiffcladeguides <- function(...){
 	guides(fill= guide_legend(keywidth = 0.5, keyheight = 0.5, order=1),
@@ -411,7 +416,7 @@ ggdiffcladeguides <- function(...){
 		   color = guide_legend(keywidth = 0.1, ncol=1, keyheight = 0.6, order = 3),...)
 }
 
-#' @importFrom ggplot2 theme
+#' @importFrom ggplot2 theme unit element_text element_rect margin
 #' @keywords internal
 ggdiffcladetheme <- function(...){
 	theme(legend.position="right",
