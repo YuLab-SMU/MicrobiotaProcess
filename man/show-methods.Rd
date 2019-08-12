@@ -5,10 +5,10 @@
 \alias{show}
 \title{show method}
 \usage{
-show(object)
+\S4method{show}{diffAnalysisClass}(object)
 }
 \arguments{
-\item{object}{`diffAnalysisClass` object}
+\item{objet}{object, `diffAnalysisClass` class}
 }
 \value{
 print info
