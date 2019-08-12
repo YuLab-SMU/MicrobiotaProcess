@@ -41,7 +41,7 @@ geom_ord_ellipse <- function(data=NULL, mapping = NULL, ellipse_pro = 0.9, alpha
 #' @importFrom grDevices chull
 StatOrdEllipse <- ggproto("StatOrdEllipse", Stat,
                           compute_group = function(self, data, scales, params, ellipse_pro) {
-                              names(data)[1:2] <- c('one', 'two')
+                              names(data)[seq_len(2)] <- c('one', 'two')
                               theta <- c(seq(-pi, pi, length = 50), seq(pi, -pi, length = 50))
                               circle <- cbind(cos(theta), sin(theta))
                               ell <- ddply(data, .(group), function(x) {
