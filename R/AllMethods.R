@@ -61,7 +61,7 @@ gettaxdf <- function(obj,...){
 }
 
 #' @method gettaxdf phyloseq
-#' @importFrom phyloseq otu_table tax_table taxa_are_rows
+#' @importFrom phyloseq otu_table tax_table taxa_are_rows rank_names
 #' @rdname gettaxdf
 #' @export
 gettaxdf.phyloseq <- function(obj, taxlevel=2, ...){
@@ -145,7 +145,7 @@ ggrarecurve <- function(obj, ...){
 #' @export
 ggrarecurve.phyloseq <- function(obj, ...){
 	otuda <- checkotu(obj)
-	sampleda <- data.frame(getsample(obj),check.names=F)
+	sampleda <- data.frame(getsample(obj),check.names=FALSE)
 	p <- ggrarecurve.default(data=otuda, sampleda=sampleda, ...)
 	return(p)	
 }
