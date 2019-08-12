@@ -12,6 +12,7 @@ getpca <- function(obj,...){
 
 #' @method getpca default
 #' @importFrom vegan decostand
+#' @importFrom stats prcomp
 #' @rdname getpca
 #' @export
 getpca.default <- function(data,
@@ -71,7 +72,7 @@ ggordpoint <- function(obj, ...){
 }
 
 #' @method ggordpoint default
-#' @importFrom ggplot2 ggplot geom_point geom_segment aes_ 
+#' @importFrom ggplot2 ggplot geom_point geom_segment aes_ labs arrow unit geom_vline geom_hline theme_bw element_blank element_text  
 #' @importFrom ggrepel geom_text_repel
 #' @rdname ggordpoint
 #' @export
@@ -139,7 +140,7 @@ ggordpoint.default <-  function(obj,
 	if (biplot){
 		varcontrib <- getvarct(obj)
 		varcontr <- varcontrib$VarContribution[,pc]
-		tmpvars <- names(sort(rowSums(varcontr), decreasing=T))
+		tmpvars <- names(sort(rowSums(varcontr), decreasing=TRUE))
 		varlist <- getvarlist(namevector=tmpvars, n=topn)
 		biplotcoord <- varcontrib$VarCoordinates[match(varlist, 
 												rownames(varcontrib$VarCoordinates)),
@@ -188,7 +189,7 @@ getvarlist <- function(namevector, n){
 			varnames <- namevector[n]
 		}
 		if (length(n)==1){
-			varnames <- namevector[1:n]
+			varnames <- namevector[seq_len(n)]
 		}
 	}
 	if (inherits(n, "character")){
@@ -255,6 +256,7 @@ getfactormap <- function(namelist){
 }
 
 #' @importFrom ggplot2 aes_
+#' @importFrom stats as.formula
 #' @keywords internal
 getellipsemap <- function(namelist){
 	tmpellipsemap <- aes_(fill=as.formula(paste0("~", namelist[1])),
