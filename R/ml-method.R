@@ -4,10 +4,10 @@
 LDAeffectsize <- function(datalist, compareclass, class, bootnums=30, LDA=2){
 	res <- list()
 	tmpformula <- as.formula(paste0(class, " ~. "))
-	for (i in 1:bootnums){
+	for (i in seq_len(bootnums)){
 		compareres <- list()
 		df <- datalist[[i]]
-		for (p in 1:nrow(compareclass)){
+		for (p in seq_len(nrow(compareclass))){
 			tmppairs <- compareclass[p,]
 			z <- suppressWarnings(lda(tmpformula,data=df, tol=1e-6))
 			w <- z$scaling[,1]
@@ -43,7 +43,7 @@ LDAeffectsize <- function(datalist, compareclass, class, bootnums=30, LDA=2){
 rfimportance <- function(datalist, class, bootnums){
 	rfres <- list()
 	tmpformula <- as.formula(paste0(class, " ~. "))
-	for (i in 1:bootnums){
+	for (i in seq_len(bootnums)){
 		df <- datalist[[i]]
 		dfres <- randomForest(tmpformula, data=df, importance=TRUE, proximity=TRUE)
 		imres <- dfres$importance	
@@ -61,15 +61,20 @@ rfimportance <- function(datalist, class, bootnums){
 #' @param ratio numeric, the ratios of each data.frame to keep.
 #' @param seednums interger, random number generation, default is 1024.
 #' @param makerownames logical, whether build row.names,default is FALSE.
+#' @param randomSeed integer, A single integer value passed to ‘set.seed’, 
+#' which is used to fix a seed for reproducibly random number, default is 1024.
 #' @author Shuangbin Xu
 #' @export
 sampledflist <- function(dalist, 
 						 bootnums=30, 
 						 ratio=0.7, 
-						 makerownames=FALSE){
+						 makerownames=FALSE,
+						 randomSeed=1024){
 	datalist <- list()
-	set.seed(1024)
-	for (i in 1:bootnums){
+	if (!is.null(randomSeed)){
+		set.seed(randomSeed)
+	}
+	for (i in seq_len(bootnums)){
 		res <- lapply(dalist,function(x){x[sample(nrow(x), trunc(nrow(x)*ratio)),,drop=FALSE]})
 		res <- do.call("rbind", c(res, make.row.names=makerownames))
 		datalist[[i]] <- res
