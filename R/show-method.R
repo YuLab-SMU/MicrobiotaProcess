@@ -2,12 +2,11 @@
 #' @name show
 #' @docType methods
 #' @rdname show-methods
-#' @param object `diffAnalysisClass` object
+#' @param objet object, `diffAnalysisClass` class
 #' @importFrom methods show
 #' @exportMethod show
 #' @author Shuangbin Xu
 #' @return print info
-#' @usage show(object)
 
 setMethod("show", 
 		  signature(object="diffAnalysisClass"),
