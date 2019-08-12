@@ -5,6 +5,7 @@
 #' @param factorNames character, the name of a factor giving the corresponding groups.
 #' @param ..., additional arguments for fun.
 #' @importFrom rlang new_formula
+#' @importFrom stats wilcox.test
 #' @author ShuangbinXu
 #' @export
 multi.compare <- function(fun = wilcox.test, 
@@ -60,7 +61,7 @@ diffclass <- function(datasample,
 					  pfold=0.05,
 					  ...){
 	keepfeature <- list()
-	for (i in 1:nrow(comclass)){
+	for (i in seq_len(nrow(comclass))){
 		classtmp <- as.vector(comclass[i,])
 		#clsize <- min(table(datasample[[class]]))
 		datatmp <- datasample %>% filter(eval(parse(text=class)) %in% classtmp)
@@ -94,10 +95,10 @@ diffsubclass <- function(datasample,
 						 pfold=0.05,
 						 ...){
 	keepfeature <- list()
-	for (i in 1:length(comsubclass)){
+	for (i in seq_len(length(comsubclass))){
 		classtmp <- colnames(comsubclass[[i]])
 		reslist <- list()
-		for (j in 1:nrow(comsubclass[[i]])){
+		for (j in seq_len(nrow(comsubclass[[i]]))){
 			subclasstmp <- as.vector(unlist(comsubclass[[i]][j,])) 
 			#subclsize <- min(table(datasample[[subclass]]))
 			datatmp <- datasample %>% filter(eval(parse(text=class)) %in% classtmp & eval(parse(text=subclass)) %in%subclasstmp)
