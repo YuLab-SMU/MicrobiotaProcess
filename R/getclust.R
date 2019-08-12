@@ -13,6 +13,7 @@ getclust <- function(obj,...){
 #' @method getclust dist
 #' @rdname getclust
 #' @importFrom ape as.phylo
+#' @importFrom stats hclust
 #' @export
 getclust.dist <- function(distobj,
 						  distmethod,
@@ -102,7 +103,8 @@ ggclust <- function(obj,...){
 
 #' @method ggclust clustplotClass
 #' @rdname ggclust
-#' @importFrom ggtree ggtree %<+% geom_tippoint geom_tiplab geom_tiplab2 
+#' @importFrom ggtree ggtree %<+% geom_tippoint geom_tiplab geom_tiplab2
+#' @importFrom ggplot2 labs element_text
 #' @export
 ggclust.clustplotClass <- function(obj, 
 								   layout="rectangular",
