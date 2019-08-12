@@ -1,6 +1,6 @@
 #' @title Differential expression analysis based on kruskal.test, generalized fold change and wilcox.test
-#' @param data data.frame, (nrow sample * ncol features)
-#' @param obj object,a phyloseq class contained otu_table, sample_data, taxda.
+#' @param obj object,a phyloseq class contained otu_table, sample_data, taxda. 
+#' @param data data.frame, nrow sample * ncol features.
 #' @param sampleda data.frame, nrow sample * ncol factor, the sample names of sampleda and data should be the same.
 #' @param class character, the factor name in sampleda.
 #' @param subclass character, the factor name in sampleda, default is NULL, 
@@ -29,18 +29,20 @@
 #' @param normalization integer, set the normalization value, set a big number if to get more meaningful values 
 #' for the LDA score, or you can set NULL for no normalization, default is 1000000.
 #' @param bootnums integer, set the number of bootstrap iteration for lda or rf, default is 30.
+#' @param ..., additional parameters.
 #' @author Shuangbin Xu
 #' @importFrom tibble column_to_rownames
 #' @importFrom dplyr select
 #' @importFrom magrittr %>%
 #' @export
-diffAnalysis <- function(x, ...){
+diffAnalysis <- function(obj, ...){
 	UseMethod("diffAnalysis")
 }
 
 #' @method diffAnalysis data.frame
 #' @rdname diffAnalysis
 #' @importFrom tibble column_to_rownames
+#' @importFrom stats p.adjust
 #' @export
 diffAnalysis.data.frame <- function(data, 
 									sampleda, 
@@ -179,7 +181,7 @@ diffAnalysis.phyloseq <- function(obj, class, subclass=NULL,...){
 getalltaxdf <- function(data, taxda){
 	data <- data.frame(t(data), check.names=FALSE)
 	dt <- list()
-	for (i in 1:ncol(taxda)){
+	for (i in seq_len(ncol(taxda))){
 		dat <- CountOrRatios(data, taxda[,i,drop=FALSE], countmode=FALSE, rownamekeep=FALSE)
 		dt[[i]] <- dat
 	}
