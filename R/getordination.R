@@ -29,7 +29,7 @@ getdist.default <- function(data,
 					   sam_data=sampleda,
 					   phy_tree=tree)
 	return(getdist.phyloseq(objphyloseq, 
-							distmethod=tmpmethod, 
+							distmethod=distmethod, 
 							method=method,
 							type=type, ...))
 	
@@ -110,6 +110,7 @@ getpcoa.default <- function(data,
 
 #' @method getpcoa dist
 #' @importFrom ape pcoa
+#' @importFrom stats cov
 #' @rdname getpcoa
 #' @export
 getpcoa.dist <- function(obj, distmethod, data=NULL, sampleda=NULL, method="hellinger", ...){
@@ -127,7 +128,7 @@ getpcoa.dist <- function(obj, distmethod, data=NULL, sampleda=NULL, method="hell
 		points.stand <- scale(pcoares$vectors)
 		S <- cov(data, points.stand)
 		tmpEig <- pcoares$values$Eigenvalues
-		tmpEig <- tmpEig[1:dim(S)[2]]
+		tmpEig <- tmpEig[seq_len(dim(S)[2])]
 		diagtmp <- diag((tmpEig/(n-1))^(-0.5))
 		U <- S %*% diagtmp
 		colnames(U) <- colnames(pcoares$vectors)
