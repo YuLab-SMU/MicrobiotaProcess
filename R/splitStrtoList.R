@@ -21,7 +21,7 @@ splitStrtoList <- function(strdataframe,
 	fill <- match.arg(fill, c("warn", "right", "left"))
        colstr <- names(strdataframe)
 	tmplength <- length(strsplit(as.character(strdataframe[1,1]), sep)[[1]])
-	newcolnames <- paste(prefix, rep(1:tmplength), sep="")
+	newcolnames <- paste(prefix, rep(seq_len(tmplength)), sep="")
 	tmpdata <- tidyr::separate(strdataframe, 
 				      colstr,
 				      newcolnames,
