@@ -22,6 +22,7 @@ generalizedFC <- function(x, y, ...){
 
 #' @method generalizedFC default
 #' @rdname generalizedFC
+#' @importFrom stats median quantile
 #' @export
 generalizedFC.default <- function(x, y, base=10, steps=0.05, pseudo=0.00001, ...){
 	x.q <- quantile(log(x+pseudo, base), probs=seq(.05, .95, steps))
@@ -38,6 +39,7 @@ generalizedFC.default <- function(x, y, base=10, steps=0.05, pseudo=0.00001, ...
 
 #' @method generalizedFC formula
 #' @rdname generalizedFC
+#' @importFrom stats terms setNames
 #' @export
 ## refrence wilcox.test
 generalizedFC.formula <- function(formula, data, subset, na.action, ...){
