@@ -29,18 +29,18 @@ CountOrRatios <- function(data,
 	nums <- !unlist(lapply(data, is.numeric))
 	group <- names(data[,nums,drop=FALSE])
     data <- data.frame(plyr::ddply(data, group, plyr::numcolwise(sum)), 
-		     check.names=F, stringsAsFactors=FALSE)   
+		     check.names=FALSE, stringsAsFactors=FALSE)   
     rownames(data) <- as.vector(data[[group]])
     data[[group]] <- NULL
 	if (!isTRUE(countmode)){
-       	data <- data.frame(prop.table(as.matrix(data), 2), check.names=F, stringsAsFactors=FALSE)
+       	data <- data.frame(prop.table(as.matrix(data), 2), check.names=FALSE, stringsAsFactors=FALSE)
 		data <- data*multiplenum
 	}
     #  	if (!isTRUE(countmode) && isTRUE(percentmode)){
     #   	data <- data*100
 	#}
 	if (isTRUE(rownamekeep)){
-		data <- data.frame(cbind(feature=rownames(data), data), check.names=F, stringsAsFactors=FALSE)
+		data <- data.frame(cbind(feature=rownames(data), data), check.names=FALSE, stringsAsFactors=FALSE)
 	}
        return (data)
 }
