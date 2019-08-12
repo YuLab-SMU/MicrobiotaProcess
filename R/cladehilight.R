@@ -7,7 +7,7 @@ getcladedf <- function(ggtree, node){
 		tmpnum <- levelsnum - as.numeric(data$nodeClass)
 		data$extend <- get_extend(tmpnum)
 	}
-	df <-lapply(node, function(x)ggtree:::get_clade_position_(data, x))
+	df <-lapply(node, function(x)get_clade_position_(data=data, node=x))
 	df <- do.call("rbind", df)
 	df$node <- node
 	df <- merge(df, data, by.x="node", by.y="node")
@@ -78,9 +78,9 @@ getannotlabel <- function(labeldf,classlevel=4){
 	if (nrow(df)>26){
 		lengthtmp <- round(nrow(df)/26,0) + 1
 		lefttmp <- nrow(df) - 26
-		annolabel <- c(letters,paste0(rep(letters,lengthtmp)[1:lefttmp], seq(1,lefttmp))) 
+		annolabel <- c(letters,paste0(rep(letters,lengthtmp)[seq_len(lefttmp)], seq(1,lefttmp))) 
 	}else{
-		annolabel <- letters[1:nrow(df)]
+		annolabel <- letters[seq_len(nrow(df))]
 	}
 	tmplabels <- paste(annolabel, df$label,sep=": ")
 	df$label <- annolabel
@@ -89,6 +89,32 @@ getannotlabel <- function(labeldf,classlevel=4){
 	return(list(labeldf=dat, annotdf=df))
 }
 
+#' @author GuangChuang Yu
+#' @keywords internal
+get_clade_position_ <- function(data, node){
+	sp <- tryCatch(tidytree:::offspring.tbl_tree(data, node)$node, error=function(e) NULL)
+	i <- match(node, data$node)
+	if (is.null(sp)) {
+		sp.df <- data[i,]
+	}else{
+		sp <- c(sp, node)
+		sp.df <- data[match(sp, data$node),] 
+	}
+	x <- sp.df$x
+	y <- sp.df$y
+	if ("branch.length" %in% colnames(data)) {
+		xmin <- min(x, na.rm=TRUE)-data[["branch.length"]][i]/2
+	}else {
+		xmin <- min(sp.df$branch, na.rm=TRUE)
+	}
+	data.frame(xmin=xmin,
+			   xmax=max(x, na.rm=TRUE),
+			   ymin=min(y, na.rm=TRUE) - 0.5, 
+			   ymax=max(y, na.rm=TRUE) + 0.5)
+}
+
+
 #' @keywords internal
 get_extend <- function(x) {x * 0.5}
+
 
