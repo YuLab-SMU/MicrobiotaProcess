@@ -1,6 +1,7 @@
 #' @method ggbartax default
 #' @rdname ggbartax
-#' @importFrom ggplot2 ggplot aes_ geom_bar
+#' @importFrom ggplot2 ggplot aes_ geom_bar theme_bw scale_fill_manual facet_grid
+#' @importFrom stats as.formula
 #' @export
 ggbartax.default <- function(data,
 				  mapping=NULL,
@@ -89,7 +90,7 @@ mappingtaxda <- function(data, topn=30,
 	dat$sums <- NULL
 	tmpsums <- matrix(colSums(dat),nrow=1) %>% data.frame()
 	if (topn < nrow(dat)){
-		dat <- dat[1:topn,,drop=FALSE]
+		dat <- dat[seq_len(topn),,drop=FALSE]
 		if (!count){
 			others <- 100 - (matrix(apply(dat,2,sum),nrow=1) %>% 
 							 data.frame(check.names=FALSE))
@@ -119,7 +120,7 @@ mappingtaxda <- function(data, topn=30,
 	}else{
 		if (!is.null(sampleda)){
 			dat <- dat %>% t() %>% 
-				data.frame(check.names=F)
+				data.frame(check.names=FALSE)
 			dat <- merge(dat, sampleda, by=0)
 		}
 		if (is.null(sampleda)&&length(tmpfactor)>0){
@@ -148,7 +149,7 @@ mappingtaxda <- function(data, topn=30,
 #}
 
 
-#' @importFrom ggplot2 theme
+#' @importFrom ggplot2 theme element_blank element_text unit element_rect 
 #' @keywords internal
 taxbartheme <- function(){
 	theme(axis.text.x = element_text(angle = -45, hjust = 0, size=7),
@@ -171,7 +172,7 @@ taxbartheme <- function(){
 #' @param ncol integer, the ncol of legend.
 #' @param ..., additional parameter.
 #' @author ShuangbinXu
-#' @importFrom ggplot2 guides
+#' @importFrom ggplot2 guides guide_legend
 #' @export
 
 taxbarguildes <- function(keywidth=0.3, keyheight=0.3, ncol=5, ...){
