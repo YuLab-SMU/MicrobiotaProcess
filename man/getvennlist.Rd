@@ -10,7 +10,7 @@ getvennlist(obj, ...)
 
 \method{getvennlist}{phyloseq}(obj, ...)
 
-\method{getvennlist}{default}(da, sampleinfo = NULL,
+\method{getvennlist}{default}(data, sampleinfo = NULL,
   factorNames = NULL, ...)
 }
 \arguments{
