@@ -5,7 +5,7 @@
 \title{Generate random data list from a original data.}
 \usage{
 sampledflist(dalist, bootnums = 30, ratio = 0.7,
-  makerownames = FALSE)
+  makerownames = FALSE, randomSeed = 1024)
 }
 \arguments{
 \item{dalist}{list, a list contained multi data.frame.}
@@ -13,6 +13,9 @@ sampledflist(dalist, bootnums = 30, ratio = 0.7,
 \item{ratio}{numeric, the ratios of each data.frame to keep.}
 
 \item{makerownames}{logical, whether build row.names,default is FALSE.}
+
+\item{randomSeed}{integer, A single integer value passed to ‘set.seed’, 
+which is used to fix a seed for reproducibly random number, default is 1024.}
 
 \item{seednums}{interger, random number generation, default is 1024.}
 }
