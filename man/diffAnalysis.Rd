@@ -6,7 +6,7 @@
 \alias{diffAnalysis.phyloseq}
 \title{Differential expression analysis based on kruskal.test, generalized fold change and wilcox.test}
 \usage{
-diffAnalysis(x, ...)
+diffAnalysis(obj, ...)
 
 \method{diffAnalysis}{data.frame}(data, sampleda, class, subclass = NULL,
   taxda = NULL, alltax = TRUE, mlfun = "lda", ratio = 0.7,
@@ -20,7 +20,11 @@ diffAnalysis(x, ...)
 \method{diffAnalysis}{phyloseq}(obj, class, subclass = NULL, ...)
 }
 \arguments{
-\item{data}{data.frame, (nrow sample * ncol features)}
+\item{obj}{object,a phyloseq class contained otu_table, sample_data, taxda.}
+
+\item{..., }{additional parameters.}
+
+\item{data}{data.frame, nrow sample * ncol features.}
 
 \item{sampleda}{data.frame, nrow sample * ncol factor, the sample names of sampleda and data should be the same.}
 
@@ -71,8 +75,6 @@ suggested choosing "kruskal.test" for uneven distributions, default is "kruskal.
 for the LDA score, or you can set NULL for no normalization, default is 1000000.}
 
 \item{bootnums}{integer, set the number of bootstrap iteration for lda or rf, default is 30.}
-
-\item{obj}{object,a phyloseq class contained otu_table, sample_data, taxda.}
 }
 \description{
 Differential expression analysis based on kruskal.test, generalized fold change and wilcox.test
