@@ -12,16 +12,16 @@ pdf: rd
         
 build: pdf 
 	cd ..;\
-       R CMD build $(PKGSRC)
+    R CMD build $(PKGSRC)
 
 check: build
 	cd ..;\
-       R CMD check --as-cran $(PKGNAME)_$(PKGVERS).tar.gz
+    R CMD check --as-cran $(PKGNAME)_$(PKGVERS).tar.gz
 
 install: check
 	cd ..;\
-       R CMD INSTALL $(PKGNAME)_$(PKGVERS).tar.gz
+    R CMD INSTALL $(PKGNAME)_$(PKGVERS).tar.gz
 
 clean:
 	cd ..;\
-       rm -rf $(PKGNAME).Rcheck
+    rm -rf $(PKGNAME).Rcheck
