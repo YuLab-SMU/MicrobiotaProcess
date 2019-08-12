@@ -1,7 +1,7 @@
 #' @method getvennlist default
 #' @rdname getvennlist
 #' @export
-getvennlist.default <- function(da,
+getvennlist.default <- function(data,
 			   sampleinfo=NULL,
 			   factorNames=NULL,
 			   ...
@@ -13,7 +13,7 @@ getvennlist.default <- function(da,
 	if (!is.null(sampleinfo) && is.null(factorNames)){
 		stop("when sampleinfo isn't NULL, factorNames shouldn't be NULL")
 	}
-	data <- CountOrRatios(da, 
+	data <- CountOrRatios(data, 
 				featurelist=sampleinfo, 
 				countmode=FALSE,
 				multiplenum=1,
