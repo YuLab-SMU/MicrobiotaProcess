@@ -17,7 +17,21 @@ getvarct(obj, ...)
 }
 \arguments{
 \item{obj}{prcomp class or pcasample class}
+
+\item{..., }{additional parameters.}
+}
+\value{
+the VarContrib class, contained the 
+contribution and coordinate of features.
 }
 \description{
 get the contribution of variables
+}
+\examples{
+library(phyloseq)
+data(GlobalPatterns)
+subGlobal <- subset_samples(GlobalPatterns,
+         SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
+pcares <- getpca(subGlobal, method="hellinger") 
+varres <- getvarct(pcares)
 }
