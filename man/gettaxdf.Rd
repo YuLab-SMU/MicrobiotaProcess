@@ -10,17 +10,19 @@ gettaxdf(obj, ...)
 
 \method{gettaxdf}{phyloseq}(obj, taxlevel = 2, ...)
 
-\method{gettaxdf}{default}(otuda, taxda, taxlevel, sampleda = NULL, ...)
+\method{gettaxdf}{default}(data, taxda, taxlevel, sampleda = NULL, ...)
 }
 \arguments{
-\item{obj}{phyloseq class or data.frame (default), the shape of data.frame should be
-row sample * column feature.}
+\item{obj}{phyloseq, phyloseq class}
 
-\item{...}{additional parameters, see also \code{\link[MicrobiotaProcess]{CountOrRatios}}}
+\item{...}{additional parameters, see also 
+\code{\link[MicrobiotaProcess]{CountOrRatios}}}
 
 \item{taxlevel}{character, the column names of taxda that you want to get.
-when the input is phyloseq class, the common names of tax rank is "Kingdom", 
-"Phylum", "Class", "Order", "Family", "Genus", "Species", but you can use 1 to 7.}
+when the input is phyloseq class, you can use 1 to 7.}
+
+\item{data}{data.frame, the shape of data.frame should be
+row sample * column feature.}
 
 \item{taxda}{data.frame, the classifies of feature contained in obj.}
 
@@ -31,6 +33,16 @@ phyloseq class contained tax data.frame and sample information.
 }
 \description{
 get the data of specified taxonomy
+}
+\examples{
+data(test_otu_data)
+phytax <- gettaxdf(test_otu_data, taxlevel=2)
+phytax
+head(phyloseq::otu_table(phytax))
+phybar <- ggbartax(phytax) + 
+          scale_y_continuous(expand=c(0,0), 
+                          limits=c(0, 105))+
+         xlab(NULL) + ylab("relative abundance (\%)")
 }
 \author{
 ShuangbinXu
