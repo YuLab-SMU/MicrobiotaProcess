@@ -14,9 +14,11 @@ getpca(obj, ...)
 \method{getpca}{phyloseq}(obj, method = "hellinger", ...)
 }
 \arguments{
-\item{obj}{data.frame or phyloseq class,shape of data.frame is nrow sample * ncol feature}
+\item{obj}{phyloseq, phyloseq class.}
 
 \item{...}{additional parameters, see\code{\link[stat]{prcomp}}.}
+
+\item{data}{data.frame, shape of data.frame is nrow sample * ncol feature.}
 
 \item{sampleda}{data.frame, nrow sample * ncol factors.}
 
@@ -28,4 +30,14 @@ pcasample class, contained prcomp class and sample information.
 }
 \description{
 Performs a principal components analysis
+}
+\examples{
+library(phyloseq)
+data(GlobalPatterns)
+subGlobal <- subset_samples(GlobalPatterns, 
+         SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
+pcares <- getpca(subGlobal, method="hellinger")
+#pcaplot <- ggordpoint(pcares, biplot=TRUE, 
+#                      speciesannot=TRUE,
+#                      factorNames=c("SampleType"), ellipse=TRUE)
 }
