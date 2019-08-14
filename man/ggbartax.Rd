@@ -16,10 +16,12 @@ ggbartax(obj, ...)
   facetNames = NULL, setColors = TRUE, ...)
 }
 \arguments{
-\item{obj}{data.frame or phyloseq class. data.frame should be 
-(nrow sample * ncol feature (factor)) or the data.frame for geom_bar.}
+\item{obj}{phyloseq, phyloseq class}
 
 \item{...}{additional parameters, see \code{\link[ggplot2]{ggplot}}}
+
+\item{data}{data.frame, data.frame should be 
+(nrow sample * ncol feature (factor)) or the data.frame for geom_bar.}
 
 \item{mapping}{set of aesthetic mapping of ggplot2, default is NULL,
 if the data is the data.frame for geom_bar, the mapping should be set.}
@@ -53,6 +55,14 @@ barplot of tax
 }
 \description{
 taxonomy barplot
+}
+\examples{
+library(tidyverse)
+data(test_otu_data)
+otubar <- ggbartax(test_otu_data) + 
+         scale_y_continuous(expand=c(0,0),
+                            limits=c(0,105))+
+         xlab(NULL) + ylab("relative abundance(\%)")
 }
 \author{
 ShuangbinXu
