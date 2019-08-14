@@ -22,6 +22,9 @@ ggeffectsize(obj, ...)
 
 \item{effectsizename}{character, the column name contained effect size information.}
 
+\item{factorLevels}{list, the levels of the factors, default is NULL,
+if you want to order the levels of factor, you can set this.}
+
 \item{setColors}{logical, whether set the colors, default is TRUE, or FALSE,then 
 use scale_color_manual setting.}
 
@@ -30,8 +33,36 @@ use theme and guides setting.}
 
 \item{removeUnkown}{logical, whether do not show unkown taxonomy, default is TRUE.}
 }
+\value{
+the figures of effect size show the LDA or MeanDecreaseAccuracy.
+}
 \description{
 visualization of effect size by the Linear Discriminant Analysis or randomForest
+}
+\examples{
+data(kostic2012crc)
+kostic2012crc
+head(phyloseq::sample_data(kostic2012crc),3)
+kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
+table(sample_data(kostic2012crc)$DIAGNOSIS)
+diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
+                        mlfun="lda", filtermod="fdr",
+                        firstcomfun = "kruskal.test",
+                        firstalpha=0.05, strictmod=TRUE,
+                        secondcomfun = "wilcox.test", 
+                        submin=3, subclwilc=TRUE,
+                        secondalpha=0.01, lda=3)  
+effectplot <- ggeffectsize(diffres,
+                        setColors=FALSE,
+                        settheme=FALSE) +
+              scale_color_manual(values=c('#00AED7', 
+                                          '#FD9347', 
+                                          '#C1E168'))+
+              theme_bw()+
+              theme(strip.background=element_rect(fill=NA),
+                    panel.spacing = unit(0.2, "mm"),
+                    panel.grid=element_blank(),
+                    strip.text.y=element_blank())
 }
 \author{
 Shuangbin Xu
