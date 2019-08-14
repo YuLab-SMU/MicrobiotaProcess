@@ -17,8 +17,20 @@ multi.compare(fun = wilcox.test, data, feature, factorNames, ...)
 
 \item{..., }{additional arguments for fun.}
 }
+\value{
+the result of fun, if fun is wilcox.test, it 
+will return the list with class "htest".
+}
 \description{
 a container for performing two or more sample test.
+}
+\examples{
+datest <- data.frame(A=rnorm(1:10,mean=5),
+                     B=rnorm(2:11, mean=6), 
+                     group=c(rep("case",5),rep("control",5)))
+head(datest)
+multi.compare(fun=wilcox.test,data=datest,
+              feature=c("A", "B"),factorNames="group")
 }
 \author{
 ShuangbinXu
