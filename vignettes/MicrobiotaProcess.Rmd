@@ -147,8 +147,9 @@ classbar
 ```{r, fig.align="center", fig.height=4.5, fig.width=6, error=TRUE, pcaAndpcoaAnalysis}
 library(phyloseq)
 data(GlobalPatterns)
-datatable(sample_data(GlobalPatterns),options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+#datatable(sample_data(GlobalPatterns),options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
 # We extracted the samples from the four different environmental.
+table(sample_data(GlobalPatterns)$SampleType)
 subGlobal <- subset_samples(GlobalPatterns, SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
 
 # get the results of `pca`, the method was designed for choosing standardization method for community ecologists.
@@ -206,7 +207,7 @@ Biomarker discovery has proven to be capacity to convert genomic data into clini
 ```{r, error=TRUE, KosticCRCdata}
 data(kostic2012crc)
 kostic2012crc
-datatable(sample_data(kostic2012crc), options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+#datatable(sample_data(kostic2012crc), options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
 kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
 table(sample_data(kostic2012crc)$DIAGNOSIS)
 ```
@@ -279,9 +280,12 @@ As show in the results of `diffAnalysis`, we also found *Fusobacterium* sequence
 ```{r, hmpdatasets}
 data(hmp_aerobiosis_small)
 # contained "featureda" "sampleda"  "taxda" datasets.
-datatable(featureda, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
-datatable(sampleda, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
-datatable(taxda, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+#datatable(featureda, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+#datatable(sampleda, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+#datatable(taxda, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+dim(featureda)
+dim(sampleda)
+dim(taxda)
 ```
 
 This dataset is from a small subset of the `HMP` 16S dataset[@Nicola2011LEfSe], contained 55 samples from 6 body sites. The dataset isn't `phyloseq` class, because `diffAnalysis` also supported the matrix datasets as input. The `featureda` contained the relative abundance of different levels features. The `sampleda` contained the information of the samples. And the `taxda` contained the information of the hierarchical relationship of taxonomy. We set the `oxygen_availability` in `sampleda` as `class`, and `body_site` also in `sampleda` as `subclass`.
@@ -337,7 +341,7 @@ Finally, we found the *Staphylococcus*, *Propionibacterium* and some species of 
 
 ```{r, hmpdiffTab}
 hmpdiffTab <- tidydiffAnalysis(hmpdiffres)
-datatable(hmpdiffTab, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+#datatable(hmpdiffTab, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
 ```
 
 # 5 Need helps?
