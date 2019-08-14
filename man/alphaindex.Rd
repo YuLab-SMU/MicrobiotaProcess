@@ -19,7 +19,6 @@ caculate the alpha index (Obseve,Chao1,Shannon,Simpson) of sample
 with \code{\link[vegan]{diversity}}
 }
 \examples{
-library(MetaMicrobiome)
 library(tidyverse)
 library(vegan)
 otudafile <- system.file("extdata", "otu_tax_table.txt", 
