@@ -20,9 +20,18 @@ if you want to split data randomly, you can set TRUE, and
 if you want the results are reproducible, you should add 
 seed before.}
 }
+\value{
+the subset of x, vector or data.frame class.
+}
 \description{
 Split large vector or dataframe to list class, which contian subset vectors
 or dataframe of origin vector or dataframe.
+}
+\examples{
+data(iris)
+irislist <- splitData(iris, 40)
+dalist <- c(1:100)
+dalist <- splitData(dalist, 30)
 }
 \author{
 ShuangbinXu
