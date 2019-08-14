@@ -19,8 +19,7 @@ ggdifftaxbar(obj, ...)
   coloslist = NULL, settheme = TRUE, ...)
 }
 \arguments{
-\item{obj}{object, diffAnalysisClass see also \code{\link[MicrobiotaProcess]{diffAnalysis}} 
-or featureMeanMedian see also \code{\link[MicrobiotaProcess]{getMeanMedian}}.}
+\item{obj}{object, diffAnalysisClass see also \code{\link[MicrobiotaProcess]{diffAnalysis}}}
 
 \item{filepath}{character, default is NULL, meaning current path.}
 
@@ -32,6 +31,8 @@ or featureMeanMedian see also \code{\link[MicrobiotaProcess]{getMeanMedian}}.}
 
 \item{figheight}{numeric, the height of figures, default is 3.}
 
+\item{feMeanMedian}{object, featureMeanMedian see also \code{\link[MicrobiotaProcess]{getMeanMedian}}.}
+
 \item{featurename}{character, the feature name, contained at the objet.}
 
 \item{class}{character, factor name.}
@@ -40,14 +41,39 @@ or featureMeanMedian see also \code{\link[MicrobiotaProcess]{getMeanMedian}}.}
 
 \item{xtextsize}{numeric, the size of axis x label, default is 3.}
 
+\item{factorLevels}{list,  the levels of the factors, default is NULL,
+if you want to order the levels of factor, you can set this.}
+
 \item{setColors}{logical, whether set the colors, default is TRUE, or FALSE,then
 use scale_color_manual setting.}
+
+\item{coloslist}{vector, color vector, if the input is phyloseq, you should use this to adjust the color, 
+not scale_color_manual.}
 
 \item{settheme}{logical, whether set the theme, default is TRUE, or FALSE, then
 use theme and guides setting.}
 }
+\value{
+the figures of features show the distributions in samples.
+}
 \description{
 significantly discriminative feature barplot
+}
+\examples{
+data(kostic2012crc)
+kostic2012crc
+head(phyloseq::sample_data(kostic2012crc),3)
+kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
+table(sample_data(kostic2012crc)$DIAGNOSIS)
+diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
+                        mlfun="lda", filtermod="fdr",
+                        firstcomfun = "kruskal.test",
+                        firstalpha=0.05, strictmod=TRUE,
+                        secondcomfun = "wilcox.test",
+                        submin=3, subclwilc=TRUE,
+                        secondalpha=0.01, lda=3)
+# not run in example
+#ggdifftaxbar(diffres, output="./biomarker_barplot")
 }
 \author{
 Shuangbin Xu
