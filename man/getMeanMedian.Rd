@@ -13,8 +13,25 @@ getMeanMedian(datameta, feature, subclass)
 
 \item{subclass}{character, factor name.}
 }
+\value{
+featureMeanMedian object, contained the abundance of feature, and the 
+mean and median of feature by subclass.
+}
 \description{
 get the mean and median of specific feature.
+}
+\examples{
+data(hmp_aerobiosis_small)
+head(sampleda)
+featureda <- merge(featureda, sampleda, by=0)
+rownames(featureda) <- as.vector(featureda$Row.names)
+featureda$Row.names <- NULL
+feameamed <- getMeanMedian(datameta=featureda, 
+                    feature="p__Actinobacteria", 
+                    subclass="body_site")
+#not run in example
+#fplot <- ggdifftaxbar(feameamed, featurename="p__Actinobacteria", 
+#                     class="oxygen_availability", subclass="body_site")
 }
 \author{
 Shuangbin Xu
