@@ -24,8 +24,18 @@ meaning 3 seconds.}
 \item{checkids}{bool, whether check the sequence of ids has been retrieved.
 default is FALSE.}
 }
+\value{
+the files of sequences downloaded by ids
+}
 \description{
 Retriveing sequences from NCBI with the accession ids.
+}
+\examples{
+retrieveSeq(ids=c("ADM52729.1", "AAF82637.1"), 
+            files="test.fasta",
+            databases="protein",
+            type="fasta",
+            checkids=TRUE)
 }
 \author{
 ShuangbinXu
