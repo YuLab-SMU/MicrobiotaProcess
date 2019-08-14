@@ -30,9 +30,20 @@ ggclust(obj, ...)
 
 \item{settheme}{logical, default is TRUE.}
 }
+\value{
+the figures of hierarchical cluster.
+}
 \description{
 plot the result of hierarchical cluster analysis for the samples
 }
+\examples{
+library(phyloseq)
+data(GlobalPatterns)
+subGlobal <- subset_samples(GlobalPatterns,
+         SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
+hcsample <- getclust(subGlobal, distmethod="jaccard",
+                  method="hellinger", hclustmethod="average") 
+}
 \author{
-ShuangbinXu
+Shuangbin Xu
 }
