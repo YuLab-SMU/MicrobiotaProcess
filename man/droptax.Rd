@@ -23,6 +23,18 @@ a list contained feature dataframe dropped, and the call, arguments.
 Drop species or features from the feature data frame that occur fewer than or equal to a threshold number of 
 occurrences and fewer abundance than to a threshold abundance.
 }
+\examples{
+otudafile <- system.file("extdata", "otu_tax_table.txt",
+                         package="MicrobiotaProcess")
+otuda <- read.table(otudafile, sep="\\t", 
+                    header=TRUE, row.names=1, 
+                    check.names=FALSE, skip=1, 
+                    comment.char="")
+otuda <- otuda[sapply(otuda, is.numeric)]
+dim(otuda)
+otudat <- droptax(otuda, minocc=0.2, minabu=10)
+dim(otudat)
+}
 \author{
 Shuangbin Xu
 }
