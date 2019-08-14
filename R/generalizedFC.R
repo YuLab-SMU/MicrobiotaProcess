@@ -13,8 +13,16 @@
 #' @param na.action, a function which indicates what should happen when the data, contain 'NA's.  
 #' Defaults to 'getOption("na.action")'.
 #' @param ..., additional arguments.
+#' @return list contained gfc, the mean and median of different group.
 #' @author ShuangbinXu
 #' @export
+#' @examples
+#' set.seed(1024)
+#' data <- data.frame(A=rnorm(1:10,mean=5), 
+#'                    B=rnorm(2:11, mean=6), 
+#'                    group=c(rep("case",5),rep("control",5))) 
+#' generalizedFC(B ~ group,data=data)
+#' generalizedFC(x=c(1,2,3,4,5),y=c(3,4,5,6,7))
 ## reference https://www.nature.com/articles/s41591-019-0406-6
 generalizedFC <- function(x, y, ...){
 	UseMethod("generalizedFC")
