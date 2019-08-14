@@ -12,7 +12,17 @@
 #' @return a list contained feature dataframe dropped, and the call, arguments.
 #' @export
 #' @author Shuangbin Xu
-
+#' @examples
+#' otudafile <- system.file("extdata", "otu_tax_table.txt",
+#'                          package="MicrobiotaProcess")
+#' otuda <- read.table(otudafile, sep="\t", 
+#'                     header=TRUE, row.names=1, 
+#'                     check.names=FALSE, skip=1, 
+#'                     comment.char="")
+#' otuda <- otuda[sapply(otuda, is.numeric)]
+#' dim(otuda)
+#' otudat <- droptax(otuda, minocc=0.2, minabu=10)
+#' dim(otudat)
 droptax <- function(taxtab, rmode=FALSE, minocc=0, minabu=0){
 	if (isTRUE(rmode)){
 		taxtab <- data.frame(t(taxtab), check.names=FALSE)
