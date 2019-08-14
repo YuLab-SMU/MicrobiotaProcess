@@ -1,8 +1,14 @@
 #' @title convert dataframe contained hierarchical relationship or other classes to treedata class
 #' @param data data.frame, such like the tax_table of phyloseq.
+#' @param ..., additional parameters.
+#' @return treedata class.
 #' @author Shuangbin Xu
 #' @importFrom tibble as_tibble
 #' @export
+#' @examples
+#' data(hmp_aerobiosis_small)
+#' head(taxda)
+#' treedat <- convert_to_treedata(taxda)
 convert_to_treedata <- function(data,...){
 	data <- fillNAtax(data)
 	data <- data.frame(root=rep("r__root", nrow(data)), data)
@@ -18,9 +24,7 @@ convert_to_treedata <- function(data,...){
 	index <- c()
 	index[isTip] <- seq(1,sum(isTip))
 	index[!isTip] <- seq(sum(isTip)+2,length(isTip)+1)
-	mapping <- data.frame(node=index, 
-						  labelnames=as.vector(datalist$child), 
-						  isTip)
+	mapping <- data.frame(node=index, labelnames=as.vector(datalist$child), isTip)
 	mapping$nodeClass <- unlist(lapply(as.vector(mapping$labelnames),
 									   function(x)(unlist(strsplit(x,"__"))[1])))
 	mapping$nodeSize <- 1
@@ -29,23 +33,14 @@ convert_to_treedata <- function(data,...){
 	edges <- cbind(parentnode, childnode) 
 	colnames(edges) <- NULL
 	edges[is.na(edges)] <- sum(isTip) + 1
-	root <- data.frame(node=sum(isTip)+1,
-					   labelnames="r__root",
-					   isTip=FALSE,
-					   nodeClass="r",
-					   nodeSize=1)
+	root <- data.frame(node=sum(isTip)+1,labelnames="r__root",
+					   isTip=FALSE, nodeClass="r", nodeSize=1)
 	mapping <- rbind(root, mapping)
 	mapping <- mapping[order(mapping$node),]
 	node.label <- as.vector(mapping$labelnames)[!mapping$isTip]
 	tip.label <- as.vector(mapping$labelnames)[mapping$isTip]
-	taxphylo <- structure(list(edge=edges,
-							   node.label=node.label,
-							   tip.label=tip.label,
-							   edge.length=rep(0.5, nrow(edges)),
-							   Nnode = length(node.label)), 
-						  class="phylo") 
-	res <- new("treedata",
-			   phylo=taxphylo, 
-			   data=as_tibble(mapping))
-
+	taxphylo <- structure(list(edge=edges, node.label=node.label,
+							   tip.label=tip.label, edge.length=rep(0.5, nrow(edges)),
+							   Nnode = length(node.label)), class="phylo") 
+	res <- new("treedata", phylo=taxphylo, data=as_tibble(mapping))
 }
