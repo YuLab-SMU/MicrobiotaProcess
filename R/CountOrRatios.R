@@ -8,13 +8,29 @@
 #' should be numeric.
 #' @param featurelist dataframe; a dataframe contained one chatacter column, default is NULL.
 #' @param countmode boolean; whether return the count results (TRUE),or relative abundance (FALSE).
-#' @param percentmode boolean; whether return the percent (FALSE),or between 0 and 1(TRUE).
 #' @param multiplenum numeric; the multiple you want to increase,default is 1.
 #' @param rownamekeep boolean; whether you return a dataframe contained the rownames,default is FALSE.
+#' @return mean of data.frame by featurelist
 #' @export 
 #' @author Shuangbin Xu
 #' @importFrom plyr ddply 
 #' @importFrom plyr numcolwise
+#' @examples
+#' otudafile <- system.file("extdata", "otu_tax_table.txt", 
+#'                       package="MicrobiotaProcess")
+#' samplefile <- system.file("extdata", 
+#'                  "sample_info.txt", package="MicrobiotaProcess")
+#' otuda <- read.table(otudafile, sep="\t", header=TRUE, 
+#'                     row.names=1, check.names=FALSE, 
+#'                     skip=1, comment.char="")
+#' sampleda <- read.table(samplefile, 
+#'             sep="\t", header=TRUE, row.names=1)
+#' taxdf <- otuda[!sapply(otuda, is.numeric)]
+#' taxdf <- splitStrtoList(taxdf)
+#' otuda <- otuda[sapply(otuda, is.numeric)]
+#' phycount <- CountOrRatios(otuda, taxdf[,1,drop=FALSE])
+#' phyratios <- CountOrRatios(otuda, taxdf[,1,drop=FALSE], 
+#'                            countmode=FALSE)
 CountOrRatios <- function(data, 
 			     featurelist, 
 			     countmode=TRUE, 
