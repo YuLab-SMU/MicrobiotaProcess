@@ -3,37 +3,19 @@
 #' @importFrom ggplot2 ggplot aes_ geom_bar theme_bw scale_fill_manual facet_grid
 #' @importFrom stats as.formula
 #' @export
-ggbartax.default <- function(data,
-				  mapping=NULL,
-				  position = "stack",
-				  stat="identity",
-				  width=0.7,
-				  topn=30,
-				  count=FALSE,
-				  sampleda=NULL,
-				  factorLevels=NULL,
-				  settheme=TRUE,
-				  facetNames=NULL,
-				  setColors=TRUE,
-				  ...){
+ggbartax.default <- function(data, mapping=NULL, position = "stack", stat="identity",
+				  width=0.7, topn=30, count=FALSE, sampleda=NULL, factorLevels=NULL,
+				  settheme=TRUE, facetNames=NULL, setColors=TRUE, ...){
 	if (is.null(mapping)){
 		mapping <- aes_(~sample, ~value, fill=~feature)
-		data <- mappingtaxda(data, 
-							 topn=topn, 
-							 count=count,
-							 sampleda=sampleda, 
-							 factorLevels=factorLevels,
-							 plotda=TRUE)
+		data <- mappingtaxda(data, topn=topn, count=count, sampleda=sampleda, 
+							 factorLevels=factorLevels, plotda=TRUE)
 		#ymax <- max(data$value)*1.05
 	}else{
 		mapping <- mapping
 	}
-	p <- ggplot(data,
-				mapping=mapping,
-				...) + 
-		geom_bar(position = position, 
-				 stat=stat,
-				 width=width) + 
+	p <- ggplot(data,mapping=mapping,...) + 
+		geom_bar(position = position,stat=stat, width=width) + 
 		theme_bw() 
 	tmpfactor <- setdiff(colnames(data), c("feature", "sample", "value"))
 	#if (is.null(facetNames) && length(tmpfactor)>0){
@@ -67,38 +49,26 @@ ggbartax.default <- function(data,
 #' if you want to order the levels of factor, you can set this. 
 #' @param plotda boolean, default is TRUE, whether build the data.frame for
 #' `geom_bar` of `ggplot2`.
+#' @return the data.frame for ggbartax
 #' @author ShuangbinXu
 #' @export
 #' @importFrom magrittr %>%
 #' @importFrom reshape melt
 
-mappingtaxda <- function(data, topn=30, 
-						 count=FALSE,
-						 sampleda=NULL, 
-						 factorLevels=NULL,
-						 plotda=TRUE){
-	tmpfeature <- colnames(data)[sapply(data,is.numeric)]
-	tmpfactor <- colnames(data)[!sapply(data,is.numeric)]
-	dat <- data[, tmpfeature,drop=FALSE] %>% t() %>% 
-		data.frame(check.names=FALSE)
-	if(!count){
-		dat <- apply(dat, 2, function(x){100*x/sum(x)}) %>% 
-			data.frame(check.names=FALSE)
-	}
+mappingtaxda <- function(data, topn=30, count=FALSE, sampleda=NULL, 
+						 factorLevels=NULL, plotda=TRUE){
+	tmpfeature <- colnames(data)[vapply(data,is.numeric,logical(1))]
+	tmpfactor <- colnames(data)[!vapply(data,is.numeric,logical(1))]
+	dat <- data[, tmpfeature,drop=FALSE] %>% t() %>% data.frame(check.names=FALSE)
+	if(!count){dat <- apply(dat, 2, function(x){100*x/sum(x)}) %>% data.frame(check.names=FALSE)}
 	dat$sums <- apply(dat, 1, sum)
 	dat <- dat[order(dat$sum, decreasing = TRUE),,drop=FALSE]
 	dat$sums <- NULL
 	tmpsums <- matrix(colSums(dat),nrow=1) %>% data.frame()
 	if (topn < nrow(dat)){
 		dat <- dat[seq_len(topn),,drop=FALSE]
-		if (!count){
-			others <- 100 - (matrix(apply(dat,2,sum),nrow=1) %>% 
-							 data.frame(check.names=FALSE))
-		}
-		if (count){
-			others <- tmpsums - (matrix(apply(dat,2,sum),nrow=1) %>% 
-							 data.frame(check.names=FALSE))
-		}
+		if (!count){others <- 100 - (matrix(apply(dat,2,sum),nrow=1) %>% data.frame(check.names=FALSE))}
+		if (count){others <- tmpsums - (matrix(apply(dat,2,sum),nrow=1) %>% data.frame(check.names=FALSE))}
 		colnames(others) <- colnames(dat)
 		rownames(others) <- "Others"
 		dat <- rbind(dat, others)
@@ -119,20 +89,16 @@ mappingtaxda <- function(data, topn=30,
 		dat$feature <- factor(dat$feature, levels=featurelevels)
 	}else{
 		if (!is.null(sampleda)){
-			dat <- dat %>% t() %>% 
-				data.frame(check.names=FALSE)
+			dat <- dat %>% t() %>% data.frame(check.names=FALSE)
 			dat <- merge(dat, sampleda, by=0)
 		}
 		if (is.null(sampleda)&&length(tmpfactor)>0){
 			tmpsample <- data[,tmpfactor,drop=FALSE]
 			dat <- merge(dat, tmpsample, by=0)
 		}
-		colnames(dat)[1] <- "sample"
-		
+		colnames(dat)[1] <- "sample"		
 	}
-	if (!is.null(factorLevels)){
-		dat <- setfactorlevels(dat, factorLevels)	
-	}
+	if (!is.null(factorLevels)){dat <- setfactorlevels(dat, factorLevels)}
 	return(dat)
 }
 
@@ -164,20 +130,21 @@ taxbartheme <- function(){
 	      strip.background = element_rect(colour="white", fill="grey"))
 }
 
-#' @title legend guides for ggbartax
-#' @description
-#' the legend guides for `ggbartax`
-#' @param keywidth numeric, the keywidth of `guide_legend`.
-#' @param keyheight numeric, the keyheight of `guide_legend`.
-#' @param ncol integer, the ncol of legend.
-#' @param ..., additional parameter.
-#' @author ShuangbinXu
-#' @importFrom ggplot2 guides guide_legend
-#' @export
-
-taxbarguildes <- function(keywidth=0.3, keyheight=0.3, ncol=5, ...){
-	guides(fill=guide_legend(keywidth = keywidth, 
-							 keyheight = keyheight,
-							 ncol=ncol),...)
-}
+###' @title legend guides for ggbartax
+###' @description
+###' the legend guides for `ggbartax`
+###' @param keywidth numeric, the keywidth of `guide_legend`.
+###' @param keyheight numeric, the keyheight of `guide_legend`.
+###' @param ncol integer, the ncol of legend.
+###' @param ..., additional parameter.
+###' @return the guides of legend.
+###' @author ShuangbinXu
+###' @importFrom ggplot2 guides guide_legend
+###' @export
+##
+#taxbarguildes <- function(keywidth=0.3, keyheight=0.3, ncol=5, ...){
+#	guides(fill=guide_legend(keywidth = keywidth, 
+#							 keyheight = keyheight,
+#							 ncol=ncol),...)
+#}
 
