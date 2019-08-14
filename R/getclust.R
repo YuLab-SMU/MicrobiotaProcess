@@ -1,11 +1,26 @@
 #' @title Hierarchical cluster analysis for the samples
-#' @param obj R object,dist data.frame or phyloseq class
+#' @param obj phyloseq, phyloseq class.
+#' @param distobj dist, dist class.
+#' @param data data.frame, data.frame, default is nrow samples * ncol features.
+#' @param taxa_are_rows logical, if the features is in column, it should set FALSE.
 #' @param distmethod character, the method of dist, when the obj is data.frame 
 #' or phyloseq default is "euclidean". see also \code{\link[MicrobiotaProcess]{getdist}}.
 #' @param sampleda data.frame, nrow sample * ncol factor. default is NULL.
+#' @param method character, the standardization methods for community ecologists, see also
+#' \code{\link[vegan]{decostand}}
 #' @param hclustmethod character, the method of hierarchical cluster, default is average.
-#' @author ShuangbinXu
+#' @param tree phylo, the phylo class, see also \code{\link[ape]{as.phylo}}.
+#' @param ..., additional parameters.
+#' @return clustplotClass object.
+#' @author Shuangbin Xu
 #' @export
+#' @examples
+#' library(phyloseq)
+#' data(GlobalPatterns)
+#' subGlobal <- subset_samples(GlobalPatterns, 
+#'          SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#' hcsample <- getclust(subGlobal, distmethod="jaccard",
+#'                   method="hellinger", hclustmethod="average")
 getclust <- function(obj,...){
 	UseMethod("getclust")
 }
@@ -68,17 +83,17 @@ getclust.default <- function(data,
 #' @method getclust phyloseq
 #' @rdname getclust
 #' @export
-getclust.phyloseq <- function(phyloseqobj, 
+getclust.phyloseq <- function(obj, 
 							  distmethod="euclidean", 
 							  method="hellinger",
 							  hclustmethod="average",
 							  ...){
-	distobj <- getdist(phyloseqobj,
+	distobj <- getdist(obj,
 					   distmethod=distmethod,
 					   method=method,
 					   type="sample",
 					   ...)
-	sampleda <- checksample(phyloseqobj)
+	sampleda <- checksample(obj)
 	phyloobj <- getclust.dist(distobj, 
 							  sampleda=sampleda, 
 							  hclustmethod=hclustmethod)
@@ -95,8 +110,16 @@ getclust.phyloseq <- function(phyloseqobj,
 #' @param hjust numeric, default is -0.1
 #' @param settheme logical, default is TRUE.
 #' @param ..., additional params, see also \code{\link[ggtree]{geom_tippoint}}
-#' @author ShuangbinXu
+#' @return the figures of hierarchical cluster.
+#' @author Shuangbin Xu
 #' @export
+#' @examples
+#' library(phyloseq)
+#' data(GlobalPatterns)
+#' subGlobal <- subset_samples(GlobalPatterns,
+#'          SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#' hcsample <- getclust(subGlobal, distmethod="jaccard",
+#'                   method="hellinger", hclustmethod="average") 
 ggclust <- function(obj,...){
 	UseMethod("ggclust")
 }
@@ -119,14 +142,10 @@ ggclust.clustplotClass <- function(obj,
 	samplehcp <- ggtree(phyloclass, 
 						layout=layout)
 	if (!is.null(obj@sampleda)){
-		sampleda <- data.frame(obj@sampleda, 
-						   check.names=FALSE)
+		sampleda <- data.frame(obj@sampleda, check.names=FALSE)
 		phyloclass <- obj@hclustphylo
-		sampleda <- sampleda[match(phyloclass$tip.label, 
-							   rownames(sampleda)),,drop=FALSE]
-		sampleda <- data.frame(sample=rownames(sampleda), 
-						   sampleda, 
-						   check.names=FALSE)
+		sampleda <- sampleda[match(phyloclass$tip.label, rownames(sampleda)),,drop=FALSE]
+		sampleda <- data.frame(sample=rownames(sampleda),sampleda, check.names=FALSE)
 		rownames(sample) <- NULL
 		if(!is.null(factorNames)){
 			tmpfactormap <- getfactormap(factorNames)	
@@ -137,29 +156,17 @@ ggclust.clustplotClass <- function(obj,
 			sampleda <- setfactorlevels(sampleda, factorLevels)
 		}
 		samplehcp <- samplehcp %<+% sampleda + 
-				geom_tippoint(tmpfactormap, 
-							  size=pointsize,
-							  ...)
+				geom_tippoint(tmpfactormap, size=pointsize, ...)
 	}
 	if (layout=="circular"){
-		samplehcp <- samplehcp + 
-				geom_tiplab2(size=fontsize, 
-							 hjust=hjust)
+		samplehcp <- samplehcp + geom_tiplab2(size=fontsize, hjust=hjust)
 	}else{
-		samplehcp <- samplehcp + 
-				geom_tiplab(size=fontsize, 
-							hjust=hjust)	
+		samplehcp <- samplehcp + geom_tiplab(size=fontsize, hjust=hjust)	
 	}
-	samplehcp <- samplehcp + 
-			labs(title=paste0("Hierarchical Cluster of Samples ", 
-							  "(", 
-							  obj@distmethod, 
-							  ")"))
+	samplehcp <- samplehcp + labs(title=paste0("Hierarchical Cluster of Samples ", "(", obj@distmethod, ")"))
 	if (settheme){
 		samplehcp <- samplehcp + 
-				theme(plot.title = element_text(face="bold",
-												lineheight=25,
-												hjust=0.5))
+				theme(plot.title = element_text(face="bold", lineheight=25,	hjust=0.5))
 	}
 	return(samplehcp)
 }
