@@ -37,8 +37,19 @@ and ‘Month’ a factor giving the corresponding groups.}
 \item{na.action, }{a function which indicates what should happen when the data, contain 'NA's.
 Defaults to 'getOption("na.action")'.}
 }
+\value{
+list contained gfc, the mean and median of different group.
+}
 \description{
 calculate the mean difference in a set of predefined quantiles of the logarithmic
+}
+\examples{
+set.seed(1024)
+data <- data.frame(A=rnorm(1:10,mean=5), 
+                   B=rnorm(2:11, mean=6), 
+                   group=c(rep("case",5),rep("control",5))) 
+generalizedFC(B ~ group,data=data)
+generalizedFC(x=c(1,2,3,4,5),y=c(3,4,5,6,7))
 }
 \author{
 ShuangbinXu
