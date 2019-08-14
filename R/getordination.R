@@ -1,16 +1,23 @@
 #' @title calculate distance
+#' @param obj phyloseq, phyloseq class.
+#' @param data data.frame, nrow sample * ncol feature. 
+#' @param method character, default is hellinger, see alse \code{\link[vegan]{decostand}} 
+#' @param distmethod character, default is "euclidean", see also \code{\link[phyloseq]{distanceMethodList}}
+#' @param taxa_are_rows logical, default is FALSE.
+#' @param sampleda data.frame, nrow sample * ncol factors.
+#' @param tree phylo, see also \code{\link[ape]{phylo}}.
+#' @param ..., additional parameters.
+#' @return distance class contianed distmethod and originalD attr
 #' @export
+#' @examples
+#' data(test_otu_data)
+#' distclass <- getdist(test_otu_data)
+#' hcsample <- getclust(distclass)
 getdist <- function(obj,...){
 	UseMethod("getdist")
 }
 
 #' @method getdist default
-#' @param data data.frame, nrow sample * ncol feature.
-#' @param method character, default is hellinger, see alse \code{\link[vegan]{decostand}}
-#' @param distmethod character, default is "euclidean", see also \code{\link[phyloseq]{distanceMethodList}}
-#' @param taxa_are_rows logical, default is FALSE.
-#' @param sampleda data.frame, nrow sample * ncol factors.
-#' @param tree phylo, see also \code{\link[ape]{phylo}}
 #' @rdname getdist
 #' @importFrom vegan decostand
 #' @importFrom phyloseq otu_table 
@@ -20,7 +27,6 @@ getdist.default <- function(data,
 						    taxa_are_rows=FALSE,	
 							sampleda=NULL,
 							tree=NULL,
-							type="sample",
 							method="hellinger",
 							...){
 	objphyloseq <- new("phyloseq",
@@ -31,7 +37,7 @@ getdist.default <- function(data,
 	return(getdist.phyloseq(objphyloseq, 
 							distmethod=distmethod, 
 							method=method,
-							type=type, ...))
+							type="sample", ...))
 	
 }
 
@@ -68,20 +74,30 @@ getdist.phyloseq <- function(obj, distmethod="euclidean", type="sample", method=
 #' @param data data.frame, numeric data.frame nrow sample * ncol features.
 #' @param obj phyloseq, the phyloseq class or dist class.
 #' @param sampleda data.frame, nrow sample * ncol factor, default is NULL.
+#' @param distmethod character, the method of distance, see also \code{\link[phyloseq]{distance}}
 #' @param taxa_are_rows logical, if feature of data is column, it should be set FALSE.
 #' @param tree phylo, the phylo class, default is NULL, when use unifrac method, it should be
 #' required.
-#' @param type character, default is sample.
 #' @param method character, the standardization method for community ecologists, default is hellinger,
 #' if the data has be normlized, it shound be set NULL.
 #' @param ..., additional parameter, see \code{\link[MicrobiotaProcess]{getdist}}.
+#' @return pcasample object, contained prcomp or pcoa and sampleda (data.frame).
 #' @author Shuangbin Xu
 #' @export
+#' @examples
+#' library(phyloseq)
+#' data(GlobalPatterns)
+#' subGlobal <- subset_samples(GlobalPatterns, SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#' pcoares <- getpcoa(subGlobal, distmethod="euclidean", method="hellinger")
+#' # pcoaplot <- ggordpoint(pcoares, biplot=FALSE,
+#' #                        speciesannot=FALSE,
+#' #                        factorNames=c("SampleType"), 
+#' #                        ellipse=FALSE)
 getpcoa <- function(obj, ...){
 	UseMethod("getpcoa")
 }
 
-#' @method getpca default
+#' @method getpcoa default
 #' @rdname getpcoa
 #' @export
 getpcoa.default <- function(data, 
@@ -89,7 +105,7 @@ getpcoa.default <- function(data,
 							taxa_are_rows=FALSE,
 							sampleda=NULL, 
 							tree=NULL,
-							type="sample",
+							#type="sample",
 							method="hellinger",
 							...){
 	tmpdist <- getdist.default(data=data, 
@@ -97,7 +113,7 @@ getpcoa.default <- function(data,
 							   taxa_are_rows=taxa_are_rows,
 							   sampleda=sampleda,
 							   tree=tree,
-							   type=type,
+							   #type=type,
 							   method=method,
 							   ...)
 	data <- attr(tmpdist, "originalD")
