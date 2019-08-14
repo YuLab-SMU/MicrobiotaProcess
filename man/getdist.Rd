@@ -10,12 +10,16 @@ getdist(obj, ...)
 
 \method{getdist}{default}(data, distmethod = "euclidean",
   taxa_are_rows = FALSE, sampleda = NULL, tree = NULL,
-  type = "sample", method = "hellinger", ...)
+  method = "hellinger", ...)
 
 \method{getdist}{phyloseq}(obj, distmethod = "euclidean",
   type = "sample", method = "hellinger", ...)
 }
 \arguments{
+\item{obj}{phyloseq, phyloseq class.}
+
+\item{..., }{additional parameters.}
+
 \item{data}{data.frame, nrow sample * ncol feature.}
 
 \item{distmethod}{character, default is "euclidean", see also \code{\link[phyloseq]{distanceMethodList}}}
@@ -24,12 +28,20 @@ getdist(obj, ...)
 
 \item{sampleda}{data.frame, nrow sample * ncol factors.}
 
-\item{tree}{phylo, see also \code{\link[ape]{phylo}}}
+\item{tree}{phylo, see also \code{\link[ape]{phylo}}.}
 
 \item{method}{character, default is hellinger, see alse \code{\link[vegan]{decostand}}}
 }
+\value{
+distance class contianed distmethod and originalD attr
+}
 \description{
 calculate distance
+}
+\examples{
+data(test_otu_data)
+distclass <- getdist(test_otu_data)
+hcsample <- getclust(distclass)
 }
 \seealso{
 \code{\link[phyloseq]{distance}}
