@@ -8,9 +8,19 @@ convert_to_treedata(data, ...)
 }
 \arguments{
 \item{data}{data.frame, such like the tax_table of phyloseq.}
+
+\item{..., }{additional parameters.}
+}
+\value{
+treedata class.
 }
 \description{
 convert dataframe contained hierarchical relationship or other classes to treedata class
+}
+\examples{
+data(hmp_aerobiosis_small)
+head(taxda)
+treedat <- convert_to_treedata(taxda)
 }
 \author{
 Shuangbin Xu
