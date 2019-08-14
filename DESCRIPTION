@@ -42,11 +42,14 @@ Imports:
   utils
 Suggests:
   DT,
+  prettydoc,
+  treeio,
+  tidyverse,
   knitr
 License: GPL (>= 2.0)
 BugReports: https://github.com/YuLab-SMU/MicrobiotaProcess/issues
 VignetteBuilder: knitr 
 Encoding: UTF-8
 LazyData: false
-biocViews: Visualization, Microbiome, Software, LDA, MultipleComparison
+biocViews: Visualization, Microbiome, Software, MultipleComparison
 RoxygenNote: 6.1.1
