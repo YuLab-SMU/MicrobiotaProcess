@@ -7,10 +7,24 @@
 #' @param sep character; the field separator character, default is "; ".
 #' @param extra character; See \code{[tidyr]{separate}} details.
 #' @param fill character; See \code{[tidyr]{separate}} details.
-#' @param ...; Additional arguments passed to \code{[tidyr]{separate}}.
+#' @param ..., Additional arguments passed to \code{[tidyr]{separate}}.
+#' @return data.frame of strdataframe by sep.
 #' @export
 #' @author Shuangbin Xu
 #' @importFrom tidyr separate
+#' @examples
+#' otudafile <- system.file("extdata", "otu_tax_table.txt",
+#'                       package="MicrobiotaProcess")
+#' samplefile <- system.file("extdata",
+#'                  "sample_info.txt", package="MicrobiotaProcess")
+#' otuda <- read.table(otudafile, sep="\t", header=TRUE,
+#'                     row.names=1, check.names=FALSE,
+#'                     skip=1, comment.char="")
+#' sampleda <- read.table(samplefile,
+#'             sep="\t", header=TRUE, row.names=1)
+#' taxdf <- otuda[!sapply(otuda, is.numeric)]
+#' taxdf <- splitStrtoList(taxdf)
+#' head(taxdf)
 splitStrtoList <- function(strdataframe, 
 			      prefix="tax", 
 			      sep="; ", 
@@ -22,7 +36,7 @@ splitStrtoList <- function(strdataframe,
        colstr <- names(strdataframe)
 	tmplength <- length(strsplit(as.character(strdataframe[1,1]), sep)[[1]])
 	newcolnames <- paste(prefix, rep(seq_len(tmplength)), sep="")
-	tmpdata <- tidyr::separate(strdataframe, 
+	tmpdata <- separate(strdataframe, 
 				      colstr,
 				      newcolnames,
 				      sep=sep,
