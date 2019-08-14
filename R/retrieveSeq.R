@@ -12,12 +12,18 @@
 #' meaning 3 seconds.
 #' @param checkids bool, whether check the sequence of ids has been retrieved.
 #' default is FALSE.
+#' @return the files of sequences downloaded by ids
 #' @importFrom Biostrings readBStringSet
 #' @importFrom rentrez entrez_fetch
 #' @importFrom stringr str_trim
 #' @author ShuangbinXu
 #' @export
-
+#' @examples
+#' retrieveSeq(ids=c("ADM52729.1", "AAF82637.1"), 
+#'             files="test.fasta",
+#'             databases="protein",
+#'             type="fasta",
+#'             checkids=TRUE)
 retrieveSeq <- function(ids, files, 
 						databases="protein", 
 						type="fasta", 
@@ -25,7 +31,7 @@ retrieveSeq <- function(ids, files,
 	if (file.exists(files) && checkids){
 		seqobj <- readBStringSet(files)
 		tmpid <- names(seqobj)
-		tmpid <- unlist(sapply(strsplit(tmpid, " "),function(x){x[1]}))
+		tmpid <- unlist(vapply(strsplit(tmpid, " "),function(x){x[1]},character(1)))
 		ids <- setdiff(ids, tmpid)
 	}
 	if (length(ids)>400){
@@ -55,7 +61,7 @@ retrieveSeq <- function(ids, files,
 #'
 #' @description
 #' Retriveing sequences from NCBI with the accession ids.
-#' @param ids list, the accession number or accession.
+#' @param idlist vector, the accession version.
 #' @param files character, the file name specified by a double-quoted string.
 #' @param databases character, the name of databases to use, default is `protein`,
 #' if nucleotide sequences to retrieve set nuccore,see \code{\link[rentrez]{entrez_fetch}}.
@@ -65,10 +71,17 @@ retrieveSeq <- function(ids, files,
 #' meaning 3 seconds.
 #' @param checkids bool, whether check the sequence of ids has been retrieved.
 #' default is FALSE.
-#' @seealso [retrieveSeq]
+#' @return the files of sequences downloaded by ids
+#' @seealso \code{\link[retrieveSeq]{MicrobiotaProcess}}
 #' @author ShuangbinXu
 #' @export
-
+#' @examples
+#' idslist <- list(c("ADM52729.1", "AAF82637.1"), c("CAA24729.1", "CAA83510.1"))
+#' mapplyretrieveSeq(idlist=idslist,
+#'                   files="test.fasta",
+#'                   databases="protein",
+#'                   type="fasta",
+#'                    times=3,checkids=TRUE)
 mapplyretrieveSeq <- function(idlist, files, 
 							  databases="protein", 
 							  type="fasta", 
