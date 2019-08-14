@@ -18,6 +18,8 @@ ggdiffclade(obj, ...)
 \arguments{
 \item{obj}{object, diffAnalysisClass, the results of diffAnalysis \code{\link[MicrobiotaProcess]{diffAnalysis}}.}
 
+\item{..., }{additional parameters.}
+
 \item{taxda}{data.frame, data.frame contained hierarchical relationship or other classes,
 such like the tax_data of phyloseq.}
 
@@ -52,8 +54,30 @@ or set FALSE, then use 'guides' or 'theme' setting.}
 
 \item{removeUnkown}{logical, whether do not show unkown taxonomy, default is TRUE.}
 }
+\value{
+figures of tax clade show the significant different feature.
+}
 \description{
 plot the clade tree results of different analysis
+}
+\examples{
+data(kostic2012crc)
+kostic2012crc
+head(phyloseq::sample_data(kostic2012crc),3)
+kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
+table(sample_data(kostic2012crc)$DIAGNOSIS)
+diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
+                        mlfun="lda", filtermod="fdr",
+                        firstcomfun = "kruskal.test",
+                        firstalpha=0.05, strictmod=TRUE,
+                        secondcomfun = "wilcox.test",
+                        submin=3, subclwilc=TRUE,
+                        secondalpha=0.01, lda=3)
+library(ggplot2)
+diffcladeplot <- ggdiffclade(diffres,alpha=0.3, size=0.2, 
+                        skpointsize=0.4, taxlevel=3,settheme=TRUE,
+                        setColors=FALSE) +
+                 scale_fill_manual(values=c('#00AED7', '#FD9347', '#C1E168'))
 }
 \author{
 Shuangbin Xu
