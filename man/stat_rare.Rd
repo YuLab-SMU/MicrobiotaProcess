@@ -21,6 +21,9 @@ if you want to order the levels of factor, you can set this.}
 \item{plotda}{boolean, default is TRUE, whether build the data.frame for
 `geom_bar` of `ggplot2`.}
 }
+\value{
+data.frame for ggrarecurve.
+}
 \description{
 generating the data of ggrarecurve.
 }
