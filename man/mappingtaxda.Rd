@@ -23,6 +23,9 @@ if you want to order the levels of factor, you can set this.}
 \item{plotda}{boolean, default is TRUE, whether build the data.frame for
 `geom_bar` of `ggplot2`.}
 }
+\value{
+the data.frame for ggbartax
+}
 \description{
 build the data.frame for `geom_bar` of `ggplot2`,
 if the data.frame was built, you can visulize with `ggbartax`.
