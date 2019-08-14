@@ -64,8 +64,21 @@ if you want to order the levels of factor, you can set this.}
 
 \item{textlinesize}{numeric, the segment size in \code{\link[ggrepel]{geom_text_repel}}.}
 }
+\value{
+point figures of PCA or PCoA.
+}
 \description{
 ordination plotter based on ggplot2.
+}
+\examples{
+library(phyloseq)
+data(GlobalPatterns)
+subGlobal <- subset_samples(GlobalPatterns,
+         SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
+pcares <- getpca(subGlobal, method="hellinger")
+pcaplot <- ggordpoint(pcares, biplot=TRUE,
+                    speciesannot=TRUE,
+                     factorNames=c("SampleType"), ellipse=TRUE)
 }
 \author{
 ShuangbinXu
