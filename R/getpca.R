@@ -1,11 +1,21 @@
 #' @title Performs a principal components analysis
-#' @param obj data.frame or phyloseq class,shape of data.frame is nrow sample * ncol feature
+#' @param obj phyloseq, phyloseq class.
+#' @param data data.frame, shape of data.frame is nrow sample * ncol feature.
 #' @param sampleda data.frame, nrow sample * ncol factors.
 #' @param method character, the standardization methods for
 #' community ecologists. see \code{\link[vegan]{decostand}}.
 #' @param ... additional parameters, see\code{\link[stat]{prcomp}}.
 #' @return pcasample class, contained prcomp class and sample information.
 #' @export
+#' @examples
+#' library(phyloseq)
+#' data(GlobalPatterns)
+#' subGlobal <- subset_samples(GlobalPatterns, 
+#'          SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#' pcares <- getpca(subGlobal, method="hellinger")
+#' #pcaplot <- ggordpoint(pcares, biplot=TRUE, 
+#' #                      speciesannot=TRUE,
+#' #                      factorNames=c("SampleType"), ellipse=TRUE)
 getpca <- function(obj,...){
 	UseMethod("getpca")
 }
@@ -65,8 +75,18 @@ getpca.phyloseq <- function(obj, method="hellinger", ...){
 #' @param fontfamily character, the font family, default is "sans".
 #' @param textlinesize numeric, the segment size in \code{\link[ggrepel]{geom_text_repel}}.
 #' @param ... additional parameters, see \code{\link[ggrepel]{geom_text_repel}}. 
+#' @return point figures of PCA or PCoA.
 #' @author ShuangbinXu
 #' @export
+#' @examples
+#' library(phyloseq)
+#' data(GlobalPatterns)
+#' subGlobal <- subset_samples(GlobalPatterns,
+#'          SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#' pcares <- getpca(subGlobal, method="hellinger")
+#' pcaplot <- ggordpoint(pcares, biplot=TRUE,
+#'                     speciesannot=TRUE,
+#'                      factorNames=c("SampleType"), ellipse=TRUE)
 ggordpoint <- function(obj, ...){
 	UseMethod("ggordpoint")
 }
@@ -76,38 +96,16 @@ ggordpoint <- function(obj, ...){
 #' @importFrom ggrepel geom_text_repel
 #' @rdname ggordpoint
 #' @export
-ggordpoint.default <-  function(obj,
-						   pc=c(1,2),
-						   mapping=NULL, 
-						   sampleda=NULL, 
-						   factorNames=NULL,
-						   factorLevels=NULL,
-						   poinsize=2,
-						   linesize=0.3,
-						   arrowsize=1.5,
-						   arrowlinecolour="grey",
-						   ellipse=FALSE,
-						   ellipse_pro=0.9, 
-						   ellipse_alpha=0.2,
-						   biplot=FALSE,
-						   topn=5,
-						   settheme=TRUE,
-						   speciesannot=FALSE,
-						   textsize=2.5,
-						   fontface="bold.italic",
-						   fontfamily="sans",
-						   textlinesize=0.02,
-
-						   ...){
+ggordpoint.default <-  function(obj, pc=c(1,2), mapping=NULL, sampleda=NULL, factorNames=NULL, factorLevels=NULL,
+						   poinsize=2, linesize=0.3, arrowsize=1.5, arrowlinecolour="grey", ellipse=FALSE, ellipse_pro=0.9, 
+						   ellipse_alpha=0.2, biplot=FALSE, topn=5, settheme=TRUE, speciesannot=FALSE, textsize=2.5,
+						   fontface="bold.italic", fontfamily="sans", textlinesize=0.02, ...){
 	plotcoordclass <- getcoord(obj,pc)
 	plotcoord <- plotcoordclass@coord
 	xlab_text <- plotcoordclass@xlab	
 	ylab_text <- plotcoordclass@ylab
 	title_text <- plotcoordclass@title
-	if(is.null(mapping)){
-		mapping <- aes_(x=as.formula(paste0("~",colnames(plotcoord)[1])), 
-						y=as.formula(paste0("~", colnames(plotcoord)[2])))
-	}
+	if(is.null(mapping)){mapping <- aes_(x=as.formula(paste0("~",colnames(plotcoord)[1])), y=as.formula(paste0("~", colnames(plotcoord)[2])))}
 	if(!is.null(sampleda)){
 		plotcoord <- merge(plotcoord, sampleda, by=0)
 		if (!is.null(factorNames)){
@@ -119,62 +117,28 @@ ggordpoint.default <-  function(obj,
 		}
 		mapping <- modifyList(mapping, tmpfactormap)
 		ellipsemapping <- modifyList(mapping, ellipsemapping)
-		if (!is.null(factorLevels)){
-			plotcoord <- setfactorlevels(plotcoord, factorLevels)
-		}
+		if (!is.null(factorLevels)){plotcoord <- setfactorlevels(plotcoord, factorLevels)}
 	}
-	p <- ggplot() + 
-		 geom_point(data=plotcoord, 
-					mapping=mapping, 
-					size=poinsize) + 
-		 labs(x=xlab_text,
-			  y=ylab_text,
-			  title=title_text)
-	if (ellipse){
-		p <- p + geom_ord_ellipse(data=plotcoord,
-								  mapping=ellipsemapping,
-								  ellipse_pro=ellipse_pro,
-								  alpha=ellipse_alpha, 
-								  show.legend=FALSE)
-	}
+	p <- ggplot() + geom_point(data=plotcoord, mapping=mapping, size=poinsize) + labs(x=xlab_text, y=ylab_text, title=title_text)
+	if (ellipse){p <- p + geom_ord_ellipse(data=plotcoord, mapping=ellipsemapping, ellipse_pro=ellipse_pro, alpha=ellipse_alpha, show.legend=FALSE)}
 	if (biplot){
 		varcontrib <- getvarct(obj)
 		varcontr <- varcontrib$VarContribution[,pc]
 		tmpvars <- names(sort(rowSums(varcontr), decreasing=TRUE))
 		varlist <- getvarlist(namevector=tmpvars, n=topn)
-		biplotcoord <- varcontrib$VarCoordinates[match(varlist, 
-												rownames(varcontrib$VarCoordinates)),
-												pc, drop=FALSE]
+		biplotcoord <- varcontrib$VarCoordinates[match(varlist, rownames(varcontrib$VarCoordinates)),pc, drop=FALSE]
 		biplotcoord <- data.frame(biplotcoord, check.names=FALSE)
-		biplotmapping <- aes_(x=0, 
-							  y=0, 
-							  xend=as.formula(paste0("~",colnames(biplotcoord)[1])), 
-							  yend=as.formula(paste0("~",colnames(biplotcoord)[2])))
-		p <- p + geom_segment(data=biplotcoord, 
-							  mapping=biplotmapping,
-							  arrow=arrow(length=unit(arrowsize, "mm")),
-							  colour=arrowlinecolour,
-							  size=linesize)
+		biplotmapping <- aes_(x=0, y=0, xend=as.formula(paste0("~",colnames(biplotcoord)[1])), yend=as.formula(paste0("~",colnames(biplotcoord)[2])))
+		p <- p + geom_segment(data=biplotcoord, mapping=biplotmapping, arrow=arrow(length=unit(arrowsize, "mm")), colour=arrowlinecolour, size=linesize)
 		if(speciesannot){
 			biplotcoord$tax <- rownames(biplotcoord)
-			textmapping <- aes_(x=as.formula(paste0("~", colnames(biplotcoord)[1])),
-								y=as.formula(paste0("~", colnames(biplotcoord)[2])),
-								label=~tax)
-			p <- p + geom_text_repel(data=biplotcoord,
-									 mapping=textmapping,
-									 fontface=fontface,
-									 family=fontfamily,
-									 size=textsize,
-									 segment.size=textlinesize,...)
+			textmapping <- aes_(x=as.formula(paste0("~", colnames(biplotcoord)[1])), y=as.formula(paste0("~", colnames(biplotcoord)[2])),label=~tax)
+			p <- p + geom_text_repel(data=biplotcoord, mapping=textmapping, fontface=fontface, family=fontfamily, size=textsize,segment.size=textlinesize,...)
 		}
 	}
    	if (settheme){
-		p <- p + 
-			 geom_vline(xintercept = 0,linetype='dashed',size=0.3,alpha=0.7)+
-			 geom_hline(yintercept = 0,linetype='dashed',size=0.3,alpha=0.7)+
-			 theme_bw() +
-			 theme(panel.grid=element_blank(),
-				   plot.title = element_text(face="bold",lineheight=25,hjust=0.5))
+		p <- p + geom_vline(xintercept = 0,linetype='dashed',size=0.3,alpha=0.7)+ geom_hline(yintercept = 0,linetype='dashed',size=0.3,alpha=0.7)+
+			 theme_bw() + theme(panel.grid=element_blank(), plot.title = element_text(face="bold",lineheight=25,hjust=0.5))
 	}
 	return(p)	
 }
@@ -216,7 +180,13 @@ ggordpoint.pcasample <- function(obj,...){
 #' @title get ordination coordinates.
 #' @param obj prcomp object
 #' @param pc integer vector, the component index.
+#' @return ordplotClass object.
 #' @export
+#' @examples
+#' require(graphics)
+#' data(USArrests)
+#' pcares <- prcomp(USArrests, scale = TRUE)
+#' coordtab <- getcoord(pcares)
 getcoord <- function(obj, pc){
 	UseMethod("getcoord")
 }
@@ -267,7 +237,17 @@ getellipsemap <- function(namelist){
 
 #' @title get the contribution of variables
 #' @param obj prcomp class or pcasample class
+#' @param ..., additional parameters.
+#' @return the VarContrib class, contained the 
+#' contribution and coordinate of features.
 #' @export
+#' @examples
+#' library(phyloseq)
+#' data(GlobalPatterns)
+#' subGlobal <- subset_samples(GlobalPatterns,
+#'          SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#' pcares <- getpca(subGlobal, method="hellinger") 
+#' varres <- getvarct(pcares)
 getvarct <- function(obj,...){
 	UseMethod("getvarct")
 }
