@@ -16,11 +16,15 @@ getclust(obj, ...)
   taxa_are_rows = FALSE, sampleda = NULL, tree = NULL,
   method = "hellinger", hclustmethod = "average", ...)
 
-\method{getclust}{phyloseq}(phyloseqobj, distmethod = "euclidean",
+\method{getclust}{phyloseq}(obj, distmethod = "euclidean",
   method = "hellinger", hclustmethod = "average", ...)
 }
 \arguments{
-\item{obj}{R object,dist data.frame or phyloseq class}
+\item{obj}{phyloseq, phyloseq class.}
+
+\item{..., }{additional parameters.}
+
+\item{distobj}{dist, dist class.}
 
 \item{distmethod}{character, the method of dist, when the obj is data.frame 
 or phyloseq default is "euclidean". see also \code{\link[MicrobiotaProcess]{getdist}}.}
@@ -28,10 +32,30 @@ or phyloseq default is "euclidean". see also \code{\link[MicrobiotaProcess]{getd
 \item{sampleda}{data.frame, nrow sample * ncol factor. default is NULL.}
 
 \item{hclustmethod}{character, the method of hierarchical cluster, default is average.}
+
+\item{data}{data.frame, data.frame, default is nrow samples * ncol features.}
+
+\item{taxa_are_rows}{logical, if the features is in column, it should set FALSE.}
+
+\item{tree}{phylo, the phylo class, see also \code{\link[ape]{as.phylo}}.}
+
+\item{method}{character, the standardization methods for community ecologists, see also
+\code{\link[vegan]{decostand}}}
+}
+\value{
+clustplotClass object.
 }
 \description{
 Hierarchical cluster analysis for the samples
 }
+\examples{
+library(phyloseq)
+data(GlobalPatterns)
+subGlobal <- subset_samples(GlobalPatterns, 
+         SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
+hcsample <- getclust(subGlobal, distmethod="jaccard",
+                  method="hellinger", hclustmethod="average")
+}
 \author{
-ShuangbinXu
+Shuangbin Xu
 }
