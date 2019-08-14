@@ -4,19 +4,29 @@
 #' @param feature vector, the features wanted to test.
 #' @param factorNames character, the name of a factor giving the corresponding groups.
 #' @param ..., additional arguments for fun.
+#' @return the result of fun, if fun is wilcox.test, it 
+#' will return the list with class "htest".
 #' @importFrom rlang new_formula
 #' @importFrom stats wilcox.test
 #' @author ShuangbinXu
 #' @export
+#' @examples
+#' datest <- data.frame(A=rnorm(1:10,mean=5),
+#'                      B=rnorm(2:11, mean=6), 
+#'                      group=c(rep("case",5),rep("control",5)))
+#' head(datest)
+#' multi.compare(fun=wilcox.test,data=datest,
+#'               feature=c("A", "B"),factorNames="group")
 multi.compare <- function(fun = wilcox.test, 
 						data, 
 						feature, 
 						factorNames, ...){ 
-	sapply(feature,
+	#sapply(feature,
+	lapply(feature,
 		   function(x){
 		   tmpformula <- new_formula(as.name(x), as.name(factorNames))
-		   do.call(fun,list(tmpformula,data=data, ...))}, 
-		   simplify = FALSE)
+		   do.call(fun,list(tmpformula,data=data, ...))})#, 
+		   #simplify = FALSE)
 }	 
 
 #' @keywords internal
@@ -132,11 +142,13 @@ getgfcwilc <- function(datasample, classlevelsnum, fun1='generalizedFC',
 							   feature=vars, factorNames=classname)
 	resgfoldC <- lapply(resgfoldC, function(x)x$gfc)
 	resgfoldC <- do.call("rbind", resgfoldC)
+	rownames(resgfoldC) <- vars
 	if (classlevelsnum>= minnum &&  wilc){
 		tmpres <- multi.compare(fun=fun2, data=datasample,
 								feature=vars, factorNames=classname, exact=FALSE)
 		pvaluetmp <- lapply(tmpres, function(x)x$p.value)
 		pvaluetmp <- do.call("rbind", pvaluetmp)
+		rownames(pvaluetmp) <- vars
 		resgfoldC <- merge(resgfoldC, pvaluetmp, by=0)
 		colnames(resgfoldC) <- c("f", "gfc", "pvalue")
 	}else{
