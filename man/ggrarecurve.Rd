@@ -16,10 +16,12 @@ ggrarecurve(obj, ...)
   log(x), ...)
 }
 \arguments{
-\item{obj}{data.frame or phyloseq class, shape of data.frame (nrow sample * ncol feature (factor)) or
-the data.frame for stat_smooth.}
+\item{obj}{phyloseq, phyloseq class}
 
 \item{...}{additional parameters, see \code{\link{ggplot2}{ggplot}}.}
+
+\item{data}{data.frame, shape of data.frame (nrow sample * ncol feature (factor)) 
+or ' the data.frame for stat_smooth.}
 
 \item{sampleda, }{data.frame, (nrow sample * ncol factor)}
 
@@ -47,8 +49,19 @@ if you want to order the levels of factor, you can set this.}
 
 \item{formula}{formula, default is `y ~ log(x)`}
 }
+\value{
+figure of rarefaction curves
+}
 \description{
 Rarefaction alpha index
+}
+\examples{
+data(test_otu_data)
+prare <- ggrarecurve(test_otu_data,
+               indexNames=c("Observe","Chao1","ACE"), 
+               chunks=300) +
+         theme(legend.spacing.y=unit(0.02,"cm"),
+               legend.text=element_text(size=6))
 }
 \author{
 ShuangbinXu
