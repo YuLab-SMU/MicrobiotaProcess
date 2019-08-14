@@ -9,9 +9,9 @@
 \usage{
 getpcoa(obj, ...)
 
-\method{getpca}{default}(data, distmethod = "euclidean",
+\method{getpcoa}{default}(data, distmethod = "euclidean",
   taxa_are_rows = FALSE, sampleda = NULL, tree = NULL,
-  type = "sample", method = "hellinger", ...)
+  method = "hellinger", ...)
 
 \method{getpcoa}{dist}(obj, distmethod, data = NULL, sampleda = NULL,
   method = "hellinger", ...)
@@ -25,6 +25,8 @@ getpcoa(obj, ...)
 
 \item{data}{data.frame, numeric data.frame nrow sample * ncol features.}
 
+\item{distmethod}{character, the method of distance, see also \code{\link[phyloseq]{distance}}}
+
 \item{taxa_are_rows}{logical, if feature of data is column, it should be set FALSE.}
 
 \item{sampleda}{data.frame, nrow sample * ncol factor, default is NULL.}
@@ -32,13 +34,24 @@ getpcoa(obj, ...)
 \item{tree}{phylo, the phylo class, default is NULL, when use unifrac method, it should be
 required.}
 
-\item{type}{character, default is sample.}
-
 \item{method}{character, the standardization method for community ecologists, default is hellinger,
 if the data has be normlized, it shound be set NULL.}
 }
+\value{
+pcasample object, contained prcomp or pcoa and sampleda (data.frame).
+}
 \description{
 performs principal coordinate analysis (PCoA)
+}
+\examples{
+library(phyloseq)
+data(GlobalPatterns)
+subGlobal <- subset_samples(GlobalPatterns, SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
+pcoares <- getpcoa(subGlobal, distmethod="euclidean", method="hellinger")
+# pcoaplot <- ggordpoint(pcoares, biplot=FALSE,
+#                        speciesannot=FALSE,
+#                        factorNames=c("SampleType"), 
+#                        ellipse=FALSE)
 }
 \author{
 Shuangbin Xu
