@@ -17,8 +17,17 @@ getcoord(obj, pc)
 
 \item{pc}{integer vector, the component index.}
 }
+\value{
+ordplotClass object.
+}
 \description{
 get ordination coordinates.
 
 get ordination coordinates
+}
+\examples{
+require(graphics)
+data(USArrests)
+pcares <- prcomp(USArrests, scale = TRUE)
+coordtab <- getcoord(pcares)
 }
