@@ -32,3 +32,4 @@ add confidence ellipse to ordinary plot
 \author{
 Guangchuang Yu
 }
+\keyword{internal}
