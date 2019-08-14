@@ -9,9 +9,9 @@
 #' @importFrom ggplot2 aes_
 #' @importFrom ggplot2 layer
 #' @importFrom utils modifyList
-#' @export
 #' @author Guangchuang Yu
 #' @references \url{http://lchblogs.netlify.com/post/2017-12-22-r-addconfellipselda/}
+#' @keywords internal
 geom_ord_ellipse <- function(data=NULL, mapping = NULL, ellipse_pro = 0.9, alpha=0.3, show.legend=NA, ...) {
     default_aes <- aes_(color = ~Groups, group = ~Groups)
     if (is.null(mapping)) {
@@ -39,6 +39,7 @@ geom_ord_ellipse <- function(data=NULL, mapping = NULL, ellipse_pro = 0.9, alpha
 #' @importFrom ggplot2 Stat
 #' @importFrom plyr ddply
 #' @importFrom grDevices chull
+#' @keywords internal
 StatOrdEllipse <- ggproto("StatOrdEllipse", Stat,
                           compute_group = function(self, data, scales, params, ellipse_pro) {
                               names(data)[seq_len(2)] <- c('one', 'two')
@@ -61,7 +62,7 @@ StatOrdEllipse <- ggproto("StatOrdEllipse", Stat,
                           required_aes = c("x", "y", "group")
                           )
 
-
+#' @keywords internal
 ## . function was from plyr package
 . <- function (..., .env = parent.frame()) {
     structure(as.list(match.call()[-1]), env = .env, class = "quoted")
