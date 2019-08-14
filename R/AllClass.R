@@ -23,11 +23,11 @@ setClassUnion("dataframeOrNull", c("data.frame", "NULL"))
 #' @rdname pcasample-class
 #' @exportClass pcasample
 setClass("pcasample",
-		 representation=representation(
-					pca="prcompOrNull",
-					#varcontrib="VarContrib",
-					sampleda="dataframeOrNull"),
-		 prototype=prototype(pca=NULL, sampleda=NULL))
+    representation=representation(
+        pca="prcompOrNull",
+        #varcontrib="VarContrib",
+        sampleda="dataframeOrNull"),
+    prototype=prototype(pca=NULL, sampleda=NULL))
 
 #' @keywords internal
 setClassUnion("matrixOrNull", c("matrix", "NULL"))
@@ -40,14 +40,14 @@ setClassUnion("characterOrNull", c("character", "NULL"))
 #' @rdname ordplotClass-class
 #' @exportClass ordplotClass
 setClass("ordplotClass",
-		 representation=representation(coord="matrixOrNull",
-									   xlab="characterOrNull",
-									   ylab="characterOrNull",
-									   title="characterOrNull"),
-		 prototype=prototype(coord=NULL, 
-							 xlab=NULL, 
-							 ylab=NULL, 
-							 title=NULL))
+    representation=representation(coord="matrixOrNull",
+                                  xlab="characterOrNull",
+                                  ylab="characterOrNull",
+                                  title="characterOrNull"),
+    prototype=prototype(coord=NULL, 
+                        xlab=NULL, 
+                        ylab=NULL, 
+                        title=NULL))
 
 #' @importClassesFrom phyloseq phylo
 #' @keywords internal 
@@ -59,13 +59,12 @@ setClassUnion("phyloOrNULL", c("phylo", "NULL"))
 #' @rdname clustplotClass-class
 #' @exportClass clustplotClass
 setClass("clustplotClass",
-		 representation=representation(hclustphylo="phyloOrNULL",
-									   sampleda="dataframeOrNull",
-									   distmethod="characterOrNull"
-									   ),
-		 prototype=prototype(hclustphylo=NULL,
-							 sampleda=NULL,
-							 distmethod=NULL))
+    representation=representation(hclustphylo="phyloOrNULL",
+                                  sampleda="dataframeOrNull",
+                                  distmethod="characterOrNull"),
+    prototype=prototype(hclustphylo=NULL,
+                        sampleda=NULL,
+                        distmethod=NULL))
 
 #' @keywords internal
 setClassUnion("listOrNull", c("list", "NULL"))
@@ -78,20 +77,19 @@ setClassUnion("numericOrNull", c("numeric", "NULL"))
 #' @rdname diffAnalysisClass-class
 #' @exportClass diffAnalysisClass
 setClass("diffAnalysisClass",
-		 representation=representation(originalD="dataframeOrNull",
-									   sampleda="dataframeOrNull",
-									   taxda="dataframeOrNull",
-									   kwres="dataframeOrNull",
-									   secondvars="listOrNull",
-									   mlres="dataframeOrNull",
-									   classname="characterOrNull",
-									   normalization="numericOrNull"
-									   ),
-		 prototype=prototype(originalD=NULL,
-							 sampleda=NULL,
-							 taxda=NULL,
-							 kwres=NULL,
-							 secondvars=NULL,
-							 mlres=NULL,
-							 classname=NULL,
-							 normalization=NULL))
+    representation=representation(originalD="dataframeOrNull",
+                                  sampleda="dataframeOrNull",
+                                  taxda="dataframeOrNull",
+                                  kwres="dataframeOrNull",
+                                  secondvars="listOrNull",
+                                  mlres="dataframeOrNull",
+                                  classname="characterOrNull",
+                                  normalization="numericOrNull"),
+    prototype=prototype(originalD=NULL,
+                        sampleda=NULL,
+                        taxda=NULL,
+                        kwres=NULL,
+                        secondvars=NULL,
+                        mlres=NULL,
+                        classname=NULL,
+                        normalization=NULL))
