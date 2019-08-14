@@ -19,11 +19,29 @@ should be numeric.}
 \item{multiplenum}{numeric; the multiple you want to increase,default is 1.}
 
 \item{rownamekeep}{boolean; whether you return a dataframe contained the rownames,default is FALSE.}
-
-\item{percentmode}{boolean; whether return the percent (FALSE),or between 0 and 1(TRUE).}
+}
+\value{
+mean of data.frame by featurelist
 }
 \description{
 Caculate the count or relative abundance of replicate element with a speficify columns
+}
+\examples{
+otudafile <- system.file("extdata", "otu_tax_table.txt", 
+                      package="MicrobiotaProcess")
+samplefile <- system.file("extdata", 
+                 "sample_info.txt", package="MicrobiotaProcess")
+otuda <- read.table(otudafile, sep="\\t", header=TRUE, 
+                    row.names=1, check.names=FALSE, 
+                    skip=1, comment.char="")
+sampleda <- read.table(samplefile, 
+            sep="\\t", header=TRUE, row.names=1)
+taxdf <- otuda[!sapply(otuda, is.numeric)]
+taxdf <- splitStrtoList(taxdf)
+otuda <- otuda[sapply(otuda, is.numeric)]
+phycount <- CountOrRatios(otuda, taxdf[,1,drop=FALSE])
+phyratios <- CountOrRatios(otuda, taxdf[,1,drop=FALSE], 
+                           countmode=FALSE)
 }
 \author{
 Shuangbin Xu
