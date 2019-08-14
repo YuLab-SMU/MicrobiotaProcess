@@ -32,7 +32,7 @@ ggrarecurve.default <- function(data,
 		}
 	}
 	if (!is.null(indexNames)){
-		data <- data %>% filter(Alpha %in% indexNames)
+		data <- data %>% filter(eval(parse(text="Alpha")) %in% indexNames)
 	}
 	p <- ggplot(data=data,
 		     mapping=mapping) +
@@ -61,6 +61,7 @@ ggrarecurve.default <- function(data,
 #' if you want to order the levels of factor, you can set this.
 #' @param plotda boolean, default is TRUE, whether build the data.frame for
 #' `geom_bar` of `ggplot2`.
+#' @return data.frame for ggrarecurve.
 #' @author ShuangbinXu
 #' @importFrom dplyr bind_rows
 #' @importFrom reshape melt
@@ -71,8 +72,8 @@ stat_rare <- function(data,
 					  sampleda,
 					  factorLevels,
 					  plotda=TRUE){
-	tmpfeature <- colnames(data)[sapply(data,is.numeric)]
-   	tmpfactor <- colnames(data)[!sapply(data,is.numeric)]
+	tmpfeature <- colnames(data)[vapply(data,is.numeric,logical(1))]
+   	tmpfactor <- colnames(data)[!vapply(data,is.numeric,logical(1))]
 	dat <- data[ , match(tmpfeature, colnames(data)), drop=FALSE]
 	out <- apply(dat, 1, samplealpha, chunks=chunks) %>% 
 		bind_rows(,.id="sample")
@@ -129,7 +130,7 @@ samplealpha <- function(data, chunks=200){
 
 #' @importFrom stats predict
 #' @importFrom dplyr tibble
-#' @export
+#' @keywords internal
 # this is from ggplot2
 predictdf.lm <- function(model, xseq, se, level) {
     pred <- predict(model, newdata = tibble(x = xseq), se.fit = se,
