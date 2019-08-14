@@ -18,10 +18,27 @@ splitStrtoList(strdataframe, prefix = "tax", sep = "; ",
 
 \item{fill}{character; See \code{[tidyr]{separate}} details.}
 
-\item{...;}{Additional arguments passed to \code{[tidyr]{separate}}.}
+\item{..., }{Additional arguments passed to \code{[tidyr]{separate}}.}
+}
+\value{
+data.frame of strdataframe by sep.
 }
 \description{
 split a dataframe contained one column with a specify field separator character.
+}
+\examples{
+otudafile <- system.file("extdata", "otu_tax_table.txt",
+                      package="MicrobiotaProcess")
+samplefile <- system.file("extdata",
+                 "sample_info.txt", package="MicrobiotaProcess")
+otuda <- read.table(otudafile, sep="\\t", header=TRUE,
+                    row.names=1, check.names=FALSE,
+                    skip=1, comment.char="")
+sampleda <- read.table(samplefile,
+            sep="\\t", header=TRUE, row.names=1)
+taxdf <- otuda[!sapply(otuda, is.numeric)]
+taxdf <- splitStrtoList(taxdf)
+head(taxdf)
 }
 \author{
 Shuangbin Xu
