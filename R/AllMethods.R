@@ -1,5 +1,6 @@
 #' @title taxonomy barplot
-#' @param obj data.frame or phyloseq class. data.frame should be 
+#' @param obj phyloseq, phyloseq class 
+#' @param data data.frame, data.frame should be 
 #' (nrow sample * ncol feature (factor)) or the data.frame for geom_bar.
 #' @param mapping set of aesthetic mapping of ggplot2, default is NULL,
 #' if the data is the data.frame for geom_bar, the mapping should be set.
@@ -21,6 +22,13 @@
 #' @return barplot of tax
 #' @author ShuangbinXu
 #' @export
+#' @examples
+#' library(tidyverse)
+#' data(test_otu_data)
+#' otubar <- ggbartax(test_otu_data) + 
+#'          scale_y_continuous(expand=c(0,0),
+#'                             limits=c(0,105))+
+#'          xlab(NULL) + ylab("relative abundance(%)")
 ggbartax <- function(obj,...){
 	UseMethod("ggbartax")
 }
@@ -45,17 +53,27 @@ ggbartax.phyloseq <- function(obj, ...){
 }
 
 #' @title get the data of specified taxonomy
-#' @param obj phyloseq class or data.frame (default), the shape of data.frame should be
+#' @param obj phyloseq, phyloseq class
+#' @param data data.frame, the shape of data.frame should be
 #' row sample * column feature.
 #' @param taxda data.frame, the classifies of feature contained in obj.
 #' @param taxlevel character, the column names of taxda that you want to get.
-#' when the input is phyloseq class, the common names of tax rank is "Kingdom", 
-#' "Phylum", "Class", "Order", "Family", "Genus", "Species", but you can use 1 to 7.
+#' when the input is phyloseq class, you can use 1 to 7.
 #' @param sampleda data.frame, the sample information.
-#' @param ... additional parameters, see also \code{\link[MicrobiotaProcess]{CountOrRatios}}
+#' @param ... additional parameters, see also 
+#' \code{\link[MicrobiotaProcess]{CountOrRatios}}
 #' @return phyloseq class contained tax data.frame and sample information.
 #' @author ShuangbinXu
 #' @export
+#' @examples
+#' data(test_otu_data)
+#' phytax <- gettaxdf(test_otu_data, taxlevel=2)
+#' phytax
+#' head(phyloseq::otu_table(phytax))
+#' phybar <- ggbartax(phytax) + 
+#'           scale_y_continuous(expand=c(0,0), 
+#'                           limits=c(0, 105))+
+#'          xlab(NULL) + ylab("relative abundance (%)")
 gettaxdf <- function(obj,...){
 	UseMethod("gettaxdf")
 }
@@ -92,19 +110,19 @@ gettaxdf.phyloseq <- function(obj, taxlevel=2, ...){
 #' @importFrom phyloseq otu_table tax_table
 #' @rdname gettaxdf
 #' @export 
-gettaxdf.default <- function(otuda, taxda, 
+gettaxdf.default <- function(data, taxda, 
 							 taxlevel,
 							 sampleda=NULL,
 							 ...){
 	if (!isTRUE(taxa_are_rows)){
-		otuda <- data.frame(t(otuda), check.names=FALSE)
+		data <- data.frame(t(data), check.names=FALSE)
 	}
 	if(!is.null(sampleda) && !inherits(sampleda, "sample_data")){
 		sampleda <- sample_data(sampleda)
 	}
 	taxda <- fillNAtax(taxda)
 	tmptax <- taxda[,match(taxlevel, colnames(taxda)), drop=FALSE]
-	taxdf <- otu_table(CountOrRatios(otuda, 
+	taxdf <- otu_table(CountOrRatios(data, 
 									 tmptax, 
 									 rownamekeep=FALSE,...), 
 					   taxa_are_rows=TRUE)
@@ -116,8 +134,9 @@ gettaxdf.default <- function(otuda, taxda,
 }
 
 #' @title Rarefaction alpha index
-#' @param obj data.frame or phyloseq class, shape of data.frame (nrow sample * ncol feature (factor)) or
-#' the data.frame for stat_smooth.
+#' @param obj phyloseq, phyloseq class 
+#' @param data data.frame, shape of data.frame (nrow sample * ncol feature (factor)) 
+#' or ' the data.frame for stat_smooth.
 #' @param mapping, set of aesthetic mapping of ggplot2, default is NULL,
 #' if the data is the data.frame for stat_smooth, the mapping should be set. 
 #' @param linesize integer, default is 0.5. 
@@ -134,8 +153,16 @@ gettaxdf.default <- function(otuda, taxda,
 #' @param method character, default is lm. 
 #' @param formula formula, default is `y ~ log(x)`
 #' @param ... additional parameters, see \code{\link{ggplot2}{ggplot}}.
+#' @return figure of rarefaction curves
 #' @author ShuangbinXu
 #' @export
+#' @examples
+#' data(test_otu_data)
+#' prare <- ggrarecurve(test_otu_data,
+#'                indexNames=c("Observe","Chao1","ACE"), 
+#'                chunks=300) +
+#'          theme(legend.spacing.y=unit(0.02,"cm"),
+#'                legend.text=element_text(size=6))
 ggrarecurve <- function(obj, ...){
 	UseMethod("ggrarecurve")
 }
@@ -152,7 +179,8 @@ ggrarecurve.phyloseq <- function(obj, ...){
 
 
 #' @title generate a vennlist for VennDiagram 
-#' @param obj data.frame or phyloseq class, a dataframe contained one character column and the others are numeric.
+#' @param obj phyloseq, phyloseq class
+#' @param data data.frame, a dataframe contained one character column and the others are numeric.
 #' all columns should be numeric if sampleinfo isn't NULL.
 #' @param sampleinfo dataframe; a sample information, default is NULL.
 #' @param  factorNames character, a column name of sampleinfo, 
@@ -162,6 +190,21 @@ ggrarecurve.phyloseq <- function(obj, ...){
 #' @return return a list for VennDiagram.
 #' @author ShuangbinXu
 #' @export 
+#' @examples
+#' data(test_otu_data)
+#' vennlist <- getvennlist(test_otu_data, 
+#'                  factorNames="group")
+#' vennlist
+#' #library(VennDiagram)
+#' #venn.diagram(vennlist, height=5, 
+#' #             width=5, filename = "./test_venn.svg", 
+#' #             alpha = 0.85, fontfamily = "serif", 
+#' #             fontface = "bold",cex = 1.2, 
+#' #             cat.cex = 1.2, cat.default.pos = "outer",
+#' #             cat.dist = c(0.22,0.22,0.12,0.12), 
+#' #             margin = 0.1, lwd = 3, 
+#' #             lty ='dotted', 
+#' #             imagetype = "svg")
 getvennlist <- function(obj,...){
 	UseMethod("getvennlist")
 }
@@ -173,7 +216,7 @@ getvennlist.phyloseq <- function(obj, ...){
 	otuda <- checkotu(obj)
 	sampleda <- checksample(obj)
 	#tmpfactors <- colnames(sampleda)[factorNamesIndex]
-	vennlist <- getvennlist.default(da=otuda,
+	vennlist <- getvennlist.default(data=otuda,
 									sampleinfo=sampleda,
 									#factorNames=factorNames,
 									...)
