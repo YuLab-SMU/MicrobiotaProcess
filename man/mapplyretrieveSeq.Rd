@@ -8,6 +8,8 @@ mapplyretrieveSeq(idlist, files, databases = "protein", type = "fasta",
   times = 3, checkids = TRUE)
 }
 \arguments{
+\item{idlist}{vector, the accession version.}
+
 \item{files}{character, the file name specified by a double-quoted string.}
 
 \item{databases}{character, the name of databases to use, default is `protein`,
@@ -21,14 +23,23 @@ meaning 3 seconds.}
 
 \item{checkids}{bool, whether check the sequence of ids has been retrieved.
 default is FALSE.}
-
-\item{ids}{list, the accession number or accession.}
+}
+\value{
+the files of sequences downloaded by ids
 }
 \description{
 Retriveing sequences from NCBI with the accession ids.
 }
+\examples{
+idslist <- list(c("ADM52729.1", "AAF82637.1"), c("CAA24729.1", "CAA83510.1"))
+mapplyretrieveSeq(idlist=idslist,
+                  files="test.fasta",
+                  databases="protein",
+                  type="fasta",
+                   times=3,checkids=TRUE)
+}
 \seealso{
-[retrieveSeq]
+\code{\link[retrieveSeq]{MicrobiotaProcess}}
 }
 \author{
 ShuangbinXu
