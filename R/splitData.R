@@ -13,13 +13,19 @@
 #' if you want to split data randomly, you can set TRUE, and
 #' if you want the results are reproducible, you should add 
 #' seed before.
+#' @return the subset of x, vector or data.frame class.
 #' @export
 #' @author ShuangbinXu
+#' @examples
+#' data(iris)
+#' irislist <- splitData(iris, 40)
+#' dalist <- c(1:100)
+#' dalist <- splitData(dalist, 30)
 splitData <- function(x, 
 			 nums, 
 			 chunks=NULL, 
 			 random=FALSE){
-       if (is.null(nums)){
+    if (missing(nums)){
 		nums <- trunc(x/chunks)
 	}
 	if (missing(nums) && is.null(chunks)){
@@ -28,7 +34,7 @@ splitData <- function(x,
 	if (!is.null(nums) && !is.null(chunks)){
 		message("We would use nums to split. and the chunk numbers is the length(x) provided by nums.")
 	}
-       if (is.vector(x) && length(x)>0){
+    if (is.vector(x) && length(x)>0){
 		ind <- seedind(length(x), nums, random=random)	    
 	}
 	if (is.vector(x) && length(x)==0){
