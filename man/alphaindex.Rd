@@ -11,9 +11,28 @@ alphaindex(data, mindepth = NULL)
 
 \item{mindepth}{numeric, Subsample size for rarefying community.}
 }
+\value{
+data.frame contained alpha Index.
+}
 \description{
 caculate the alpha index (Obseve,Chao1,Shannon,Simpson) of sample
 with \code{\link[vegan]{diversity}}
+}
+\examples{
+library(MetaMicrobiome)
+library(tidyverse)
+library(vegan)
+otudafile <- system.file("extdata", "otu_tax_table.txt", 
+                        package="MicrobiotaProcess")
+otuda <- read.table(otudafile, sep="\\t", 
+             header=TRUE, row.names=1, 
+             check.names=FALSE, skip=1, comment.char="")
+otuda <- otuda[sapply(otuda, is.numeric)] \%>\% t() \%>\% 
+          data.frame(check.names=FALSE)
+set.seed(1024)
+otuda <- rrarefy(otuda, min(rowSums(otuda)))
+alphatab <- alphaindex(otuda)
+head(alphatab)
 }
 \author{
 ShuangbinXu
