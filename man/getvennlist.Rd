@@ -14,10 +14,12 @@ getvennlist(obj, ...)
   factorNames = NULL, ...)
 }
 \arguments{
-\item{obj}{data.frame or phyloseq class, a dataframe contained one character column and the others are numeric.
-all columns should be numeric if sampleinfo isn't NULL.}
+\item{obj}{phyloseq, phyloseq class}
 
 \item{...}{additional parameters, see \code{\link[MicrobitaProcess]{CountOrRatios}}.}
+
+\item{data}{data.frame, a dataframe contained one character column and the others are numeric.
+all columns should be numeric if sampleinfo isn't NULL.}
 
 \item{sampleinfo}{dataframe; a sample information, default is NULL.}
 
@@ -30,6 +32,22 @@ return a list for VennDiagram.
 }
 \description{
 generate a vennlist for VennDiagram
+}
+\examples{
+data(test_otu_data)
+vennlist <- getvennlist(test_otu_data, 
+                 factorNames="group")
+vennlist
+#library(VennDiagram)
+#venn.diagram(vennlist, height=5, 
+#             width=5, filename = "./test_venn.svg", 
+#             alpha = 0.85, fontfamily = "serif", 
+#             fontface = "bold",cex = 1.2, 
+#             cat.cex = 1.2, cat.default.pos = "outer",
+#             cat.dist = c(0.22,0.22,0.12,0.12), 
+#             margin = 0.1, lwd = 3, 
+#             lty ='dotted', 
+#             imagetype = "svg")
 }
 \author{
 ShuangbinXu
