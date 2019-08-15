@@ -39,8 +39,8 @@ sampleda <- read.table(samplefile,
 taxdf <- otuda[!sapply(otuda, is.numeric)]
 taxdf <- splitStrtoList(taxdf)
 otuda <- otuda[sapply(otuda, is.numeric)]
-phycount <- CountOrRatios(otuda, taxdf[,1,drop=FALSE])
-phyratios <- CountOrRatios(otuda, taxdf[,1,drop=FALSE], 
+phycount <- CountOrRatios(otuda, taxdf[,2,drop=FALSE])
+phyratios <- CountOrRatios(otuda, taxdf[,2,drop=FALSE], 
                            countmode=FALSE)
 }
 \author{
