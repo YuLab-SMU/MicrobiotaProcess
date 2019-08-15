@@ -7,3 +7,19 @@
 \description{
 ordplotClass class
 }
+\section{Slots}{
+
+\describe{
+\item{\code{coord}}{matrix object contained the coordinate 
+for ordination plot.}
+
+\item{\code{xlab}}{character object contained the text of xlab
+for ordination plot.}
+
+\item{\code{ylab}}{character object contained the text of ylab
+for ordination plot.}
+
+\item{\code{title}}{character object contained the text of title
+for ordination plot.}
+}}
+
