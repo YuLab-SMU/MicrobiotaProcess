@@ -3,68 +3,68 @@
 #' @keywords internal
 # this is from `ggtree`
 getCols <- function (n){
-     col <- c("#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3",
-              "#fdb462", "#b3de69", "#fccde5", "#d9d9d9", "#bc80bd",
-              "#ccebc5", "#ffed6f")
-     col2 <- c("#1f78b4", "#ffff33", "#c2a5cf", "#ff7f00", "#810f7c",
-               "#a6cee3", "#006d2c", "#4d4d4d", "#8c510a", "#d73027",
-               "#78c679", "#7f0000", "#41b6c4", "#e7298a", "#54278f")
-     col3 <- c("#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99",
-               "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a",
-               "#ffff99", "#b15928")
-         colorRampPalette(col2)(n)
+    col <- c("#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3",
+             "#fdb462", "#b3de69", "#fccde5", "#d9d9d9", "#bc80bd",
+             "#ccebc5", "#ffed6f")
+    col2 <- c("#1f78b4", "#ffff33", "#c2a5cf", "#ff7f00", "#810f7c",
+              "#a6cee3", "#006d2c", "#4d4d4d", "#8c510a", "#d73027",
+              "#78c679", "#7f0000", "#41b6c4", "#e7298a", "#54278f")
+    col3 <- c("#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99",
+              "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a",
+              "#ffff99", "#b15928")
+    colorRampPalette(col2)(n)
 }
 
 #' @keywords internal 
 setfactorlevels <- function(data, factorlist){
-        factornames <- intersect(colnames(data), names(factorlist))
-        if (length(factornames)>0){
-                for(i in factornames){
-                        data[[match(i,colnames(data))]] <- factor(data[[match(i, colnames(data))]], 
-                                   levels=as.vector(factorlist[[match(i,names(factorlist))]]))
-                }
-        }
-        return(data)
+    factornames <- intersect(colnames(data), names(factorlist))
+    if (length(factornames)>0){
+            for(i in factornames){
+                    data[[match(i,colnames(data))]] <- factor(data[[match(i, colnames(data))]], 
+                               levels=as.vector(factorlist[[match(i,names(factorlist))]]))
+            }
+    }
+    return(data)
 }
 
 #' @keywords internal
 getotudata <- function(obj){
-	if(taxa_are_rows(obj)){
-		otudata <- data.frame(t(otu_table(obj)), check.names=FALSE)
-	}else{
-		otudata <- data.frame(otu_table(obj), check.names=FALSE)
-	}
+    if(taxa_are_rows(obj)){
+    	otudata <- data.frame(t(otu_table(obj)), check.names=FALSE)
+    }else{
+    	otudata <- data.frame(otu_table(obj), check.names=FALSE)
+    }
 }
 
 #' @keywords internal
 checkotu <- function(obj){
-	if (is.null(obj@otu_table)){
-		stop("The otu table is empty!")
-	}else{
-		otuda <- getotudata(obj)
-		return(otuda)
-	}
+    if (is.null(obj@otu_table)){
+    	stop("The otu table is empty!")
+    }else{
+    	otuda <- getotudata(obj)
+    	return(otuda)
+    }
 }
 
 #' @keywords internal
 checksample <- function(obj){
-	if (is.null(obj@sam_data)){
-		stop("The sample_data is empty")
-	}else{
-		sampleda <- getsample(obj)
-		return(sampleda)
-	}
+    if (is.null(obj@sam_data)){
+    	stop("The sample_data is empty")
+    }else{
+    	sampleda <- getsample(obj)
+    	return(sampleda)
+    }
 }
 
 #' @importFrom phyloseq sample_data
 #' @keywords internal.
 getsample <- function(obj){
-	if (is.null(obj@sam_data)){
-		sampleda <- NULL
-	}else{
-		sampleda <- data.frame(sample_data(obj), check.names=FALSE)
-	}
-	return(sampleda)
+    if (is.null(obj@sam_data)){
+    	sampleda <- NULL
+    }else{
+    	sampleda <- data.frame(sample_data(obj), check.names=FALSE)
+    }
+    return(sampleda)
 }
 
 #' @keywords internal
@@ -73,75 +73,75 @@ taxlevel <- c("k", "p", "c", "o", "f", "g", "s")
 #' @importFrom zoo na.locf
 #' @keywords internal
 filltaxname <- function(taxdf){
-	tmprownames <- rownames(taxdf)
-	indexmark <- apply(taxdf, 2, function(x){nchar(x, keepNA = TRUE)})==3
-	taxdf[indexmark] <- NA
-	indextmp <- apply(is.na(taxdf), 1, which)
-	if(length(indextmp)==0){
-		return(taxdf)
-	}
-	taxdf <- apply(taxdf, 1, na.locf)
-	taxdf <- lapply(seq_len(ncol(taxdf)), function(i) taxdf[,i])
-	newtaxname <- function(x, y){
-		y <- as.vector(y)
-		x[y] <- paste(taxlevel[y], x[y], sep="__un_")
-		x
-	}
-	taxdf <- data.frame(t(mapply(newtaxname, taxdf, indextmp)), 
-						stringsAsFactors=FALSE)
-	rownames(taxdf) <- tmprownames
-	return(taxdf)
+    tmprownames <- rownames(taxdf)
+    indexmark <- apply(taxdf, 2, function(x){nchar(x, keepNA = TRUE)})==3
+    taxdf[indexmark] <- NA
+    indextmp <- apply(is.na(taxdf), 1, which)
+    if(length(indextmp)==0){
+    	return(taxdf)
+    }
+    taxdf <- apply(taxdf, 1, na.locf)
+    taxdf <- lapply(seq_len(ncol(taxdf)), function(i) taxdf[,i])
+    newtaxname <- function(x, y){
+    	y <- as.vector(y)
+    	x[y] <- paste(taxlevel[y], x[y], sep="__un_")
+    	x
+    }
+    taxdf <- data.frame(t(mapply(newtaxname, taxdf, indextmp)), 
+    					stringsAsFactors=FALSE)
+    rownames(taxdf) <- tmprownames
+    return(taxdf)
 }
 
 #' @keywords internal
 addtaxlevel <- function(taxdf){
 	#taxlevel <- c("k", "p", "c", "o", "f", "g", "s")
-	paste(taxlevel, taxdf, sep="__")
+    paste(taxlevel, taxdf, sep="__")
 }
 
 #' @importFrom tibble column_to_rownames
 #' @keywords internal
 fillNAtax <- function(taxdf){
-	if (!grepl("^k__", taxdf[1,1])){
-		tmprownames <- rownames(taxdf)
-		tmpcolnames <- colnames(taxdf)
-		taxdf <- t(apply(taxdf, 1, as.character))
-		taxdf[is.na(taxdf)] <- ""
-		taxdf <- data.frame(t(apply(taxdf, 1, addtaxlevel)),
-							stringsAsFactors=FALSE)
-		rownames(taxdf) <- tmprownames
-		colnames(taxdf) <- tmpcolnames
-	}
-	taxdf <- filltaxname(taxdf)
-	taxdf <- repduplicatedtaxcheck(taxdf) #%>% column_to_rownames(var="rowname")
-	return(taxdf)
+    if (!grepl("^k__", taxdf[1,1])){
+    	tmprownames <- rownames(taxdf)
+    	tmpcolnames <- colnames(taxdf)
+    	taxdf <- t(apply(taxdf, 1, as.character))
+    	taxdf[is.na(taxdf)] <- ""
+    	taxdf <- data.frame(t(apply(taxdf, 1, addtaxlevel)),
+    						stringsAsFactors=FALSE)
+    	rownames(taxdf) <- tmprownames
+    	colnames(taxdf) <- tmpcolnames
+    }
+    taxdf <- filltaxname(taxdf)
+    taxdf <- repduplicatedtaxcheck(taxdf) #%>% column_to_rownames(var="rowname")
+    return(taxdf)
 }
 
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @keywords internal
 duplicatedtaxcheck <- function(taxdf){
-	if (ncol(taxdf)==1){return(taxdf)}
-	taxdf <- taxdf %>% rownames_to_column()
-	for (i in ncol(taxdf):3){
-		tmp <- split(taxdf,taxdf[,i])
-		for (j in seq_len(length(tmp))){
-			flag <- length(unique(as.vector(tmp[[j]][,i-1])))
-			if (flag > 1){
-				tmp[[j]][,i] <- paste(tmp[[j]][,i],tmp[[j]][,i-1],sep="_")
-			}
-		}
-		taxdf <- do.call("rbind",c(tmp, make.row.names=FALSE)) 
-	}
-	taxdf #%>% column_to_rownames(var="rowname")
-	return(taxdf)
+    if (ncol(taxdf)==1){return(taxdf)}
+    taxdf <- taxdf %>% rownames_to_column()
+    for (i in ncol(taxdf):3){
+    	tmp <- split(taxdf,taxdf[,i])
+    	for (j in seq_len(length(tmp))){
+    		flag <- length(unique(as.vector(tmp[[j]][,i-1])))
+    		if (flag > 1){
+    			tmp[[j]][,i] <- paste(tmp[[j]][,i],tmp[[j]][,i-1],sep="_")
+    		}
+    	}
+    	taxdf <- do.call("rbind",c(tmp, make.row.names=FALSE)) 
+    }
+    taxdf #%>% column_to_rownames(var="rowname")
+    return(taxdf)
 }
 
 #' @keywords internal
 repduplicatedtaxcheck <- function(taxdf){
-	for (i in seq_len(7)){
-		taxdf <- duplicatedtaxcheck(taxdf) %>% column_to_rownames(var="rowname")
-	}
-	return(taxdf)
+    for (i in seq_len(7)){
+    	taxdf <- duplicatedtaxcheck(taxdf) %>% column_to_rownames(var="rowname")
+    }
+    return(taxdf)
 }
 
