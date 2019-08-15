@@ -10,23 +10,23 @@ ggrarecurve(obj, ...)
 
 \method{ggrarecurve}{phyloseq}(obj, ...)
 
-\method{ggrarecurve}{default}(data, sampleda, indexNames = "Observe",
+\method{ggrarecurve}{default}(obj, sampleda, indexNames = "Observe",
   linesize = 0.5, facetnrow = 1, mapping = NULL, chunks = 400,
   factorNames, factorLevels, se = FALSE, method = "lm", formula = y ~
   log(x), ...)
 }
 \arguments{
-\item{obj}{phyloseq, phyloseq class}
-
-\item{...}{additional parameters, see \code{\link{ggplot2}{ggplot}}.}
-
-\item{data}{data.frame, shape of data.frame (nrow sample * ncol feature (factor)) 
+\item{obj}{phyloseq, phyloseq class or data.frame
+shape of data.frame (nrow sample * ncol feature (factor)) 
 or ' the data.frame for stat_smooth.}
+
+\item{...}{additional parameters, 
+see also \code{\link{ggplot2}{ggplot}}.}
 
 \item{sampleda, }{data.frame, (nrow sample * ncol factor)}
 
-\item{indexNames}{vector character, default is "Observe", only for "Observe",
-"Chao1", "ACE", "Shannon", "Simpson", "J".}
+\item{indexNames}{vector character, default is "Observe",
+only for "Observe", "Chao1", "ACE", "Shannon", "Simpson", "J".}
 
 \item{linesize}{integer, default is 0.5.}
 
@@ -57,6 +57,7 @@ Rarefaction alpha index
 }
 \examples{
 data(test_otu_data)
+library(ggplot2)
 prare <- ggrarecurve(test_otu_data,
                indexNames=c("Observe","Chao1","ACE"), 
                chunks=300) +
