@@ -7,3 +7,11 @@
 \description{
 pcasample class
 }
+\section{Slots}{
+
+\describe{
+\item{\code{pca}}{prcomp or pcoa object}
+
+\item{\code{sampleda}}{associated sample information}
+}}
+
