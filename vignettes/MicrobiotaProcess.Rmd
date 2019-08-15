@@ -75,9 +75,9 @@ In this vignette, We used several datasets to facilitate testing and exploration
 
 Rarefaction, based on sampling technique, was used to compensate for the effect of sample size on the number of units observed in a sample[@siegel2004rarefaction]. It can be important in comparisons of the diversity of microbial communities. `MicrobiotaProcess` provided `ggrarecurve` to plot the curves, based on `rrarefy` of `r CRANpkg("vegan")`[@Jari2019vegan].
 
-```{r, fig.cap="Rarefaction curve(1)", fig.align="center", fig.height=3.2, fig.width=8}
+```{r, error=TRUE, fig.cap="Rarefaction curve(1)", fig.align="center", fig.height=3.2, fig.width=8}
 data(test_otu_data)
-prare <- ggrarecurve(test_otu_data,
+prare <- ggrarecurve(obj=test_otu_data,
 					 indexNames=c("Observe","Chao1","ACE"), 
 					 chunks=300) + 
 		 theme(legend.spacing.y=unit(0.02,"cm"),
@@ -97,12 +97,12 @@ otuda <- otuda[,sapply(otuda, is.numeric), drop=FALSE] %>% t() %>%
 #datatable(otuda, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
 sampleda <- read.table(samplefile, sep="\t", header=TRUE, row.names=1)
 #datatable(sampleda)
-prare2 <- ggrarecurve(data=otuda, 
+prare2 <- ggrarecurve(obj=otuda, 
 					  sampleda=sampleda, 
-					  indexNames = c("Observe","Chao1","ACE")) + 
-		  geom_point(size=0.01) + 
-		  theme(legend.spacing.y=unit(0.02,"cm"),
-				legend.text=element_text(size=6))
+					  indexNames = c("Observe","Chao1","ACE"))  
+		  #geom_point(size=0.01) + 
+		  #theme(legend.spacing.y=unit(0.02,"cm"),
+		  #		legend.text=element_text(size=6))
 prare2
 ```
 
@@ -111,7 +111,7 @@ prare2
 The visualization of taxonomy abundance is common to investigate the composition of complex microbial communities. Although some tools support the function, they couldn't easily produce publication-quality graphics. `MicrobiotaProcess` presents the `ggbartax` for the visualization of composition of microbial communities.
 
 ```{r, error=TRUE, fig.align="center", fig.height=4.5, fig.width=7, OTUrelativeabundance}
-otubar <- ggbartax(test_otu_data) + 
+otubar <- ggbartax(obj=test_otu_data) + 
 		scale_y_continuous(expand=c(0,0), limits=c(0, 105))+
 		xlab(NULL) + 
 		ylab("relative abundance (%)")
@@ -121,8 +121,8 @@ otubar
 If you want to get the abundance of specific levels of class, You can use `gettaxdf` then use `ggbartax` to visualize.
 
 ```{r, error=TRUE, fig.align="center", fig.height=4.5, fig.width=7, phylumAbundance}
-phytax <- gettaxdf(test_otu_data, taxlevel=2)
-phybar <- ggbartax(phytax) + 
+phytax <- gettaxdf(obj=test_otu_data, taxlevel=2)
+phybar <- ggbartax(obj=phytax) + 
 		scale_y_continuous(expand=c(0,0), limits=c(0, 105))+ 
 		xlab(NULL) + ylab("relative abundance (%)")
 phybar
@@ -131,10 +131,10 @@ phybar
 Moreover, the absolute abundance of taxonomy also can be visualized by setting `count` to `TRUE`, and the facet of plot can be showed by setting the `facetNames`.
 
 ```{r, error=TRUE, fig.align="center", fig.height=4.5, fig.width=7, classAbundance}
-phybar2 <- ggbartax(phytax, facetNames="group", count=TRUE) + xlab(NULL) + ylab("abundance")
+phybar2 <- ggbartax(obj=phytax, facetNames="group", count=TRUE) + xlab(NULL) + ylab("abundance")
 phybar2
-classtax <- gettaxdf(test_otu_data, taxlevel=3)
-classbar <- ggbartax(classtax, facetNames="group", count=FALSE) +
+classtax <- gettaxdf(obj=test_otu_data, taxlevel=3)
+classbar <- ggbartax(obj=classtax, facetNames="group", count=FALSE) +
 		scale_y_continuous(expand=c(0,0), limits=c(0, 105))+ 
 		xlab(NULL) + ylab("relative abundance (%)")
 classbar
@@ -153,14 +153,14 @@ table(sample_data(GlobalPatterns)$SampleType)
 subGlobal <- subset_samples(GlobalPatterns, SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
 
 # get the results of `pca`, the method was designed for choosing standardization method for community ecologists.
-pcares <- getpca(subGlobal, method="hellinger")
-pcaplot <- ggordpoint(pcares, biplot=TRUE, speciesannot=TRUE,
+pcares <- getpca(obj=subGlobal, method="hellinger")
+pcaplot <- ggordpoint(obj=pcares, biplot=TRUE, speciesannot=TRUE,
 					  factorNames=c("SampleType"), ellipse=TRUE)
 
 pcaplot
 
-pcoares <- getpcoa(subGlobal, distmethod="euclidean", method="hellinger")
-pcoaplot <- ggordpoint(pcoares, biplot=TRUE, speciesannot=TRUE,
+pcoares <- getpcoa(obj=subGlobal, distmethod="euclidean", method="hellinger")
+pcoaplot <- ggordpoint(obj=pcoares, biplot=TRUE, speciesannot=TRUE,
 					   factorNames=c("SampleType"), ellipse=TRUE)
 pcoaplot
 ```
@@ -177,9 +177,9 @@ Beta diversity metrics can assess the differences between microbial communities.
 
 ```{r, fig.align="center", fig.height=5, fig.width=6, error=TRUE, hclustAnalysis}
 library(ggtree)
-hcsample <- getclust(subGlobal, distmethod="jaccard", 
+hcsample <- getclust(obj=subGlobal, distmethod="jaccard", 
 					 method="hellinger", hclustmethod="average")
-clustplot1 <- ggclust(hcsample,
+clustplot1 <- ggclust(obj=hcsample,
 					 layout = "rectangular",
 					 pointsize=1,
 					 fontsize=0,
@@ -188,7 +188,7 @@ clustplot1 <- ggclust(hcsample,
 						 plot.title = element_text(face="bold", lineheight=25,hjust=0.5))
 clustplot1
 
-clustplot2 <- ggclust(hcsample,
+clustplot2 <- ggclust(obj=hcsample,
 					  layout = "circular",
 					  pointsize=1,
 					  fontsize=2,
@@ -215,7 +215,8 @@ table(sample_data(kostic2012crc)$DIAGNOSIS)
 This datasets contained 86 Colorectal Carcinoma samples and 91 Control samples(remove the none sample information and low depth sample).In the research, they found the *Fusobacterium* sequences were enriched in carcinomas, confirmed by quantitative PCR and 16S rDNA, while the *Firmicutes* and *Bacteroidetes* phyla were depleted in tumors[@kostic2012genomic].
 
 ```{r, error=TRUE, KosticCRCdiffAnalysis}
-diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
+set.seed(1024)
+diffres <- diffAnalysis(x=kostic2012crc, class="DIAGNOSIS",
 						mlfun="lda",
 						filtermod="fdr",
 						firstcomfun = "kruskal.test",
@@ -232,14 +233,14 @@ diffres
 The results of `diffAnalysis` is a `S4` class, contained the original feature datasets, results of first test, results of second test, results of `LDA` or `rf` assessed and the record of some arguments. It can be visualized by `ggeffectsize`. The horizontal ordinate represents the effect size (`LDA` or `MeanDecreaseAccuracy`), the vertical ordinate represents the feature of significantly discriminative. And the colors represent the class that the relevant feature is positive.
 
 ```{r, fig.align="center", fig.height=5, fig.width=6, error=TRUE, KosticCRCplotEffectSize}
-plotes <- ggeffectsize(diffres)
+plotes <- ggeffectsize(obj=diffres)
 plotes
 ```
 
 If the `taxda` was provided, it also can be visualized by `ggdiffclade`. The colors represent the relevant features enriched in the relevant class. The size of point colored represent the `-log10(pvalue)`.
 
 ```{r, fig.width=7, fig.height=7, fig.align="center", error=TRUE, KosticCRCdiffclade}
-diffcladeplot <- ggdiffclade(diffres,
+diffcladeplot <- ggdiffclade(obj=diffres,
 							 alpha=0.3, size=0.2, 
 							 skpointsize=0.6,
 							 taxlevel=3,
@@ -263,14 +264,14 @@ diffcladeplot
 Moreover, the abundance of the features can be visualized by `ggdifftaxbar`. This will generate the figures in specific directory. And the horizontal ordinate of figures represent the sample of different class, the vertical ordinate represent relative abundance of relevant features (sum is 1).
 
 ```{r, error=TRUE, KosticCRCdifftaxbar}
-ggdifftaxbar(diffres, xtextsize=1.5, output="./kostic2012crc_biomarkder_barplot")
+ggdifftaxbar(obj=diffres, xtextsize=1.5, output="./kostic2012crc_biomarkder_barplot")
 ```
 
 And we also provided `tidydiffAnalysis` to produce the table of results of `diffAnalysis`.
 
-```{r, KosticCRCdiffTab}
-crcdiffTab <- tidydiffAnalysis(diffres)
-datatable(crcdiffTab, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+```{r, KosticCRCdiffTab, error=TRUE}
+crcdiffTab <- tidydiffAnalysis(obj=diffres)
+#datatable(crcdiffTab, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
 ```
 
 As show in the results of `diffAnalysis`, we also found *Fusobacterium* sequences were enriched in carcinomas, and *Firmicutes*, *Bacteroides*, *Clostridiales* were depleted in tumors. These results were consistent with the original article[@kostic2012genomic]. In addition, we also found *Campylobacter* were enriched in tumors, but the relative abundance of it is lower than *Fusobacterium*. And the species of *Campylobacter* has been proven to associated with the colorectal cancer[@He289; @wu2013dysbiosis; @amer2017microbiome].
@@ -290,8 +291,9 @@ dim(taxda)
 
 This dataset is from a small subset of the `HMP` 16S dataset[@Nicola2011LEfSe], contained 55 samples from 6 body sites. The dataset isn't `phyloseq` class, because `diffAnalysis` also supported the matrix datasets as input. The `featureda` contained the relative abundance of different levels features. The `sampleda` contained the information of the samples. And the `taxda` contained the information of the hierarchical relationship of taxonomy. We set the `oxygen_availability` in `sampleda` as `class`, and `body_site` also in `sampleda` as `subclass`.
 
-```{r, hmpdiffAnalysis}
-hmpdiffres <- diffAnalysis(data=featureda, 
+```{r, hmpdiffAnalysis, error=TRUE}
+set.seed(1024)
+hmpdiffres <- diffAnalysis(x=featureda, 
 						   sampleda=sampleda, 
 						   taxda=taxda, 
 						   alltax=FALSE, 
@@ -308,7 +310,7 @@ hmpdiffres
 ```
 
 ```{r, fig.align="center", fig.height=6, fig.width=5.5, error=TRUE, hmpplotEffectSize}
-hmpeffetsieze <- ggeffectsize(hmpdiffres, 
+hmpeffetsieze <- ggeffectsize(obj=hmpdiffres, 
 							  setColors=FALSE,
 							  settheme=FALSE) + 
 				scale_color_manual(values=c('#00AED7', '#FD9347', '#C1E168'))+
@@ -323,7 +325,7 @@ hmpeffetsieze
 The explanation of figures refer to the previous section.
 
 ```{r, fig.width=7, fig.height=7, fig.align="center", error=TRUE, hmpdiffclade}
-hmpdiffclade <- ggdiffclade(hmpdiffres, alpha=0.3, size=0.2, 
+hmpdiffclade <- ggdiffclade(obj=hmpdiffres, alpha=0.3, size=0.2, 
 							skpointsize=0.4, taxlevel=3,
 							settheme=TRUE,
 							setColors=FALSE) +
@@ -333,14 +335,14 @@ hmpdiffclade
 
 The explanation of figures refer to the previous section. 
 
-```{r, hmpdifftaxbar}
-ggdifftaxbar(hmpdiffres, output="./hmp_biomarker_barplot")
+```{r, hmpdifftaxbar, error=TRUE}
+ggdifftaxbar(obj=hmpdiffres, output="./hmp_biomarker_barplot")
 ```
 
 Finally, we found the *Staphylococcus*, *Propionibacterium* and some species of *Actinobacteria* was enriched in `High_O2`, these species mainly live in high oxygen environment. Some species of *Bacteroides*, species of *Clostridia* and species of *Erysipelotrichi* was enriched in `Low_O2`, these species mainly inhabit in the gut of human. These results were consistent with the reality.
 
-```{r, hmpdiffTab}
-hmpdiffTab <- tidydiffAnalysis(hmpdiffres)
+```{r, hmpdiffTab, error=TRUE}
+hmpdiffTab <- tidydiffAnalysis(obj=hmpdiffres)
 #datatable(hmpdiffTab, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
 ```
 
