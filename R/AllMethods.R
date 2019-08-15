@@ -1,6 +1,5 @@
 #' @title taxonomy barplot
-#' @param obj phyloseq, phyloseq class 
-#' @param data data.frame, data.frame should be 
+#' @param obj phyloseq, phyloseq class or data.frame, 
 #' (nrow sample * ncol feature (factor)) or the data.frame for geom_bar.
 #' @param mapping set of aesthetic mapping of ggplot2, default is NULL,
 #' if the data is the data.frame for geom_bar, the mapping should be set.
@@ -23,14 +22,14 @@
 #' @author ShuangbinXu
 #' @export
 #' @examples
-#' library(tidyverse)
+#' library(ggplot2)
 #' data(test_otu_data)
 #' otubar <- ggbartax(test_otu_data) + 
 #'          scale_y_continuous(expand=c(0,0),
 #'                             limits=c(0,105))+
 #'          xlab(NULL) + ylab("relative abundance(%)")
 ggbartax <- function(obj,...){
-	UseMethod("ggbartax")
+    UseMethod("ggbartax")
 }
 
 #' @method ggbartax phyloseq
@@ -38,25 +37,29 @@ ggbartax <- function(obj,...){
 #' @rdname ggbartax
 #' @export
 ggbartax.phyloseq <- function(obj, ...){
-	if (is.null(obj@otu_table)){
-		stop("The otu table is empty!")
-	}else{
-		otudata <- getotudata(obj)
-	}
-	if (!is.null(obj@sam_data)){
-		sampleda <- data.frame(sample_data(obj), check.names=FALSE)
-		p <- ggbartax.default(otudata, sampleda=sampleda, ...)
-	}else{
-		p <- ggbartax.default(otudata,...)
-	}
-	return(p)	
+    if (is.null(obj@otu_table)){
+    	stop("The otu table is empty!")
+    }else{
+    	otudata <- getotudata(obj)
+    }
+    if (!is.null(obj@sam_data)){
+    	sampleda <- data.frame(sample_data(obj), check.names=FALSE)
+    	p <- ggbartax.default(obj=otudata, sampleda=sampleda, ...)
+    }else{
+    	p <- ggbartax.default(obj=otudata,...)
+    }
+    return(p)	
 }
 
 #' @title get the data of specified taxonomy
-#' @param obj phyloseq, phyloseq class
-#' @param data data.frame, the shape of data.frame should be
-#' row sample * column feature.
-#' @param taxda data.frame, the classifies of feature contained in obj.
+#' @param obj phyloseq, phyloseq class or data.frame
+#' the shape of data.frame (nrow sample * column feature
+#' taxa_are_rows set FALSE, nrow feature * ncol sample, 
+#' taxa_are_rows set TRUE).
+#' @param taxa_are_rows logical, if the column of data.frame
+#' are features, it should be set FALSE.
+#' @param taxda data.frame, the classifies of feature contained 
+#' in obj(data.frame).
 #' @param taxlevel character, the column names of taxda that you want to get.
 #' when the input is phyloseq class, you can use 1 to 7.
 #' @param sampleda data.frame, the sample information.
@@ -66,6 +69,7 @@ ggbartax.phyloseq <- function(obj, ...){
 #' @author ShuangbinXu
 #' @export
 #' @examples
+#' library(ggplot2)
 #' data(test_otu_data)
 #' phytax <- gettaxdf(test_otu_data, taxlevel=2)
 #' phytax
@@ -75,7 +79,7 @@ ggbartax.phyloseq <- function(obj, ...){
 #'                           limits=c(0, 105))+
 #'          xlab(NULL) + ylab("relative abundance (%)")
 gettaxdf <- function(obj,...){
-	UseMethod("gettaxdf")
+    UseMethod("gettaxdf")
 }
 
 #' @method gettaxdf phyloseq
@@ -83,59 +87,61 @@ gettaxdf <- function(obj,...){
 #' @rdname gettaxdf
 #' @export
 gettaxdf.phyloseq <- function(obj, taxlevel=2, ...){
-	if (is.null(obj@tax_table)){
-		stop("The tax table is empty!")
-	}else{
-		taxdf <- tax_table(obj)
-	}
-	otuda <- checkotu(obj)
-	sampleda <- getsample(obj)
-	if (inherits(taxlevel, 'numeric')){taxlevel <- rank_names(obj)[taxlevel]}
-	if (inherits(taxlevel, 'character')){
-		if (!taxlevel %in% rank_names(obj)){
-			stop("the taxlevel should be among the values of rank_names(phyloseq)")
-		}else{
-			taxlevel <- rank_names(obj)[match(taxlevel,rank_names(obj))]
-		}
-	}
-	#taxlevel <- rank_names(obj)[taxlevel]
-	taxdf <- gettaxdf.default(otuda, 
-							  taxda=taxdf, 
-							  taxlevel=taxlevel,
-							  sampleda=sampleda,...)
-	return(taxdf)
+    if (is.null(obj@tax_table)){
+    	stop("The tax table is empty!")
+    }else{
+    	taxdf <- tax_table(obj)
+    }
+    otuda <- checkotu(obj)
+    sampleda <- getsample(obj)
+    if (inherits(taxlevel, 'numeric')){taxlevel <- rank_names(obj)[taxlevel]}
+    if (inherits(taxlevel, 'character')){
+    	if (!taxlevel %in% rank_names(obj)){
+    		stop("the taxlevel should be among the values of rank_names(phyloseq)")
+    	}else{
+    		taxlevel <- rank_names(obj)[match(taxlevel,rank_names(obj))]
+    	}
+    }
+    #taxlevel <- rank_names(obj)[taxlevel]
+    taxdf <- gettaxdf.default(obj=otuda, 
+    						  taxda=taxdf, 
+    						  taxlevel=taxlevel,
+    						  sampleda=sampleda,
+    						  taxa_are_rows=FALSE,...)
+    return(taxdf)
 }
 
 #' @method gettaxdf default
 #' @importFrom phyloseq otu_table tax_table
 #' @rdname gettaxdf
 #' @export 
-gettaxdf.default <- function(data, taxda, 
+gettaxdf.default <- function(obj, taxda, 
+							 taxa_are_rows,
 							 taxlevel,
 							 sampleda=NULL,
 							 ...){
-	if (!isTRUE(taxa_are_rows)){
-		data <- data.frame(t(data), check.names=FALSE)
-	}
-	if(!is.null(sampleda) && !inherits(sampleda, "sample_data")){
-		sampleda <- sample_data(sampleda)
-	}
-	taxda <- fillNAtax(taxda)
-	tmptax <- taxda[,match(taxlevel, colnames(taxda)), drop=FALSE]
-	taxdf <- otu_table(CountOrRatios(data, 
-									 tmptax, 
-									 rownamekeep=FALSE,...), 
-					   taxa_are_rows=TRUE)
-	taxdf <- new("phyloseq",
-				 otu_table=taxdf,
-				 sam_data=sampleda)
-	return(taxdf)
-
+    if (!taxa_are_rows){
+    	obj <- data.frame(t(obj), check.names=FALSE)
+    }
+    if(!is.null(sampleda) && !inherits(sampleda, "sample_data")){
+    	sampleda <- sample_data(sampleda)
+    }
+    taxda <- fillNAtax(taxda)
+    tmptax <- taxda[,match(taxlevel, colnames(taxda)), drop=FALSE]
+    taxdf <- otu_table(CountOrRatios(data=obj, 
+    								 tmptax, 
+    								 rownamekeep=FALSE,...), 
+    				   taxa_are_rows=TRUE)
+    taxdf <- new("phyloseq",
+    			 otu_table=taxdf,
+    			 sam_data=sampleda)
+    return(taxdf)
+    
 }
 
 #' @title Rarefaction alpha index
-#' @param obj phyloseq, phyloseq class 
-#' @param data data.frame, shape of data.frame (nrow sample * ncol feature (factor)) 
+#' @param obj phyloseq, phyloseq class or data.frame
+#' shape of data.frame (nrow sample * ncol feature (factor)) 
 #' or ' the data.frame for stat_smooth.
 #' @param mapping, set of aesthetic mapping of ggplot2, default is NULL,
 #' if the data is the data.frame for stat_smooth, the mapping should be set. 
@@ -147,46 +153,49 @@ gettaxdf.default <- function(data, taxda,
 #' @param facetnrow, the nrow of facet, default is 1.
 #' @param factorLevels list, the levels of the factors, default is NULL,
 #' if you want to order the levels of factor, you can set this.
-#' @param indexNames vector character, default is "Observe", only for "Observe",
-#' "Chao1", "ACE", "Shannon", "Simpson", "J".
+#' @param indexNames vector character, default is "Observe",
+#' only for "Observe", "Chao1", "ACE", "Shannon", "Simpson", "J".
 #' @param se logical, default is FALSE.
 #' @param method character, default is lm. 
 #' @param formula formula, default is `y ~ log(x)`
-#' @param ... additional parameters, see \code{\link{ggplot2}{ggplot}}.
+#' @param ... additional parameters, 
+#' see also \code{\link{ggplot2}{ggplot}}.
 #' @return figure of rarefaction curves
 #' @author ShuangbinXu
 #' @export
 #' @examples
 #' data(test_otu_data)
+#' library(ggplot2)
 #' prare <- ggrarecurve(test_otu_data,
 #'                indexNames=c("Observe","Chao1","ACE"), 
 #'                chunks=300) +
 #'          theme(legend.spacing.y=unit(0.02,"cm"),
 #'                legend.text=element_text(size=6))
 ggrarecurve <- function(obj, ...){
-	UseMethod("ggrarecurve")
+    UseMethod("ggrarecurve")
 }
 
 #' @method ggrarecurve phyloseq
 #' @rdname ggrarecurve
 #' @export
 ggrarecurve.phyloseq <- function(obj, ...){
-	otuda <- checkotu(obj)
-	sampleda <- data.frame(getsample(obj),check.names=FALSE)
-	p <- ggrarecurve.default(data=otuda, sampleda=sampleda, ...)
-	return(p)	
+    otuda <- checkotu(obj)
+    sampleda <- data.frame(getsample(obj),check.names=FALSE)
+    p <- ggrarecurve.default(obj=otuda, sampleda=sampleda, ...)
+    return(p)	
 }
 
 
 #' @title generate a vennlist for VennDiagram 
-#' @param obj phyloseq, phyloseq class
-#' @param data data.frame, a dataframe contained one character column and the others are numeric.
-#' all columns should be numeric if sampleinfo isn't NULL.
+#' @param obj phyloseq, phyloseq class or data.frame
+#' a dataframe contained one character column and the others are numeric.
+#' or all columns should be numeric if sampleinfo isn't NULL.
 #' @param sampleinfo dataframe; a sample information, default is NULL.
 #' @param  factorNames character, a column name of sampleinfo, 
 #' when sampleinfo isn't NULL, factorNames shouldn't be NULL, default is NULL,
 #' when the input is phyloseq, the factorNames should be provided. 
-#' @param ... additional parameters, see \code{\link[MicrobitaProcess]{CountOrRatios}}.
+#' @param ... additional parameters,
+#' see also \code{\link[MicrobiotaProcess]{CountOrRatios}}.
 #' @return return a list for VennDiagram.
 #' @author ShuangbinXu
 #' @export 
@@ -206,19 +215,19 @@ ggrarecurve.phyloseq <- function(obj, ...){
 #' #             lty ='dotted', 
 #' #             imagetype = "svg")
 getvennlist <- function(obj,...){
-	UseMethod("getvennlist")
+    UseMethod("getvennlist")
 }
 
 #' @method getvennlist phyloseq
 #' @rdname getvennlist
 #' @export 
 getvennlist.phyloseq <- function(obj, ...){
-	otuda <- checkotu(obj)
-	sampleda <- checksample(obj)
-	#tmpfactors <- colnames(sampleda)[factorNamesIndex]
-	vennlist <- getvennlist.default(data=otuda,
-									sampleinfo=sampleda,
-									#factorNames=factorNames,
-									...)
-	return(vennlist)
+    otuda <- checkotu(obj)
+    sampleda <- checksample(obj)
+    #tmpfactors <- colnames(sampleda)[factorNamesIndex]
+    vennlist <- getvennlist.default(obj=otuda,
+    								sampleinfo=sampleda,
+    								#factorNames=factorNames,
+    								...)
+    return(vennlist)
 }
