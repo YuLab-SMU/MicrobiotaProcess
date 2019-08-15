@@ -1,0 +1,10 @@
+context("dataframe to treedata")
+test_that("dataframe to treedata",{
+	library(phyloseq)
+    dir <- system.file("extdata", package="phyloseq")
+	richph <- import_biom(file.path(dir,"rich_dense_otu_table.biom"), header=TRUE)
+	taxda <- tax_table(richph)
+	taxda <- MicrobiotaProcess:::fillNAtax(taxda)
+	treeda <- convert_to_treedata(taxda)
+    expect_that(treeda, is_a("treedata"))
+})
