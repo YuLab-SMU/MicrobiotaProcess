@@ -7,3 +7,28 @@
 \description{
 diffAnalysisClass class
 }
+\section{Slots}{
+
+\describe{
+\item{\code{originalD}}{original feature data.frame.}
+
+\item{\code{sampleda}}{associated sample information.}
+
+\item{\code{taxda}}{the data.frame contained taxonomy.}
+
+\item{\code{kwres}}{the results of first test, contained
+feature names, pvalue and fdr.}
+
+\item{\code{secondvars}}{the results of second test, contained
+features names, gfc (TRUE representation the relevant 
+feantures is enriched in relevant factorNames), 
+Freq(the number of TRUE or FALSE), factorNames.}
+
+\item{\code{mlres}}{the results of LDA or randomForest,}
+
+\item{\code{classname}}{character the factor names.}
+
+\item{\code{normalization}}{the argument of 
+\code{\link[MicrobiotaProcess]{diffAnalysis}}}
+}}
+
