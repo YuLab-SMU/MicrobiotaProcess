@@ -7,21 +7,25 @@
 droptax(taxtab, rmode = FALSE, minocc = 0, minabu = 0)
 }
 \arguments{
-\item{taxtab}{dataframe; a dataframe of species (or features), default is (n_sample, n_feature).}
+\item{taxtab}{dataframe; a dataframe of species (or features), 
+default is (n_sample, n_feature).}
 
 \item{rmode}{boolean; whether transpose the taxtab, default is False.}
 
-\item{minocc}{numeric; the threshold number of occurrences to be dropped, if < 1.0,
-it will be the threshold ratios of occurrences, default is 0.}
+\item{minocc}{numeric; the threshold number of occurrences to be 
+dropped, if < 1.0,it will be the threshold ratios of occurrences, 
+default is 0.}
 
-\item{minabu}{numeric: the threshold abundance, if fewer than the threshold will be dropped, default is 0.}
+\item{minabu}{numeric: the threshold abundance, if fewer than the 
+threshold will be dropped, default is 0.}
 }
 \value{
-a list contained feature dataframe dropped, and the call, arguments.
+dataframe of new features.
 }
 \description{
-Drop species or features from the feature data frame that occur fewer than or equal to a threshold number of 
-occurrences and fewer abundance than to a threshold abundance.
+Drop species or features from the feature data frame that occur 
+fewer than or equal to a threshold number of occurrences and fewer 
+abundance than to a threshold abundance.
 }
 \examples{
 otudafile <- system.file("extdata", "otu_tax_table.txt",
@@ -32,7 +36,7 @@ otuda <- read.table(otudafile, sep="\\t",
                     comment.char="")
 otuda <- otuda[sapply(otuda, is.numeric)]
 dim(otuda)
-otudat <- droptax(otuda, minocc=0.2, minabu=10)
+otudat <- droptax(otuda, rmode=TRUE, minocc=0.1, minabu=1)
 dim(otudat)
 }
 \author{
