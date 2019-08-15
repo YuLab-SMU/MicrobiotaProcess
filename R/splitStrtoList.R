@@ -26,22 +26,22 @@
 #' taxdf <- splitStrtoList(taxdf)
 #' head(taxdf)
 splitStrtoList <- function(strdataframe, 
-			      prefix="tax", 
-			      sep="; ", 
-			      extra="drop",
-			      fill="right",
-			      ...){
-    	extra <- match.arg(extra, c("drop","warn","merge"))
-	fill <- match.arg(fill, c("warn", "right", "left"))
-       colstr <- names(strdataframe)
-	tmplength <- length(strsplit(as.character(strdataframe[1,1]), sep)[[1]])
-	newcolnames <- paste(prefix, rep(seq_len(tmplength)), sep="")
-	tmpdata <- separate(strdataframe, 
-				      colstr,
-				      newcolnames,
-				      sep=sep,
-				      extra = "drop", 
-				      fill = "right",...
-				      )
-	return(tmpdata)
+    prefix="tax", 
+    sep="; ", 
+    extra="drop",
+    fill="right",
+    ...){
+    extra <- match.arg(extra, c("drop","warn","merge"))
+    fill <- match.arg(fill, c("warn", "right", "left"))
+    colstr <- colnames(strdataframe)
+    tmplength <- length(strsplit(as.character(strdataframe[1,1]), sep)[[1]])
+    newcolnames <- paste(prefix, rep(seq_len(tmplength)), sep="")
+    tmpdata <- separate(strdataframe, 
+    			      colstr,
+    			      newcolnames,
+    			      sep=sep,
+    			      extra = "drop", 
+    			      fill = "right",...
+    			      )
+    return(tmpdata)
 }
