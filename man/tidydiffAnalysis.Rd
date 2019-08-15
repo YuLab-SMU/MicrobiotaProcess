@@ -20,7 +20,8 @@ data(kostic2012crc)
 kostic2012crc
 head(phyloseq::sample_data(kostic2012crc),3)
 kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
-table(sample_data(kostic2012crc)$DIAGNOSIS)
+table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
+set.seed(1024)
 diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
                         mlfun="lda", filtermod="fdr",
                         firstcomfun = "kruskal.test",
