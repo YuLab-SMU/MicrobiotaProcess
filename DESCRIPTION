@@ -29,6 +29,7 @@ Imports:
   rentrez,
   reshape,
   zoo,
+  tidytree,
   ggtree,
   tidytree,
   gtools,
