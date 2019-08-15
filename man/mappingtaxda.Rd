@@ -33,3 +33,4 @@ if the data.frame was built, you can visulize with `ggbartax`.
 \author{
 ShuangbinXu
 }
+\keyword{internal}
