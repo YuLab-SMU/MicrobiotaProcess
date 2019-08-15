@@ -22,37 +22,38 @@
 #' dalist <- c(1:100)
 #' dalist <- splitData(dalist, 30)
 splitData <- function(x, 
-			 nums, 
-			 chunks=NULL, 
-			 random=FALSE){
+    nums, 
+    chunks=NULL, 
+    random=FALSE){
     if (missing(nums)){
-		nums <- trunc(x/chunks)
-	}
-	if (missing(nums) && is.null(chunks)){
-		stop("The nums and chunks shouldn't concurrently be missing!")
-	}
-	if (!is.null(nums) && !is.null(chunks)){
-		message("We would use nums to split. and the chunk numbers is the length(x) provided by nums.")
-	}
+    	nums <- trunc(x/chunks)
+    }
+    if (missing(nums) && is.null(chunks)){
+    	stop("The nums and chunks shouldn't concurrently be missing!")
+    }
+    if (!is.null(nums) && !is.null(chunks)){
+    	message("We would use nums to split. and the chunk numbers is the length(x) provided by nums.")
+    }
     if (is.vector(x) && length(x)>0){
-		ind <- seedind(length(x), nums, random=random)	    
-	}
-	if (is.vector(x) && length(x)==0){
-		stop("The legth of vector should be larger than zero, if the class of x is vector.")
-	}
-	if (is.data.frame(x)){
-		ind <- seedind(nrow(x), nums, random=random)
-	}
-	return(split(x, ind))
+    	ind <- seedind(length(x), nums, random=random)	    
+    }
+    if (is.vector(x) && length(x)==0){
+    	stop("The legth of vector should be larger than zero, if the class of x is vector.")
+    }
+    if (is.data.frame(x)){
+    	ind <- seedind(nrow(x), nums, random=random)
+    }
+    return(split(x, ind))
 }
 
+#' @keywords internal
 seedind <- function(l, n, random=FALSE, seed=TRUE){
     tmpind <- rep(seq_len(trunc(l/n)+1),n)
     if (random){
-	#if ((l%%n)==0){
-	#	tmpind <- tmpind[!tmpind %in% max(tmpind)]
-	#}
-	tmpind <- sample(sort(tmpind)[seq_len(l)])
+    #if ((l%%n)==0){
+    #	tmpind <- tmpind[!tmpind %in% max(tmpind)]
+    #}
+    tmpind <- sample(sort(tmpind)[seq_len(l)])
     }else{
     	tmpind <- sort(tmpind)[seq_len(l)]
     }
