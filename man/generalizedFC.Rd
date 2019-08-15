@@ -6,42 +6,46 @@
 \alias{generalizedFC.formula}
 \title{generalized fold change}
 \usage{
-generalizedFC(x, y, ...)
+generalizedFC(x, ...)
 
 \method{generalizedFC}{default}(x, y, base = 10, steps = 0.05,
   pseudo = 1e-05, ...)
 
-\method{generalizedFC}{formula}(formula, data, subset, na.action, ...)
+\method{generalizedFC}{formula}(x, data, subset, na.action, ...)
 }
 \arguments{
-\item{x}{numeric vector, numeric vector of data values}
+\item{x}{numeric vector, numeric vector of data values or
+formula, example 'Ozone ~ Month', Ozone is a numeric variable
+giving the data values ‘Month’ a factor giving the corresponding groups.}
+
+\item{...}{additional arguments.}
 
 \item{y}{numeric vector, numeric vector of data values}
 
-\item{..., }{additional arguments.}
+\item{base}{a positive or complex number, the base with respect to 
+which logarithms are computed, default is 10.}
 
-\item{base}{a positive or complex number, the base with respect to which logarithms are computed.
-default is 10.}
+\item{steps}{positive numeric, increment of the sequence, 
+default is 0.05.}
 
-\item{steps}{positive numeric, increment of the sequence, default is 0.05.}
+\item{pseudo}{positive numeric, avoid the zero for logarithmic, 
+default is 0.00001.}
 
-\item{pseudo}{positive numeric, avoid the zero for logarithmic, default is 0.00001.}
+\item{data}{data.frame, an optional matrix or data frame,containing the 
+variables in the formula.}
 
-\item{formula, }{example 'Ozone ~ Month', Ozone is a numeric variable giving the data values
-and ‘Month’ a factor giving the corresponding groups.}
+\item{subset}{(similar: see 'wilcox.test')an optional vector specifying 
+a subset of observations to be used.}
 
-\item{data}{data.frame, an optional matrix or data frame,containing the variables in the formula.}
-
-\item{subset, }{(similar: see 'wilcox.test')an optional vector specifying a subset of observations to be used.}
-
-\item{na.action, }{a function which indicates what should happen when the data, contain 'NA's.
-Defaults to 'getOption("na.action")'.}
+\item{na.action}{a function which indicates what should happen when the 
+data, contain 'NA's. Defaults to 'getOption("na.action")'.}
 }
 \value{
 list contained gfc, the mean and median of different group.
 }
 \description{
-calculate the mean difference in a set of predefined quantiles of the logarithmic
+calculate the mean difference in a set of predefined 
+quantiles of the logarithmic
 }
 \examples{
 set.seed(1024)
