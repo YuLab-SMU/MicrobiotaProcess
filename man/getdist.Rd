@@ -8,21 +8,21 @@
 \usage{
 getdist(obj, ...)
 
-\method{getdist}{default}(data, distmethod = "euclidean",
+\method{getdist}{default}(obj, distmethod = "euclidean",
   taxa_are_rows = FALSE, sampleda = NULL, tree = NULL,
   method = "hellinger", ...)
 
 \method{getdist}{phyloseq}(obj, distmethod = "euclidean",
-  type = "sample", method = "hellinger", ...)
+  method = "hellinger", ...)
 }
 \arguments{
-\item{obj}{phyloseq, phyloseq class.}
+\item{obj}{phyloseq, phyloseq class or data.frame
+nrow sample * ncol feature.}
 
 \item{..., }{additional parameters.}
 
-\item{data}{data.frame, nrow sample * ncol feature.}
-
-\item{distmethod}{character, default is "euclidean", see also \code{\link[phyloseq]{distanceMethodList}}}
+\item{distmethod}{character, default is "euclidean", 
+see also \code{\link[phyloseq]{distanceMethodList}}}
 
 \item{taxa_are_rows}{logical, default is FALSE.}
 
@@ -30,7 +30,8 @@ getdist(obj, ...)
 
 \item{tree}{phylo, see also \code{\link[ape]{phylo}}.}
 
-\item{method}{character, default is hellinger, see alse \code{\link[vegan]{decostand}}}
+\item{method}{character, default is hellinger, 
+see alse \code{\link[vegan]{decostand}}}
 }
 \value{
 distance class contianed distmethod and originalD attr
