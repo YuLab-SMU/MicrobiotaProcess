@@ -10,16 +10,16 @@ getvennlist(obj, ...)
 
 \method{getvennlist}{phyloseq}(obj, ...)
 
-\method{getvennlist}{default}(data, sampleinfo = NULL,
+\method{getvennlist}{default}(obj, sampleinfo = NULL,
   factorNames = NULL, ...)
 }
 \arguments{
-\item{obj}{phyloseq, phyloseq class}
+\item{obj}{phyloseq, phyloseq class or data.frame
+a dataframe contained one character column and the others are numeric.
+or all columns should be numeric if sampleinfo isn't NULL.}
 
-\item{...}{additional parameters, see \code{\link[MicrobitaProcess]{CountOrRatios}}.}
-
-\item{data}{data.frame, a dataframe contained one character column and the others are numeric.
-all columns should be numeric if sampleinfo isn't NULL.}
+\item{...}{additional parameters,
+see also \code{\link[MicrobiotaProcess]{CountOrRatios}}.}
 
 \item{sampleinfo}{dataframe; a sample information, default is NULL.}
 
