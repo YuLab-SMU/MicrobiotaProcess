@@ -30,3 +30,4 @@ generating the data of ggrarecurve.
 \author{
 ShuangbinXu
 }
+\keyword{internal}
