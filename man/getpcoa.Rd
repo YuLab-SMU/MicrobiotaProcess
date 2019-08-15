@@ -9,7 +9,7 @@
 \usage{
 getpcoa(obj, ...)
 
-\method{getpcoa}{default}(data, distmethod = "euclidean",
+\method{getpcoa}{default}(obj, distmethod = "euclidean",
   taxa_are_rows = FALSE, sampleda = NULL, tree = NULL,
   method = "hellinger", ...)
 
@@ -23,8 +23,6 @@ getpcoa(obj, ...)
 
 \item{..., }{additional parameter, see \code{\link[MicrobiotaProcess]{getdist}}.}
 
-\item{data}{data.frame, numeric data.frame nrow sample * ncol features.}
-
 \item{distmethod}{character, the method of distance, see also \code{\link[phyloseq]{distance}}}
 
 \item{taxa_are_rows}{logical, if feature of data is column, it should be set FALSE.}
@@ -36,6 +34,8 @@ required.}
 
 \item{method}{character, the standardization method for community ecologists, default is hellinger,
 if the data has be normlized, it shound be set NULL.}
+
+\item{data}{data.frame, numeric data.frame nrow sample * ncol features.}
 }
 \value{
 pcasample object, contained prcomp or pcoa and sampleda (data.frame).
