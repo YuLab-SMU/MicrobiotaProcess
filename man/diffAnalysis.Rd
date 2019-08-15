@@ -8,7 +8,7 @@
 \usage{
 diffAnalysis(obj, ...)
 
-\method{diffAnalysis}{data.frame}(data, sampleda, class, subclass = NULL,
+\method{diffAnalysis}{data.frame}(obj, sampleda, class, subclass = NULL,
   taxda = NULL, alltax = TRUE, mlfun = "lda", ratio = 0.7,
   firstcomfun = "kruskal.test", padjust = "fdr",
   filtermod = "pvalue", firstalpha = 0.05, strictmod = TRUE,
@@ -20,11 +20,10 @@ diffAnalysis(obj, ...)
 \method{diffAnalysis}{phyloseq}(obj, class, subclass = NULL, ...)
 }
 \arguments{
-\item{obj}{object,a phyloseq class contained otu_table, sample_data, taxda.}
+\item{obj}{object,a phyloseq class contained otu_table, sample_data, taxda, 
+or data.frame, nrow sample * ncol features.}
 
 \item{..., }{additional parameters.}
-
-\item{data}{data.frame, nrow sample * ncol features.}
 
 \item{sampleda}{data.frame, nrow sample * ncol factor, the sample names of sampleda and data should be the same.}
 
@@ -87,7 +86,8 @@ data(kostic2012crc)
 kostic2012crc
 head(phyloseq::sample_data(kostic2012crc),3)
 kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
-table(sample_data(kostic2012crc)$DIAGNOSIS)
+table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
+set.seed(1024)
 diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
                         mlfun="lda", filtermod="fdr",
                         firstcomfun = "kruskal.test",
