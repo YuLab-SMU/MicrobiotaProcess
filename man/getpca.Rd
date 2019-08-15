@@ -8,17 +8,16 @@
 \usage{
 getpca(obj, ...)
 
-\method{getpca}{default}(data, sampleda = NULL, method = "hellinger",
+\method{getpca}{default}(obj, sampleda = NULL, method = "hellinger",
   ...)
 
 \method{getpca}{phyloseq}(obj, method = "hellinger", ...)
 }
 \arguments{
-\item{obj}{phyloseq, phyloseq class.}
+\item{obj}{phyloseq, phyloseq class or data.frame
+shape of data.frame is nrow sample * ncol feature.}
 
-\item{...}{additional parameters, see\code{\link[stat]{prcomp}}.}
-
-\item{data}{data.frame, shape of data.frame is nrow sample * ncol feature.}
+\item{...}{additional parameters, see\code{\link[stats]{prcomp}}.}
 
 \item{sampleda}{data.frame, nrow sample * ncol factors.}
 
