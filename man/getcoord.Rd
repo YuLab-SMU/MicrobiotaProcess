@@ -13,7 +13,7 @@ getcoord(obj, pc)
 \method{getcoord}{prcomp}(obj, pc)
 }
 \arguments{
-\item{obj}{prcomp object}
+\item{obj}{object,prcomp class or pcoa class}
 
 \item{pc}{integer vector, the component index.}
 }
@@ -29,5 +29,6 @@ get ordination coordinates
 require(graphics)
 data(USArrests)
 pcares <- prcomp(USArrests, scale = TRUE)
-coordtab <- getcoord(pcares)
+coordtab <- getcoord(pcares,pc=c(1, 2))
+coordtab2 <- getcoord(pcares, pc=c(2, 3))
 }
