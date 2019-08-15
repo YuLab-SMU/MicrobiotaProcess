@@ -9,10 +9,10 @@
 \usage{
 getclust(obj, ...)
 
-\method{getclust}{dist}(distobj, distmethod, sampleda = NULL,
+\method{getclust}{dist}(obj, distmethod, sampleda = NULL,
   hclustmethod = "average", ...)
 
-\method{getclust}{default}(data, distmethod = "euclidean",
+\method{getclust}{default}(obj, distmethod = "euclidean",
   taxa_are_rows = FALSE, sampleda = NULL, tree = NULL,
   method = "hellinger", hclustmethod = "average", ...)
 
@@ -20,27 +20,27 @@ getclust(obj, ...)
   method = "hellinger", hclustmethod = "average", ...)
 }
 \arguments{
-\item{obj}{phyloseq, phyloseq class.}
+\item{obj}{phyloseq, phyloseq class or dist class, or 
+data.frame, data.frame, default is nrow samples * ncol features.}
 
 \item{..., }{additional parameters.}
 
-\item{distobj}{dist, dist class.}
-
-\item{distmethod}{character, the method of dist, when the obj is data.frame 
-or phyloseq default is "euclidean". see also \code{\link[MicrobiotaProcess]{getdist}}.}
+\item{distmethod}{character, the method of dist, when the 
+obj is data.frame or phyloseq default is "euclidean". see also 
+\code{\link[MicrobiotaProcess]{getdist}}.}
 
 \item{sampleda}{data.frame, nrow sample * ncol factor. default is NULL.}
 
-\item{hclustmethod}{character, the method of hierarchical cluster, default is average.}
+\item{hclustmethod}{character, the method of hierarchical cluster, 
+default is average.}
 
-\item{data}{data.frame, data.frame, default is nrow samples * ncol features.}
-
-\item{taxa_are_rows}{logical, if the features is in column, it should set FALSE.}
+\item{taxa_are_rows}{logical, if the features of data.frame(obj) 
+is in column, it should set FALSE.}
 
 \item{tree}{phylo, the phylo class, see also \code{\link[ape]{as.phylo}}.}
 
-\item{method}{character, the standardization methods for community ecologists, see also
-\code{\link[vegan]{decostand}}}
+\item{method}{character, the standardization methods for community 
+ecologists, see also \code{\link[vegan]{decostand}}}
 }
 \value{
 clustplotClass object.
