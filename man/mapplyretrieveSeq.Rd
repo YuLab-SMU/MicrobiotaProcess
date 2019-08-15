@@ -39,7 +39,7 @@ mapplyretrieveSeq(idlist=idslist,
                    times=3,checkids=TRUE)
 }
 \seealso{
-\code{\link[retrieveSeq]{MicrobiotaProcess}}
+\code{\link[MicrobiotaProcess]{retrieveSeq}}
 }
 \author{
 ShuangbinXu
