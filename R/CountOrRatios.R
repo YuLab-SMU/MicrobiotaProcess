@@ -28,8 +28,8 @@
 #' taxdf <- otuda[!sapply(otuda, is.numeric)]
 #' taxdf <- splitStrtoList(taxdf)
 #' otuda <- otuda[sapply(otuda, is.numeric)]
-#' phycount <- CountOrRatios(otuda, taxdf[,1,drop=FALSE])
-#' phyratios <- CountOrRatios(otuda, taxdf[,1,drop=FALSE], 
+#' phycount <- CountOrRatios(otuda, taxdf[,2,drop=FALSE])
+#' phyratios <- CountOrRatios(otuda, taxdf[,2,drop=FALSE], 
 #'                            countmode=FALSE)
 CountOrRatios <- function(data, 
 			     featurelist, 
@@ -38,26 +38,26 @@ CountOrRatios <- function(data,
 			     multiplenum=1, 
 			     rownamekeep=FALSE){
     if (!is.null(featurelist)){
-		data <- merge(data, featurelist, by=0)
-		rownames(data) <- data$Row.names
+    	data <- merge(data, featurelist, by=0)
+    	rownames(data) <- data$Row.names
     	data$Row.names <- NULL
-	}
-	nums <- !unlist(lapply(data, is.numeric))
-	group <- names(data[,nums,drop=FALSE])
+    }
+    nums <- !unlist(lapply(data, is.numeric))
+    group <- names(data[,nums,drop=FALSE])
     data <- data.frame(plyr::ddply(data, group, plyr::numcolwise(sum)), 
-		     check.names=FALSE, stringsAsFactors=FALSE)   
+    	     check.names=FALSE, stringsAsFactors=FALSE)   
     rownames(data) <- as.vector(data[[group]])
     data[[group]] <- NULL
-	if (!isTRUE(countmode)){
+    if (!isTRUE(countmode)){
        	data <- data.frame(prop.table(as.matrix(data), 2), check.names=FALSE, stringsAsFactors=FALSE)
-		data <- data*multiplenum
-	}
+    	data <- data*multiplenum
+    }
     #  	if (!isTRUE(countmode) && isTRUE(percentmode)){
     #   	data <- data*100
-	#}
-	if (isTRUE(rownamekeep)){
-		data <- data.frame(cbind(feature=rownames(data), data), check.names=FALSE, stringsAsFactors=FALSE)
-	}
-       return (data)
+    #}
+    if (isTRUE(rownamekeep)){
+    	data <- data.frame(cbind(feature=rownames(data), data), check.names=FALSE, stringsAsFactors=FALSE)
+    }
+    return (data)
 }
 
