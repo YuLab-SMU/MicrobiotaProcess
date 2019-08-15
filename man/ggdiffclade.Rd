@@ -4,11 +4,11 @@
 \alias{ggdiffclade}
 \alias{ggdiffclade.data.frame}
 \alias{ggdiffclade.diffAnalysisClass}
-\title{plot the clade tree results of different analysis}
+\title{plot the clade tree with highlight}
 \usage{
 ggdiffclade(obj, ...)
 
-\method{ggdiffclade}{data.frame}(taxda, nodedf, factorName,
+\method{ggdiffclade}{data.frame}(obj, nodedf, factorName,
   layout = "circular", size = 0.6, skpointsize = 0.8, alpha = 0.4,
   taxlevel = 6, cladetext = 2, factorLevels = NULL,
   setColors = TRUE, settheme = TRUE, setlegend = TRUE, ...)
@@ -16,23 +16,24 @@ ggdiffclade(obj, ...)
 \method{ggdiffclade}{diffAnalysisClass}(obj, removeUnkown = TRUE, ...)
 }
 \arguments{
-\item{obj}{object, diffAnalysisClass, the results of diffAnalysis \code{\link[MicrobiotaProcess]{diffAnalysis}}.}
+\item{obj}{object, diffAnalysisClass, the results of diffAnalysis 
+see also \code{\link[MicrobiotaProcess]{diffAnalysis}}, or data.frame,
+contained hierarchical relationship or other classes.}
 
 \item{..., }{additional parameters.}
 
-\item{taxda}{data.frame, data.frame contained hierarchical relationship or other classes,
-such like the tax_data of phyloseq.}
-
-\item{nodedf}{data.frame, contained the tax and the factor information and(or pvalue).}
+\item{nodedf}{data.frame, contained the tax and the factor 
+information and(or pvalue).}
 
 \item{factorName}{character, the names of factor in nodedf.}
 
-\item{layout}{character, the layout of ggtree, but only "rectangular" and "circular" in here, 
-default is circular.}
+\item{layout}{character, the layout of ggtree, but only "rectangular" 
+and "circular" in here, default is circular.}
 
 \item{size}{numeric, the size of segment of ggtree, default is 0.6.}
 
-\item{skpointsize}{numeric, the point size of skeleton of tree, default is 0.8 .}
+\item{skpointsize}{numeric, the point size of skeleton of tree, 
+default is 0.8 .}
 
 \item{alpha}{numeric, the alpha of clade, default is 0.4.}
 
@@ -52,20 +53,24 @@ or set FALSE, then use 'theme' setting.}
 \item{setlegend}{logical, whether set the legend, default is TRUE,
 or set FALSE, then use 'guides' or 'theme' setting.}
 
-\item{removeUnkown}{logical, whether do not show unkown taxonomy, default is TRUE.}
+\item{removeUnkown}{logical, whether do not show unkown taxonomy, 
+default is TRUE.}
 }
 \value{
 figures of tax clade show the significant different feature.
 }
 \description{
-plot the clade tree results of different analysis
+plot results of different analysis or data.frame, 
+contained hierarchical relationship or other classes,such like the 
+tax_data of phyloseq.
 }
 \examples{
 data(kostic2012crc)
 kostic2012crc
 head(phyloseq::sample_data(kostic2012crc),3)
 kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
-table(sample_data(kostic2012crc)$DIAGNOSIS)
+table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
+set.seed(1024)
 diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
                         mlfun="lda", filtermod="fdr",
                         firstcomfun = "kruskal.test",
