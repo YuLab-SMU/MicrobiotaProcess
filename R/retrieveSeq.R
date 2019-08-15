@@ -25,36 +25,36 @@
 #'             type="fasta",
 #'             checkids=TRUE)
 retrieveSeq <- function(ids, files, 
-						databases="protein", 
-						type="fasta", 
-						times=3, checkids=FALSE){
-	if (file.exists(files) && checkids){
-		seqobj <- readBStringSet(files)
-		tmpid <- names(seqobj)
-		tmpid <- unlist(vapply(strsplit(tmpid, " "),function(x){x[1]},character(1)))
-		ids <- setdiff(ids, tmpid)
-	}
-	if (length(ids)>400){
-		stop("The length of ids vector should be shorter than 400!")
-	}
-	if (length(ids)==0){
-		return(NA)
-	}
-	cat(ids)
-	cat("\n")
-	tryCatch({tmprecs <- entrez_fetch(db=databases, ids, rettype=type)
-		    tmprecs <- gsub("\n\n", "\n", tmprecs)
-			tmprecs <- str_trim(tmprecs)
-	 	   write(tmprecs, 
-			      files,
-		          append=TRUE)},
-		error=function(e){do.call("retrieveSeq", 
-					     args=list(ids=ids,
-							 files=files,
-							 checkids=TRUE))})
-	message(paste0("Sleeping ... ",times,"s"))
-	Sys.sleep(times)
-	
+    databases="protein", 
+    type="fasta", 
+    times=3, checkids=FALSE){
+    if (file.exists(files) && checkids){
+    	seqobj <- readBStringSet(files)
+    	tmpid <- names(seqobj)
+    	tmpid <- unlist(vapply(strsplit(tmpid, " "),function(x){x[1]},character(1)))
+    	ids <- setdiff(ids, tmpid)
+    }
+    if (length(ids)>400){
+    	stop("The length of ids vector should be shorter than 400!")
+    }
+    if (length(ids)==0){
+    	return(NA)
+    }
+    cat(ids)
+    cat("\n")
+    tryCatch({tmprecs <- entrez_fetch(db=databases, ids, rettype=type)
+    	    tmprecs <- gsub("\n\n", "\n", tmprecs)
+    		tmprecs <- str_trim(tmprecs)
+     	   write(tmprecs, 
+    		      files,
+    	          append=TRUE)},
+    	error=function(e){do.call("retrieveSeq", 
+    				     args=list(ids=ids,
+    						 files=files,
+    						 checkids=TRUE))})
+    message(paste0("Sleeping ... ",times,"s"))
+    Sys.sleep(times)
+
 }
 
 #' @title Retriveing Sequencing from NCBI By mapply
@@ -72,7 +72,7 @@ retrieveSeq <- function(ids, files,
 #' @param checkids bool, whether check the sequence of ids has been retrieved.
 #' default is FALSE.
 #' @return the files of sequences downloaded by ids
-#' @seealso \code{\link[retrieveSeq]{MicrobiotaProcess}}
+#' @seealso \code{\link[MicrobiotaProcess]{retrieveSeq}}
 #' @author ShuangbinXu
 #' @export
 #' @examples
@@ -83,15 +83,15 @@ retrieveSeq <- function(ids, files,
 #'                   type="fasta",
 #'                    times=3,checkids=TRUE)
 mapplyretrieveSeq <- function(idlist, files, 
-							  databases="protein", 
-							  type="fasta", 
-				              times=3, checkids=TRUE){
-	invisible(mapply(retrieveSeq, 
-			   idlist, 
-	  	 	   MoreArgs=list(files=files,
-						  databases=databases,
-						  type=type,
-				          times=times,
+    databases="protein", 
+    type="fasta", 
+    times=3, checkids=TRUE){
+    invisible(mapply(retrieveSeq, 
+    		   idlist, 
+      	 	   MoreArgs=list(files=files,
+    					  databases=databases,
+    					  type=type,
+    			          times=times,
                           checkids=checkids),
-			   SIMPLIFY=FALSE))
+    		   SIMPLIFY=FALSE))
 }
