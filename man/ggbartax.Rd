@@ -10,18 +10,16 @@ ggbartax(obj, ...)
 
 \method{ggbartax}{phyloseq}(obj, ...)
 
-\method{ggbartax}{default}(data, mapping = NULL, position = "stack",
+\method{ggbartax}{default}(obj, mapping = NULL, position = "stack",
   stat = "identity", width = 0.7, topn = 30, count = FALSE,
   sampleda = NULL, factorLevels = NULL, settheme = TRUE,
   facetNames = NULL, setColors = TRUE, ...)
 }
 \arguments{
-\item{obj}{phyloseq, phyloseq class}
+\item{obj}{phyloseq, phyloseq class or data.frame, 
+(nrow sample * ncol feature (factor)) or the data.frame for geom_bar.}
 
 \item{...}{additional parameters, see \code{\link[ggplot2]{ggplot}}}
-
-\item{data}{data.frame, data.frame should be 
-(nrow sample * ncol feature (factor)) or the data.frame for geom_bar.}
 
 \item{mapping}{set of aesthetic mapping of ggplot2, default is NULL,
 if the data is the data.frame for geom_bar, the mapping should be set.}
@@ -57,7 +55,7 @@ barplot of tax
 taxonomy barplot
 }
 \examples{
-library(tidyverse)
+library(ggplot2)
 data(test_otu_data)
 otubar <- ggbartax(test_otu_data) + 
          scale_y_continuous(expand=c(0,0),
