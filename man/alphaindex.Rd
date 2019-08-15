@@ -29,7 +29,6 @@ otuda <- read.table(otudafile, sep="\\t",
 otuda <- otuda[sapply(otuda, is.numeric)] \%>\% t() \%>\% 
           data.frame(check.names=FALSE)
 set.seed(1024)
-otuda <- rrarefy(otuda, min(rowSums(otuda)))
 alphatab <- alphaindex(otuda)
 head(alphatab)
 }
