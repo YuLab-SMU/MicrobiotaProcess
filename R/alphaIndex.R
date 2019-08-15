@@ -20,7 +20,6 @@
 #' otuda <- otuda[sapply(otuda, is.numeric)] %>% t() %>% 
 #'           data.frame(check.names=FALSE)
 #' set.seed(1024)
-#' otuda <- rrarefy(otuda, min(rowSums(otuda)))
 #' alphatab <- alphaindex(otuda)
 #' head(alphatab)
 alphaindex <- function(data,mindepth=NULL){
@@ -39,7 +38,7 @@ alphaindex <- function(data,mindepth=NULL){
     Chao <- estimateR(x)
     Shannon <- diversity(x)
     Simpson <- diversity(x, index="simpson")
-    J <- Shannon/log(specnumber(data))
+    J <- Shannon/log(specnumber(x))
     alpha <- data.frame(Observe=Chao[1,],
                         Chao1=Chao[2,],
                         ACE=Chao[4,],
