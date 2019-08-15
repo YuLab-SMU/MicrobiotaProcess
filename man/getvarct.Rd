@@ -7,18 +7,18 @@
 \alias{getvarct.pcasample}
 \title{get the contribution of variables}
 \usage{
-\method{getvarct}{pcoa}(obj)
+\method{getvarct}{pcoa}(obj, ...)
 
 getvarct(obj, ...)
 
-\method{getvarct}{prcomp}(obj)
+\method{getvarct}{prcomp}(obj, ...)
 
-\method{getvarct}{pcasample}(obj)
+\method{getvarct}{pcasample}(obj, ...)
 }
 \arguments{
 \item{obj}{prcomp class or pcasample class}
 
-\item{..., }{additional parameters.}
+\item{...}{additional parameters.}
 }
 \value{
 the VarContrib class, contained the 
