@@ -8,15 +8,16 @@
 \usage{
 ggeffectsize(obj, ...)
 
-\method{ggeffectsize}{data.frame}(data, factorName, effectsizename,
+\method{ggeffectsize}{data.frame}(obj, factorName, effectsizename,
   factorLevels = NULL, setColors = TRUE, settheme = TRUE, ...)
 
 \method{ggeffectsize}{diffAnalysisClass}(obj, removeUnkown = TRUE, ...)
 }
 \arguments{
-\item{obj}{object, diffAnalysisClass see \code{\link[MicrobiotaProcess]{diffAnalysis}}}
+\item{obj}{object, diffAnalysisClass see \code{\link[MicrobiotaProcess]{diffAnalysis}},
+or data.frame, contained effect size and the group information.}
 
-\item{data}{data.frame, data.frame contained effect size and the group information.}
+\item{...}{additional arguments.}
 
 \item{factorName}{character, the column name contained group information in data.frame.}
 
@@ -44,14 +45,16 @@ data(kostic2012crc)
 kostic2012crc
 head(phyloseq::sample_data(kostic2012crc),3)
 kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
-table(sample_data(kostic2012crc)$DIAGNOSIS)
+table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
+set.seed(1024)
 diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
                         mlfun="lda", filtermod="fdr",
                         firstcomfun = "kruskal.test",
                         firstalpha=0.05, strictmod=TRUE,
                         secondcomfun = "wilcox.test", 
                         submin=3, subclwilc=TRUE,
-                        secondalpha=0.01, lda=3)  
+                        secondalpha=0.01, lda=3) 
+library(ggplot2)
 effectplot <- ggeffectsize(diffres,
                         setColors=FALSE,
                         settheme=FALSE) +
