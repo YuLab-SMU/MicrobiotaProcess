@@ -10,10 +10,14 @@ gettaxdf(obj, ...)
 
 \method{gettaxdf}{phyloseq}(obj, taxlevel = 2, ...)
 
-\method{gettaxdf}{default}(data, taxda, taxlevel, sampleda = NULL, ...)
+\method{gettaxdf}{default}(obj, taxda, taxa_are_rows, taxlevel,
+  sampleda = NULL, ...)
 }
 \arguments{
-\item{obj}{phyloseq, phyloseq class}
+\item{obj}{phyloseq, phyloseq class or data.frame
+the shape of data.frame (nrow sample * column feature
+taxa_are_rows set FALSE, nrow feature * ncol sample, 
+taxa_are_rows set TRUE).}
 
 \item{...}{additional parameters, see also 
 \code{\link[MicrobiotaProcess]{CountOrRatios}}}
@@ -21,10 +25,11 @@ gettaxdf(obj, ...)
 \item{taxlevel}{character, the column names of taxda that you want to get.
 when the input is phyloseq class, you can use 1 to 7.}
 
-\item{data}{data.frame, the shape of data.frame should be
-row sample * column feature.}
+\item{taxda}{data.frame, the classifies of feature contained 
+in obj(data.frame).}
 
-\item{taxda}{data.frame, the classifies of feature contained in obj.}
+\item{taxa_are_rows}{logical, if the column of data.frame
+are features, it should be set FALSE.}
 
 \item{sampleda}{data.frame, the sample information.}
 }
@@ -35,6 +40,7 @@ phyloseq class contained tax data.frame and sample information.
 get the data of specified taxonomy
 }
 \examples{
+library(ggplot2)
 data(test_otu_data)
 phytax <- gettaxdf(test_otu_data, taxlevel=2)
 phytax
