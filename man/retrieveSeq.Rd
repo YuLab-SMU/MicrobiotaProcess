@@ -13,16 +13,18 @@ retrieveSeq(ids, files, databases = "protein", type = "fasta",
 \item{files}{character, the file name specified by a double-quoted string.}
 
 \item{databases}{character, the name of databases to use, default is `protein`,
-if nucleotide sequences to retrieve set nuccore,see \code{\link[rentrez]{entrez_fetch}}.}
+if nucleotide sequences to retrieve set nuccore,
+see also \code{\link[rentrez]{entrez_fetch}}.}
 
-\item{type}{character, the format in which to get data,such as fasta, xml ...,
-see \code{\link[rentrez]{entrez_fetch}}.}
+\item{type}{character, the format in which to get data,
+such as fasta, xml ...,
+see also \code{\link[rentrez]{entrez_fetch}}.}
 
 \item{times}{integer, the time of sleeping, default is 3, 
 meaning 3 seconds.}
 
-\item{checkids}{bool, whether check the sequence of ids has been retrieved.
-default is FALSE.}
+\item{checkids}{logical, whether check the sequence of 
+ids has been retrieved. default is FALSE.}
 }
 \value{
 the files of sequences downloaded by ids
