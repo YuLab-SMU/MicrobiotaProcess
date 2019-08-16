@@ -45,6 +45,7 @@ Suggests:
   prettydoc,
   treeio,
   tidyverse,
+  testthat,
   knitr
 License: GPL (>= 2.0)
 BugReports: https://github.com/YuLab-SMU/MicrobiotaProcess/issues
