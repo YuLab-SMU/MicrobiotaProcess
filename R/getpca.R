@@ -192,7 +192,6 @@ getcoord <- function(obj, pc){
     UseMethod("getcoord")
 }
 
-#' @title get ordination coordinates
 #' @method getcoord prcomp
 #' @rdname getcoord
 #' @export
