@@ -13,7 +13,7 @@ Description: MicrobiotaProcess is an R package for analysis, visualization and
     the biomarker discovery of metagenome or other datasets. We also validated 
     this method on several microbiomes from available public datasets.
 Depends: 
-  R (>= 3.6.1)
+  R (>= 3.6)
 Imports:
   ape,
   plyr,	
