@@ -2,16 +2,15 @@ Package: MicrobiotaProcess
 Type: Package
 Title: an package for analysis, visualization and biomarker discovery of microbiome 
 Version: 0.99.0
-Authors@R: c(person("Shuangbin", "Xu", email = "xshuangbin@163.com", role = c("aut", "cre")),person("Guangchuang", "Yu", email = "guangchuangyu@gmail.com", role = c("aut", "ctb")))
-Maintainer: Shuangbin Xu <xshuangbin@163.com>
+Authors@R: c(person("Shuangbin", "Xu", email = "xshuangbin@163.com", role = c("aut", "cre"), comment=c(ORCID="0000-0003-3513-5362")),
+             person("Guangchuang", "Yu", email = "guangchuangyu@gmail.com", role = c("aut", "ctb")))
 Description: MicrobiotaProcess is an R package for analysis, visualization and 
     biomarker discovery of microbial datasets. It supports calculating alpha 
     index and provides functions to visualize rarefaction curves. Moreover, 
     it also supports visualizing the abundance of taxonomy of samples. And It 
     also provides functions to perform the PCA, PCoA and hierarchical cluster 
     analysis. More importantly, MicrobiotaProcess also provides a method for 
-    the biomarker discovery of metagenome or other datasets. We also validated 
-    this method on several microbiomes from available public datasets.
+    the biomarker discovery of metagenome or other datasets.
 Depends: 
   R (>= 3.6)
 Imports:
@@ -52,5 +51,5 @@ BugReports: https://github.com/YuLab-SMU/MicrobiotaProcess/issues
 VignetteBuilder: knitr 
 Encoding: UTF-8
 LazyData: false
-biocViews: Visualization, Microbiome, Software, MultipleComparison
+biocViews: Visualization, Microbiome, Software, MultipleComparison, FeatureExtraction
 RoxygenNote: 6.1.1
