@@ -76,21 +76,29 @@ getdist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",...
 #' @param data data.frame, numeric data.frame nrow sample * ncol features.
 #' @param obj phyloseq, the phyloseq class or dist class.
 #' @param sampleda data.frame, nrow sample * ncol factor, default is NULL.
-#' @param distmethod character, the method of distance, see also \code{\link[phyloseq]{distance}}
-#' @param taxa_are_rows logical, if feature of data is column, it should be set FALSE.
-#' @param tree phylo, the phylo class, default is NULL, when use unifrac method, it should be
-#' required.
-#' @param method character, the standardization method for community ecologists, default is hellinger,
-#' if the data has be normlized, it shound be set NULL.
-#' @param ..., additional parameter, see \code{\link[MicrobiotaProcess]{getdist}}.
-#' @return pcasample object, contained prcomp or pcoa and sampleda (data.frame).
+#' @param distmethod character, the method of distance, 
+#' see also \code{\link[phyloseq]{distance}}
+#' @param taxa_are_rows logical, if feature of data is column, 
+#' it should be set FALSE.
+#' @param tree phylo, the phylo class, default is NULL, 
+#' when use unifrac method, it should be required.
+#' @param method character, the standardization method for 
+#' community ecologists, default is hellinger, if the data 
+#' has be normlized, it shound be set NULL.
+#' @param ..., additional parameter, see also
+#' \code{\link[MicrobiotaProcess]{getdist}}.
+#' @return pcasample object, contained prcomp or 
+#' pcoa and sampleda (data.frame).
 #' @author Shuangbin Xu
 #' @export
 #' @examples
 #' library(phyloseq)
 #' data(GlobalPatterns)
-#' subGlobal <- subset_samples(GlobalPatterns, SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
-#' pcoares <- getpcoa(subGlobal, distmethod="euclidean", method="hellinger")
+#' subGlobal <- subset_samples(GlobalPatterns, 
+#'               SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#' pcoares <- getpcoa(subGlobal, 
+#'                    distmethod="euclidean",
+#'                    method="hellinger")
 #' # pcoaplot <- ggordpoint(pcoares, biplot=FALSE,
 #' #                        speciesannot=FALSE,
 #' #                        factorNames=c("SampleType"), 
