@@ -216,7 +216,7 @@ This datasets contained 86 Colorectal Carcinoma samples and 91 Control samples(r
 
 ```{r, error=TRUE, KosticCRCdiffAnalysis}
 set.seed(1024)
-diffres <- diffAnalysis(x=kostic2012crc, class="DIAGNOSIS",
+diffres <- diffAnalysis(obj=kostic2012crc, class="DIAGNOSIS",
 						mlfun="lda",
 						filtermod="fdr",
 						firstcomfun = "kruskal.test",
@@ -293,7 +293,7 @@ This dataset is from a small subset of the `HMP` 16S dataset[@Nicola2011LEfSe], 
 
 ```{r, hmpdiffAnalysis, error=TRUE}
 set.seed(1024)
-hmpdiffres <- diffAnalysis(x=featureda, 
+hmpdiffres <- diffAnalysis(obj=featureda, 
 						   sampleda=sampleda, 
 						   taxda=taxda, 
 						   alltax=FALSE, 
