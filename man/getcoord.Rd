@@ -22,8 +22,6 @@ ordplotClass object.
 }
 \description{
 get ordination coordinates.
-
-get ordination coordinates
 }
 \examples{
 require(graphics)
