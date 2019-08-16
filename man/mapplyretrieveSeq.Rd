@@ -21,7 +21,7 @@ see \code{\link[rentrez]{entrez_fetch}}.}
 \item{times}{integer, the time of sleeping, default is 3, 
 meaning 3 seconds.}
 
-\item{checkids}{bool, whether check the sequence of ids has been retrieved.
+\item{checkids}{logical, whether check the sequence of ids has been retrieved.
 default is FALSE.}
 }
 \value{
@@ -31,7 +31,8 @@ the files of sequences downloaded by ids
 Retriveing sequences from NCBI with the accession ids.
 }
 \examples{
-idslist <- list(c("ADM52729.1", "AAF82637.1"), c("CAA24729.1", "CAA83510.1"))
+idslist <- list(c("ADM52729.1", "AAF82637.1"), 
+                c("CAA24729.1", "CAA83510.1"))
 mapplyretrieveSeq(idlist=idslist,
                   files="test.fasta",
                   databases="protein",
