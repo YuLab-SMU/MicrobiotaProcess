@@ -37,13 +37,13 @@ getlabeldf <- function(ggtree, node){
 }
 
 #' @author GuangChuang Yu, Shuangbin Xu
-#' @importFrom utils getFromNamespace
+#' @importFrom tidytree offspring
 #' @keywords internal
 getcladelabelposition <- function(data, node, angle = "auto", adjustRatio=1, angleoff=90, extend = 0) { 
     if (length(extend) == 1) {
     	 extend = rep(extend, 2)
     }
-    sp <- tryCatch(offspringtbl_tree(data, node)$node, error=function(e) NULL)
+    sp <- tryCatch(offspring(data, node)$node, error=function(e) NULL)
     i <- match(node, data$node)
     if (is.null(sp)) {
     	sp.df <- data[i,]
@@ -91,10 +91,11 @@ getannotlabel <- function(labeldf,classlevel=4){
     return(list(labeldf=dat, annotdf=df))
 }
 
+#' @importFrom tidytree offspring
 #' @author GuangChuang Yu
 #' @keywords internal
 get_clade_position_ <- function(data, node){
-    sp <- tryCatch(offspringtbl_tree(data, node)$node, error=function(e) NULL)
+    sp <- tryCatch(offspring(data, node)$node, error=function(e) NULL)
     i <- match(node, data$node)
     if (is.null(sp)) {
     	sp.df <- data[i,]
