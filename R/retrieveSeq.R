@@ -5,13 +5,15 @@
 #' @param ids vector, the accession number or accession.
 #' @param files character, the file name specified by a double-quoted string.
 #' @param databases character, the name of databases to use, default is `protein`,
-#' if nucleotide sequences to retrieve set nuccore,see \code{\link[rentrez]{entrez_fetch}}.
-#' @param type character, the format in which to get data,such as fasta, xml ...,
-#' see \code{\link[rentrez]{entrez_fetch}}.
+#' if nucleotide sequences to retrieve set nuccore,
+#' see also \code{\link[rentrez]{entrez_fetch}}.
+#' @param type character, the format in which to get data,
+#' such as fasta, xml ...,
+#' see also \code{\link[rentrez]{entrez_fetch}}.
 #' @param times integer, the time of sleeping, default is 3, 
 #' meaning 3 seconds.
-#' @param checkids bool, whether check the sequence of ids has been retrieved.
-#' default is FALSE.
+#' @param checkids logical, whether check the sequence of 
+#' ids has been retrieved. default is FALSE.
 #' @return the files of sequences downloaded by ids
 #' @importFrom Biostrings readBStringSet
 #' @importFrom rentrez entrez_fetch
@@ -69,14 +71,15 @@ retrieveSeq <- function(ids, files,
 #' see \code{\link[rentrez]{entrez_fetch}}.
 #' @param times integer, the time of sleeping, default is 3, 
 #' meaning 3 seconds.
-#' @param checkids bool, whether check the sequence of ids has been retrieved.
+#' @param checkids logical, whether check the sequence of ids has been retrieved.
 #' default is FALSE.
 #' @return the files of sequences downloaded by ids
 #' @seealso \code{\link[MicrobiotaProcess]{retrieveSeq}}
 #' @author ShuangbinXu
 #' @export
 #' @examples
-#' idslist <- list(c("ADM52729.1", "AAF82637.1"), c("CAA24729.1", "CAA83510.1"))
+#' idslist <- list(c("ADM52729.1", "AAF82637.1"), 
+#'                 c("CAA24729.1", "CAA83510.1"))
 #' mapplyretrieveSeq(idlist=idslist,
 #'                   files="test.fasta",
 #'                   databases="protein",
