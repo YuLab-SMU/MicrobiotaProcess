@@ -35,7 +35,8 @@
 #' data(kostic2012crc)
 #' kostic2012crc
 #' head(phyloseq::sample_data(kostic2012crc),3)
-#' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
+#' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,
+#'                          rngseed=1024)
 #' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
 #' set.seed(1024)
 #' diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
@@ -47,9 +48,13 @@
 #'                         secondalpha=0.01, lda=3)
 #' library(ggplot2)
 #' diffcladeplot <- ggdiffclade(diffres,alpha=0.3, size=0.2, 
-#'                         skpointsize=0.4, taxlevel=3,settheme=TRUE,
+#'                         skpointsize=0.4, 
+#'                         taxlevel=3,
+#'                         settheme=TRUE,
 #'                         setColors=FALSE) +
-#'                  scale_fill_manual(values=c('#00AED7', '#FD9347', '#C1E168'))
+#'         scale_fill_manual(values=c('#00AED7', 
+#'                                    '#FD9347', 
+#'                                    '#C1E168'))
 ggdiffclade <- function(obj,...){
     UseMethod("ggdiffclade")
 }
@@ -159,7 +164,8 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
 #' data(kostic2012crc)
 #' kostic2012crc
 #' head(phyloseq::sample_data(kostic2012crc),3)
-#' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
+#' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,
+#'                               rngseed=1024)
 #' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
 #' set.seed(1024)
 #' diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
