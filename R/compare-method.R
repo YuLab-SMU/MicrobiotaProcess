@@ -64,10 +64,9 @@ diffAnalysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=N
     firstalpha=0.05, strictmod=TRUE, fcfun="generalizedFC",	secondcomfun="wilcox.test",
     clmin=5, clwilc=TRUE, secondalpha=0.05,	subclmin=3,	subclwilc=TRUE,	ldascore=2,
     normalization=1000000, bootnums=30,	...){
-    if (!is.null(taxda)){
-    	taxda <- fillNAtax(taxda)
+    if (!is.null(taxda)){taxda <- fillNAtax(taxda)
     	if (alltax){obj <- getalltaxdf(obj, taxda)}
-    }
+	}
     sampleda <- sampleda %>% select(c(class, subclass))
     if (ncol(sampleda)>1){sampleda <- duplicatedtaxcheck(sampleda) %>% column_to_rownames(var="rowname")}
     vars <- colnames(obj)
@@ -99,8 +98,9 @@ diffAnalysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=N
     if (!is.null(normalization)){obj <- obj * normalization}
     dameta <- merge(obj, sampleda, by=0) %>% column_to_rownames(var="Row.names")
     dameta <- dameta %>% select(c(secondvarsvectors, class))
-    dameta <- split(dameta, dameta[[class]])
+    dameta <- split(dameta, dameta[,match(class,colnames(dameta))])
     dameta <- sampledflist(dameta, bootnums=bootnums, ratio=ratio)#, randomSeed=1024)
+    dameta <- removeconstant(dameta) 
     if (mlfun=="lda"){mlres <- LDAeffectsize(dameta, compareclass, class, bootnums=bootnums, LDA=ldascore)}
     if (mlfun=="rf"){mlres <- rfimportance(dameta, class, bootnums=bootnums)}
     res <- new("diffAnalysisClass",originalD=obj,sampleda=sampleda,taxda=taxda,kwres=kwres,
