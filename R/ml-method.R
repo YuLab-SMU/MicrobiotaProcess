@@ -86,7 +86,7 @@ sampledflist <- function(dalist,
     return(datalist)
 }
 
-
+#' @importFrom stats var
 #' @keywords internal
 removeconstant <- function(dflist){
     noconstant <- list()
