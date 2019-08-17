@@ -86,3 +86,21 @@ sampledflist <- function(dalist,
     return(datalist)
 }
 
+
+#' @keywords internal
+removeconstant <- function(dflist){
+    noconstant <- list()
+    factornames <- colnames(dflist[[1]][!vapply(dflist[[1]],
+					is.numeric,logical(1))])
+    for (i in seq_len(length(dflist))){
+        tmpdata <- dflist[[i]][vapply(dflist[[i]],is.numeric,logical(1))]
+        noconstant[[i]] <- colnames(tmpdata[,apply(tmpdata, 2, var, na.rm=TRUE) != 0])
+    }
+    noconstant <- Reduce(intersect,noconstant)
+    for (i in seq_len(length(dflist))){
+        dflist[[i]] <- dflist[[i]][,match(c(noconstant,factornames),
+					colnames(dflist[[i]])),drop=FALSE]
+    }
+    return(dflist)
+}
+
