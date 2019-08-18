@@ -38,14 +38,16 @@ Imports:
   tibble,
   grDevices,
   stats,
-  utils
+  utils,
+  coin
 Suggests:
   DT,
   prettydoc,
   treeio,
   tidyverse,
   testthat,
-  knitr
+  knitr,
+  nlme
 License: GPL (>= 2.0)
 BugReports: https://github.com/YuLab-SMU/MicrobiotaProcess/issues
 VignetteBuilder: knitr 
