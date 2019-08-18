@@ -8,7 +8,7 @@
 #' will return the list with class "htest".
 #' @importFrom rlang new_formula
 #' @importFrom stats wilcox.test
-#' @author ShuangbinXu
+#' @author Shuangbin Xu
 #' @export
 #' @examples
 #' datest <- data.frame(A=rnorm(1:10,mean=5),
@@ -25,9 +25,80 @@ multi.compare <- function(fun = wilcox.test,
     lapply(feature,
     	   function(x){
     	   tmpformula <- new_formula(as.name(x), as.name(factorNames))
-    	   do.call(fun,list(tmpformula,data=data, ...))})#, 
+    	   suppressWarnings(do.call(fun,list(tmpformula,data=data, ...)))})#, 
     	   #simplify = FALSE)
-}	 
+}
+
+#' @title Methods for computation of the p-value
+#' @param obj object, such as htest, lm, negbin
+#' ScalarIndependenceTest class.
+#' @return pvalue.
+#' @author Shuangbin Xu
+#' @export
+#' @examples
+#' library(nlme)
+#' lmeres <- lme(distance ~ Sex,data=Orthodont)
+#' pvalue <- getpvalue(lmeres)
+getpvalue <- function(obj){
+    UseMethod("getpvalue")
+}
+
+#' @method getpvalue htest
+#' @rdname getpvalue
+#' @export
+getpvalue.htest <- function(obj){
+    pvalue <- obj$p.value
+    return(pvalue)
+}
+
+#' @method getpvalue lme
+#' @rdname getpvalue
+#' @export
+getpvalue.lme <- function(obj){
+    anres <- getanova(obj)
+    pvalue <- anres[2,4]
+    return (pvalue)
+}
+
+#' @method getpvalue negbin
+#' @rdname getpvalue
+#' @export
+getpvalue.negbin <- function(obj){
+    anres <- getanova(obj)
+    pvalue <- anres[2,5]
+    return (pvalue)
+}
+
+#' @method getpvalue ScalarIndependenceTest
+#' @rdname getpvalue
+#' @importFrom coin pvalue
+#' @export
+getpvalue.ScalarIndependenceTest <- function(obj){
+    pvalue(obj)
+}
+
+#' @method getpvalue QuadTypeIndependenceTest
+#' @rdname getpvalue
+#' @export
+getpvalue.QuadTypeIndependenceTest <- function(obj){
+    getpvalue.ScalarIndependenceTest(obj)
+}
+
+#' @method getpvalue lm
+#' @rdname getpvalue
+#' @export
+getpvalue.lm <- function(obj){
+    anres <- getanova(obj)
+    pvalue <- anres[1,5]
+    return(pvalue)
+}
+
+#' @importFrom stats anova
+#' @keywords internal 
+getanova <- function(obj){
+    anres <- suppressWarnings(anova(obj))
+    return (anres)
+}
 
 #' @keywords internal
 getclasslevels <- function(sampleda, class){
@@ -85,7 +156,8 @@ diffclass <- function(datasample,
     							classname=class,
     							minnum=classmin,
     							fun2=secondcomfun, 
-    							wilc=clwilc)
+    							wilc=clwilc,
+								...)
     	resgfoldC <- getcompareres(resgfoldC, pfold=pfold)
     	keepfeature[[paste(classtmp, collapse="-vs-")]] <- resgfoldC[resgfoldC$Freq==1,]
     }
@@ -122,7 +194,8 @@ diffsubclass <- function(datasample,
     								classname=subclass,
     								minnum=submin,
     								fun2=secondcomfun,
-    								wilc=subclwilc)
+    								wilc=subclwilc,
+									...)
     		reslist[[j]] <- resgfoldC
     	}
     	reslist <- do.call("rbind", reslist)
@@ -137,7 +210,7 @@ diffsubclass <- function(datasample,
 
 #' @keywords internal
 getgfcwilc <- function(datasample, classlevelsnum, fun1='generalizedFC', 
-					   vars, classname, minnum, fun2='wilcox.test', wilc){
+					   vars, classname, minnum, fun2='wilcox.test', wilc,...){
     resgfoldC <- multi.compare(fun=fun1, data=datasample,
     						   feature=vars, factorNames=classname)
     resgfoldC <- lapply(resgfoldC, function(x)x$gfc)
@@ -145,8 +218,8 @@ getgfcwilc <- function(datasample, classlevelsnum, fun1='generalizedFC',
     rownames(resgfoldC) <- vars
     if (classlevelsnum>= minnum &&  wilc){
     	tmpres <- multi.compare(fun=fun2, data=datasample,
-    							feature=vars, factorNames=classname, exact=FALSE)
-    	pvaluetmp <- lapply(tmpres, function(x)x$p.value)
+    							feature=vars, factorNames=classname, ...)
+    	pvaluetmp <- lapply(tmpres, function(x)getpvalue(x))
     	pvaluetmp <- do.call("rbind", pvaluetmp)
     	rownames(pvaluetmp) <- vars
     	resgfoldC <- merge(resgfoldC, pvaluetmp, by=0)
