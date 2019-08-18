@@ -72,7 +72,7 @@ diffAnalysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=N
     vars <- colnames(obj)
     datameta <- merge(obj, sampleda, by=0)
     kwres <- multi.compare(fun=firstcomfun, data=datameta, feature=vars, factorNames=class)
-    kwres <- lapply(kwres, function(x)x$p.value)
+    kwres <- lapply(kwres, function(x)getpvalue(x))
     kwres <- do.call("rbind", kwres)
     rownames(kwres) <- vars
     kwres <- data.frame(f=rownames(kwres),pvalue=kwres[,1])
@@ -86,10 +86,10 @@ diffAnalysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=N
     	class2sub <- getclass2sub(sampleda, class, subclass)
     	comsubclass <- apply(compareclass,1,function(x)getcomparesubclass(x[1],x[2],class2sub))
     	secondvars <- diffsubclass(datasample=datameta, features=varsfirst, comsubclass=comsubclass,class=class,subclass=subclass,
-    				 	fcfun=fcfun, secondcomfun=secondcomfun, submin=subclmin, subclwilc=subclwilc, pfold=secondalpha)
+    				 	fcfun=fcfun, secondcomfun=secondcomfun, submin=subclmin, subclwilc=subclwilc, pfold=secondalpha, ...)
     }else{
     	secondvars <- diffclass(datasample=datameta, features=varsfirst, comclass=compareclass, class=class, fcfun=fcfun,
-    							secondcomfun=secondcomfun,classmin=clmin,clwilc=clwilc,pfold=secondalpha)
+    							secondcomfun=secondcomfun,classmin=clmin,clwilc=clwilc,pfold=secondalpha, ...)
 	}
     if (!length(secondvars)>0){stop("There are not significantly discriminative features after internal wilcoxon!")}
     leaveclasslevels <- unlist(lapply(names(secondvars), function(x){unlist(strsplit(x,"-vs-"))}))
