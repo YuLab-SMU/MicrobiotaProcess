@@ -33,5 +33,5 @@ multi.compare(fun=wilcox.test,data=datest,
               feature=c("A", "B"),factorNames="group")
 }
 \author{
-ShuangbinXu
+Shuangbin Xu
 }
