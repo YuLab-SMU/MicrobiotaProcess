@@ -93,6 +93,17 @@ getpvalue.lm <- function(obj){
     return(pvalue)
 }
 
+#' @method getpvalue glm
+#' @rdname getpvalue
+#' @importFrom stats pnorm
+#' @export
+getpvalue.glm <- function(obj){
+    anres <- summary(obj)
+    pvalue <- 2*pnorm(abs(anres$coeff[2,3]),
+					  lower.tail=FALSE)
+	return(pvalue)
+}
+
 #' @importFrom stats anova
 #' @keywords internal 
 getanova <- function(obj){
