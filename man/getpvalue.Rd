@@ -8,6 +8,7 @@
 \alias{getpvalue.ScalarIndependenceTest}
 \alias{getpvalue.QuadTypeIndependenceTest}
 \alias{getpvalue.lm}
+\alias{getpvalue.glm}
 \title{Methods for computation of the p-value}
 \usage{
 getpvalue(obj)
@@ -23,6 +24,8 @@ getpvalue(obj)
 \method{getpvalue}{QuadTypeIndependenceTest}(obj)
 
 \method{getpvalue}{lm}(obj)
+
+\method{getpvalue}{glm}(obj)
 }
 \arguments{
 \item{obj}{object, such as htest, lm, negbin
