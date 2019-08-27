@@ -13,13 +13,17 @@
 #' @param ratio numeric, range from 0 to 1, the proportion of samples for calculating the effect 
 #' size of features, default is 0.7. 
 #' @param firstcomfun character, the method for first test, "oneway.test" for normal distributions, 
-#' suggested choosing "kruskal.test" for uneven distributions, default is "kruskal.test".
+#' suggested choosing "kruskal.test" for uneven distributions, default is "kruskal.test", or
+#' you can use lm, glm, or glm.nb (for negative binomial distribution), or `kruskal_test`, 
+#' `oneway_test` of `coin`.
 #' @param padjust character, the correction method, default is "fdr".
 #' @param filtermod character, the method to filter, default is "pvalue".
 #' @param firstalpha numeric, the alpha value for the first test, default is 0.05.
 #' @param strictmod logical, whether to performed in one-against-one, default is TRUE (strict).
 #' @param fcfun character, default is "generalizedFC", it can't be set another at the present time.
-#' @param secondcomfun character, the method for one-against-one, default is "wilcox.test" for uneven distributions.
+#' @param secondcomfun character, the method for one-against-one, default is "wilcox.test" for 
+#' uneven distributions, or `wilcox_test` of `coin`, or you can also use `lm`,
+#' `glm`, `glm.nb`(for negative binomial distribution in `MASS`).
 #' @param clmin integer, the minimum number of samples per class for performing test, default is 5.
 #' @param clwilc logical, whether to perform test of per class, default is TRUE.
 #' @param secondalpha numeric, the alpha value for the second test, default is 0.05.
