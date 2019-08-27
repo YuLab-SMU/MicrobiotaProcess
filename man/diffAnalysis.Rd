@@ -44,7 +44,9 @@ choose "lda" or "rf", default is "lda".}
 size of features, default is 0.7.}
 
 \item{firstcomfun}{character, the method for first test, "oneway.test" for normal distributions, 
-suggested choosing "kruskal.test" for uneven distributions, default is "kruskal.test".}
+suggested choosing "kruskal.test" for uneven distributions, default is "kruskal.test", or
+you can use lm, glm, or glm.nb (for negative binomial distribution), or `kruskal_test`, 
+`oneway_test` of `coin`.}
 
 \item{padjust}{character, the correction method, default is "fdr".}
 
@@ -56,7 +58,9 @@ suggested choosing "kruskal.test" for uneven distributions, default is "kruskal.
 
 \item{fcfun}{character, default is "generalizedFC", it can't be set another at the present time.}
 
-\item{secondcomfun}{character, the method for one-against-one, default is "wilcox.test" for uneven distributions.}
+\item{secondcomfun}{character, the method for one-against-one, default is "wilcox.test" for 
+uneven distributions, or `wilcox_test` of `coin`, or you can also use `lm`,
+`glm`, `glm.nb`(for negative binomial distribution in `MASS`).}
 
 \item{clmin}{integer, the minimum number of samples per class for performing test, default is 5.}
 
