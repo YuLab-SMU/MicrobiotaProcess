@@ -145,3 +145,13 @@ repduplicatedtaxcheck <- function(taxdf){
     return(taxdf)
 }
 
+#' @keywords internal
+getcall <- function(obj, arg){
+    if (!"call" %in% slotNames(diffres)){
+		stop("The object don't have call slot!")
+	}else{
+	    callres <- as.list(obj@call)
+        argres <- callres[[match(arg,names(callres))]]
+        return(argres)
+	}
+}
