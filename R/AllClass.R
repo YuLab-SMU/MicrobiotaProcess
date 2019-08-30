@@ -103,8 +103,7 @@ setClassUnion("callOrNull", c("call", "NULL"))
 #' feantures is enriched in relevant factorNames), 
 #' Freq(the number of TRUE or FALSE), factorNames.
 #' @slot mlres the results of LDA or randomForest,
-#' @slot classname character the factor names.
-#' @slot normalization the argument of 
+#' @slot call, the call of 
 #' \code{\link[MicrobiotaProcess]{diffAnalysis}}
 #' @name diffAnalysisClass-class
 #' @rdname diffAnalysisClass-class
