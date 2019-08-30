@@ -121,6 +121,7 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
     #nodedfres <- nodedfres[as.vector(nodedfres$f)%in%as.vector(obj@mlres$f),]
     #nodedfres <- merge(nodedfres, obj@mlres$f, by.x="f", by.y="f")
     nodedfres <- tidydiffAnalysis(obj)
+    classname <- getcall(obj, "class")
     if (removeUnkown){
     	tmpflag <- grep("__un_",as.vector(nodedfres$f))
     	if (length(tmpflag)>0){
@@ -129,7 +130,7 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
     }
     p <- ggdiffclade.data.frame(obj=taxda,
     							nodedf=nodedfres,
-    							factorName=obj@classname,
+    							factorName=classname,
     							...)
     return(p)
 }
@@ -196,8 +197,10 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
     figheight=3,
     ...){
     featureda <- obj@originalD
-    if (!is.null(obj@normalization)){
-    	featureda <- featureda / obj@normalization
+	classname <- getcall(obj, "class")
+	normalization <- getcall(obj, "normalization")
+    if (!is.null(normalization)){
+    	featureda <- featureda / normalization
     }
     sampleda <- obj@sampleda
     featureda <- merge(featureda, sampleda, by=0) %>%
@@ -208,9 +211,9 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
     		featurelist <- featurelist[-grep("__un_", featurelist)]
     }
     if (ncol(sampleda)>1){
-    	subclass <- colnames(sampleda)[-match(obj@classname, colnames(sampleda))]
+    	subclass <- colnames(sampleda)[-match(classname, colnames(sampleda))]
     }else{
-    	subclass <- obj@classname
+    	subclass <- classname
     }
     if(is.null(filepath)){filepath <- getwd()}
     filepath <- paste(filepath, output, sep="/")
@@ -221,7 +224,7 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
     						   subclass=subclass)
     	p <- ggdifftaxbar.featureMeanMedian(resdf,
     								 vars,
-    								 obj@classname,
+    								 classname,
     								 subclass,...)
     	filename <- paste(filepath, paste0(vars,".svg"), sep="/")
     	ggsave(filename, p, device="svg", width = figwidth, height=figheight)
@@ -411,6 +414,7 @@ ggeffectsize.data.frame <- function(obj,
 #' @export
 ggeffectsize.diffAnalysisClass <- function(obj, removeUnkown=TRUE,...){
     efres <- tidyEffectSize(obj)
+    classname <- getcall(obj, "class")
     if (removeUnkown && length(grep("__un_",efres$f))){
     	efres <- efres[-grep("__un_",efres$f),,drop=FALSE]
     }
@@ -420,7 +424,7 @@ ggeffectsize.diffAnalysisClass <- function(obj, removeUnkown=TRUE,...){
     	effectsizename <- "MeanDecreaseAccuracy" 
     }
     p <- ggeffectsize.data.frame(obj=efres, 
-    							 factorName=obj@classname, 
+    							 factorName=classname, 
     							 effectsizename=effectsizename,
     							 ...)
     return (p)
