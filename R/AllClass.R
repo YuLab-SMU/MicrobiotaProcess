@@ -88,6 +88,9 @@ setClassUnion("listOrNull", c("list", "NULL"))
 #' @keywords internal
 setClassUnion("numericOrNull", c("numeric", "NULL"))
 
+#' @keywords internal
+setClassUnion("callOrNull", c("call", "NULL"))
+
 #' @title diffAnalysisClass class
 #' @docType class
 #' @slot originalD original feature data.frame.
@@ -113,13 +116,15 @@ setClass("diffAnalysisClass",
     kwres="dataframeOrNull",
     secondvars="listOrNull",
     mlres="dataframeOrNull",
-    classname="characterOrNull",
-    normalization="numericOrNull"),
+    call="callOrNull"),
+    #classname="characterOrNull",
+    #normalization="numericOrNull"),
     prototype=prototype(originalD=NULL,
     sampleda=NULL,
     taxda=NULL,
     kwres=NULL,
     secondvars=NULL,
     mlres=NULL,
-    classname=NULL,
-    normalization=NULL))
+	call=NULL))
+    #classname=NULL,
+    #normalization=NULL))
