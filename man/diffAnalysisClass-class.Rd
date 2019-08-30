@@ -26,9 +26,7 @@ Freq(the number of TRUE or FALSE), factorNames.}
 
 \item{\code{mlres}}{the results of LDA or randomForest,}
 
-\item{\code{classname}}{character the factor names.}
-
-\item{\code{normalization}}{the argument of 
+\item{\code{call,}}{the call of 
 \code{\link[MicrobiotaProcess]{diffAnalysis}}}
 }}
 
