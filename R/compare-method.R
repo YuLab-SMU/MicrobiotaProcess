@@ -108,7 +108,7 @@ diffAnalysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=N
     if (mlfun=="lda"){mlres <- LDAeffectsize(dameta, compareclass, class, bootnums=bootnums, LDA=ldascore)}
     if (mlfun=="rf"){mlres <- rfimportance(dameta, class, bootnums=bootnums)}
     res <- new("diffAnalysisClass",originalD=obj,sampleda=sampleda,taxda=taxda,kwres=kwres,
-    		   secondvars=secondvars,mlres=mlres,call=match.call)#,classname=class,normalization=normalization)
+               secondvars=secondvars,mlres=mlres,call=match.call())#,classname=class,normalization=normalization)
     return(res)
 }
 
