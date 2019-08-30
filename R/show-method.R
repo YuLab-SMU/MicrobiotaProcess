@@ -35,11 +35,14 @@ setMethod("show",
       else{cat("The taxda is NULL",fill=TRUE)}
       kwres <- object@kwres
       numfirstf <- nrow(kwres[kwres$pvalue<=0.05 & !is.na(kwres$pvalue),])
-      cat(paste0("after first test (default is kruskal.test) number of feature (pvalue <=0.05):", 
-      		   numfirstf),
-      	fill=TRUE)
+      firstfun <- getcall(object, "firstcomfun")
+      filtermod <- getcall(object, "filtermod")
+      alphafold <- getcall(object, "firstalpha")
+      cat(paste0("after first test (",firstfun,") number of feature (", filtermod,"<=",alphafold,"):", 
+      numfirstf),fill=TRUE)
       secondvars <- getsecondTRUEvar(object)
-      cat(paste0("after second test (default is wilcox.test) number of significantly discriminative feature:", 
+      secondfun <- getcall(object, "secondcomfun")
+      cat(paste0("after second test (",secondfun,") number of significantly discriminative feature:", 
       		   nrow(secondvars)),
       		   fill=TRUE)
       mlres <- tidydiffAnalysis(object) 
