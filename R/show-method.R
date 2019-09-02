@@ -16,7 +16,7 @@
 #'                         firstcomfun = "kruskal.test",
 #'                         firstalpha=0.05, strictmod=TRUE, 
 #'                         secondcomfun = "wilcox.test",
-#'                         submin=3, subclwilc=TRUE,
+#'                         subclmin=3, subclwilc=TRUE,
 #'                         secondalpha=0.01, lda=3)
 #' show(diffres)
 setMethod("show", 
@@ -47,7 +47,8 @@ setMethod("show",
       		   fill=TRUE)
       mlres <- tidydiffAnalysis(object) 
       uncertain <- length(grep("__un_", mlres$f))
-      cat(paste0("after LDA or rf, Number of discriminative features: ", 
+      mlmethod <- getcall(object, "mlfun")
+      cat(paste0("after ",mlmethod,", Number of discriminative features: ", 
       		   nrow(mlres), " (certain taxonomy classification:", 
       		   nrow(mlres) -uncertain , 
       		   "; uncertain taxonomy classication: ",uncertain,")"), 
