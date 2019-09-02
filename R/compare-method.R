@@ -52,7 +52,7 @@
 #'                         firstcomfun = "kruskal.test",
 #'                         firstalpha=0.05, strictmod=TRUE,
 #'                         secondcomfun = "wilcox.test",
-#'                         submin=3, subclwilc=TRUE,
+#'                         subclmin=3, subclwilc=TRUE,
 #'                         secondalpha=0.01, lda=3)
 diffAnalysis <- function(obj, ...){
 	UseMethod("diffAnalysis")
@@ -117,14 +117,14 @@ diffAnalysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=N
 #' @rdname diffAnalysis
 #' @importFrom phyloseq tax_table
 #' @export
-diffAnalysis.phyloseq <- function(obj, class, subclass=NULL,...){
+diffAnalysis.phyloseq <- function(obj, ...){
     otuda <- checkotu(obj)
     sampleda <- checksample(obj)
     taxda <- tax_table(obj)
     res <- diffAnalysis.data.frame(obj=otuda, 
     						sampleda=sampleda, 
-    						class=class,
-    						subclass=subclass,
+    						#class=class,
+    						#subclass=subclass,
     						taxda=taxda,
     						...)
     return(res)
@@ -162,7 +162,7 @@ getalltaxdf <- function(data, taxda){
 #'                         firstcomfun = "kruskal.test",
 #'                         firstalpha=0.05, strictmod=TRUE,
 #'                         secondcomfun = "wilcox.test",
-#'                         submin=3, subclwilc=TRUE,
+#'                         subclmin=3, subclwilc=TRUE,
 #'                         secondalpha=0.01, lda=3)
 #' restab <-tidydiffAnalysis(diffres)
 #' head(restab)
@@ -177,12 +177,13 @@ tidydiffAnalysis <- function(obj){
 tidyEffectSize <- function(obj){
     f <- LDA <- MeanDecreaseAccuracy <- NULL
     secondvars <- getsecondTRUEvar(obj)
+	classname <- getcall(obj, "class")
     efres <- merge(obj@mlres, secondvars, by.x="f", by.y="f") %>%
     		select (-c("gfc", "Freq"))
     if ("LDA" %in% colnames(efres)){
-    	efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=obj@classname)), LDA)]))
+    	efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)), LDA)]))
     }else{
-    	efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=obj@classname)),
+    	efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)),
     														   MeanDecreaseAccuracy)]))
     }
     return(efres)
