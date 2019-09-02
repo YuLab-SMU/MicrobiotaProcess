@@ -74,7 +74,7 @@ diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
                         firstcomfun = "kruskal.test",
                         firstalpha=0.05, strictmod=TRUE,
                         secondcomfun = "wilcox.test",
-                        submin=3, subclwilc=TRUE,
+                        subclmin=3, subclwilc=TRUE,
                         secondalpha=0.01, lda=3)
 # not run in example
 #ggdifftaxbar(diffres, output="./biomarker_barplot")
