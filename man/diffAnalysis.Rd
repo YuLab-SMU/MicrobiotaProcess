@@ -17,7 +17,7 @@ diffAnalysis(obj, ...)
   subclwilc = TRUE, ldascore = 2, normalization = 1e+06,
   bootnums = 30, ...)
 
-\method{diffAnalysis}{phyloseq}(obj, class, subclass = NULL, ...)
+\method{diffAnalysis}{phyloseq}(obj, ...)
 }
 \arguments{
 \item{obj}{object,a phyloseq class contained otu_table, sample_data, taxda, 
@@ -97,7 +97,7 @@ diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
                         firstcomfun = "kruskal.test",
                         firstalpha=0.05, strictmod=TRUE,
                         secondcomfun = "wilcox.test",
-                        submin=3, subclwilc=TRUE,
+                        subclmin=3, subclwilc=TRUE,
                         secondalpha=0.01, lda=3)
 }
 \author{
