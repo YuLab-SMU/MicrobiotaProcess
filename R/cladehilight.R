@@ -37,13 +37,12 @@ getlabeldf <- function(ggtree, node){
 }
 
 #' @author GuangChuang Yu, Shuangbin Xu
-#' @importFrom tidytree offspring
 #' @keywords internal
 getcladelabelposition <- function(data, node, angle = "auto", adjustRatio=1, angleoff=90, extend = 0) { 
     if (length(extend) == 1) {
     	 extend = rep(extend, 2)
     }
-    sp <- tryCatch(offspring(data, node)$node, error=function(e) NULL)
+    sp <- tryCatch(offspringtbl_tree(data, node)$node, error=function(e) NULL)
     i <- match(node, data$node)
     if (is.null(sp)) {
     	sp.df <- data[i,]
@@ -91,30 +90,29 @@ getannotlabel <- function(labeldf,classlevel=4){
     return(list(labeldf=dat, annotdf=df))
 }
 
-#' @importFrom tidytree offspring
-#' @author GuangChuang Yu
-#' @keywords internal
-get_clade_position_ <- function(data, node){
-    sp <- tryCatch(offspring(data, node)$node, error=function(e) NULL)
-    i <- match(node, data$node)
-    if (is.null(sp)) {
-    	sp.df <- data[i,]
-    }else{
-    	sp <- c(sp, node)
-    	sp.df <- data[match(sp, data$node),] 
-    }
-    x <- sp.df$x
-    y <- sp.df$y
-    if ("branch.length" %in% colnames(data)) {
-    	xmin <- min(x, na.rm=TRUE)-data[["branch.length"]][i]/2
-    }else {
-    	xmin <- min(sp.df$branch, na.rm=TRUE)
-    }
-    data.frame(xmin=xmin,
-    		   xmax=max(x, na.rm=TRUE),
-    		   ymin=min(y, na.rm=TRUE) - 0.5, 
-    		   ymax=max(y, na.rm=TRUE) + 0.5)
-}
+###' @author GuangChuang Yu
+###' @keywords internal
+#get_clade_position_ <- function(data, node){
+#    sp <- tryCatch(offspringtbl_tree(data, node)$node, error=function(e) NULL)
+#    i <- match(node, data$node)
+#    if (is.null(sp)) {
+#    	sp.df <- data[i,]
+#    }else{
+#    	sp <- c(sp, node)
+#    	sp.df <- data[match(sp, data$node),] 
+#    }
+#    x <- sp.df$x
+#    y <- sp.df$y
+#    if ("branch.length" %in% colnames(data)) {
+#    	xmin <- min(x, na.rm=TRUE)-data[["branch.length"]][i]/2
+#    }else {
+#    	xmin <- min(sp.df$branch, na.rm=TRUE)
+#    }
+#    data.frame(xmin=xmin,
+#    		   xmax=max(x, na.rm=TRUE),
+#    		   ymin=min(y, na.rm=TRUE) - 0.5, 
+#    		   ymax=max(y, na.rm=TRUE) + 0.5)
+#}
 
 
 #' @keywords internal
@@ -123,3 +121,7 @@ get_extend <- function(x) {x * 0.5}
 #' @importFrom utils getFromNamespace
 #' @keywords internal
 offspringtbl_tree <- getFromNamespace("offspring.tbl_tree","tidytree")
+
+#' @importFrom utils getFromNamespace
+#' @keywords internal
+get_clade_position_ <- getFromNamespace("get_clade_position_", "ggtree")
