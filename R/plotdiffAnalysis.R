@@ -476,5 +476,6 @@ ggdiffcladetheme <- function(...){
     	  legend.box.spacing=unit(0.02,"cm"),
     	  legend.text = element_text(size=5),
     	  legend.title=element_text(size=6),
-    	  legend.background=element_rect(fill=NA))
+    	  legend.background=element_rect(fill=NA),
+		  ...)
 }
