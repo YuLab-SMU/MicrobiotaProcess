@@ -1,6 +1,7 @@
 #' @method ggrarecurve default
-#' @importFrom ggplot2 ggplot aes_ stat_smooth facet_wrap
+#' @importFrom ggplot2 ggplot aes_string stat_smooth facet_wrap
 #' @importFrom dplyr filter
+#' @importFrom rlang .data
 #' @rdname ggrarecurve
 #' @export
 ggrarecurve.default <- function(obj,
@@ -22,17 +23,16 @@ ggrarecurve.default <- function(obj,
     					  sampleda=sampleda,
     					  factorLevels=factorLevels,
     					  plotda=TRUE)
-    	mapping <- aes_(~readsNums, ~value, color=~sample)
+    	mapping <- aes_string(x="readsNums", y="value", color="sample")
     	if (!missing(factorNames)){
-    	    tmpcolor <- as.formula(paste0("~", factorNames))
+    	    #tmpcolor <- as.formula(paste0("~", factorNames))
     		mapping <- modifyList(mapping,
-    					 aes_(~readsNums,
-    					      ~value, 
-    					      color=tmpcolor))
+    		           aes_string(color="factorNames"))
     	}
     }
     if (!is.null(indexNames)){
-    	obj <- obj %>% filter(eval(parse(text="Alpha")) %in% indexNames)
+    	#obj <- obj %>% filter(eval(parse(text="Alpha")) %in% indexNames)
+		obj <- obj %>% filter(.data$Alpha %in% indexNames)
     }
     p <- ggplot(data=obj, mapping=mapping) +
     	 stat_smooth(se=se, method = method, size=linesize,formula = formula,
