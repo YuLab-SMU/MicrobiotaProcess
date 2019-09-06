@@ -71,22 +71,22 @@ ggbartax.phyloseq <- function(obj, ...){
 #' @examples
 #' library(ggplot2)
 #' data(test_otu_data)
-#' phytax <- gettaxdf(test_otu_data, taxlevel=2)
+#' phytax <- get_taxdf(test_otu_data, taxlevel=2)
 #' phytax
 #' head(phyloseq::otu_table(phytax))
 #' phybar <- ggbartax(phytax) + 
 #'           scale_y_continuous(expand=c(0,0), 
 #'                           limits=c(0, 105))+
 #'          xlab(NULL) + ylab("relative abundance (%)")
-gettaxdf <- function(obj,...){
-    UseMethod("gettaxdf")
+get_taxdf <- function(obj,...){
+    UseMethod("get_taxdf")
 }
 
-#' @method gettaxdf phyloseq
+#' @method get_taxdf phyloseq
 #' @importFrom phyloseq otu_table tax_table taxa_are_rows rank_names
-#' @rdname gettaxdf
+#' @rdname get_taxdf
 #' @export
-gettaxdf.phyloseq <- function(obj, taxlevel=2, ...){
+get_taxdf.phyloseq <- function(obj, taxlevel=2, ...){
     if (is.null(obj@tax_table)){
     	stop("The tax table is empty!")
     }else{
@@ -103,7 +103,7 @@ gettaxdf.phyloseq <- function(obj, taxlevel=2, ...){
     	}
     }
     #taxlevel <- rank_names(obj)[taxlevel]
-    taxdf <- gettaxdf.default(obj=otuda, 
+    taxdf <- get_taxdf.default(obj=otuda, 
     						  taxda=taxdf, 
     						  taxlevel=taxlevel,
     						  sampleda=sampleda,
@@ -111,11 +111,11 @@ gettaxdf.phyloseq <- function(obj, taxlevel=2, ...){
     return(taxdf)
 }
 
-#' @method gettaxdf default
+#' @method get_taxdf default
 #' @importFrom phyloseq otu_table tax_table
-#' @rdname gettaxdf
+#' @rdname get_taxdf
 #' @export 
-gettaxdf.default <- function(obj, taxda, 
+get_taxdf.default <- function(obj, taxda, 
 							 taxa_are_rows,
 							 taxlevel,
 							 sampleda=NULL,
@@ -201,7 +201,7 @@ ggrarecurve.phyloseq <- function(obj, ...){
 #' @export 
 #' @examples
 #' data(test_otu_data)
-#' vennlist <- getvennlist(test_otu_data, 
+#' vennlist <- get_vennlist(test_otu_data, 
 #'                  factorNames="group")
 #' vennlist
 #' #library(VennDiagram)
@@ -214,18 +214,18 @@ ggrarecurve.phyloseq <- function(obj, ...){
 #' #             margin = 0.1, lwd = 3, 
 #' #             lty ='dotted', 
 #' #             imagetype = "svg")
-getvennlist <- function(obj,...){
-    UseMethod("getvennlist")
+get_vennlist <- function(obj,...){
+    UseMethod("get_vennlist")
 }
 
-#' @method getvennlist phyloseq
-#' @rdname getvennlist
+#' @method get_vennlist phyloseq
+#' @rdname get_vennlist
 #' @export 
-getvennlist.phyloseq <- function(obj, ...){
+get_vennlist.phyloseq <- function(obj, ...){
     otuda <- checkotu(obj)
     sampleda <- checksample(obj)
     #tmpfactors <- colnames(sampleda)[factorNamesIndex]
-    vennlist <- getvennlist.default(obj=otuda,
+    vennlist <- get_vennlist.default(obj=otuda,
     								sampleinfo=sampleda,
     								#factorNames=factorNames,
     								...)
