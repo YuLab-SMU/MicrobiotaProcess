@@ -1,6 +1,6 @@
 #' @method ggbartax default
 #' @rdname ggbartax
-#' @importFrom ggplot2 ggplot aes_ geom_bar theme_bw scale_fill_manual facet_grid
+#' @importFrom ggplot2 ggplot aes_ geom_bar scale_fill_manual facet_grid
 #' @importFrom stats as.formula
 #' @export
 ggbartax.default <- function(obj, mapping=NULL, position = "stack", stat="identity",
@@ -15,8 +15,8 @@ ggbartax.default <- function(obj, mapping=NULL, position = "stack", stat="identi
     	mapping <- mapping
     }
     p <- ggplot(data=obj,mapping=mapping,...) + 
-    	geom_bar(position = position,stat=stat, width=width) + 
-    	theme_bw() 
+    	geom_bar(position = position,stat=stat, width=width) #+ 
+    	#theme_bw() 
     tmpfactor <- setdiff(colnames(obj), c("feature", "sample", "value"))
     #if (is.null(facetNames) && length(tmpfactor)>0){
     #	tmpformula <- as.formula(paste0("~ ",tmpfactor[1]))
@@ -31,7 +31,7 @@ ggbartax.default <- function(obj, mapping=NULL, position = "stack", stat="identi
     	p <- p + facet_grid(tmpformula, scales="free_x", space="free_x")
     }
     if (settheme){
-    	p <- p + taxbartheme()
+    	p <- p + theme_taxbar()
     }
     return(p)
 }
@@ -113,20 +113,48 @@ mappingtaxda <- function(data, topn=30, count=FALSE, sampleda=NULL,
 #	return(data)
 #}
 
-
-#' @importFrom ggplot2 theme element_blank element_text unit element_rect 
-#' @keywords internal
-taxbartheme <- function(){
-    theme(axis.text.x = element_text(angle = -45, hjust = 0, size=7),
-    	  panel.grid = element_blank(),
-    	  legend.position = "bottom", 
-    	  legend.box = "horizontal", 
-    	  legend.text = element_text(size = 8), 
-    	  legend.title=element_blank(),
-    	  plot.margin=unit(c(0.2,1,0.2,0.2),"cm"),
+#' @title theme_taxbar
+#' @param axis.text.x element_text, x axis tick labels.
+#' @param legend.position character, default is "bottom".
+#' @param legend.box character, arrangement of legends, default is "horizontal".
+#' @param legend.text element_text, legend labels text.
+#' @param legend.title element_text, legend title text
+#' @param strip.text.x element_text, strip text of x
+#' @param strip.background element_rect, the background of x
+#' @param ... additional parameters
+#' @return updated ggplot object with new theme
+#' @importFrom ggplot2 theme element_blank element_text unit element_rect theme_bw
+#' @seealso \code{\link[ggplot2]{theme}}
+#' @export
+#' @examples
+#' library(ggplot2)
+#' data(test_otu_data)
+#' otubar <- ggbartax(test_otu_data, settheme=FALSE) + 
+#'     xlab(NULL) + ylab("relative abundance(%)") + 
+#'     theme_taxbar()
+theme_taxbar <- function(axis.text.x=element_text(angle = -45, hjust = 0, size=7),
+						 #panel.grid = element_blank(),
+						 legend.position = "bottom",
+						 legend.box = "horizontal",
+						 legend.text = element_text(size = 8),
+						 legend.title=element_blank(),
+						 #panel.spacing = unit(0.2, "mm"),
+						 strip.text.x=element_text(size=12, face="bold"),
+						 strip.background = element_rect(colour="white", fill="grey"),
+						 ...
+						 ){
+    theme_bw()+
+    theme(axis.text.x = axis.text.x,
+          panel.grid = element_blank(),
+          legend.position = legend.position, 
+          legend.box = legend.box, 
+          legend.text = legend.text, 
+          legend.title = legend.title,
+          plot.margin = unit(c(0.2,1,0.2,0.2),"cm"),
           panel.spacing = unit(0.2, "mm"),
-          strip.text.x = element_text(size=12, face="bold"),
-          strip.background = element_rect(colour="white", fill="grey"))
+          strip.text.x = strip.text.x,
+          strip.background = strip.background,
+		  ...)
 }
 
 ###' @title legend guides for ggbartax
