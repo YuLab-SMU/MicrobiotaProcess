@@ -16,7 +16,7 @@ ggdifftaxbar(obj, ...)
 
 \method{ggdifftaxbar}{featureMeanMedian}(obj, featurename, class, subclass,
   xtextsize = 3, factorLevels = NULL, setColors = TRUE,
-  coloslist = NULL, settheme = TRUE, ...)
+  coloslist = NULL, ...)
 }
 \arguments{
 \item{obj}{object, diffAnalysisClass see also 
@@ -51,9 +51,6 @@ use scale_color_manual setting.}
 
 \item{coloslist}{vector, color vector, if the input is phyloseq, 
 you should use this to adjust the color, not scale_color_manual.}
-
-\item{settheme}{logical, whether set the theme, default is TRUE, 
-or FALSE, then use theme and guides setting.}
 }
 \value{
 the figures of features show the distributions in samples.
