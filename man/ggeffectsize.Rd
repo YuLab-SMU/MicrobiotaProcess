@@ -9,7 +9,7 @@
 ggeffectsize(obj, ...)
 
 \method{ggeffectsize}{data.frame}(obj, factorName, effectsizename,
-  factorLevels = NULL, setColors = TRUE, settheme = TRUE, ...)
+  factorLevels = NULL, setColors = TRUE, ...)
 
 \method{ggeffectsize}{diffAnalysisClass}(obj, removeUnkown = TRUE, ...)
 }
@@ -28,9 +28,6 @@ if you want to order the levels of factor, you can set this.}
 
 \item{setColors}{logical, whether set the colors, default is TRUE, or FALSE,then 
 use scale_color_manual setting.}
-
-\item{settheme}{logical, whether set the theme, default is TRUE, or FALSE, then
-use theme and guides setting.}
 
 \item{removeUnkown}{logical, whether do not show unkown taxonomy, default is TRUE.}
 }
@@ -56,8 +53,7 @@ diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
                         secondalpha=0.01, lda=3) 
 library(ggplot2)
 effectplot <- ggeffectsize(diffres,
-                        setColors=FALSE,
-                        settheme=FALSE) +
+                        setColors=FALSE) +
               scale_color_manual(values=c('#00AED7', 
                                           '#FD9347', 
                                           '#C1E168'))+
