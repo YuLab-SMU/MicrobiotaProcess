@@ -5,7 +5,7 @@
 \title{theme_taxbar}
 \usage{
 theme_taxbar(axis.text.x = element_text(angle = -45, hjust = 0, size =
-  7), legend.position = "bottom", legend.box = "horizontal",
+  12), legend.position = "bottom", legend.box = "horizontal",
   legend.text = element_text(size = 8), legend.title = element_blank(),
   strip.text.x = element_text(size = 12, face = "bold"),
   strip.background = element_rect(colour = "white", fill = "grey"), ...)
