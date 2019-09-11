@@ -11,7 +11,7 @@ ggdiffclade(obj, ...)
 \method{ggdiffclade}{data.frame}(obj, nodedf, factorName,
   layout = "circular", size = 0.6, skpointsize = 0.8, alpha = 0.4,
   taxlevel = 6, cladetext = 2, factorLevels = NULL,
-  setColors = TRUE, settheme = TRUE, setlegend = TRUE, ...)
+  setColors = TRUE, ...)
 
 \method{ggdiffclade}{diffAnalysisClass}(obj, removeUnkown = TRUE, ...)
 }
@@ -47,12 +47,6 @@ if you want to order the levels of factor, you can set this.}
 \item{setColors}{logical, whether set the color of clade, default is TRUE, 
 or set FALSE,then use 'scale_fill_manual' setting.}
 
-\item{settheme}{logical, whether set the theme of tree, default is TRUE,
-or set FALSE, then use 'theme' setting.}
-
-\item{setlegend}{logical, whether set the legend, default is TRUE,
-or set FALSE, then use 'guides' or 'theme' setting.}
-
 \item{removeUnkown}{logical, whether do not show unkown taxonomy, 
 default is TRUE.}
 }
@@ -83,7 +77,6 @@ library(ggplot2)
 diffcladeplot <- ggdiffclade(diffres,alpha=0.3, size=0.2, 
                         skpointsize=0.4, 
                         taxlevel=3,
-                        settheme=TRUE,
                         setColors=FALSE) +
         scale_fill_manual(values=c('#00AED7', 
                                    '#FD9347', 
