@@ -132,7 +132,7 @@ mappingtaxda <- function(data, topn=30, count=FALSE, sampleda=NULL,
 #' otubar <- ggbartax(test_otu_data, settheme=FALSE) + 
 #'     xlab(NULL) + ylab("relative abundance(%)") + 
 #'     theme_taxbar()
-theme_taxbar <- function(axis.text.x=element_text(angle = -45, hjust = 0, size=7),
+theme_taxbar <- function(axis.text.x=element_text(angle = -45, hjust = 0, size=12),
 						 #panel.grid = element_blank(),
 						 legend.position = "bottom",
 						 legend.box = "horizontal",
@@ -145,6 +145,7 @@ theme_taxbar <- function(axis.text.x=element_text(angle = -45, hjust = 0, size=7
 						 ){
     theme_bw()+
     theme(axis.text.x = axis.text.x,
+	  axis.text.y = element_text(size=12),
           panel.grid = element_blank(),
           legend.position = legend.position, 
           legend.box = legend.box, 
