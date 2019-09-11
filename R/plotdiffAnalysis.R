@@ -23,10 +23,6 @@
 #' if you want to order the levels of factor, you can set this.
 #' @param setColors logical, whether set the color of clade, default is TRUE, 
 #' or set FALSE,then use 'scale_fill_manual' setting.
-#' @param settheme logical, whether set the theme of tree, default is TRUE,
-#' or set FALSE, then use 'theme' setting.
-#' @param setlegend logical, whether set the legend, default is TRUE,
-#' or set FALSE, then use 'guides' or 'theme' setting.
 #' @param ..., additional parameters.
 #' @return figures of tax clade show the significant different feature.
 #' @author Shuangbin Xu
@@ -50,7 +46,6 @@
 #' diffcladeplot <- ggdiffclade(diffres,alpha=0.3, size=0.2, 
 #'                         skpointsize=0.4, 
 #'                         taxlevel=3,
-#'                         settheme=TRUE,
 #'                         setColors=FALSE) +
 #'         scale_fill_manual(values=c('#00AED7', 
 #'                                    '#FD9347', 
@@ -67,7 +62,7 @@ ggdiffclade <- function(obj,...){
 #' @export
 ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", size=0.6, 
     skpointsize=0.8, alpha=0.4, taxlevel=6, cladetext=2, factorLevels=NULL, setColors=TRUE,
-    settheme=TRUE, setlegend=TRUE, ...){
+    ...){
     treedata <- convert_to_treedata(obj)
     layout %<>% match.arg(c("rectangular", "circular"))
     if (!is.null(factorLevels)){nodedf <- setfactorlevels(nodedf, factorLevels)}
@@ -87,9 +82,9 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", s
     	pointmapping <- aes_(x=~x,y=~y, fill=as.formula(paste("~",factorName)))
     }
     p <- p + geom_rect(data=cladecoord,aes_(fill=as.formula(paste("~",factorName)), 
-    										xmin=~xmin, ymin=~ymin, xmax=~xmax, ymax=~ymax),
-    				   alpha=alpha,
-    				   show.legend=FALSE) +
+    		                            xmin=~xmin, ymin=~ymin, xmax=~xmax, ymax=~ymax),
+    		       alpha=alpha,
+    	               show.legend=FALSE) +
     	geom_text(data=labelcoord, aes_(x=~x,y=~y, label=~label, angle=~angle), size=2) +
     	geom_point(data=cladecoord, pointmapping, shape=21)+
     	geom_point(data=annotcoord, aes_(x=0,y=0, color=~label), size=0, stroke=0) +
@@ -98,12 +93,7 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", s
     	tmpn <- length(unique(as.vector(nodedf[[match(factorName,colnames(nodedf))]])))
     	p <- p + scale_fill_manual(values=getCols(tmpn))
     }
-    if (settheme){
-    	p <- p + ggdiffcladetheme()
-    }
-    if (setlegend){
-    	p <- p + ggdiffcladeguides()
-    }
+    p <- p + theme_diffclade() + guides_diffclade() 
     return(p)
 }
 
@@ -129,9 +119,9 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
     	}
     }
     p <- ggdiffclade.data.frame(obj=taxda,
-    							nodedf=nodedfres,
-    							factorName=classname,
-    							...)
+    			        nodedf=nodedfres,
+    			        factorName=classname,
+    			        ...)
     return(p)
 }
 
@@ -155,8 +145,6 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
 #' use scale_color_manual setting.
 #' @param coloslist vector, color vector, if the input is phyloseq, 
 #' you should use this to adjust the color, not scale_color_manual.
-#' @param settheme logical, whether set the theme, default is TRUE, 
-#' or FALSE, then use theme and guides setting.
 #' @param ... additional arguments.
 #' @return the figures of features show the distributions in samples.
 #' @author Shuangbin Xu
@@ -220,12 +208,12 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
     dir.create(filepath, showWarnings = FALSE)
     for (vars in featurelist){
     	resdf <- getMeanMedian(datameta=featureda, 
-    						   feature=vars, 
-    						   subclass=subclass)
+    			       feature=vars, 
+    			       subclass=subclass)
     	p <- ggdifftaxbar.featureMeanMedian(resdf,
-    								 vars,
-    								 classname,
-    								 subclass,...)
+    				            vars,
+    					    classname,
+    					    subclass,...)
     	filename <- paste(filepath, paste0(vars,".svg"), sep="/")
     	ggsave(filename, p, device="svg", width = figwidth, height=figheight)
     }
@@ -237,7 +225,7 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
 #' @importFrom ggplot2 guide_legend element_text element_rect element_blank scale_fill_manual
 #' @export
 ggdifftaxbar.featureMeanMedian <- function(obj, featurename, class, subclass, xtextsize=3,
-    factorLevels=NULL, setColors=TRUE, coloslist=NULL, settheme=TRUE, ...){
+    factorLevels=NULL, setColors=TRUE, coloslist=NULL, ...){
     data <- obj$singlefedf
     dastatistic <- obj$singlefestat
     if (!is.null(factorLevels)){
@@ -247,19 +235,18 @@ ggdifftaxbar.featureMeanMedian <- function(obj, featurename, class, subclass, xt
     if (missing(subclass)){subclass <- class}
     p <- ggplot(data, aes_(x=~sample, y=~RelativeAbundance, fill=as.formula(paste0("~",subclass))))+
     	geom_bar(stat="identity") +
-    	geom_errorbar(data=dastatistic, aes_(x=~sample, ymax=~value, ymin=~value, linetype=~statistic), size=0.5, width=1, inherit.aes=FALSE)+
+    	geom_errorbar(data=dastatistic, aes_(x=~sample, ymax=~value, ymin=~value, linetype=~statistic), 
+	              size=0.5, width=1, inherit.aes=FALSE)+
     	scale_linetype_manual(values=c("solid", "dotted"))+
     	facet_grid(as.formula(paste0("~",class)), space="free_x", scales="free_x") + 
     	labs(title=featurename) + xlab(NULL)+
     	scale_y_continuous(expand=c(0,0), limits=c(0,max(data$RelativeAbundance)*1.05))
-    if (settheme){
-    	p <- p + theme_bw() + guides(fill= guide_legend(keywidth = 0.5, keyheight = 0.5, order=1),
-    				   linetype=guide_legend(keywidth = 0.7, keyheight = 0.5, order=2))+
-    			theme(plot.title = element_text(face="bold",lineheight=25,hjust=0.5),
-    				  panel.grid=element_blank(), legend.text = element_text(size=6.5),  legend.title=element_text(size=7),
-    				  legend.background=element_rect(fill=NA), axis.text.x=element_text(angle=-45, hjust = 0, size=xtextsize),
-    				  panel.spacing = unit(0.2, "mm"), strip.background = element_rect(colour=NA,fill="grey"))
-    }
+    p <- p + theme_bw() + guides(fill= guide_legend(keywidth = 0.5, keyheight = 0.5, order=1),
+    			   linetype=guide_legend(keywidth = 0.7, keyheight = 0.5, order=2))+
+    	 theme(plot.title = element_text(face="bold",lineheight=25,hjust=0.5),
+    	       panel.grid=element_blank(), legend.text = element_text(size=6.5),  legend.title=element_text(size=7),
+    	       legend.background=element_rect(fill=NA), axis.text.x=element_text(angle=-45, hjust = 0, size=xtextsize),
+    	       panel.spacing = unit(0.2, "mm"), strip.background = element_rect(colour=NA,fill="grey"))
     if (setColors){
     	if (is.null(coloslist)){
     		tmpn <- length(unique(as.vector(data[[match(subclass,colnames(data))]])))
@@ -296,7 +283,6 @@ ggdifftaxbar.featureMeanMedian <- function(obj, featurename, class, subclass, xt
 #' #fplot <- ggdifftaxbar(feameamed, featurename="p__Actinobacteria", 
 #' #                     class="oxygen_availability", subclass="body_site")
 getMeanMedian <- function(datameta, feature, subclass){
-    #featureda <- merge(data,sampleda,by=0) %>% rename(sample=Row.names)
     RelativeAbundance <- NULL
     factornames <- colnames(datameta)[!unlist(vapply(datameta,is.numeric,logical(1)))]
     featuredatmp <- datameta %>% rownames_to_column(var="sample") %>%
@@ -324,8 +310,6 @@ getMeanMedian <- function(datameta, feature, subclass){
 #' if you want to order the levels of factor, you can set this.
 #' @param setColors logical, whether set the colors, default is TRUE, or FALSE,then 
 #' use scale_color_manual setting.
-#' @param settheme logical, whether set the theme, default is TRUE, or FALSE, then
-#' use theme and guides setting.
 #' @param ... additional arguments.
 #' @return the figures of effect size show the LDA or MeanDecreaseAccuracy.
 #' @author Shuangbin Xu
@@ -346,8 +330,7 @@ getMeanMedian <- function(datameta, feature, subclass){
 #'                         secondalpha=0.01, lda=3) 
 #' library(ggplot2)
 #' effectplot <- ggeffectsize(diffres,
-#'                         setColors=FALSE,
-#'                         settheme=FALSE) +
+#'                         setColors=FALSE) +
 #'               scale_color_manual(values=c('#00AED7', 
 #'                                           '#FD9347', 
 #'                                           '#C1E168'))+
@@ -370,7 +353,6 @@ ggeffectsize.data.frame <- function(obj,
     effectsizename,
     factorLevels=NULL,
     setColors=TRUE,
-    settheme=TRUE,
     ...){
     if (effectsizename %in% "LDA"){
     	xlabtext <- bquote(paste(Log[10],"(",.("LDA"), ")"))
@@ -381,31 +363,30 @@ ggeffectsize.data.frame <- function(obj,
     	obj <- setfactorlevels(obj,factorLevels)
     }
     p <- ggplot(data=obj, 
-    			aes_(x=as.formula(paste0("~",effectsizename)),
-    				 y=~f)) + 
+    	        aes_(x=as.formula(paste0("~",effectsizename)),
+    		     y=~f)) + 
     	geom_segment(aes_(xend=0, yend=~f), 
-    				 color="grey") + 
+    		     color="grey") + 
     	geom_point(aes_(color=as.formula(paste0("~",factorName)))) +
     	facet_grid(as.formula(paste0(factorName," ~.")),
     			   scales = "free_y", space = "free_y")+
     	scale_x_continuous(expand=c(0,0), 
-    					   limits=c(0, max(obj[[effectsizename]])*1.1))+
+    			   limits=c(0, max(obj[[effectsizename]])*1.1))+
     	ylab(NULL) +
     	xlab(xlabtext) 
     if (setColors){
     	tmpn <- length(unique(as.vector(obj[[factorName]])))
     	p <- p + scale_color_manual(values=getCols(tmpn))
     }
-    if (settheme){
-    	p <- p + theme_bw()+
-    			theme(axis.text.y = element_text(size=7),
-    				   panel.grid=element_blank(),
-    				   panel.spacing = unit(0.2, "mm"),
-    				   legend.title=element_text(size=7),
-    				   legend.text=element_text(size=6),
-    				   strip.background = element_rect(colour=NA, 
-    												   fill="grey"))
-    }
+    p <- p + theme_bw()+
+    	theme(axis.text.y = element_text(size=12),
+	      axis.text.x = element_text(size=12),
+      	      panel.grid=element_blank(),
+    	      panel.spacing = unit(0.2, "mm"),
+    	      legend.title=element_text(size=10),
+    	      legend.text=element_text(size=8),
+    	      strip.background = element_rect(colour=NA, 
+    				   fill="grey"))
     return(p)
 }
 
@@ -424,9 +405,9 @@ ggeffectsize.diffAnalysisClass <- function(obj, removeUnkown=TRUE,...){
     	effectsizename <- "MeanDecreaseAccuracy" 
     }
     p <- ggeffectsize.data.frame(obj=efres, 
-    							 factorName=classname, 
-    							 effectsizename=effectsizename,
-    							 ...)
+    			         factorName=classname, 
+    			         effectsizename=effectsizename,
+    			          ...)
     return (p)
 }
 
@@ -447,21 +428,22 @@ getnode <- function(treedata, nodedf){
 
 
 #' @importFrom ggtree ggtree
+#' @importFrom ggtree geom_point
 #' @keywords internal
 treeskeleton <- function(treedata, layout, size, pointsize=1){
     p <- ggtree(treedata,
-    			layout=layout,
-    			size=size) +
+    	        layout=layout,
+    	        size=size) +
     	 geom_point(size=pointsize,
-    				shape=21, 
-    				fill="white",
-    				color="black")
+    		    shape=21, 
+    		    fill="white",
+    		    color="black")
     return(p)
 }
 
 #' @importFrom ggplot2 guides guide_legend
 #' @keywords internal
-ggdiffcladeguides <- function(...){
+guides_diffclade <- function(...){
     guides(fill= guide_legend(keywidth = 0.5, keyheight = 0.5, order=1),
     	   size=guide_legend(keywidth = 0.5, keyheight = 0.5, order=2),
     	   color = guide_legend(keywidth = 0.1, ncol=1, keyheight = 0.6, order = 3),...)
@@ -469,7 +451,7 @@ ggdiffcladeguides <- function(...){
 
 #' @importFrom ggplot2 theme unit element_text element_rect margin
 #' @keywords internal
-ggdiffcladetheme <- function(...){
+theme_diffclade <- function(...){
     theme(legend.position="right",
     	  legend.margin=margin(0,0,0,0),
     	  legend.spacing.y = unit(0.02, "cm"),
