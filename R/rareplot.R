@@ -19,29 +19,25 @@ ggrarecurve.default <- function(obj,
     ...){
     if (is.null(mapping)){
     	obj <- stat_rare(data=obj,
-    					  chunks=chunks,
-    					  sampleda=sampleda,
-    					  factorLevels=factorLevels,
-    					  plotda=TRUE)
+    		         chunks=chunks,
+    		         sampleda=sampleda,
+    	                 factorLevels=factorLevels,
+             	         plotda=TRUE)
     	mapping <- aes_string(x="readsNums", y="value", color="sample")
     	if (!missing(factorNames)){
-    	    #tmpcolor <- as.formula(paste0("~", factorNames))
     		mapping <- modifyList(mapping,
     		           aes_string(color="factorNames"))
     	}
     }
     if (!is.null(indexNames)){
-    	#obj <- obj %>% filter(eval(parse(text="Alpha")) %in% indexNames)
-		obj <- obj %>% filter(.data$Alpha %in% indexNames)
+        obj <- obj %>% filter(.data$Alpha %in% indexNames)
     }
     p <- ggplot(data=obj, mapping=mapping) +
-    	 stat_smooth(se=se, method = method, size=linesize,formula = formula,
+    	 stat_smooth(se=se, method = method, 
+	             size=linesize,formula = formula,
     			...) 
-    #if (!missing(nrows)){
-    p <- p + facet_wrap(~ Alpha, scales="free", nrow=facetnrow)
-    #}else{
-    #	p <- p + facet_wrap(~ Alpha, scales="free")
-    #}
+    p <- p + facet_wrap(~ Alpha, scales="free", nrow=facetnrow) +
+	 ylab("alpha metric")+xlab("number of reads")
     return(p)
 }
 
@@ -141,6 +137,7 @@ predictdf.lm <- function(model, xseq, se, level) {
     }
     # add the x=zero ,y=zero
     res <- rbind(rep(0, ncol(res)), res)
+    res <- res[res$y>=0,]
     return(res)
 }  
 
