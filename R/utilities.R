@@ -140,7 +140,8 @@ duplicatedtaxcheck <- function(taxdf){
 #' @keywords internal
 repduplicatedtaxcheck <- function(taxdf){
     for (i in seq_len(7)){
-    	taxdf <- duplicatedtaxcheck(taxdf) %>% column_to_rownames(var="rowname")
+    	taxdf <- duplicatedtaxcheck(taxdf) %>% 
+		column_to_rownames(var="rowname")
     }
     return(taxdf)
 }
@@ -148,10 +149,10 @@ repduplicatedtaxcheck <- function(taxdf){
 #' @keywords internal
 getcall <- function(obj, arg){
     if (!"call" %in% slotNames(obj)){
-		stop("The object don't have call slot!")
-	}else{
-	    callres <- as.list(obj@call)
+	stop("The object don't have call slot!")
+    }else{
+        callres <- as.list(obj@call)
         argres <- callres[[match(arg,names(callres))]]
         return(argres)
-	}
+    }
 }
