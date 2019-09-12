@@ -73,11 +73,7 @@ sampledflist <- function(dalist,
     bootnums=30, 
     ratio=0.7, 
     makerownames=FALSE){
-    #randomSeed=FALSE){
     datalist <- list()
-    #if (as(randomSeed, "logical")){
-    #	set.seed(randomSeed)
-    #}
     for (i in seq_len(bootnums)){
     	res <- lapply(dalist,function(x){x[sample(nrow(x), trunc(nrow(x)*ratio)),,drop=FALSE]})
     	res <- do.call("rbind", c(res, make.row.names=makerownames))
