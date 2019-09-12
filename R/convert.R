@@ -26,7 +26,7 @@ convert_to_treedata <- function(data,...){
     index[!isTip] <- seq(sum(isTip)+2,length(isTip)+1)
     mapping <- data.frame(node=index, labelnames=as.vector(datalist$child), isTip)
     mapping$nodeClass <- unlist(lapply(as.vector(mapping$labelnames),
-    								   function(x)(unlist(strsplit(x,"__"))[1])))
+    		   		       function(x)(unlist(strsplit(x,"__"))[1])))
     mapping$nodeSize <- 1
     parentnode <- mapping[match(as.vector(datalist$parent), as.vector(mapping$labelnames)),]$node 
     childnode <- mapping[match(as.vector(datalist$child), as.vector(mapping$labelnames)),]$node
@@ -34,13 +34,13 @@ convert_to_treedata <- function(data,...){
     colnames(edges) <- NULL
     edges[is.na(edges)] <- sum(isTip) + 1
     root <- data.frame(node=sum(isTip)+1,labelnames="r__root",
-    				   isTip=FALSE, nodeClass="r", nodeSize=1)
+    		       isTip=FALSE, nodeClass="r", nodeSize=1)
     mapping <- rbind(root, mapping)
     mapping <- mapping[order(mapping$node),]
     node.label <- as.vector(mapping$labelnames)[!mapping$isTip]
     tip.label <- as.vector(mapping$labelnames)[mapping$isTip]
     taxphylo <- structure(list(edge=edges, node.label=node.label,
-    						   tip.label=tip.label, edge.length=rep(0.5, nrow(edges)),
-    						   Nnode = length(node.label)), class="phylo") 
+    			       tip.label=tip.label, edge.length=rep(0.5, nrow(edges)),
+    			       Nnode = length(node.label)), class="phylo") 
     res <- new("treedata", phylo=taxphylo, data=as_tibble(mapping))
 }
