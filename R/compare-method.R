@@ -64,9 +64,9 @@ diffAnalysis <- function(obj, ...){
 #' @importFrom stats p.adjust
 #' @export
 diffAnalysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=NULL,alltax=TRUE, mlfun="lda", 
-    ratio=0.7,	firstcomfun='kruskal.test',	padjust="fdr",filtermod="pvalue",
-    firstalpha=0.05, strictmod=TRUE, fcfun="generalizedFC",	secondcomfun="wilcox.test",
-    clmin=5, clwilc=TRUE, secondalpha=0.05,	subclmin=3,	subclwilc=TRUE,	ldascore=2,
+    ratio=0.7, firstcomfun='kruskal.test', padjust="fdr",filtermod="pvalue",
+    firstalpha=0.05, strictmod=TRUE, fcfun="generalizedFC", secondcomfun="wilcox.test",
+    clmin=5, clwilc=TRUE, secondalpha=0.05, subclmin=3, subclwilc=TRUE,	ldascore=2,
     normalization=1000000, bootnums=30,	...){
     if (!is.null(taxda)){taxda <- fillNAtax(taxda)
     	if (alltax){obj <- getalltaxdf(obj, taxda)}
@@ -122,11 +122,11 @@ diffAnalysis.phyloseq <- function(obj, ...){
     sampleda <- checksample(obj)
     taxda <- tax_table(obj)
     res <- diffAnalysis.data.frame(obj=otuda, 
-    						sampleda=sampleda, 
-    						#class=class,
-    						#subclass=subclass,
-    						taxda=taxda,
-    						...)
+    			           sampleda=sampleda, 
+    				   #class=class,
+    				   #subclass=subclass,
+    				   taxda=taxda,
+    				   ...)
     return(res)
 }
 
@@ -146,29 +146,35 @@ getalltaxdf <- function(data, taxda){
     return(dt)
 }
 
-#' @title get the table of diffAnalysisClass
-#' @param obj object, diffAnalysisClass
-#' @return a data.frame contained results of diffAnalysis
+###' @title get the table of diffAnalysisClass
+###' @param x object, diffAnalysisClass
+###' @param ..., additional parameters
+###' @return a data.frame contained results of diffAnalysis
+###' @export
+###' @examples
+###' data(kostic2012crc)
+###' kostic2012crc
+###' head(phyloseq::sample_data(kostic2012crc),3)
+###' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
+###' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
+###' set.seed(1024)
+###' diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
+###'                         mlfun="lda", filtermod="fdr",
+###'                         firstcomfun = "kruskal.test",
+###'                         firstalpha=0.05, strictmod=TRUE,
+###'                         secondcomfun = "wilcox.test",
+###'                         subclmin=3, subclwilc=TRUE,
+###'                         secondalpha=0.01, lda=3)
+###' restab <- as.data.frame(diffres)
+###' head(restab)
+##base::as.data.frame
+
+#' @method as.data.frame diffAnalysisClass
+#' @rdname as.data.frame
 #' @export
-#' @examples
-#' data(kostic2012crc)
-#' kostic2012crc
-#' head(phyloseq::sample_data(kostic2012crc),3)
-#' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
-#' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
-#' set.seed(1024)
-#' diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
-#'                         mlfun="lda", filtermod="fdr",
-#'                         firstcomfun = "kruskal.test",
-#'                         firstalpha=0.05, strictmod=TRUE,
-#'                         secondcomfun = "wilcox.test",
-#'                         subclmin=3, subclwilc=TRUE,
-#'                         secondalpha=0.01, lda=3)
-#' restab <-tidydiffAnalysis(diffres)
-#' head(restab)
-tidydiffAnalysis <- function(obj){
-    efres <- tidyEffectSize(obj)
-    kwres <- obj@kwres
+as.data.frame.diffAnalysisClass <- function(x,...){
+    efres <- tidyEffectSize(x)
+    kwres <- x@kwres
     difftb <- merge(efres, kwres, by.x="f", by.y="f")
     return(difftb)
 }
