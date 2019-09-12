@@ -39,9 +39,9 @@ generalizedFC <- function(x, ...){
 #' @export
 generalizedFC.default <- function(x, y, base=10, steps=0.05, pseudo=0.00001,...){
     x.q <- quantile(log(x+pseudo, base), 
-					probs=seq(.05, .95, steps), na.rm=TRUE,...)
+		probs=seq(.05, .95, steps), na.rm=TRUE,...)
     y.q <- quantile(log(y+pseudo, base), 
-					probs=seq(.05, .95, steps), na.rm=TRUE,...)
+		probs=seq(.05, .95, steps), na.rm=TRUE,...)
     x.mean <- mean(x)
     x.med <- median(x)
     y.mean <- mean(y)
