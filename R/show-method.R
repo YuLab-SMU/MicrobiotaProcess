@@ -45,7 +45,7 @@ setMethod("show",
       cat(paste0("after second test (",secondfun,") number of significantly discriminative feature:", 
       		   nrow(secondvars)),
       		   fill=TRUE)
-      mlres <- tidydiffAnalysis(object) 
+      mlres <- as.data.frame(object) 
       uncertain <- length(grep("__un_", mlres$f))
       mlmethod <- getcall(object, "mlfun")
       cat(paste0("after ",mlmethod,", Number of discriminative features: ", 
