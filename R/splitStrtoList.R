@@ -5,9 +5,9 @@
 #' @param strdataframe dataframe; a dataframe contained one column to split.
 #' @param prefix character; the result dataframe columns names prefix, default is "tax".
 #' @param sep character; the field separator character, default is "; ".
-#' @param extra character; See \code{[tidyr]{separate}} details.
-#' @param fill character; See \code{[tidyr]{separate}} details.
-#' @param ..., Additional arguments passed to \code{[tidyr]{separate}}.
+#' @param extra character; See \code{\link[tidyr]{separate}} details.
+#' @param fill character; See \code{\link[tidyr]{separate}} details.
+#' @param ..., Additional arguments passed to \code{\link[tidyr]{separate}}.
 #' @return data.frame of strdataframe by sep.
 #' @export
 #' @author Shuangbin Xu
@@ -34,14 +34,15 @@ splitStrtoList <- function(strdataframe,
     extra <- match.arg(extra, c("drop","warn","merge"))
     fill <- match.arg(fill, c("warn", "right", "left"))
     colstr <- colnames(strdataframe)
-    tmplength <- length(strsplit(as.character(strdataframe[1,1]), sep)[[1]])
+    tmplength <- max(unlist(lapply(strsplit(as.vector(strdataframe[,1]), sep),
+		         function(x)length(x))))
     newcolnames <- paste(prefix, rep(seq_len(tmplength)), sep="")
-    tmpdata <- separate(strdataframe, 
-    			      colstr,
-    			      newcolnames,
-    			      sep=sep,
-    			      extra = "drop", 
-    			      fill = "right",...
-    			      )
+    tmpdata <- suppressWarnings(separate(strdataframe, 
+                                         colstr,
+                                         newcolnames,
+                                         sep=sep,
+                                         extra = "warn", 
+                                         fill = "warn",
+                                         ...))
     return(tmpdata)
 }
