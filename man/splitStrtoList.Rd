@@ -14,11 +14,11 @@ splitStrtoList(strdataframe, prefix = "tax", sep = "; ",
 
 \item{sep}{character; the field separator character, default is "; ".}
 
-\item{extra}{character; See \code{[tidyr]{separate}} details.}
+\item{extra}{character; See \code{\link[tidyr]{separate}} details.}
 
-\item{fill}{character; See \code{[tidyr]{separate}} details.}
+\item{fill}{character; See \code{\link[tidyr]{separate}} details.}
 
-\item{..., }{Additional arguments passed to \code{[tidyr]{separate}}.}
+\item{..., }{Additional arguments passed to \code{\link[tidyr]{separate}}.}
 }
 \value{
 data.frame of strdataframe by sep.
