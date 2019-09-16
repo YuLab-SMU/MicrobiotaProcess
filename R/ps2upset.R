@@ -35,6 +35,7 @@ setGeneric("ps2upset", function(obj, ...)standardGeneric("ps2upset"))
 
 #' @aliases ps2upset,data.frame
 #' @rdname ps2upset
+#' @importFrom stats na.omit
 #' @export
 setMethod("ps2upset", "data.frame", function(obj, sampleda, factorNames, threshold=0, ...){
     flaglen <- length(na.omit(match(rownames(obj),rownames(sampleda))))
