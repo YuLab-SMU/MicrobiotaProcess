@@ -32,15 +32,16 @@
 #' phyratios <- CountOrRatios(otuda, taxdf[,2,drop=FALSE], 
 #'                            countmode=FALSE)
 CountOrRatios <- function(data, 
-			     featurelist, 
-			     countmode=TRUE, 
-			     #percentmode=FALSE,
-			     multiplenum=1, 
-			     rownamekeep=FALSE){
-    if (!is.null(featurelist)){
-    	data <- merge(data, featurelist, by=0)
-    	rownames(data) <- data$Row.names
-    	data$Row.names <- NULL
+                          featurelist, 
+                          countmode=TRUE, 
+                          multiplenum=1, 
+                          rownamekeep=FALSE){
+    if (missing(featurelist) || is.null(featurelist)){
+        data <- data
+    }else{
+        data <- merge(data, featurelist, by=0)
+        rownames(data) <- as.vector(data$Row.names)
+        data$Row.names <- NULL
     }
     nums <- !unlist(lapply(data, is.numeric))
     group <- names(data[,nums,drop=FALSE])
@@ -52,9 +53,6 @@ CountOrRatios <- function(data,
        	data <- data.frame(prop.table(as.matrix(data), 2), check.names=FALSE, stringsAsFactors=FALSE)
     	data <- data*multiplenum
     }
-    #  	if (!isTRUE(countmode) && isTRUE(percentmode)){
-    #   	data <- data*100
-    #}
     if (isTRUE(rownamekeep)){
     	data <- data.frame(cbind(feature=rownames(data), data), check.names=FALSE, stringsAsFactors=FALSE)
     }
