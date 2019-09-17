@@ -3,11 +3,12 @@
 #' @description
 #' caculate the alpha index (Obseve,Chao1,Shannon,Simpson) of sample
 #' with \code{\link[vegan]{diversity}}
-#' @param data data.frame, (nrow sample * ncol taxonomy(feature))
+#' @param obj object, data.frame of (nrow sample * ncol taxonomy(feature)) 
+#' or phyloseq.
 #' @param mindepth numeric, Subsample size for rarefying community.
+#' @param ..., additional arguments.
 #' @return data.frame contained alpha Index.
 #' @author ShuangbinXu
-#' @importFrom vegan rrarefy estimateR diversity specnumber
 #' @export
 #' @examples
 #' library(tidyverse)
@@ -22,31 +23,64 @@
 #' set.seed(1024)
 #' alphatab <- alphaindex(otuda)
 #' head(alphatab)
-alphaindex <- function(data,mindepth=NULL){
-    if (is.data.frame(data)){
-           data <- data[,colSums(data)>0,drop=FALSE]
-    }else{
-           data <- data[data>0]}
-    x <- as.matrix(data)
-    if (!identical(all.equal(x, round(x)),TRUE)){
-           stop("the data should be integer (counts)")
+#' data(test_otu_data)
+#' class(test_otu_data)
+#' set.seed(1024)
+#' alphatab2 <- alphaindex(test_otu_data)
+#' head(alphatab2)
+setGeneric("alphaindex", function(obj, ...){standardGeneric("alphaindex")})
+
+#' @aliases alphaindex,matrix
+#' @rdname alphaindex
+#' @importFrom vegan rrarefy estimateR diversity specnumber
+#' @export
+setMethod("alphaindex", "matrix", function(obj, mindepth,...){
+    if (!identical(all.equal(obj, round(obj)),TRUE)){
+           stop("the data should be integer (counts)!")
     }
-    if (is.null(mindepth) || missing(mindepth)){
-           mindepth = min(rowSums(data))
+    if (missing(mindepth) || is.null(mindepth)){
+           mindepth = min(rowSums(obj))
     }
-    x <- rrarefy(data, mindepth)
-    Chao <- estimateR(x)
-    Shannon <- diversity(x)
-    Simpson <- diversity(x, index="simpson")
-    J <- Shannon/log(specnumber(x))
+    obj <- rrarefy(obj, mindepth)
+    Chao <- estimateR(obj)
+    Shannon <- diversity(obj)
+    Simpson <- diversity(obj, index="simpson")
+    J <- Shannon/log(specnumber(obj))
     alpha <- data.frame(Observe=Chao[1,],
                         Chao1=Chao[2,],
                         ACE=Chao[4,],
                         Shannon,
                         Simpson,
                         J)
-    #attr(alpha, "indexs") <- alpha
-    #attr(alpha, "class") <- "Alpha"
     return(alpha)
-}     
+})     
+
+#' @aliases alphaindex,data.frame
+#' @rdname alphaindex
+#' @export
+setMethod("alphaindex", "data.frame", function(obj, ...){
+    obj <- obj[,colSums(obj)>0,drop=FALSE]
+    obj <- as.matrix(obj)
+    alpha <- alphaindex(obj, ...)
+    return(alpha)
+})
+
+#' @aliases alphaindex,integer
+#' @rdname alphaindex
+#' @export
+setMethod("alphaindex", "integer", function(obj, ...){
+    obj <- obj[obj>0]
+    obj <- as.matrix(obj)
+    alpha <- alphaindex(obj, ...)
+    return(alpha)
+})
+
+#' @aliases alphaindex,phyloseq
+#' @rdname alphaindex
+#' @export
+setMethod("alphaindex", "phyloseq", function(obj, ...){
+    otuda <- checkotu(obj)
+    alpha <- alphaindex(otuda, ...)
+    return(alpha)
+})
 
