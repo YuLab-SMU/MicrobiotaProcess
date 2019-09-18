@@ -22,12 +22,12 @@
 #'           data.frame(check.names=FALSE)
 #' set.seed(1024)
 #' alphatab <- alphaindex(otuda)
-#' head(alphatab)
+#' head(as.data.frame(alphatab))
 #' data(test_otu_data)
 #' class(test_otu_data)
 #' set.seed(1024)
 #' alphatab2 <- alphaindex(test_otu_data)
-#' head(alphatab2)
+#' head(as.data.frame(alphatab2))
 setGeneric("alphaindex", function(obj, ...){standardGeneric("alphaindex")})
 
 #' @aliases alphaindex,matrix
