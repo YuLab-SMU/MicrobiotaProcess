@@ -18,6 +18,20 @@ setClassUnion("prcompOrNull", c("prcomp", "pcoa", "NULL"))
 #' @keywords internal
 setClassUnion("dataframeOrNull", c("data.frame", "NULL"))
 
+#' @title alphasample class
+#' @docType class
+#' @slot alpha data.frame contained alpha metrics of samples
+#' @slot sampleda associated sample information
+#' @name alphasample-class
+#' @rdname alphasample-class
+#' @exportClass alphasample
+setClass("alphasample",
+    representation=representation(
+        alpha="dataframeOrNull",
+	sampleda="dataframeOrNull"),
+    prototype=prototype(alpha=NULL,sampleda=NULL)
+)
+
 #' @title pcasample class
 #' @docType class
 #' @slot pca prcomp or pcoa object 
@@ -28,7 +42,6 @@ setClassUnion("dataframeOrNull", c("data.frame", "NULL"))
 setClass("pcasample",
     representation=representation(
         pca="prcompOrNull",
-        #varcontrib="VarContrib",
         sampleda="dataframeOrNull"),
     prototype=prototype(pca=NULL, sampleda=NULL))
 
@@ -116,14 +129,10 @@ setClass("diffAnalysisClass",
     secondvars="listOrNull",
     mlres="dataframeOrNull",
     call="callOrNull"),
-    #classname="characterOrNull",
-    #normalization="numericOrNull"),
     prototype=prototype(originalD=NULL,
     sampleda=NULL,
     taxda=NULL,
     kwres=NULL,
     secondvars=NULL,
     mlres=NULL,
-	call=NULL))
-    #classname=NULL,
-    #normalization=NULL))
+    call=NULL))
