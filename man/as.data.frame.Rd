@@ -2,9 +2,12 @@
 % Please edit documentation in R/compare-method.R
 \name{as.data.frame.diffAnalysisClass}
 \alias{as.data.frame.diffAnalysisClass}
+\alias{as.data.frame.alphasample}
 \title{get the table of diffAnalysisClass}
 \usage{
 \method{as.data.frame}{diffAnalysisClass}(x, ...)
+
+\method{as.data.frame}{alphasample}(x, ...)
 }
 \arguments{
 \item{x}{object, diffAnalysisClass}
