@@ -179,6 +179,14 @@ as.data.frame.diffAnalysisClass <- function(x,...){
     return(difftb)
 }
 
+#' @method as.data.frame alphasample
+#' @rdname as.data.frame
+#' @export
+as.data.frame.alphasample <- function(x, ...){
+    dat <- x@alpha
+    return(dat)
+}
+
 #' @keywords internal
 tidyEffectSize <- function(obj){
     f <- LDA <- MeanDecreaseAccuracy <- NULL
@@ -190,15 +198,14 @@ tidyEffectSize <- function(obj){
     	efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)), LDA)]))
     }else{
     	efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)),
-    														   MeanDecreaseAccuracy)]))
+                                                         MeanDecreaseAccuracy)]))
     }
     return(efres)
 }
 
 #' @keywords internal
 getsecondTRUEvar <- function(obj){
-    secondvars <- do.call("rbind",c(obj@secondvars,
-    								make.row.names=FALSE))
+    secondvars <- do.call("rbind",c(obj@secondvars,make.row.names=FALSE))
     secondvars <- secondvars %>% filter(eval(parse(text="gfc"))%in%"TRUE")
     return(secondvars)
 }
