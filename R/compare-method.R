@@ -184,6 +184,11 @@ as.data.frame.diffAnalysisClass <- function(x,...){
 #' @export
 as.data.frame.alphasample <- function(x, ...){
     dat <- x@alpha
+    if (!is.null(x@sampleda)){
+        dat <- merge(dat, x@sampleda, by=0)
+        rownames(dat) <- as.vector(dat$Row.names)
+        dat$Row.names <- NULL
+    }
     return(dat)
 }
 
