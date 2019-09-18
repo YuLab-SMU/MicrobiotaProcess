@@ -15,7 +15,7 @@
 \usage{
 alphaindex(obj, ...)
 
-\S4method{alphaindex}{matrix}(obj, mindepth, ...)
+\S4method{alphaindex}{matrix}(obj, mindepth, sampleda, ...)
 
 \S4method{alphaindex}{data.frame}(obj, ...)
 
@@ -27,9 +27,11 @@ alphaindex(obj, ...)
 \item{obj}{object, data.frame of (nrow sample * ncol taxonomy(feature)) 
 or phyloseq.}
 
-\item{..., }{additional arguments.}
+\item{...}{additional arguments.}
 
 \item{mindepth}{numeric, Subsample size for rarefying community.}
+
+\item{sampleda}{data.frame,sample information, row sample * column factors.}
 }
 \value{
 data.frame contained alpha Index.
@@ -40,7 +42,6 @@ with \code{\link[vegan]{diversity}}
 }
 \examples{
 library(tidyverse)
-library(vegan)
 otudafile <- system.file("extdata", "otu_tax_table.txt", 
                         package="MicrobiotaProcess")
 otuda <- read.table(otudafile, sep="\\t", 
@@ -50,12 +51,12 @@ otuda <- otuda[sapply(otuda, is.numeric)] \%>\% t() \%>\%
           data.frame(check.names=FALSE)
 set.seed(1024)
 alphatab <- alphaindex(otuda)
-head(alphatab)
+head(as.data.frame(alphatab))
 data(test_otu_data)
 class(test_otu_data)
 set.seed(1024)
 alphatab2 <- alphaindex(test_otu_data)
-head(alphatab2)
+head(as.data.frame(alphatab2))
 }
 \author{
 ShuangbinXu
