@@ -39,7 +39,8 @@ Imports:
   grDevices,
   stats,
   utils,
-  coin
+  coin,
+  ggsignif
 Suggests:
   DT,
   prettydoc,
