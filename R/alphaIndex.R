@@ -6,13 +6,13 @@
 #' @param obj object, data.frame of (nrow sample * ncol taxonomy(feature)) 
 #' or phyloseq.
 #' @param mindepth numeric, Subsample size for rarefying community.
-#' @param ..., additional arguments.
+#' @param sampleda data.frame,sample information, row sample * column factors.
+#' @param ... additional arguments.
 #' @return data.frame contained alpha Index.
 #' @author ShuangbinXu
 #' @export
 #' @examples
 #' library(tidyverse)
-#' library(vegan)
 #' otudafile <- system.file("extdata", "otu_tax_table.txt", 
 #'                         package="MicrobiotaProcess")
 #' otuda <- read.table(otudafile, sep="\t", 
@@ -34,7 +34,7 @@ setGeneric("alphaindex", function(obj, ...){standardGeneric("alphaindex")})
 #' @rdname alphaindex
 #' @importFrom vegan rrarefy estimateR diversity specnumber
 #' @export
-setMethod("alphaindex", "matrix", function(obj, mindepth,...){
+setMethod("alphaindex", "matrix", function(obj, mindepth, sampleda,...){
     if (!identical(all.equal(obj, round(obj)),TRUE)){
            stop("the data should be integer (counts)!")
     }
@@ -52,6 +52,12 @@ setMethod("alphaindex", "matrix", function(obj, mindepth,...){
                         Shannon,
                         Simpson,
                         J)
+    if (missing(sampleda)){
+        sampleda <- NULL
+    }
+    alpha <- new("alphasample",
+                 alpha=alpha,
+		 sampleda=sampleda)
     return(alpha)
 })     
 
@@ -72,6 +78,7 @@ setMethod("alphaindex", "integer", function(obj, ...){
     obj <- obj[obj>0]
     obj <- as.matrix(obj)
     alpha <- alphaindex(obj, ...)
+    alpha <- alpha@alpha
     return(alpha)
 })
 
@@ -80,7 +87,8 @@ setMethod("alphaindex", "integer", function(obj, ...){
 #' @export
 setMethod("alphaindex", "phyloseq", function(obj, ...){
     otuda <- checkotu(obj)
-    alpha <- alphaindex(otuda, ...)
+    sampleda <- checksample(obj)
+    alpha <- alphaindex(obj=otuda, sampleda=sampleda,...)
     return(alpha)
 })
 
