@@ -104,10 +104,10 @@ get_taxdf.phyloseq <- function(obj, taxlevel=2, ...){
     }
     #taxlevel <- rank_names(obj)[taxlevel]
     taxdf <- get_taxdf.default(obj=otuda, 
-    						  taxda=taxdf, 
-    						  taxlevel=taxlevel,
-    						  sampleda=sampleda,
-    						  taxa_are_rows=FALSE,...)
+                               taxda=taxdf, 
+                               taxlevel=taxlevel,
+                               sampleda=sampleda,
+                               taxa_are_rows=FALSE,...)
     return(taxdf)
 }
 
@@ -116,10 +116,10 @@ get_taxdf.phyloseq <- function(obj, taxlevel=2, ...){
 #' @rdname get_taxdf
 #' @export 
 get_taxdf.default <- function(obj, taxda, 
-							 taxa_are_rows,
-							 taxlevel,
-							 sampleda=NULL,
-							 ...){
+                              taxa_are_rows,
+                              taxlevel,
+                              sampleda=NULL,
+                              ...){
     if (!taxa_are_rows){
     	obj <- data.frame(t(obj), check.names=FALSE)
     }
@@ -129,12 +129,12 @@ get_taxdf.default <- function(obj, taxda,
     taxda <- fillNAtax(taxda)
     tmptax <- taxda[,match(taxlevel, colnames(taxda)), drop=FALSE]
     taxdf <- otu_table(CountOrRatios(data=obj, 
-    								 tmptax, 
-    								 rownamekeep=FALSE,...), 
-    				   taxa_are_rows=TRUE)
+                                     tmptax, 
+                                     rownamekeep=FALSE,...), 
+                                     taxa_are_rows=TRUE)
     taxdf <- new("phyloseq",
-    			 otu_table=taxdf,
-    			 sam_data=sampleda)
+                 otu_table=taxdf,
+                 sam_data=sampleda)
     return(taxdf)
     
 }
@@ -143,17 +143,17 @@ get_taxdf.default <- function(obj, taxda,
 #' @param obj phyloseq, phyloseq class or data.frame
 #' shape of data.frame (nrow sample * ncol feature (factor)) 
 #' or ' the data.frame for stat_smooth.
-#' @param mapping, set of aesthetic mapping of ggplot2, default is NULL,
+#' @param mapping set of aesthetic mapping of ggplot2, default is NULL,
 #' if the data is the data.frame for stat_smooth, the mapping should be set. 
 #' @param linesize integer, default is 0.5. 
 #' @param chunks integer, the number of subsample in a sample,
 #'  default is 400.
-#' @param sampleda, data.frame, (nrow sample * ncol factor)
+#' @param sampleda data.frame, (nrow sample * ncol factor)
 #' @param factorNames character, default is missing.
-#' @param facetnrow, the nrow of facet, default is 1.
+#' @param facetnrow integer, the nrow of facet, default is 1.
 #' @param factorLevels list, the levels of the factors, default is NULL,
 #' if you want to order the levels of factor, you can set this.
-#' @param indexNames vector character, default is "Observe",
+#' @param indexNames character, default is "Observe",
 #' only for "Observe", "Chao1", "ACE", "Shannon", "Simpson", "J".
 #' @param se logical, default is FALSE.
 #' @param method character, default is lm. 
@@ -226,8 +226,8 @@ get_vennlist.phyloseq <- function(obj, ...){
     sampleda <- checksample(obj)
     #tmpfactors <- colnames(sampleda)[factorNamesIndex]
     vennlist <- get_vennlist.default(obj=otuda,
-    								sampleinfo=sampleda,
-    								#factorNames=factorNames,
-    								...)
+                                     sampleinfo=sampleda,
+                                     #factorNames=factorNames,
+                                     ...)
     return(vennlist)
 }
