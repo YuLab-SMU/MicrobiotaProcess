@@ -23,16 +23,16 @@ or ' the data.frame for stat_smooth.}
 \item{...}{additional parameters, 
 see also \code{\link{ggplot2}{ggplot}}.}
 
-\item{sampleda, }{data.frame, (nrow sample * ncol factor)}
+\item{sampleda}{data.frame, (nrow sample * ncol factor)}
 
-\item{indexNames}{vector character, default is "Observe",
+\item{indexNames}{character, default is "Observe",
 only for "Observe", "Chao1", "ACE", "Shannon", "Simpson", "J".}
 
 \item{linesize}{integer, default is 0.5.}
 
-\item{facetnrow, }{the nrow of facet, default is 1.}
+\item{facetnrow}{integer, the nrow of facet, default is 1.}
 
-\item{mapping, }{set of aesthetic mapping of ggplot2, default is NULL,
+\item{mapping}{set of aesthetic mapping of ggplot2, default is NULL,
 if the data is the data.frame for stat_smooth, the mapping should be set.}
 
 \item{chunks}{integer, the number of subsample in a sample,
