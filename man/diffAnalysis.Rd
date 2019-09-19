@@ -9,13 +9,13 @@
 diffAnalysis(obj, ...)
 
 \method{diffAnalysis}{data.frame}(obj, sampleda, class, subclass = NULL,
-  taxda = NULL, alltax = TRUE, mlfun = "lda", ratio = 0.7,
-  firstcomfun = "kruskal.test", padjust = "fdr",
-  filtermod = "pvalue", firstalpha = 0.05, strictmod = TRUE,
-  fcfun = "generalizedFC", secondcomfun = "wilcox.test", clmin = 5,
-  clwilc = TRUE, secondalpha = 0.05, subclmin = 3,
-  subclwilc = TRUE, ldascore = 2, normalization = 1e+06,
-  bootnums = 30, ...)
+  taxda = NULL, alltax = TRUE, standard_method = NULL,
+  mlfun = "lda", ratio = 0.7, firstcomfun = "kruskal.test",
+  padjust = "fdr", filtermod = "pvalue", firstalpha = 0.05,
+  strictmod = TRUE, fcfun = "generalizedFC",
+  secondcomfun = "wilcox.test", clmin = 5, clwilc = TRUE,
+  secondalpha = 0.05, subclmin = 3, subclwilc = TRUE, ldascore = 2,
+  normalization = 1e+06, bootnums = 30, ...)
 
 \method{diffAnalysis}{phyloseq}(obj, ...)
 }
@@ -36,6 +36,9 @@ meaning no subclass compare.}
 
 \item{alltax}{logical, whether to set all classification as features if taxda is not NULL, 
 default is TRUE.}
+
+\item{standard_method}{character, the method of standardization, see also \code{\link[vegan]{decostand}},
+default is NULL, it represents that the relative abundance of taxonomy will be used.}
 
 \item{mlfun}{character, the method for calculating the effect size of features, 
 choose "lda" or "rf", default is "lda".}
