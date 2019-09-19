@@ -1,7 +1,8 @@
 #' @method ggrarecurve default
-#' @importFrom ggplot2 ggplot aes_string stat_smooth facet_wrap
+#' @importFrom ggplot2 ggplot aes_string geom_smooth facet_wrap scale_y_continuous
 #' @importFrom dplyr filter
 #' @importFrom rlang .data
+#' @importFrom scales squish
 #' @rdname ggrarecurve
 #' @export
 ggrarecurve.default <- function(obj,
@@ -33,9 +34,10 @@ ggrarecurve.default <- function(obj,
         obj <- obj %>% filter(.data$Alpha %in% indexNames)
     }
     p <- ggplot(data=obj, mapping=mapping) +
-    	 stat_smooth(se=se, method = method, 
+    	 geom_smooth(se=se, method = method, 
 	             size=linesize,formula = formula,
-    			...) 
+    			...) + 
+         scale_y_continuous(limits=c(0,NA), oob=squish)
     p <- p + facet_wrap(~ Alpha, scales="free", nrow=facetnrow) +
 	 ylab("alpha metric")+xlab("number of reads")
     return(p)
@@ -119,25 +121,4 @@ samplealpha <- function(data, chunks=200){
     out[is.na(out)] <- 0
     return (out)
 }
-
-#' @importFrom stats predict
-#' @importFrom dplyr tibble
-#' @keywords internal
-# this is from ggplot2
-predictdf.lm <- function(model, xseq, se, level) {
-    pred <- predict(model, newdata = tibble(x = xseq), se.fit = se,
-    level = level, interval = if (se) "confidence" else "none")
-     
-    if (se) {
-      fit <- as.data.frame(pred$fit)
-      names(fit) <- c("y", "ymin", "ymax")
-      res <- data.frame(x = xseq, fit, se = pred$se.fit)
-    } else {
-      res <- data.frame(x = xseq, y = as.vector(pred))
-    }
-    # add the x=zero ,y=zero
-    res <- rbind(rep(0, ncol(res)), res)
-    res <- res[res$y>=0,]
-    return(res)
-}  
 
