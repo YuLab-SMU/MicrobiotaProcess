@@ -40,7 +40,8 @@ Imports:
   stats,
   utils,
   coin,
-  ggsignif
+  ggsignif,
+  scales
 Suggests:
   DT,
   prettydoc,
