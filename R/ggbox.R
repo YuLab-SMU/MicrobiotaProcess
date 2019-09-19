@@ -80,7 +80,8 @@ setMethod("ggbox", "data.frame",
     comparelist <- get_comparelist(obj, factorNames)
     mapping <- aes_string(x=factorNames,y="value",fill=factorNames)
     p <- ggplot(data=obj,mapping)
-    ifelse(geom=="boxplot",p <- p + geom_boxplot(),p <- p + geom_violin())
+    ifelse(geom=="boxplot",p <- p + geom_boxplot(outlier.size=0.5,outlier.shape=21),
+           p <- p + geom_violin())
     if (compare){
         p <- p + geom_signif(comparisons = comparelist,
 			     test = testmethod,
