@@ -8,6 +8,8 @@
 #' @param taxda data.frame, the classification of the feature in data. default is NULL.
 #' @param alltax logical, whether to set all classification as features if taxda is not NULL, 
 #' default is TRUE.
+#' @param standard_method character, the method of standardization, see also \code{\link[vegan]{decostand}},
+#' default is NULL, it represents that the relative abundance of taxonomy will be used.
 #' @param mlfun character, the method for calculating the effect size of features, 
 #' choose "lda" or "rf", default is "lda".
 #' @param ratio numeric, range from 0 to 1, the proportion of samples for calculating the effect 
@@ -63,14 +65,14 @@ diffAnalysis <- function(obj, ...){
 #' @importFrom tibble column_to_rownames
 #' @importFrom stats p.adjust
 #' @export
-diffAnalysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=NULL,alltax=TRUE, mlfun="lda", 
+diffAnalysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=NULL,alltax=TRUE, standard_method=NULL, mlfun="lda", 
     ratio=0.7, firstcomfun='kruskal.test', padjust="fdr",filtermod="pvalue",
     firstalpha=0.05, strictmod=TRUE, fcfun="generalizedFC", secondcomfun="wilcox.test",
     clmin=5, clwilc=TRUE, secondalpha=0.05, subclmin=3, subclwilc=TRUE,	ldascore=2,
     normalization=1000000, bootnums=30,	...){
     if (!is.null(taxda)){taxda <- fillNAtax(taxda)
-    	if (alltax){obj <- getalltaxdf(obj, taxda)}
-	}
+        if (alltax){obj <- getalltaxdf(obj, taxda, method=standard_method)}
+    }
     sampleda <- sampleda %>% select(c(class, subclass))
     if (ncol(sampleda)>1){sampleda <- duplicatedtaxcheck(sampleda) %>% column_to_rownames(var="rowname")}
     vars <- colnames(obj)
@@ -82,19 +84,19 @@ diffAnalysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=N
     kwres <- data.frame(f=rownames(kwres),pvalue=kwres[,1])
     kwres$fdr <- p.adjust(kwres$pvalue, method=padjust)
     if (!filtermod=="pvalue"){varsfirst <- as.vector(kwres[kwres$fdr<=firstalpha& !is.na(kwres$fdr),,drop=FALSE]$f)
-	}else{varsfirst <- as.vector(kwres[kwres$pvalue<=firstalpha&!is.na(kwres$pvalue),,drop=FALSE]$f)}
+    }else{varsfirst <- as.vector(kwres[kwres$pvalue<=firstalpha&!is.na(kwres$pvalue),,drop=FALSE]$f)}
     if (!length(varsfirst)>0){stop("There are not significantly discriminative features before internal wilcoxon!")}
     classlevels <- getclasslevels(sampleda, class)
     compareclass <- getcompareclass(classlevels)
     if (!is.null(subclass) && strictmod){
-    	class2sub <- getclass2sub(sampleda, class, subclass)
-    	comsubclass <- apply(compareclass,1,function(x)getcomparesubclass(x[1],x[2],class2sub))
-    	secondvars <- diffsubclass(datasample=datameta, features=varsfirst, comsubclass=comsubclass,class=class,subclass=subclass,
-    				 	fcfun=fcfun, secondcomfun=secondcomfun, submin=subclmin, subclwilc=subclwilc, pfold=secondalpha, ...)
+        class2sub <- getclass2sub(sampleda, class, subclass)
+        comsubclass <- apply(compareclass,1,function(x)getcomparesubclass(x[1],x[2],class2sub))
+        secondvars <- diffsubclass(datasample=datameta, features=varsfirst, comsubclass=comsubclass,class=class,subclass=subclass,
+                                   fcfun=fcfun, secondcomfun=secondcomfun, submin=subclmin, subclwilc=subclwilc, pfold=secondalpha, ...)
     }else{
-    	secondvars <- diffclass(datasample=datameta, features=varsfirst, comclass=compareclass, class=class, fcfun=fcfun,
-    							secondcomfun=secondcomfun,classmin=clmin,clwilc=clwilc,pfold=secondalpha, ...)
-	}
+        secondvars <- diffclass(datasample=datameta, features=varsfirst, comclass=compareclass, class=class, fcfun=fcfun,
+                                secondcomfun=secondcomfun,classmin=clmin,clwilc=clwilc,pfold=secondalpha, ...)
+    }
     if (!length(secondvars)>0){stop("There are not significantly discriminative features after internal wilcoxon!")}
     leaveclasslevels <- unlist(lapply(names(secondvars), function(x){unlist(strsplit(x,"-vs-"))}))
     secondvars <- getconsistentfeatures(diffsubclassfeature=secondvars,	class=class,classlevels=leaveclasslevels)
@@ -103,12 +105,12 @@ diffAnalysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=N
     dameta <- merge(obj, sampleda, by=0) %>% column_to_rownames(var="Row.names")
     dameta <- dameta %>% select(c(secondvarsvectors, class))
     dameta <- split(dameta, dameta[,match(class,colnames(dameta))])
-    dameta <- sampledflist(dameta, bootnums=bootnums, ratio=ratio)#, randomSeed=1024)
+    dameta <- sampledflist(dameta, bootnums=bootnums, ratio=ratio)
     dameta <- removeconstant(dameta) 
     if (mlfun=="lda"){mlres <- LDAeffectsize(dameta, compareclass, class, bootnums=bootnums, LDA=ldascore)}
     if (mlfun=="rf"){mlres <- rfimportance(dameta, class, bootnums=bootnums)}
     res <- new("diffAnalysisClass",originalD=obj,sampleda=sampleda,taxda=taxda,kwres=kwres,
-               secondvars=secondvars,mlres=mlres,call=match.call())#,classname=class,normalization=normalization)
+               secondvars=secondvars,mlres=mlres,call=match.call())
     return(res)
 }
 
@@ -122,11 +124,11 @@ diffAnalysis.phyloseq <- function(obj, ...){
     sampleda <- checksample(obj)
     taxda <- tax_table(obj)
     res <- diffAnalysis.data.frame(obj=otuda, 
-    			           sampleda=sampleda, 
-    				   #class=class,
-    				   #subclass=subclass,
-    				   taxda=taxda,
-    				   ...)
+                                   sampleda=sampleda, 
+                                   #class=class,
+                                   #subclass=subclass,
+                                   taxda=taxda,
+                                   ...)
     return(res)
 }
 
@@ -134,16 +136,32 @@ diffAnalysis.phyloseq <- function(obj, ...){
 #' @importFrom dplyr bind_rows
 #' @importFrom magrittr %>%
 #' @keywords internal
-getalltaxdf <- function(data, taxda){
+getalltaxdf <- function(data, taxda, method=NULL, ...){
     data <- data.frame(t(data), check.names=FALSE)
     dt <- list()
     for (i in seq_len(ncol(taxda))){
-    	dat <- CountOrRatios(data, taxda[,i,drop=FALSE], countmode=FALSE, rownamekeep=FALSE)
-    	dt[[i]] <- dat
+        if (is.null(method)){
+            dat <- CountOrRatios(data, taxda[,i,drop=FALSE],
+                                 countmode=FALSE, rownamekeep=FALSE)
+	}else{
+	    dat <- CountOrRatios(data, taxda[,i,drop=FALSE], 
+                                 countmode=TRUE, rownamekeep=FALSE)
+            dat <- transformdf(data=dat, method=method, ...)
+	}
+        dt[[i]] <- dat
     }
     dt <- do.call("rbind", dt)
     dt <- data.frame(t(dt), check.names=FALSE)
     return(dt)
+}
+
+#' @importFrom vegan decostand
+#' @keywords internal
+transformdf <- function(data, method, ...){
+    data <- data.frame(t(data), check.names=FALSE)
+    data <- decostand(data, method=method, ...)
+    data <- data.frame(t(data), check.names=FALSE)
+    return(data)
 }
 
 ###' @title get the table of diffAnalysisClass
@@ -196,13 +214,13 @@ as.data.frame.alphasample <- function(x, ...){
 tidyEffectSize <- function(obj){
     f <- LDA <- MeanDecreaseAccuracy <- NULL
     secondvars <- getsecondTRUEvar(obj)
-	classname <- getcall(obj, "class")
+    classname <- getcall(obj, "class")
     efres <- merge(obj@mlres, secondvars, by.x="f", by.y="f") %>%
-    		select (-c("gfc", "Freq"))
+             select (-c("gfc", "Freq"))
     if ("LDA" %in% colnames(efres)){
-    	efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)), LDA)]))
+        efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)), LDA)]))
     }else{
-    	efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)),
+        efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)),
                                                          MeanDecreaseAccuracy)]))
     }
     return(efres)
