@@ -17,7 +17,7 @@ getcladedf <- function(ggtree, node){
 
 #' @author Shuangbin Xu, GuangChuang Yu
 #' @keywords internal
-getlabeldf <- function(ggtree, node){
+getlabeldf <- function(ggtree, node, angle="auto"){
     data <- ggtree$data 
     if ("nodeClass" %in% colnames(data)){
     	levelsnum <- length(levels(data$nodeClass)) + 1
@@ -26,7 +26,7 @@ getlabeldf <- function(ggtree, node){
     	data$extend <- get_extend(tmpnum)*0.9
     }
     df <- lapply(node, function(x)getcladelabelposition(data, 
-	            x, angle="auto", angleoff=90))
+	            x, angle=angle, angleoff=90))
     df <- do.call("rbind", df)
     df$node <- node
     df$y <- as.numeric(apply(df[,match(c("y", "yend"), colnames(df))], 1, mean)) 
