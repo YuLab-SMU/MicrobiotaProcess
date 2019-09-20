@@ -41,7 +41,7 @@
 #'                         firstalpha=0.05, strictmod=TRUE,
 #'                         secondcomfun = "wilcox.test",
 #'                         subclmin=3, subclwilc=TRUE,
-#'                         secondalpha=0.01, lda=3)
+#'                         secondalpha=0.01, ldascore=3)
 #' library(ggplot2)
 #' diffcladeplot <- ggdiffclade(diffres,alpha=0.3, size=0.2, 
 #'                         skpointsize=0.4, 
@@ -70,8 +70,12 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", s
     p <- treeskeleton(treedata,	layout=layout,size=size,pointsize=skpointsize)
     cladecoord <- getcladedf(p, nodedf$node)
     cladecoord <- merge(cladecoord, nodedf, by.x="node", by.y="node")
-    labelannotcoord <- getlabeldf(p, nodedf$node)
-    if (layout=="rectangular"){taxlevel=7}
+    if (layout=="rectangular"){
+        taxlevel=7
+        labelannotcoord <- getlabeldf(p, nodedf$node, angle="others")
+    }else{
+        labelannotcoord <- getlabeldf(p, nodedf$node)
+    }
     labelannotcoord <- getannotlabel(labelannotcoord, classlevel=taxlevel)
     labelcoord <- labelannotcoord$labeldf
     annotcoord <- labelannotcoord$annotdf
@@ -163,7 +167,7 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
 #'                         firstalpha=0.05, strictmod=TRUE,
 #'                         secondcomfun = "wilcox.test",
 #'                         subclmin=3, subclwilc=TRUE,
-#'                         secondalpha=0.01, lda=3)
+#'                         secondalpha=0.01, ldascore=3)
 #' # not run in example
 #' #ggdifftaxbar(diffres, output="./biomarker_barplot")
 ggdifftaxbar <- function(obj,...){
@@ -185,8 +189,8 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
     figheight=3,
     ...){
     featureda <- obj@originalD
-	classname <- getcall(obj, "class")
-	normalization <- getcall(obj, "normalization")
+    classname <- getcall(obj, "class")
+    normalization <- getcall(obj, "normalization")
     if (!is.null(normalization)){
     	featureda <- featureda / normalization
     }
@@ -327,7 +331,7 @@ getMeanMedian <- function(datameta, feature, subclass){
 #'                         firstalpha=0.05, strictmod=TRUE,
 #'                         secondcomfun = "wilcox.test", 
 #'                         subclmin=3, subclwilc=TRUE,
-#'                         secondalpha=0.01, lda=3) 
+#'                         secondalpha=0.01, ldascore=3) 
 #' library(ggplot2)
 #' effectplot <- ggeffectsize(diffres,
 #'                         setColors=FALSE) +
