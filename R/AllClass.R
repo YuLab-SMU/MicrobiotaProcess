@@ -102,7 +102,7 @@ setClassUnion("listOrNull", c("list", "NULL"))
 setClassUnion("numericOrNull", c("numeric", "NULL"))
 
 #' @keywords internal
-setClassUnion("callOrNull", c("call", "NULL"))
+setClassUnion("callOrNull", c("call", "function", "NULL"))
 
 #' @title diffAnalysisClass class
 #' @docType class
