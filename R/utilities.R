@@ -147,6 +147,21 @@ repduplicatedtaxcheck <- function(taxdf){
 }
 
 #' @keywords internal
+## reference https://rdrr.io/cran/stackoverflow/man/match.call.defaults.html
+match.call.defaults <- function(fun) {
+    if (!is.na(fun)){
+        args(diffAnalysis.data.frame)
+    }else{
+        call <- evalq(match.call(expand.dots=TRUE), parent.frame(1))
+        formals <- evalq(formals(), parent.frame(1))
+        for(i in setdiff(names(formals), c(names(call)))){
+            call[i] <- list(formals[[i]])
+        }
+        match.call(sys.function(sys.parent()), call)
+    }
+}
+
+#' @keywords internal
 getcall <- function(obj, arg){
     if (!"call" %in% slotNames(obj)){
 	stop("The object don't have call slot!")
