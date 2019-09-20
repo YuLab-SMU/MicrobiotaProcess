@@ -55,7 +55,7 @@
 #'                         firstalpha=0.05, strictmod=TRUE,
 #'                         secondcomfun = "wilcox.test",
 #'                         subclmin=3, subclwilc=TRUE,
-#'                         secondalpha=0.01, lda=3)
+#'                         secondalpha=0.01, ldascore=3)
 diffAnalysis <- function(obj, ...){
 	UseMethod("diffAnalysis")
 }
@@ -109,8 +109,9 @@ diffAnalysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=N
     dameta <- removeconstant(dameta) 
     if (mlfun=="lda"){mlres <- LDAeffectsize(dameta, compareclass, class, bootnums=bootnums, LDA=ldascore)}
     if (mlfun=="rf"){mlres <- rfimportance(dameta, class, bootnums=bootnums)}
+    tmpfun <- ifelse(!"funname" %in% names(match.call()),NA,"diffAnalysis.data.frame")
     res <- new("diffAnalysisClass",originalD=obj,sampleda=sampleda,taxda=taxda,kwres=kwres,
-               secondvars=secondvars,mlres=mlres,call=match.call())
+               secondvars=secondvars,mlres=mlres,call=match.call.defaults(fun=tmpfun))
     return(res)
 }
 
@@ -123,12 +124,16 @@ diffAnalysis.phyloseq <- function(obj, ...){
     otuda <- checkotu(obj)
     sampleda <- checksample(obj)
     taxda <- tax_table(obj)
-    res <- diffAnalysis.data.frame(obj=otuda, 
-                                   sampleda=sampleda, 
-                                   #class=class,
-                                   #subclass=subclass,
+    call <- match.call()
+    res <- diffAnalysis.data.frame(obj=otuda,
+                                   sampleda=sampleda,
                                    taxda=taxda,
+				   funname=TRUE,
                                    ...)
+    for (i in setdiff(names(as.list(res@call)), names(call))){
+        call[i] <- list(as.list(res@call)[[i]])
+    }
+    res@call <- call
     return(res)
 }
 
