@@ -101,7 +101,7 @@ diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
                         firstalpha=0.05, strictmod=TRUE,
                         secondcomfun = "wilcox.test",
                         subclmin=3, subclwilc=TRUE,
-                        secondalpha=0.01, lda=3)
+                        secondalpha=0.01, ldascore=3)
 }
 \author{
 Shuangbin Xu
