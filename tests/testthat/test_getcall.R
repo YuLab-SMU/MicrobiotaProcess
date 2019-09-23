@@ -1,7 +1,7 @@
-context("matchcall of diffAnalysis")
+context("matchcall of diff_analysis")
 data(kostic2012crc)
 set.seed(1024)
-diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
+diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
 		        mlfun="lda", filtermod="fdr",
 		        firstcomfun = "kruskal.test", 
 		        firstalpha=0.05, strictmod=TRUE,
