@@ -150,7 +150,7 @@ repduplicatedtaxcheck <- function(taxdf){
 ## reference https://rdrr.io/cran/stackoverflow/man/match.call.defaults.html
 match.call.defaults <- function(fun) {
     if (!is.na(fun)){
-        args(diffAnalysis.data.frame)
+        args(diff_analysis.data.frame)
     }else{
         call <- evalq(match.call(expand.dots=TRUE), parent.frame(1))
         formals <- evalq(formals(), parent.frame(1))
