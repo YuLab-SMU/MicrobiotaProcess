@@ -11,7 +11,7 @@
 #' head(phyloseq::sample_data(kostic2012crc),3)
 #' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
 #' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
-#' diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
+#' diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
 #'                         mlfun="lda", filtermod="fdr",
 #'                         firstcomfun = "kruskal.test",
 #'                         firstalpha=0.05, strictmod=TRUE, 
