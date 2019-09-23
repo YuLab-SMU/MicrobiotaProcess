@@ -72,11 +72,11 @@ sampleda <- read.table(samplefile,
 otuda <- otuda[sapply(otuda, is.numeric)] \%>\% t() \%>\%
          data.frame(check.names=FALSE)
 set.seed(1024)
-alphaobj1 <- alphaindex(otuda, sampleda=sampleda)
+alphaobj1 <- get_alphaindex(otuda, sampleda=sampleda)
 p1 <- ggbox(alphaobj1, factorNames="group")
 data(test_otu_data)
 set.seed(1024)
-alphaobj2 <- alphaindex(test_otu_data)
+alphaobj2 <- get_alphaindex(test_otu_data)
 class(alphaobj2)
 head(as.data.frame(alphaobj2))
 p2 <- ggbox(alphaobj2, factorNames="group")
