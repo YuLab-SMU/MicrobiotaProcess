@@ -113,7 +113,7 @@ samplealpha <- function(data, chunks=200){
     n <- seq(0, sdepth, by=step)[-1]
     n <- c(n, sdepth)
     out <- lapply(n, function(x){
-    		tmp <- alphaindex(data, mindepth=x)
+                tmp <- get_alphaindex(data, mindepth=x)
     		#tmp <- tmp$indexs
     		tmp$readsNums <- x
     	    return(tmp)})
