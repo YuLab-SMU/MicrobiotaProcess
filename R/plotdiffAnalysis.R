@@ -3,8 +3,8 @@
 #' @description plot results of different analysis or data.frame, 
 #' contained hierarchical relationship or other classes,such like the 
 #' tax_data of phyloseq.
-#' @param obj object, diffAnalysisClass, the results of diffAnalysis 
-#' see also \code{\link[MicrobiotaProcess]{diffAnalysis}}, or data.frame,
+#' @param obj object, diffAnalysisClass, the results of diff_analysis 
+#' see also \code{\link[MicrobiotaProcess]{diff_analysis}}, or data.frame,
 #' contained hierarchical relationship or other classes.
 #' @param nodedf data.frame, contained the tax and the factor 
 #' information and(or pvalue).
@@ -35,7 +35,7 @@
 #'                          rngseed=1024)
 #' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
 #' set.seed(1024)
-#' diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
+#' diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
 #'                         mlfun="lda", filtermod="fdr",
 #'                         firstcomfun = "kruskal.test",
 #'                         firstalpha=0.05, strictmod=TRUE,
@@ -132,7 +132,7 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
 
 #' @title significantly discriminative feature barplot
 #' @param obj object, diffAnalysisClass see also 
-#' \code{\link[MicrobiotaProcess]{diffAnalysis}} or feMeanMedian class, 
+#' \code{\link[MicrobiotaProcess]{diff_analysis}} or feMeanMedian class, 
 #' see also \code{\link[MicrobiotaProcess]{getMeanMedian}}.
 #' @param filepath character, default is NULL, meaning current path. 
 #' @param output character, the output dir name, default is "biomarker_barplot".
@@ -161,7 +161,7 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
 #'                               rngseed=1024)
 #' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
 #' set.seed(1024)
-#' diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
+#' diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
 #'                         mlfun="lda", filtermod="fdr",
 #'                         firstcomfun = "kruskal.test",
 #'                         firstalpha=0.05, strictmod=TRUE,
@@ -305,7 +305,7 @@ getMeanMedian <- function(datameta, feature, subclass){
 }
 
 #' @title visualization of effect size by the Linear Discriminant Analysis or randomForest
-#' @param obj object, diffAnalysisClass see \code{\link[MicrobiotaProcess]{diffAnalysis}},
+#' @param obj object, diffAnalysisClass see \code{\link[MicrobiotaProcess]{diff_analysis}},
 #' or data.frame, contained effect size and the group information.
 #' @param removeUnkown logical, whether do not show unkown taxonomy, default is TRUE.
 #' @param factorName character, the column name contained group information in data.frame.
@@ -325,7 +325,7 @@ getMeanMedian <- function(datameta, feature, subclass){
 #' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
 #' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
 #' set.seed(1024)
-#' diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
+#' diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
 #'                         mlfun="lda", filtermod="fdr",
 #'                         firstcomfun = "kruskal.test",
 #'                         firstalpha=0.05, strictmod=TRUE,
