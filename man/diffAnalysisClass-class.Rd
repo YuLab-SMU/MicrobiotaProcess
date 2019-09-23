@@ -27,6 +27,6 @@ Freq(the number of TRUE or FALSE), factorNames.}
 \item{\code{mlres}}{the results of LDA or randomForest,}
 
 \item{\code{call,}}{the call of 
-\code{\link[MicrobiotaProcess]{diffAnalysis}}}
+\code{\link[MicrobiotaProcess]{diff_analysis}}}
 }}
 
