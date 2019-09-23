@@ -33,10 +33,10 @@ get_clust <- function(obj,...){
 #' @importFrom stats hclust
 #' @export
 get_clust.dist <- function(obj,
-						  distmethod,
-						  sampleda=NULL,
-						  hclustmethod="average",
-						  ...){
+                           distmethod,
+                           sampleda=NULL,
+                           hclustmethod="average",
+                           ...){
     if (missing(distmethod) && is.null(attr(obj, "distmethod"))){
     	stop("the method of distance should be provided!")
     }
@@ -47,13 +47,13 @@ get_clust.dist <- function(obj,
     	distmethod <- distmethod
     }
     hclustobj <- hclust(obj, 
-    					method=hclustmethod, 
-    					...)
+                        method=hclustmethod, 
+                        ...)
     phyloobj <- as.phylo(hclustobj)
     clustplot <- new("clustplotClass",
-    				 hclustphylo=phyloobj,
-    				 sampleda=sampleda,
-    				 distmethod=distmethod)
+                     hclustphylo=phyloobj,
+                     sampleda=sampleda,
+                     distmethod=distmethod)
     return(clustplot)
 }
 
@@ -61,23 +61,23 @@ get_clust.dist <- function(obj,
 #' @rdname get_clust
 #' @export
 get_clust.default <- function(obj, 
-							 distmethod="euclidean",
-							 taxa_are_rows=FALSE,
-							 sampleda=NULL,
-							 tree=NULL,
-							 method="hellinger",
-							 hclustmethod="average",
-							 ...){
+                              distmethod="euclidean",
+                              taxa_are_rows=FALSE,
+                              sampleda=NULL,
+                              tree=NULL,
+                              method="hellinger",
+                              hclustmethod="average",
+                              ...){
     distobj <- get_dist(obj, 
-    		distmethod=distmethod,
-    		taxa_are_rows=taxa_are_rows,
-    		sampleda=sampleda,
-    		tree=tree,
-    		method=method, ...)
+                        distmethod=distmethod,
+                        taxa_are_rows=taxa_are_rows,
+                        sampleda=sampleda,
+                        tree=tree,
+                        method=method, ...)
     phyloobj <- get_clust.dist(distobj, 
-    						  distmethod=distmethod,
-    						  sampleda=sampleda,
-    						  hclustmethod=hclustmethod)
+                               distmethod=distmethod,
+                               sampleda=sampleda,
+                               hclustmethod=hclustmethod)
     return(phyloobj)
 }
 
@@ -85,18 +85,18 @@ get_clust.default <- function(obj,
 #' @rdname get_clust
 #' @export
 get_clust.phyloseq <- function(obj, 
-							  distmethod="euclidean", 
-							  method="hellinger",
-							  hclustmethod="average",
-							  ...){
+                               distmethod="euclidean", 
+                               method="hellinger",
+                               hclustmethod="average",
+                               ...){
     distobj <- get_dist(obj,
-    				   distmethod=distmethod,
-    				   method=method,
-    				   ...)
+                        distmethod=distmethod,
+                        method=method,
+                        ...)
     sampleda <- checksample(obj)
     phyloobj <- get_clust.dist(distobj, 
-    						  sampleda=sampleda, 
-    						  hclustmethod=hclustmethod)
+                               sampleda=sampleda, 
+                               hclustmethod=hclustmethod)
     return(phyloobj)
 }
 
@@ -130,17 +130,17 @@ ggclust <- function(obj,...){
 #' @importFrom ggplot2 labs element_text
 #' @export
 ggclust.clustplotClass <- function(obj, 
-								   layout="rectangular",
-								   factorNames=NULL,
-								   factorLevels=NULL,
-								   pointsize=2,
-								   fontsize=2.6,
-								   hjust=-0.1,
-								   settheme=TRUE,
-								   ...){
+                                   layout="rectangular",
+                                   factorNames=NULL,
+                                   factorLevels=NULL,
+                                   pointsize=2,
+                                   fontsize=2.6,
+                                   hjust=-0.1,
+                                   settheme=TRUE,
+                                   ...){
     phyloclass <- obj@hclustphylo
     samplehcp <- ggtree(phyloclass, 
-    					layout=layout)
+                        layout=layout)
     if (!is.null(obj@sampleda)){
     	sampleda <- data.frame(obj@sampleda, check.names=FALSE)
     	phyloclass <- obj@hclustphylo
@@ -166,7 +166,7 @@ ggclust.clustplotClass <- function(obj,
     samplehcp <- samplehcp + labs(title=paste0("Hierarchical Cluster of Samples ", "(", obj@distmethod, ")"))
     if (settheme){
     	samplehcp <- samplehcp + 
-    			theme(plot.title = element_text(face="bold", lineheight=25,	hjust=0.5))
+                     theme(plot.title = element_text(face="bold", lineheight=25, hjust=0.5))
     }
     return(samplehcp)
 }
