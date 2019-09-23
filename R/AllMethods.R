@@ -71,22 +71,22 @@ ggbartax.phyloseq <- function(obj, ...){
 #' @examples
 #' library(ggplot2)
 #' data(test_otu_data)
-#' phytax <- get_taxdf(test_otu_data, taxlevel=2)
+#' phytax <- get_taxadf(test_otu_data, taxlevel=2)
 #' phytax
 #' head(phyloseq::otu_table(phytax))
 #' phybar <- ggbartax(phytax) + 
 #'           scale_y_continuous(expand=c(0,0), 
 #'                           limits=c(0, 105))+
 #'          xlab(NULL) + ylab("relative abundance (%)")
-get_taxdf <- function(obj,...){
-    UseMethod("get_taxdf")
+get_taxadf <- function(obj,...){
+    UseMethod("get_taxadf")
 }
 
-#' @method get_taxdf phyloseq
+#' @method get_taxadf phyloseq
 #' @importFrom phyloseq otu_table tax_table taxa_are_rows rank_names
-#' @rdname get_taxdf
+#' @rdname get_taxadf
 #' @export
-get_taxdf.phyloseq <- function(obj, taxlevel=2, ...){
+get_taxadf.phyloseq <- function(obj, taxlevel=2, ...){
     if (is.null(obj@tax_table)){
     	stop("The tax table is empty!")
     }else{
@@ -103,7 +103,7 @@ get_taxdf.phyloseq <- function(obj, taxlevel=2, ...){
     	}
     }
     #taxlevel <- rank_names(obj)[taxlevel]
-    taxdf <- get_taxdf.default(obj=otuda, 
+    taxdf <- get_taxadf.default(obj=otuda, 
                                taxda=taxdf, 
                                taxlevel=taxlevel,
                                sampleda=sampleda,
@@ -111,11 +111,11 @@ get_taxdf.phyloseq <- function(obj, taxlevel=2, ...){
     return(taxdf)
 }
 
-#' @method get_taxdf default
+#' @method get_taxadf default
 #' @importFrom phyloseq otu_table tax_table
-#' @rdname get_taxdf
+#' @rdname get_taxadf
 #' @export 
-get_taxdf.default <- function(obj, taxda, 
+get_taxadf.default <- function(obj, taxda, 
                               taxa_are_rows,
                               taxlevel,
                               sampleda=NULL,
