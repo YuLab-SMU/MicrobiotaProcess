@@ -1,4 +1,4 @@
-#' @title Differential expression analysis based on kruskal.test, generalized fold change and wilcox.test
+#' @title Differential expression analysis
 #' @param obj object,a phyloseq class contained otu_table, sample_data, taxda, 
 #' or data.frame, nrow sample * ncol features.
 #' @param sampleda data.frame, nrow sample * ncol factor, the sample names of sampleda and data should be the same.
@@ -36,7 +36,7 @@
 #' for the LDA score, or you can set NULL for no normalization, default is 1000000.
 #' @param bootnums integer, set the number of bootstrap iteration for lda or rf, default is 30.
 #' @param ..., additional parameters.
-#' @return diffAnalysis class.
+#' @return diff_analysis class.
 #' @author Shuangbin Xu
 #' @importFrom tibble column_to_rownames
 #' @importFrom dplyr select
@@ -49,23 +49,23 @@
 #' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
 #' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
 #' set.seed(1024)
-#' diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
+#' diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
 #'                         mlfun="lda", filtermod="fdr",
 #'                         firstcomfun = "kruskal.test",
 #'                         firstalpha=0.05, strictmod=TRUE,
 #'                         secondcomfun = "wilcox.test",
 #'                         subclmin=3, subclwilc=TRUE,
 #'                         secondalpha=0.01, ldascore=3)
-diffAnalysis <- function(obj, ...){
-	UseMethod("diffAnalysis")
+diff_analysis <- function(obj, ...){
+	UseMethod("diff_analysis")
 }
 
-#' @method diffAnalysis data.frame
-#' @rdname diffAnalysis
+#' @method diff_analysis data.frame
+#' @rdname diff_analysis
 #' @importFrom tibble column_to_rownames
 #' @importFrom stats p.adjust
 #' @export
-diffAnalysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=NULL,alltax=TRUE, standard_method=NULL, mlfun="lda", 
+diff_analysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=NULL,alltax=TRUE, standard_method=NULL, mlfun="lda", 
     ratio=0.7, firstcomfun='kruskal.test', padjust="fdr",filtermod="pvalue",
     firstalpha=0.05, strictmod=TRUE, fcfun="generalizedFC", secondcomfun="wilcox.test",
     clmin=5, clwilc=TRUE, secondalpha=0.05, subclmin=3, subclwilc=TRUE,	ldascore=2,
@@ -109,23 +109,23 @@ diffAnalysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=N
     dameta <- removeconstant(dameta) 
     if (mlfun=="lda"){mlres <- LDAeffectsize(dameta, compareclass, class, bootnums=bootnums, LDA=ldascore)}
     if (mlfun=="rf"){mlres <- rfimportance(dameta, class, bootnums=bootnums)}
-    tmpfun <- ifelse(!"funname" %in% names(match.call()),NA,"diffAnalysis.data.frame")
+    tmpfun <- ifelse(!"funname" %in% names(match.call()),NA,"diff_analysis.data.frame")
     res <- new("diffAnalysisClass",originalD=obj,sampleda=sampleda,taxda=taxda,kwres=kwres,
                secondvars=secondvars,mlres=mlres,call=match.call.defaults(fun=tmpfun))
     return(res)
 }
 
 
-#' @method diffAnalysis phyloseq
-#' @rdname diffAnalysis
+#' @method diff_analysis phyloseq
+#' @rdname diff_analysis
 #' @importFrom phyloseq tax_table
 #' @export
-diffAnalysis.phyloseq <- function(obj, ...){
+diff_analysis.phyloseq <- function(obj, ...){
     otuda <- checkotu(obj)
     sampleda <- checksample(obj)
     taxda <- tax_table(obj)
     call <- match.call()
-    res <- diffAnalysis.data.frame(obj=otuda,
+    res <- diff_analysis.data.frame(obj=otuda,
                                    sampleda=sampleda,
                                    taxda=taxda,
 				   funname=TRUE,
@@ -172,7 +172,7 @@ transformdf <- function(data, method, ...){
 ###' @title get the table of diffAnalysisClass
 ###' @param x object, diffAnalysisClass
 ###' @param ..., additional parameters
-###' @return a data.frame contained results of diffAnalysis
+###' @return a data.frame contained results of diff_analysis
 ###' @export
 ###' @examples
 ###' data(kostic2012crc)
@@ -181,7 +181,7 @@ transformdf <- function(data, method, ...){
 ###' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
 ###' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
 ###' set.seed(1024)
-###' diffres <- diffAnalysis(kostic2012crc, class="DIAGNOSIS",
+###' diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
 ###'                         mlfun="lda", filtermod="fdr",
 ###'                         firstcomfun = "kruskal.test",
 ###'                         firstalpha=0.05, strictmod=TRUE,
