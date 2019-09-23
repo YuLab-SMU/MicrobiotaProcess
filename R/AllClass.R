@@ -117,7 +117,7 @@ setClassUnion("callOrNull", c("call", "function", "NULL"))
 #' Freq(the number of TRUE or FALSE), factorNames.
 #' @slot mlres the results of LDA or randomForest,
 #' @slot call, the call of 
-#' \code{\link[MicrobiotaProcess]{diffAnalysis}}
+#' \code{\link[MicrobiotaProcess]{diff_analysis}}
 #' @name diffAnalysisClass-class
 #' @rdname diffAnalysisClass-class
 #' @exportClass diffAnalysisClass
