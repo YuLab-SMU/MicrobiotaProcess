@@ -9,6 +9,8 @@
 \alias{get_alphaindex,data.frame}
 \alias{get_alphaindex,integer-method}
 \alias{get_alphaindex,integer}
+\alias{get_alphaindex,numeric-method}
+\alias{get_alphaindex,numeric}
 \alias{get_alphaindex,phyloseq-method}
 \alias{get_alphaindex,phyloseq}
 \title{alpha index}
@@ -20,6 +22,8 @@ get_alphaindex(obj, ...)
 \S4method{get_alphaindex}{data.frame}(obj, ...)
 
 \S4method{get_alphaindex}{integer}(obj, ...)
+
+\S4method{get_alphaindex}{numeric}(obj, ...)
 
 \S4method{get_alphaindex}{phyloseq}(obj, ...)
 }
