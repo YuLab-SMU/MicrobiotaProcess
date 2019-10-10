@@ -3,6 +3,7 @@
 #' @importFrom dplyr filter
 #' @importFrom rlang .data
 #' @importFrom scales squish
+#' @importFrom Rmisc summarySE
 #' @rdname ggrarecurve
 #' @export
 ggrarecurve.default <- function(obj,
@@ -26,8 +27,16 @@ ggrarecurve.default <- function(obj,
              	         plotda=TRUE)
     	mapping <- aes_string(x="readsNums", y="value", color="sample")
     	if (!missing(factorNames)){
+                obj <- summarySE(obj, measurevar="value", 
+                                 groupvars=c(factorNames, "readsNums", "Alpha"),
+                                 na.rm=TRUE)
+		obj$up <- obj$value - obj$ci
+		obj$down <- obj$value + obj$ci
     		mapping <- modifyList(mapping,
-    		           aes_string(color="factorNames"))
+                                      aes_string(group=factorNames, 
+                                                 color=factorNames,
+                                                 ymin="up",
+                                                 ymax="down"))
     	}
     }
     if (!is.null(indexNames)){
@@ -38,6 +47,9 @@ ggrarecurve.default <- function(obj,
 	             size=linesize,formula = formula,
     			...) + 
          scale_y_continuous(limits=c(0,NA), oob=squish)
+    if (!missing(factorNames)){
+        p <- p + geom_errorbar()
+    }    
     p <- p + facet_wrap(~ Alpha, scales="free", nrow=facetnrow) +
 	 ylab("alpha metric")+xlab("number of reads")
     return(p)
