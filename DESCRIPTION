@@ -41,7 +41,8 @@ Imports:
   utils,
   coin,
   ggsignif,
-  scales
+  scales,
+  Rmisc
 Suggests:
   DT,
   prettydoc,
