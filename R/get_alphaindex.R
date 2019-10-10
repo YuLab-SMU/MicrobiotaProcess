@@ -82,6 +82,17 @@ setMethod("get_alphaindex", "integer", function(obj, ...){
     return(alpha)
 })
 
+#' @aliases get_alphaindex,numeric
+#' @rdname get_alphaindex
+#' @export
+setMethod("get_alphaindex", "numeric",function(obj, ...){
+    obj <- obj[obj>0]
+    obj <- as.matrix(obj)
+    alpha <- get_alphaindex(obj, ...)
+    alpha <- alpha@alpha
+    return(alpha)
+})
+
 #' @aliases get_alphaindex,phyloseq
 #' @rdname get_alphaindex
 #' @export
