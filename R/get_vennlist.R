@@ -14,7 +14,7 @@ get_vennlist.default <- function(obj,
     }
     obj <- CountOrRatios(obj, 
     			featurelist=sampleinfo, 
-    			countmode=FALSE,
+    			countmode=TRUE,
     			multiplenum=1,
     			rownamekeep=FALSE,
     			...)
