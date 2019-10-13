@@ -12,8 +12,7 @@ ggbartax(obj, ...)
 
 \method{ggbartax}{default}(obj, mapping = NULL, position = "stack",
   stat = "identity", width = 0.7, topn = 30, count = FALSE,
-  sampleda = NULL, factorLevels = NULL, settheme = TRUE,
-  facetNames = NULL, setColors = TRUE, ...)
+  sampleda = NULL, factorLevels = NULL, facetNames = NULL, ...)
 }
 \arguments{
 \item{obj}{phyloseq, phyloseq class or data.frame, 
@@ -40,13 +39,7 @@ information, if the data doesn't contain the information.}
 \item{factorLevels}{list, the levels of the factors, default is NULL,
 if you want to order the levels of factor, you can set this.}
 
-\item{settheme}{logical, default is TRUE, or you can set FALSE, then
-set the theme by youself.}
-
 \item{facetNames}{character, default is NULL.}
-
-\item{setColors}{logical, default is TRUE, or you can set FALSE, then 
-set colors by `scale_fill_manual` of `ggplot2`.}
 }
 \value{
 barplot of tax
