@@ -117,10 +117,11 @@ ggordpoint.default <-  function(obj, pc=c(1,2), mapping=NULL, sampleda=NULL, fac
     	}
     	mapping <- modifyList(mapping, tmpfactormap)
     	ellipsemapping <- modifyList(mapping, ellipsemapping)
+	ellipsemapping <- modifyList(ellipsemapping,aes_string(shape=NULL))
     	if (!is.null(factorLevels)){plotcoord <- setfactorlevels(plotcoord, factorLevels)}
     }
     p <- ggplot() + geom_point(data=plotcoord, mapping=mapping, size=poinsize) + labs(x=xlab_text, y=ylab_text, title=title_text)
-    if (ellipse){p <- p + geom_ord_ellipse(data=plotcoord, mapping=ellipsemapping, ellipse_pro=ellipse_pro, alpha=ellipse_alpha, show.legend=FALSE)}
+    if (ellipse){p <- p + geom_ord_ellipse(data=plotcoord,mapping=ellipsemapping,ellipse_pro=ellipse_pro, alpha=ellipse_alpha, fill=NA, show.legend=FALSE, lty=3)}
     if (biplot){
     	varcontrib <- get_varct(obj)
     	varcontr <- varcontrib$VarContribution[,pc]
@@ -220,7 +221,7 @@ getfactormap <- function(namelist){
     	tmpfactormap <- aes_string(color=namelist[1])
     }else{
     	tmpfactormap <- aes_string(color=namelist[1],
-    						 shape=namelist[2])
+                                   shape=namelist[2])
     }
     return(tmpfactormap)
 }
@@ -229,8 +230,8 @@ getfactormap <- function(namelist){
 #' @importFrom stats as.formula
 #' @keywords internal
 getellipsemap <- function(namelist){
-    tmpellipsemap <- aes_string(fill=namelist[1],
-    					  group=namelist[1])
+    tmpellipsemap <- aes_string(color=namelist[1],
+                                group=namelist[1])
     return(tmpellipsemap)
 } 
 
