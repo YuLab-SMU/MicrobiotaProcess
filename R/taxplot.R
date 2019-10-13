@@ -5,34 +5,31 @@
 #' @export
 ggbartax.default <- function(obj, mapping=NULL, position = "stack", stat="identity",
     width=0.7, topn=30, count=FALSE, sampleda=NULL, factorLevels=NULL,
-    settheme=TRUE, facetNames=NULL, setColors=TRUE, ...){
+    facetNames=NULL, ...){
     if (is.null(mapping)){
     	mapping <- aes_(~sample, ~value, fill=~feature)
     	obj <- mappingtaxda(data=obj, topn=topn, count=count, sampleda=sampleda, 
     						 factorLevels=factorLevels, plotda=TRUE)
-    	#ymax <- max(data$value)*1.05
     }else{
     	mapping <- mapping
     }
     p <- ggplot(data=obj,mapping=mapping,...) + 
-    	geom_bar(position = position,stat=stat, width=width) #+ 
-    	#theme_bw() 
-    tmpfactor <- setdiff(colnames(obj), c("feature", "sample", "value"))
+         geom_bar(position = position,stat=stat, width=width) + 
+         scale_y_continuous(expand=c(0,0))
+    #tmpfactor <- setdiff(colnames(obj), c("feature", "sample", "value"))
     #if (is.null(facetNames) && length(tmpfactor)>0){
     #	tmpformula <- as.formula(paste0("~ ",tmpfactor[1]))
     #	p <- p + facet_grid(tmpformula, scales="free_x", space="free_x")
     #}
-    if(setColors){
-    	tmpn <- length(levels(obj$feature))
-    	p <- p + scale_fill_manual(values=getCols(tmpn))
+    if(is.null(mapping)){
+        tmpn <- length(levels(obj$feature))
+        p <- p + scale_fill_manual(values=getCols(tmpn))
     }
     if (!is.null(facetNames)){
-    	tmpformula <- as.formula(paste0("~ ", facetNames))
-    	p <- p + facet_grid(tmpformula, scales="free_x", space="free_x")
+        tmpformula <- as.formula(paste0("~ ", facetNames))
+        p <- p + facet_grid(tmpformula, scales="free_x", space="free_x")
     }
-    if (settheme){
-    	p <- p + theme_taxbar()
-    }
+    p <- p + theme_taxbar()
     return(p)
 }
 
