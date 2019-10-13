@@ -218,8 +218,12 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
     				            vars,
     					    classname,
     					    subclass,...)
-    	filename <- paste(filepath, paste0(vars,".svg"), sep="/")
-    	ggsave(filename, p, device="svg", width = figwidth, height=figheight)
+	if (grepl("/", vars)){
+            vars <- sub("/", "--", vars)
+	    #filename <- paste(filepath, paste0(vars,".svg"), sep="/")
+	}
+        filename <- paste(filepath, paste0(vars,".svg"), sep="/")	
+        ggsave(filename, p, device="svg", width = figwidth, height=figheight)
     }
 })
 
@@ -386,7 +390,7 @@ ggeffectsize.data.frame <- function(obj,
     	theme(axis.text.y = element_text(size=12),
 	      axis.text.x = element_text(size=12),
       	      panel.grid=element_blank(),
-    	      panel.spacing = unit(0.2, "mm"),
+    	      #panel.spacing = unit(0.2, "mm"),
     	      legend.title=element_text(size=10),
     	      legend.text=element_text(size=8),
     	      strip.background = element_rect(colour=NA, 
