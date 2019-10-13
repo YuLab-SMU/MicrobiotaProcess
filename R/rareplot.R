@@ -48,7 +48,7 @@ ggrarecurve.default <- function(obj,
     			...) + 
          scale_y_continuous(limits=c(0,NA), oob=squish)
     if (!missing(factorNames)){
-        p <- p + geom_errorbar()
+        p <- p + geom_errorbar(alpha=0.5)
     }    
     p <- p + facet_wrap(~ Alpha, scales="free", nrow=facetnrow) +
 	 ylab("alpha metric")+xlab("number of reads")
