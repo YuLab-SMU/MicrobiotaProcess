@@ -12,11 +12,7 @@
 #' information, if the data doesn't contain the information.
 #' @param factorLevels list, the levels of the factors, default is NULL,
 #' if you want to order the levels of factor, you can set this.
-#' @param settheme logical, default is TRUE, or you can set FALSE, then
-#' set the theme by youself.
 #' @param facetNames character, default is NULL.
-#' @param setColors logical, default is TRUE, or you can set FALSE, then 
-#' set colors by `scale_fill_manual` of `ggplot2`.
 #' @param ... additional parameters, see \code{\link[ggplot2]{ggplot}}
 #' @return barplot of tax
 #' @author ShuangbinXu
