@@ -5,7 +5,7 @@
 \title{add confidence ellipse to ordinary plot}
 \usage{
 geom_ord_ellipse(data = NULL, mapping = NULL, ellipse_pro = 0.9,
-  alpha = 0.3, show.legend = NA, ...)
+  alpha = 0.3, show.legend = NA, inherit.aes = TRUE, ...)
 }
 \arguments{
 \item{data, }{default is NULL.}
@@ -17,6 +17,8 @@ geom_ord_ellipse(data = NULL, mapping = NULL, ellipse_pro = 0.9,
 \item{alpha}{numeric, alpha of ellipse, default is 0.2}
 
 \item{show.legend, }{default is NA.}
+
+\item{inherit.aes, }{default is TRUE}
 
 \item{...}{additional parameters}
 }
