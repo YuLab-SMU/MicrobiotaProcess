@@ -1,5 +1,5 @@
 #' @method ggrarecurve default
-#' @importFrom ggplot2 ggplot aes_string geom_smooth facet_wrap scale_y_continuous
+#' @importFrom ggplot2 ggplot geom_ribbon aes_string geom_smooth facet_wrap scale_y_continuous
 #' @importFrom dplyr filter
 #' @importFrom rlang .data
 #' @importFrom scales squish
@@ -7,51 +7,31 @@
 #' @rdname ggrarecurve
 #' @export
 ggrarecurve.default <- function(obj,
-    sampleda,
-    indexNames="Observe",
-    linesize=0.5,
-    facetnrow=1,
-    mapping=NULL,	   
-    chunks=400,
-    factorNames,
-    factorLevels,
-    se=FALSE,
-    method="lm",			   
-    formula=y ~ log(x),
-    ...){
+    sampleda, indexNames="Observe", linesize=0.5, facetnrow=1,
+    mapping=NULL, chunks=400, factorNames, factorLevels, se=FALSE,
+    method="lm", formula=y ~ log(x), ...){
     if (is.null(mapping)){
-    	obj <- stat_rare(data=obj,
-    		         chunks=chunks,
-    		         sampleda=sampleda,
-    	                 factorLevels=factorLevels,
-             	         plotda=TRUE)
-    	mapping <- aes_string(x="readsNums", y="value", color="sample")
-    	if (!missing(factorNames)){
-                obj <- summarySE(obj, measurevar="value", 
-                                 groupvars=c(factorNames, "readsNums", "Alpha"),
-                                 na.rm=TRUE)
-		obj$up <- obj$value - obj$ci
-		obj$down <- obj$value + obj$ci
-    		mapping <- modifyList(mapping,
-                                      aes_string(group=factorNames, 
-                                                 color=factorNames,
-                                                 ymin="up",
-                                                 ymax="down"))
+        obj <- stat_rare(data=obj, chunks=chunks, sampleda=sampleda, factorLevels=factorLevels, plotda=TRUE)
+        mapping <- aes_string(x="readsNums", y="value", color="sample")
+        if (!missing(factorNames)){
+            obj <- summarySE(obj, measurevar="value", groupvars=c(factorNames, "readsNums", "Alpha"), na.rm=TRUE)
+            obj$up <- obj$value - obj$se
+            obj$down <- obj$value + obj$se
+            mapping <- modifyList(mapping, aes_string(group=factorNames, color=factorNames, fill=factorNames, ymin="up", ymax="down"))
     	}
     }
     if (!is.null(indexNames)){
         obj <- obj %>% filter(.data$Alpha %in% indexNames)
     }
-    p <- ggplot(data=obj, mapping=mapping) +
-    	 geom_smooth(se=se, method = method, 
-	             size=linesize,formula = formula,
-    			...) + 
-         scale_y_continuous(limits=c(0,NA), oob=squish)
+    p <- ggplot(data=obj, mapping=mapping) #+
     if (!missing(factorNames)){
-        p <- p + geom_errorbar(alpha=0.5)
+        #p <- p + geom_errorbar(alpha=0.5)
+        p <- p + geom_ribbon(alpha=0.3, color=NA, show.legend=FALSE)
     }    
-    p <- p + facet_wrap(~ Alpha, scales="free", nrow=facetnrow) +
-	 ylab("alpha metric")+xlab("number of reads")
+    p <- p + geom_smooth(se=se, method = method, size=linesize,formula = formula,...)+
+         scale_y_continuous(limits=c(0,NA), oob=squish) +
+         facet_wrap(~ Alpha, scales="free", nrow=facetnrow) +
+         ylab("alpha metric")+xlab("number of reads")
     return(p)
 }
 
