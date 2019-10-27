@@ -42,7 +42,11 @@ Imports:
   coin,
   ggsignif,
   scales,
-  Rmisc
+  Rmisc,
+  DECIPHER,
+  biomformat,
+  yaml,
+  phangorn
 Suggests:
   DT,
   prettydoc,
