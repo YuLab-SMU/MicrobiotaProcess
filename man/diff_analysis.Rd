@@ -25,20 +25,23 @@ or data.frame, nrow sample * ncol features.}
 
 \item{..., }{additional parameters.}
 
-\item{sampleda}{data.frame, nrow sample * ncol factor, the sample names of sampleda and data should be the same.}
+\item{sampleda}{data.frame, nrow sample * ncol factor, the sample names of 
+sampleda and data should be the same.}
 
 \item{class}{character, the factor name in sampleda.}
 
 \item{subclass}{character, the factor name in sampleda, default is NULL, 
 meaning no subclass compare.}
 
-\item{taxda}{data.frame, the classification of the feature in data. default is NULL.}
+\item{taxda}{data.frame, the classification of the feature in data. 
+default is NULL.}
 
 \item{alltax}{logical, whether to set all classification as features if taxda is not NULL, 
 default is TRUE.}
 
-\item{standard_method}{character, the method of standardization, see also \code{\link[vegan]{decostand}},
-default is NULL, it represents that the relative abundance of taxonomy will be used.}
+\item{standard_method}{character, the method of standardization, 
+see also \code{\link[vegan]{decostand}}, default is NULL, 
+it represents that the relative abundance of taxonomy will be used.}
 
 \item{mlfun}{character, the method for calculating the effect size of features, 
 choose "lda" or "rf", default is "lda".}
