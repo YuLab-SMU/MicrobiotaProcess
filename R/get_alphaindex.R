@@ -39,7 +39,7 @@ setMethod("get_alphaindex", "matrix", function(obj, mindepth, sampleda,...){
            stop("the data should be integer (counts)!")
     }
     if (missing(mindepth) || is.null(mindepth)){
-           mindepth = min(rowSums(obj))
+           mindepth <- min(rowSums(obj))
     }
     obj <- rrarefy(obj, mindepth)
     Chao <- estimateR(obj)
