@@ -142,9 +142,9 @@ read.featuretab <- function(file, build_tree=FALSE, ...){
     if (taxflag){
         taxtab <- NULL
     }else{
-        taxtab = lapply(biomobj$rows, function(i){parse_taxonomy_greengenes(i$metadata$taxonomy)})
+        taxtab <- lapply(biomobj$rows, function(i){parse_taxonomy_greengenes(i$metadata$taxonomy)})
         names(taxtab) <- rownames(x)
-        taxtab = build_tax_table(taxtab)
+        taxtab <- build_tax_table(taxtab)
     }
     return(list(otutab = x, taxtab=taxtab, refseq = refseq, reftree= reftree))
 }
@@ -154,7 +154,7 @@ read.featuretab <- function(file, build_tree=FALSE, ...){
 #' @importFrom utils read.table
 #' @keywords internal 
 read.taxa <- function(file, parallel=FALSE){
-    x <- read.table(file, sep="\t", row.names=1, header=T)
+    x <- read.table(file, sep="\t", row.names=1, header=TRUE)
     flag <- guess_rownames(rownames(x))
     if (flag=="DNA"){
         refseq <- rownames(x)
