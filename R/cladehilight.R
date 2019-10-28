@@ -26,10 +26,11 @@ getlabeldf <- function(ggtree, node, angle="auto"){
     	data$extend <- get_extend(tmpnum)*0.9
     }
     df <- lapply(node, function(x)getcladelabelposition(data, 
-	            x, angle=angle, angleoff=90))
+                 x, angle=angle, angleoff=90))
     df <- do.call("rbind", df)
     df$node <- node
-    df$y <- as.numeric(apply(df[,match(c("y", "yend"), colnames(df))], 1, mean)) 
+    df$y <- as.numeric(apply(df[,match(c("y", "yend"), colnames(df))],
+                             1, mean)) 
     data <- data %>% dplyr::select(-c("x", "y", "angle"))
     df <- merge(df, data, by.x="node", by.y="node")
     df$x <- df$x + df$extend
@@ -38,9 +39,12 @@ getlabeldf <- function(ggtree, node, angle="auto"){
 
 #' @author GuangChuang Yu, Shuangbin Xu
 #' @keywords internal
-getcladelabelposition <- function(data, node, angle = "auto", adjustRatio=1, angleoff=90, extend = 0) { 
+getcladelabelposition <- function(data, 
+                                  node, angle = "auto", 
+                                  adjustRatio=1, angleoff=90, 
+                                  extend = 0) { 
     if (length(extend) == 1) {
-    	 extend = rep(extend, 2)
+    	 extend <- rep(extend, 2)
     }
     sp <- tryCatch(offspringtbl_tree(data, node)$node, error=function(e) NULL)
     i <- match(node, data$node)
@@ -76,12 +80,13 @@ getcladelabelposition <- function(data, node, angle = "auto", adjustRatio=1, ang
 getannotlabel <- function(labeldf,classlevel=4){
     df <- labeldf[labeldf$levelindex <= classlevel, ]
     dat <- labeldf[labeldf$levelindex > classlevel, ]
-    if (nrow(df)>26){
-    	lengthtmp <- round(nrow(df)/26,0) + 1
-    	lefttmp <- nrow(df) - 26
-    	annolabel <- c(letters,paste0(rep(letters,lengthtmp)[seq_len(lefttmp)], seq(1,lefttmp))) 
+    lett <- c(letters, toupper(letters))
+    if (nrow(df)>52){
+        lengthtmp <- round(nrow(df)/52,0) + 1
+        lefttmp <- nrow(df) - 52
+        annolabel <- c(lett,paste0(rep(lett,lengthtmp)[seq_len(lefttmp)], seq(1,lefttmp))) 
     }else{
-    	annolabel <- letters[seq_len(nrow(df))]
+        annolabel <- lett[seq_len(nrow(df))]
     }
     tmplabels <- paste(annolabel, df$label,sep=": ")
     df$label <- annolabel
