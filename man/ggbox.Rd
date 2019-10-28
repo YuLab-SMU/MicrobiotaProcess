@@ -53,6 +53,9 @@ default is 0.1.}
 
 \item{facetnrow}{integer, the nrow of facet, default is 1.}
 }
+\value{
+a 'ggplot' plot object, a box or violine plot.
+}
 \description{
 A box or violin plot with significance test
 }
