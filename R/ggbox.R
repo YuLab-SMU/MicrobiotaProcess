@@ -20,6 +20,7 @@
 #' default is 0.1.
 #' @param facetnrow integer, the nrow of facet, default is 1.
 #' @param ... additional arguments, see also \code{\link[ggsignif]{geom_signif}}.
+#' @return a 'ggplot' plot object, a box or violine plot.
 #' @export
 #' @examples
 #' library(tidyverse)
