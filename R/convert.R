@@ -4,6 +4,7 @@
 #' @return treedata class.
 #' @author Shuangbin Xu
 #' @importFrom tibble as_tibble
+#' @importFrom tidytree treedata
 #' @export
 #' @examples
 #' data(hmp_aerobiosis_small)
@@ -40,7 +41,7 @@ convert_to_treedata <- function(data,...){
     node.label <- as.vector(mapping$labelnames)[!mapping$isTip]
     tip.label <- as.vector(mapping$labelnames)[mapping$isTip]
     taxphylo <- structure(list(edge=edges, node.label=node.label,
-    			       tip.label=tip.label, edge.length=rep(0.5, nrow(edges)),
-    			       Nnode = length(node.label)), class="phylo") 
-    res <- new("treedata", phylo=taxphylo, data=as_tibble(mapping))
+                               tip.label=tip.label, edge.length=rep(0.5, nrow(edges)),
+                               Nnode = length(node.label)), class="phylo")
+    res <- treedata(phylo=taxphylo, data=as_tibble(mapping))
 }
