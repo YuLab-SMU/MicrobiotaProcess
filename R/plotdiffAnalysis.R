@@ -71,7 +71,7 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", s
     cladecoord <- getcladedf(p, nodedf$node)
     cladecoord <- merge(cladecoord, nodedf, by.x="node", by.y="node")
     if (layout=="rectangular"){
-        taxlevel=7
+        taxlevel <- 7
         labelannotcoord <- getlabeldf(p, nodedf$node, angle="others")
     }else{
         labelannotcoord <- getlabeldf(p, nodedf$node)
@@ -169,7 +169,7 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
 #'                         subclmin=3, subclwilc=TRUE,
 #'                         secondalpha=0.01, ldascore=3)
 #' # not run in example
-#' #ggdifftaxbar(diffres, output="./biomarker_barplot")
+#' #ggdifftaxbar(diffres, output="biomarker_barplot")
 ggdifftaxbar <- function(obj,...){
     UseMethod("ggdifftaxbar")
 }
@@ -208,7 +208,7 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
     	subclass <- classname
     }
     if(is.null(filepath)){filepath <- getwd()}
-    filepath <- paste(filepath, output, sep="/")
+    filepath <- file.path(filepath, output)
     dir.create(filepath, showWarnings = FALSE)
     for (vars in featurelist){
     	resdf <- getMeanMedian(datameta=featureda, 
@@ -220,9 +220,8 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
     					    subclass,...)
 	if (grepl("/", vars)){
             vars <- sub("/", "--", vars)
-	    #filename <- paste(filepath, paste0(vars,".svg"), sep="/")
 	}
-        filename <- paste(filepath, paste0(vars,".svg"), sep="/")	
+        filename <- file.path(filepath, paste0(vars,".svg"))	
         ggsave(filename, p, device="svg", width = figwidth, height=figheight)
     }
 })
@@ -251,9 +250,9 @@ ggdifftaxbar.featureMeanMedian <- function(obj, featurename, class, subclass, xt
     	scale_y_continuous(expand=c(0,0), limits=c(0,max(data$RelativeAbundance)*1.05))
     p <- p + theme_bw() + guides(fill= guide_legend(keywidth = 0.5, keyheight = 0.5, order=1),
     			   linetype=guide_legend(keywidth = 0.7, keyheight = 0.5, order=2))+
-    	 theme(plot.title = element_text(face="bold",lineheight=25,hjust=0.5),
+    	 theme(plot.title = element_text(face="bold",lineheight=25,hjust=0.5), legend.box.spacing=unit(0.02,"cm"),
     	       panel.grid=element_blank(), legend.text = element_text(size=6.5),  legend.title=element_text(size=7),
-    	       legend.background=element_rect(fill=NA), axis.text.x=element_text(angle=-45, hjust = 0, size=xtextsize),
+    	       legend.background=element_rect(fill=NA), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
     	       panel.spacing = unit(0.2, "mm"), strip.background = element_rect(colour=NA,fill="grey"))
     if (setColors){
     	if (is.null(coloslist)){
