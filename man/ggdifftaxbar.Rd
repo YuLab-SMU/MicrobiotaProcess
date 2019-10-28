@@ -74,7 +74,7 @@ diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
                         subclmin=3, subclwilc=TRUE,
                         secondalpha=0.01, ldascore=3)
 # not run in example
-#ggdifftaxbar(diffres, output="./biomarker_barplot")
+#ggdifftaxbar(diffres, output="biomarker_barplot")
 }
 \author{
 Shuangbin Xu
