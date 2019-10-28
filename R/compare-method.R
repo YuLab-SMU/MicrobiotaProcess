@@ -1,15 +1,18 @@
 #' @title Differential expression analysis
 #' @param obj object,a phyloseq class contained otu_table, sample_data, taxda, 
 #' or data.frame, nrow sample * ncol features.
-#' @param sampleda data.frame, nrow sample * ncol factor, the sample names of sampleda and data should be the same.
+#' @param sampleda data.frame, nrow sample * ncol factor, the sample names of 
+#' sampleda and data should be the same.
 #' @param class character, the factor name in sampleda.
 #' @param subclass character, the factor name in sampleda, default is NULL, 
 #' meaning no subclass compare.
-#' @param taxda data.frame, the classification of the feature in data. default is NULL.
+#' @param taxda data.frame, the classification of the feature in data. 
+#' default is NULL.
 #' @param alltax logical, whether to set all classification as features if taxda is not NULL, 
 #' default is TRUE.
-#' @param standard_method character, the method of standardization, see also \code{\link[vegan]{decostand}},
-#' default is NULL, it represents that the relative abundance of taxonomy will be used.
+#' @param standard_method character, the method of standardization, 
+#' see also \code{\link[vegan]{decostand}}, default is NULL, 
+#' it represents that the relative abundance of taxonomy will be used.
 #' @param mlfun character, the method for calculating the effect size of features, 
 #' choose "lda" or "rf", default is "lda".
 #' @param ratio numeric, range from 0 to 1, the proportion of samples for calculating the effect 
