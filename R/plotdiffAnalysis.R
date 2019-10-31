@@ -140,13 +140,12 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
 #' @param removeUnkown logical, whether do not show unkown taxonomy, default is TRUE.
 #' @param figwidth numeric, the width of figures, default is 6.
 #' @param figheight numeric, the height of figures, default is 3.
+#' @param ylabel character, the label of y, default is 'relative abundance'.
 #' @param featurename character, the feature name, contained at the objet.
 #' @param class character, factor name.
 #' @param subclass character, factor name. 
 #' @param factorLevels list,  the levels of the factors, default is NULL,
 #' if you want to order the levels of factor, you can set this. 
-#' @param setColors logical, whether set the colors, default is TRUE, or FALSE,then
-#' use scale_color_manual setting.
 #' @param coloslist vector, color vector, if the input is phyloseq, 
 #' you should use this to adjust the color, not scale_color_manual.
 #' @param ... additional arguments.
@@ -187,6 +186,7 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
     removeUnkown=TRUE,
     figwidth=6,
     figheight=3,
+    ylabel="relative abundance",
     ...){
     featureda <- obj@originalD
     classname <- getcall(obj, "class")
@@ -217,7 +217,9 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
     	p <- ggdifftaxbar.featureMeanMedian(resdf,
     				            vars,
     					    classname,
-    					    subclass,...)
+    					    subclass,
+                                            ylabel=ylabel,
+                                            ...)
 	if (grepl("/", vars)){
             vars <- sub("/", "--", vars)
 	}
@@ -232,7 +234,7 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
 #' @importFrom ggplot2 guide_legend element_text element_rect element_blank scale_fill_manual
 #' @export
 ggdifftaxbar.featureMeanMedian <- function(obj, featurename, class, subclass, xtextsize=3,
-    factorLevels=NULL, setColors=TRUE, coloslist=NULL, ...){
+    factorLevels=NULL, coloslist=NULL, ylabel="relative abundance", ...){
     data <- obj$singlefedf
     dastatistic <- obj$singlefestat
     if (!is.null(factorLevels)){
@@ -246,7 +248,7 @@ ggdifftaxbar.featureMeanMedian <- function(obj, featurename, class, subclass, xt
 	              size=0.5, width=1, inherit.aes=FALSE)+
     	scale_linetype_manual(values=c("solid", "dotted"))+
     	facet_grid(as.formula(paste0("~",class)), space="free_x", scales="free_x") + 
-    	labs(title=featurename) + xlab(NULL)+
+    	labs(title=featurename) + xlab(NULL)+ ylab(ylabel)+
     	scale_y_continuous(expand=c(0,0), limits=c(0,max(data$RelativeAbundance)*1.05))
     p <- p + theme_bw() + guides(fill= guide_legend(keywidth = 0.5, keyheight = 0.5, order=1),
     			   linetype=guide_legend(keywidth = 0.7, keyheight = 0.5, order=2))+
@@ -254,13 +256,11 @@ ggdifftaxbar.featureMeanMedian <- function(obj, featurename, class, subclass, xt
     	       panel.grid=element_blank(), legend.text = element_text(size=6.5),  legend.title=element_text(size=7),
     	       legend.background=element_rect(fill=NA), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
     	       panel.spacing = unit(0.2, "mm"), strip.background = element_rect(colour=NA,fill="grey"))
-    if (setColors){
-    	if (is.null(coloslist)){
-    		tmpn <- length(unique(as.vector(data[[match(subclass,colnames(data))]])))
-    		p <- p + scale_fill_manual(values=getCols(tmpn))
-    	}else{
-    		p <- p + scale_fill_manual(values=coloslist)
-    	}
+    if (is.null(coloslist)){
+        tmpn <- length(unique(as.vector(data[[match(subclass,colnames(data))]])))
+        p <- p + scale_fill_manual(values=getCols(tmpn))
+    }else{
+        p <- p + scale_fill_manual(values=coloslist)
     }
     return(p)
 }
