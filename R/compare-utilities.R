@@ -3,6 +3,7 @@
 #' @param data data.frame, nrow sample * ncol feature+factorNames.
 #' @param feature vector, the features wanted to test.
 #' @param factorNames character, the name of a factor giving the corresponding groups.
+#' @param subgroup vector, the names of groups, default is NULL.
 #' @param ..., additional arguments for fun.
 #' @return the result of fun, if fun is wilcox.test, it 
 #' will return the list with class "htest".
@@ -17,16 +18,25 @@
 #' head(datest)
 #' multi.compare(fun=wilcox.test,data=datest,
 #'               feature=c("A", "B"),factorNames="group")
+#' da2 <- data.frame(A=rnorm(1:15,mean=5),
+#'                   B=rnorm(2:16,mean=6),
+#'                   group=c(rep("case1",5),rep("case2",5),rep("control",5)))
+#' multi.compare(fun=wilcox.test,data=da2,
+#'               feature=c("A", "B"),factorNames="group",
+#'               subgroup=c("case1", "case2"))
 multi.compare <- function(fun = wilcox.test, 
-						data, 
-						feature, 
-						factorNames, ...){ 
-	#sapply(feature,
+                          data, 
+                          feature, 
+                          factorNames, 
+                          subgroup=NULL, ...){ 
+    if (!is.null(subgroup)){
+        data <- data[data[[factorNames]] %in% subgroup, ,drop=FALSE]
+        data[[factorNames]] <- factor(data[[factorNames]], levels=subgroup)
+    }
     lapply(feature,
-    	   function(x){
-    	   tmpformula <- new_formula(as.name(x), as.name(factorNames))
-    	   suppressWarnings(do.call(fun,list(tmpformula,data=data, ...)))})#, 
-    	   #simplify = FALSE)
+           function(x){
+           tmpformula <- new_formula(as.name(x), as.name(factorNames))
+           suppressWarnings(do.call(fun,list(tmpformula,data=data, ...)))}) 
 }
 
 #' @title Methods for computation of the p-value
