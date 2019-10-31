@@ -4,7 +4,8 @@
 \alias{multi.compare}
 \title{a container for performing two or more sample test.}
 \usage{
-multi.compare(fun = wilcox.test, data, feature, factorNames, ...)
+multi.compare(fun = wilcox.test, data, feature, factorNames,
+  subgroup = NULL, ...)
 }
 \arguments{
 \item{fun}{character, the method for test, optional ""}
@@ -14,6 +15,8 @@ multi.compare(fun = wilcox.test, data, feature, factorNames, ...)
 \item{feature}{vector, the features wanted to test.}
 
 \item{factorNames}{character, the name of a factor giving the corresponding groups.}
+
+\item{subgroup}{vector, the names of groups, default is NULL.}
 
 \item{..., }{additional arguments for fun.}
 }
@@ -31,6 +34,12 @@ datest <- data.frame(A=rnorm(1:10,mean=5),
 head(datest)
 multi.compare(fun=wilcox.test,data=datest,
               feature=c("A", "B"),factorNames="group")
+da2 <- data.frame(A=rnorm(1:15,mean=5),
+                  B=rnorm(2:16,mean=6),
+                  group=c(rep("case1",5),rep("case2",5),rep("control",5)))
+multi.compare(fun=wilcox.test,data=da2,
+              feature=c("A", "B"),factorNames="group",
+              subgroup=c("case1", "case2"))
 }
 \author{
 Shuangbin Xu
