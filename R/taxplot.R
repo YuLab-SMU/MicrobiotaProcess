@@ -21,7 +21,7 @@ ggbartax.default <- function(obj, mapping=NULL, position = "stack", stat="identi
     #	tmpformula <- as.formula(paste0("~ ",tmpfactor[1]))
     #	p <- p + facet_grid(tmpformula, scales="free_x", space="free_x")
     #}
-    if(is.null(mapping)){
+    if(!is.null(mapping)){
         tmpn <- length(levels(obj$feature))
         p <- p + scale_fill_manual(values=getCols(tmpn))
     }
