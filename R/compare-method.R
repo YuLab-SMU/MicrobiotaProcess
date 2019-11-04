@@ -111,7 +111,7 @@ diff_analysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=
     dameta <- sampledflist(dameta, bootnums=bootnums, ratio=ratio)
     dameta <- removeconstant(dameta) 
     if (mlfun=="lda"){mlres <- LDAeffectsize(dameta, compareclass, class, bootnums=bootnums, LDA=ldascore)}
-    if (mlfun=="rf"){mlres <- rfimportance(dameta, class, bootnums=bootnums)}
+    if (mlfun=="rf"){mlres <- rfimportance(dameta, class, bootnums=bootnums, effsize=ldascore)}
     tmpfun <- ifelse(!"funname" %in% names(match.call()),NA,"diff_analysis.data.frame")
     res <- new("diffAnalysisClass",originalD=obj,sampleda=sampleda,taxda=taxda,kwres=kwres,
                secondvars=secondvars,mlres=mlres,call=match.call.defaults(fun=tmpfun))
@@ -129,10 +129,10 @@ diff_analysis.phyloseq <- function(obj, ...){
     taxda <- tax_table(obj)
     call <- match.call()
     res <- diff_analysis.data.frame(obj=otuda,
-                                   sampleda=sampleda,
-                                   taxda=taxda,
-				   funname=TRUE,
-                                   ...)
+                                    sampleda=sampleda,
+                                    taxda=taxda,
+                                    funname=TRUE,
+                                    ...)
     for (i in setdiff(names(as.list(res@call)), names(call))){
         call[i] <- list(as.list(res@call)[[i]])
     }
@@ -140,8 +140,54 @@ diff_analysis.phyloseq <- function(obj, ...){
     return(res)
 }
 
+#' @title get the table of abundance of all level taxonomy 
+#'
+#' @description
+#' This function was designed to get the abundance of all level taxonomy,
+#' the input can be phyloseq object or data.frame.
+#' @param obj object, phyloseq or data.frame
+#' @param method character, the normalization method, 
+#' see also \code{\link[vegan]{decostand}}, default is NULL, the relative abundance 
+#' will return.
+#' @param taxda data.frame, the taxonomy table.
+#' @param taxa_are_rows logical, if the obj is data.frame, and the features are rownames,
+#' the taxa_are_rows should be set TRUE, default FALSE, meaning the features are colnames. 
+#' @param ..., additional parameters, see also \code{\link[vegan]{decostand}}.
+#' @return the all taxonomy abundance table
+#' @author Shuangbin Xu
+#' @export
+#' @examples
+#' data(test_otu_data)
+#' alltaxatab <- get_alltaxadf(test_otu_data)
+#' head(alltaxatab[,1:10])
+setGeneric("get_alltaxadf", function(obj, ...){standardGeneric("get_alltaxadf")})
 
-#' @importFrom dplyr bind_rows
+#' @aliases get_alltaxadf,phyloseq
+#' @rdname get_alltaxadf
+#' @importFrom phyloseq tax_table
+#' @export
+setMethod("get_alltaxadf", "phyloseq",function(obj, method=NULL,...){
+    otuda <- checkotu(obj)
+    if (is.null(obj@tax_table)){
+        stop("The taxaonomy table is empty!")
+    }else{
+        taxa <- fillNAtax(tax_table(obj)) 
+    }
+    data <- getalltaxdf(data=otuda, taxda=taxa, method=NULL,...)
+    return(data)
+})
+
+#' @aliases get_alltaxadf,data.frame
+#' @rdname get_alltaxadf
+#' @export
+setMethod("get_alltaxadf", "data.frame", function(obj, taxda, taxa_are_rows=FALSE, method=NULL, ...){
+    if (!taxa_are_rows){
+        obj <- data.frame(t(obj), check.names=FALSE)
+    }
+    data <- getalltaxdf(data=obj, taxda=taxda, method=NULL,...)
+    return(data)
+})
+
 #' @importFrom magrittr %>%
 #' @keywords internal
 getalltaxdf <- function(data, taxda, method=NULL, ...){
