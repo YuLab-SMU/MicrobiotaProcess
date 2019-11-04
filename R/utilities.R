@@ -78,14 +78,15 @@ filltaxname <- function(taxdf){
     taxdf[indexmark] <- NA
     indextmp <- apply(is.na(taxdf), 1, which)
     if(length(indextmp)==0){
-    	return(taxdf)
+        taxdf <- data.frame(taxdf, check.names=FALSE)
+        return(taxdf)
     }
     taxdf <- apply(taxdf, 1, na.locf)
     taxdf <- lapply(seq_len(ncol(taxdf)), function(i) taxdf[,i])
     newtaxname <- function(x, y){
-    	y <- as.vector(y)
-    	x[y] <- paste(taxlevel[y], x[y], sep="__un_")
-    	x
+        y <- as.vector(y)
+        x[y] <- paste(taxlevel[y], x[y], sep="__un_")
+        x
     }
     taxdf <- data.frame(t(mapply(newtaxname, taxdf, indextmp)), 
     					stringsAsFactors=FALSE)
