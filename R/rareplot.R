@@ -15,8 +15,8 @@ ggrarecurve.default <- function(obj,
         mapping <- aes_string(x="readsNums", y="value", color="sample")
         if (!missing(factorNames)){
             obj <- summarySE(obj, measurevar="value", groupvars=c(factorNames, "readsNums", "Alpha"), na.rm=TRUE)
-            obj$up <- obj$value - obj$se
-            obj$down <- obj$value + obj$se
+            obj$up <- obj$value - obj$sd
+            obj$down <- obj$value + obj$sd
             mapping <- modifyList(mapping, aes_string(group=factorNames, color=factorNames, fill=factorNames, ymin="up", ymax="down"))
     	}
     }
