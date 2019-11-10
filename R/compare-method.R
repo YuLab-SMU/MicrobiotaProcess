@@ -166,25 +166,25 @@ setGeneric("get_alltaxadf", function(obj, ...){standardGeneric("get_alltaxadf")}
 #' @rdname get_alltaxadf
 #' @importFrom phyloseq tax_table
 #' @export
-setMethod("get_alltaxadf", "phyloseq",function(obj, method=NULL,...){
+setMethod("get_alltaxadf", "phyloseq",function(obj, ...){
     otuda <- checkotu(obj)
     if (is.null(obj@tax_table)){
         stop("The taxaonomy table is empty!")
     }else{
         taxa <- fillNAtax(tax_table(obj)) 
     }
-    data <- getalltaxdf(data=otuda, taxda=taxa, method=NULL,...)
+    data <- getalltaxdf(data=otuda, taxda=taxa, ...)
     return(data)
 })
 
 #' @aliases get_alltaxadf,data.frame
 #' @rdname get_alltaxadf
 #' @export
-setMethod("get_alltaxadf", "data.frame", function(obj, taxda, taxa_are_rows=FALSE, method=NULL, ...){
+setMethod("get_alltaxadf", "data.frame", function(obj, taxda, taxa_are_rows=FALSE, ...){
     if (!taxa_are_rows){
         obj <- data.frame(t(obj), check.names=FALSE)
     }
-    data <- getalltaxdf(data=obj, taxda=taxda, method=NULL,...)
+    data <- getalltaxdf(data=obj, taxda=taxda, ...)
     return(data)
 })
 
@@ -197,11 +197,15 @@ getalltaxdf <- function(data, taxda, method=NULL, ...){
         if (is.null(method)){
             dat <- CountOrRatios(data, taxda[,i,drop=FALSE],
                                  countmode=FALSE, rownamekeep=FALSE)
-	}else{
-	    dat <- CountOrRatios(data, taxda[,i,drop=FALSE], 
+        }else{
+            dat <- CountOrRatios(data, taxda[,i,drop=FALSE], 
                                  countmode=TRUE, rownamekeep=FALSE)
-            dat <- transformdf(data=dat, method=method, ...)
-	}
+            if(method=="count"){
+                dat <- dat
+            }else{
+                dat <- transformdf(data=dat, method=method, ...)
+            }
+        }
         dt[[i]] <- dat
     }
     dt <- do.call("rbind", dt)
