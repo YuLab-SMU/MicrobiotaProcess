@@ -28,7 +28,7 @@ information and(or pvalue).}
 \item{factorName}{character, the names of factor in nodedf.}
 
 \item{layout}{character, the layout of ggtree, but only "rectangular" 
-and "circular" in here, default is circular.}
+, "radial", "slanted" and "circular" in here, default is circular.}
 
 \item{size}{numeric, the size of segment of ggtree, default is 0.6.}
 
