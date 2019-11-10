@@ -11,24 +11,24 @@
 \usage{
 get_alltaxadf(obj, ...)
 
-\S4method{get_alltaxadf}{phyloseq}(obj, method = NULL, ...)
+\S4method{get_alltaxadf}{phyloseq}(obj, ...)
 
 \S4method{get_alltaxadf}{data.frame}(obj, taxda, taxa_are_rows = FALSE,
-  method = NULL, ...)
+  ...)
 }
 \arguments{
 \item{obj}{object, phyloseq or data.frame}
 
 \item{..., }{additional parameters, see also \code{\link[vegan]{decostand}}.}
 
-\item{method}{character, the normalization method, 
-see also \code{\link[vegan]{decostand}}, default is NULL, the relative abundance 
-will return.}
-
 \item{taxda}{data.frame, the taxonomy table.}
 
 \item{taxa_are_rows}{logical, if the obj is data.frame, and the features are rownames,
 the taxa_are_rows should be set TRUE, default FALSE, meaning the features are colnames.}
+
+\item{method}{character, the normalization method, 
+see also \code{\link[vegan]{decostand}}, default is NULL, the relative abundance 
+will return.}
 }
 \value{
 the all taxonomy abundance table
