@@ -12,7 +12,7 @@
 #' @param removeUnkown logical, whether do not show unkown taxonomy, 
 #' default is TRUE.
 #' @param layout character, the layout of ggtree, but only "rectangular" 
-#' and "circular" in here, default is circular.
+#' , "radial", "slanted" and "circular" in here, default is circular.
 #' @param size numeric, the size of segment of ggtree, default is 0.6.
 #' @param skpointsize numeric, the point size of skeleton of tree, 
 #' default is 0.8 .
@@ -64,13 +64,13 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", s
     skpointsize=0.8, alpha=0.4, taxlevel=6, cladetext=2, factorLevels=NULL, setColors=TRUE,
     ...){
     treedata <- convert_to_treedata(obj)
-    layout %<>% match.arg(c("rectangular", "circular"))
+    layout %<>% match.arg(c("rectangular", "circular", "slanted", "radial"))
     if (!is.null(factorLevels)){nodedf <- setfactorlevels(nodedf, factorLevels)}
     nodedf <- getnode(treedata, nodedf)
     p <- treeskeleton(treedata,	layout=layout,size=size,pointsize=skpointsize)
     cladecoord <- getcladedf(p, nodedf$node)
     cladecoord <- merge(cladecoord, nodedf, by.x="node", by.y="node")
-    if (layout=="rectangular"){
+    if (layout %in% c("rectangular","slanted")){
         taxlevel <- 7
         labelannotcoord <- getlabeldf(p, nodedf$node, angle="others")
     }else{
