@@ -252,6 +252,7 @@ as.data.frame.diffAnalysisClass <- function(x,...){
     efres <- tidyEffectSize(x)
     kwres <- x@kwres
     difftb <- merge(efres, kwres, by.x="f", by.y="f")
+    difftb <- difftb[order(difftb$pvalue),]
     return(difftb)
 }
 
