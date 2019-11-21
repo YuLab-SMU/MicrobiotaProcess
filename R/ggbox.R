@@ -18,6 +18,8 @@
 #' default is 2.
 #' @param step_increase numeric, see also \code{\link[ggsignif]{geom_signif}},
 #' default is 0.1.
+#' @param boxwidth numeric, the width of boxplot when the geom is 'violin',
+#' default is 0.2.
 #' @param facetnrow integer, the nrow of facet, default is 1.
 #' @param ... additional arguments, see also \code{\link[ggsignif]{geom_signif}}.
 #' @return a 'ggplot' plot object, a box or violine plot.
@@ -58,7 +60,7 @@ setGeneric("ggbox", function(obj, factorNames, ...){standardGeneric("ggbox")})
 setMethod("ggbox", "data.frame", 
           function(obj, sampleda, factorNames, indexNames, geom="boxplot",
                    factorLevels=NULL, compare=TRUE, testmethod="wilcox.test",
-                   signifmap=FALSE, p_textsize=2, step_increase=0.1, 
+                   signifmap=FALSE, p_textsize=2, step_increase=0.1, boxwidth=0.2,
                    facetnrow=1,...){
     if (missing(sampleda) || is.null(sampleda)){
         stop("the sampleda should be provided!")
@@ -82,7 +84,10 @@ setMethod("ggbox", "data.frame",
     mapping <- aes_string(x=factorNames,y="value",fill=factorNames)
     p <- ggplot(data=obj,mapping)
     ifelse(geom=="boxplot",p <- p + geom_boxplot(outlier.size=0.5,outlier.shape=21),
-           p <- p + geom_violin())
+           p <- p + geom_violin()+
+                geom_boxplot(outlier.size=0.5,outlier.shape=21, 
+			     width=boxwidth,
+                             fill="white", show.legend=FALSE))
     if (compare){
         p <- p + geom_signif(comparisons = comparelist,
 			     test = testmethod,
