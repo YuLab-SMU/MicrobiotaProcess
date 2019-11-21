@@ -9,7 +9,7 @@
 ggeffectsize(obj, ...)
 
 \method{ggeffectsize}{data.frame}(obj, factorName, effectsizename,
-  factorLevels = NULL, setColors = TRUE, ...)
+  factorLevels = NULL, ...)
 
 \method{ggeffectsize}{diffAnalysisClass}(obj, removeUnkown = TRUE, ...)
 }
@@ -25,9 +25,6 @@ or data.frame, contained effect size and the group information.}
 
 \item{factorLevels}{list, the levels of the factors, default is NULL,
 if you want to order the levels of factor, you can set this.}
-
-\item{setColors}{logical, whether set the colors, default is TRUE, or FALSE,then 
-use scale_color_manual setting.}
 
 \item{removeUnkown}{logical, whether do not show unkown taxonomy, default is TRUE.}
 }
