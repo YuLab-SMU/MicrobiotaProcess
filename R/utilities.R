@@ -68,11 +68,12 @@ getsample <- function(obj){
 }
 
 #' @keywords internal
-taxlevel <- c("k", "p", "c", "o", "f", "g", "s")
+taxlevel <- c("k", "p", "c", "o", "f", "g", "s", "st")
 
 #' @importFrom zoo na.locf
 #' @keywords internal
 filltaxname <- function(taxdf){
+    taxlevel <- taxlevel[seq_len(ncol(taxdf))]
     tmprownames <- rownames(taxdf)
     indexmark <- apply(taxdf, 2, function(x){nchar(x, keepNA = TRUE)})==3
     taxdf[indexmark] <- NA
@@ -96,7 +97,7 @@ filltaxname <- function(taxdf){
 
 #' @keywords internal
 addtaxlevel <- function(taxdf){
-	#taxlevel <- c("k", "p", "c", "o", "f", "g", "s")
+    taxlevel <- taxlevel[seq_len(length(taxdf))]
     paste(taxlevel, taxdf, sep="__")
 }
 
