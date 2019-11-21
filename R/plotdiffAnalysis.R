@@ -315,8 +315,6 @@ getMeanMedian <- function(datameta, feature, subclass){
 #' @param effectsizename character, the column name contained effect size information.
 #' @param factorLevels list, the levels of the factors, default is NULL,
 #' if you want to order the levels of factor, you can set this.
-#' @param setColors logical, whether set the colors, default is TRUE, or FALSE,then 
-#' use scale_color_manual setting.
 #' @param ... additional arguments.
 #' @return the figures of effect size show the LDA or MeanDecreaseAccuracy.
 #' @author Shuangbin Xu
@@ -359,7 +357,6 @@ ggeffectsize.data.frame <- function(obj,
     factorName, 
     effectsizename,
     factorLevels=NULL,
-    setColors=TRUE,
     ...){
     if (effectsizename %in% "LDA"){
     	xlabtext <- bquote(paste(Log[10],"(",.("LDA"), ")"))
@@ -379,12 +376,11 @@ ggeffectsize.data.frame <- function(obj,
     			   scales = "free_y", space = "free_y")+
     	scale_x_continuous(expand=c(0,0), 
     			   limits=c(0, max(obj[[effectsizename]])*1.1))+
-    	ylab(NULL) +
-    	xlab(xlabtext) 
-    if (setColors){
-    	tmpn <- length(unique(as.vector(obj[[factorName]])))
-    	p <- p + scale_color_manual(values=getCols(tmpn))
-    }
+    	ylab(NULL) + xlab(xlabtext) 
+    #if (setColors){
+    tmpn <- length(unique(as.vector(obj[[factorName]])))
+    p <- p + scale_color_manual(values=getCols(tmpn))
+    #}
     p <- p + theme_bw()+
     	theme(axis.text.y = element_text(size=12),
 	      axis.text.x = element_text(size=12),
