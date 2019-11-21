@@ -14,7 +14,7 @@ ggbox(obj, factorNames, ...)
 \S4method{ggbox}{data.frame}(obj, sampleda, factorNames, indexNames,
   geom = "boxplot", factorLevels = NULL, compare = TRUE,
   testmethod = "wilcox.test", signifmap = FALSE, p_textsize = 2,
-  step_increase = 0.1, facetnrow = 1, ...)
+  step_increase = 0.1, boxwidth = 0.2, facetnrow = 1, ...)
 
 \S4method{ggbox}{alphasample}(obj, factorNames, ...)
 }
@@ -50,6 +50,9 @@ default is 2.}
 
 \item{step_increase}{numeric, see also \code{\link[ggsignif]{geom_signif}},
 default is 0.1.}
+
+\item{boxwidth}{numeric, the width of boxplot when the geom is 'violin',
+default is 0.2.}
 
 \item{facetnrow}{integer, the nrow of facet, default is 1.}
 }
