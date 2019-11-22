@@ -46,8 +46,6 @@ phytax <- get_taxadf(test_otu_data, taxlevel=2)
 phytax
 head(phyloseq::otu_table(phytax))
 phybar <- ggbartax(phytax) + 
-          scale_y_continuous(expand=c(0,0), 
-                          limits=c(0, 105))+
          xlab(NULL) + ylab("relative abundance (\%)")
 }
 \author{
