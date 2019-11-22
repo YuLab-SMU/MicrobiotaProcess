@@ -13,6 +13,10 @@
 #' @param factorLevels list, the levels of the factors, default is NULL,
 #' if you want to order the levels of factor, you can set this.
 #' @param facetNames character, default is NULL.
+#' @param plotgroup logical, whether calculate the mean or median etc 
+#' for each group, default is FALSE.
+#' @param groupfun character, how to calculate for feature in each group,
+#' the default is `mean`, this will plot the mean of feature in each group.
 #' @param ... additional parameters, see \code{\link[ggplot2]{ggplot}}
 #' @return barplot of tax
 #' @author ShuangbinXu
@@ -21,8 +25,6 @@
 #' library(ggplot2)
 #' data(test_otu_data)
 #' otubar <- ggbartax(test_otu_data) + 
-#'          scale_y_continuous(expand=c(0,0),
-#'                             limits=c(0,105))+
 #'          xlab(NULL) + ylab("relative abundance(%)")
 ggbartax <- function(obj,...){
     UseMethod("ggbartax")
@@ -71,8 +73,6 @@ ggbartax.phyloseq <- function(obj, ...){
 #' phytax
 #' head(phyloseq::otu_table(phytax))
 #' phybar <- ggbartax(phytax) + 
-#'           scale_y_continuous(expand=c(0,0), 
-#'                           limits=c(0, 105))+
 #'          xlab(NULL) + ylab("relative abundance (%)")
 get_taxadf <- function(obj,...){
     UseMethod("get_taxadf")
@@ -108,7 +108,7 @@ get_taxadf.phyloseq <- function(obj, taxlevel=2, ...){
 }
 
 #' @method get_taxadf default
-#' @importFrom phyloseq otu_table tax_table
+#' @importFrom phyloseq phyloseq otu_table tax_table
 #' @rdname get_taxadf
 #' @export 
 get_taxadf.default <- function(obj, taxda, 
@@ -128,9 +128,7 @@ get_taxadf.default <- function(obj, taxda,
                                      tmptax, 
                                      rownamekeep=FALSE,...), 
                                      taxa_are_rows=TRUE)
-    taxdf <- new("phyloseq",
-                 otu_table=taxdf,
-                 sam_data=sampleda)
+    taxdf <- phyloseq(taxdf, sampleda)
     return(taxdf)
     
 }
