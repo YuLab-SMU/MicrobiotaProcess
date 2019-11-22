@@ -148,7 +148,7 @@ diff_analysis.phyloseq <- function(obj, ...){
 #' @param obj object, phyloseq or data.frame
 #' @param method character, the normalization method, 
 #' see also \code{\link[vegan]{decostand}}, default is NULL, the relative abundance 
-#' will return.
+#' will be return, if it set `count`, the count table will be return.
 #' @param taxda data.frame, the taxonomy table.
 #' @param taxa_are_rows logical, if the obj is data.frame, and the features are rownames,
 #' the taxa_are_rows should be set TRUE, default FALSE, meaning the features are colnames. 
@@ -166,25 +166,25 @@ setGeneric("get_alltaxadf", function(obj, ...){standardGeneric("get_alltaxadf")}
 #' @rdname get_alltaxadf
 #' @importFrom phyloseq tax_table
 #' @export
-setMethod("get_alltaxadf", "phyloseq",function(obj, ...){
+setMethod("get_alltaxadf", "phyloseq",function(obj, method=NULL, ...){
     otuda <- checkotu(obj)
     if (is.null(obj@tax_table)){
         stop("The taxaonomy table is empty!")
     }else{
         taxa <- fillNAtax(tax_table(obj)) 
     }
-    data <- getalltaxdf(data=otuda, taxda=taxa, ...)
+    data <- getalltaxdf(data=otuda, taxda=taxa, method=method, ...)
     return(data)
 })
 
 #' @aliases get_alltaxadf,data.frame
 #' @rdname get_alltaxadf
 #' @export
-setMethod("get_alltaxadf", "data.frame", function(obj, taxda, taxa_are_rows=FALSE, ...){
+setMethod("get_alltaxadf", "data.frame", function(obj, taxda, taxa_are_rows=FALSE, method=NULL, ...){
     if (!taxa_are_rows){
         obj <- data.frame(t(obj), check.names=FALSE)
     }
-    data <- getalltaxdf(data=obj, taxda=taxda, ...)
+    data <- getalltaxdf(data=obj, taxda=taxda, method=method,...)
     return(data)
 })
 
