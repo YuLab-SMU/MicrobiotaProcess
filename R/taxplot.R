@@ -2,30 +2,35 @@
 #' @rdname ggbartax
 #' @importFrom ggplot2 ggplot aes_ geom_bar scale_fill_manual facet_grid
 #' @importFrom stats as.formula
+#' @importFrom rlang as_name
+#' @importFrom stats aggregate
 #' @export
 ggbartax.default <- function(obj, mapping=NULL, position = "stack", stat="identity",
     width=0.7, topn=30, count=FALSE, sampleda=NULL, factorLevels=NULL,
-    facetNames=NULL, ...){
+    facetNames=NULL, plotgroup=FALSE, groupfun=mean,...){
     if (is.null(mapping)){
-    	mapping <- aes_(~sample, ~value, fill=~feature)
-    	obj <- mappingtaxda(data=obj, topn=topn, count=count, sampleda=sampleda, 
-    						 factorLevels=factorLevels, plotda=TRUE)
+        mapping <- aes_(~sample, ~value, fill=~feature)
+        obj <- mappingtaxda(data=obj, topn=topn, count=count, sampleda=sampleda, 
+                            factorLevels=factorLevels, plotda=TRUE)
+        if(!is.null(facetNames) & plotgroup){
+            formulatmp <- as.formula(paste0("value ~ ", 
+                                     paste(c(as.name(facetNames), "feature"),collapse="+")))
+            obj <- aggregate(formulatmp, obj, FUN=groupfun)
+            mapping <- aes_string(x=facetNames, y="value", fill="feature")
+        }
     }else{
-    	mapping <- mapping
+        mapping <- mapping
     }
     p <- ggplot(data=obj,mapping=mapping,...) + 
          geom_bar(position = position,stat=stat, width=width) + 
          scale_y_continuous(expand=c(0,0))
-    #tmpfactor <- setdiff(colnames(obj), c("feature", "sample", "value"))
-    #if (is.null(facetNames) && length(tmpfactor)>0){
-    #	tmpformula <- as.formula(paste0("~ ",tmpfactor[1]))
-    #	p <- p + facet_grid(tmpformula, scales="free_x", space="free_x")
-    #}
-    if(!is.null(mapping)){
-        tmpn <- length(levels(obj$feature))
-        p <- p + scale_fill_manual(values=getCols(tmpn))
+    if ("fill" %in% names(mapping)){
+        tmpn <- length(levels(obj[,as_name(mapping[["fill"]])]))
+    }else{
+        tmpn <- nrow(obj)
     }
-    if (!is.null(facetNames)){
+    p <- p + scale_fill_manual(values=getCols(tmpn))
+    if (!is.null(facetNames) & !plotgroup){
         tmpformula <- as.formula(paste0("~ ", facetNames))
         p <- p + facet_grid(tmpformula, scales="free_x", space="free_x")
     }
