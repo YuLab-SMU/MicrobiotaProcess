@@ -12,7 +12,8 @@ ggbartax(obj, ...)
 
 \method{ggbartax}{default}(obj, mapping = NULL, position = "stack",
   stat = "identity", width = 0.7, topn = 30, count = FALSE,
-  sampleda = NULL, factorLevels = NULL, facetNames = NULL, ...)
+  sampleda = NULL, factorLevels = NULL, facetNames = NULL,
+  plotgroup = FALSE, groupfun = mean, ...)
 }
 \arguments{
 \item{obj}{phyloseq, phyloseq class or data.frame, 
@@ -40,6 +41,12 @@ information, if the data doesn't contain the information.}
 if you want to order the levels of factor, you can set this.}
 
 \item{facetNames}{character, default is NULL.}
+
+\item{plotgroup}{logical, whether calculate the mean or median etc 
+for each group, default is FALSE.}
+
+\item{groupfun}{character, how to calculate for feature in each group,
+the default is `mean`, this will plot the mean of feature in each group.}
 }
 \value{
 barplot of tax
@@ -51,8 +58,6 @@ taxonomy barplot
 library(ggplot2)
 data(test_otu_data)
 otubar <- ggbartax(test_otu_data) + 
-         scale_y_continuous(expand=c(0,0),
-                            limits=c(0,105))+
          xlab(NULL) + ylab("relative abundance(\%)")
 }
 \author{
