@@ -315,6 +315,7 @@ getMeanMedian <- function(datameta, feature, subclass){
 #' @param effectsizename character, the column name contained effect size information.
 #' @param factorLevels list, the levels of the factors, default is NULL,
 #' if you want to order the levels of factor, you can set this.
+#' @param setFacet logical, whether use facet to plot, default is TRUE.
 #' @param ... additional arguments.
 #' @return the figures of effect size show the LDA or MeanDecreaseAccuracy.
 #' @author Shuangbin Xu
@@ -357,6 +358,7 @@ ggeffectsize.data.frame <- function(obj,
     factorName, 
     effectsizename,
     factorLevels=NULL,
+    setFacet=TRUE,
     ...){
     if (effectsizename %in% "LDA"){
     	xlabtext <- bquote(paste(Log[10],"(",.("LDA"), ")"))
@@ -371,11 +373,13 @@ ggeffectsize.data.frame <- function(obj,
     		     y=~f)) + 
     	geom_segment(aes_(xend=0, yend=~f), 
     		     color="grey") + 
-    	geom_point(aes_(color=as.formula(paste0("~",factorName)))) +
-    	facet_grid(as.formula(paste0(factorName," ~.")),
-    			   scales = "free_y", space = "free_y")+
-    	scale_x_continuous(expand=c(0,0), 
-    			   limits=c(0, max(obj[[effectsizename]])*1.1))+
+    	geom_point(aes_(color=as.formula(paste0("~",factorName)))) 
+    if (setFacet) {
+        p <- p + facet_grid(as.formula(paste0(factorName," ~.")),
+    			   scales = "free_y", space = "free_y")
+    }
+    p <- p + scale_x_continuous(expand=c(0,0), 
+        limits=c(0, max(obj[[effectsizename]])*1.1))+
     	ylab(NULL) + xlab(xlabtext) 
     #if (setColors){
     tmpn <- length(unique(as.vector(obj[[factorName]])))
@@ -396,7 +400,7 @@ ggeffectsize.data.frame <- function(obj,
 #' @method ggeffectsize diffAnalysisClass
 #' @rdname ggeffectsize
 #' @export
-ggeffectsize.diffAnalysisClass <- function(obj, removeUnkown=TRUE,...){
+ggeffectsize.diffAnalysisClass <- function(obj, removeUnkown=TRUE, setFacet=TRUE,...){
     efres <- tidyEffectSize(obj)
     classname <- getcall(obj, "class")
     if (removeUnkown && length(grep("__un_",efres$f))){
@@ -410,6 +414,7 @@ ggeffectsize.diffAnalysisClass <- function(obj, removeUnkown=TRUE,...){
     p <- ggeffectsize.data.frame(obj=efres, 
     			         factorName=classname, 
     			         effectsizename=effectsizename,
+                                 setFacet=setFacet,
     			          ...)
     return (p)
 }
