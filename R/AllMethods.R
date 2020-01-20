@@ -19,7 +19,7 @@
 #' the default is `mean`, this will plot the mean of feature in each group.
 #' @param ... additional parameters, see \code{\link[ggplot2]{ggplot}}
 #' @return barplot of tax
-#' @author ShuangbinXu
+#' @author Shuangbin Xu
 #' @export
 #' @examples
 #' library(ggplot2)
@@ -64,7 +64,7 @@ ggbartax.phyloseq <- function(obj, ...){
 #' @param ... additional parameters, see also 
 #' \code{\link[MicrobiotaProcess]{CountOrRatios}}
 #' @return phyloseq class contained tax data.frame and sample information.
-#' @author ShuangbinXu
+#' @author Shuangbin Xu
 #' @export
 #' @examples
 #' library(ggplot2)
@@ -155,7 +155,7 @@ get_taxadf.default <- function(obj, taxda,
 #' @param ... additional parameters, 
 #' see also \code{\link{ggplot2}{ggplot}}.
 #' @return figure of rarefaction curves
-#' @author ShuangbinXu
+#' @author Shuangbin Xu
 #' @export
 #' @examples
 #' data(test_otu_data)
@@ -191,7 +191,7 @@ ggrarecurve.phyloseq <- function(obj, ...){
 #' @param ... additional parameters,
 #' see also \code{\link[MicrobiotaProcess]{CountOrRatios}}.
 #' @return return a list for VennDiagram.
-#' @author ShuangbinXu
+#' @author Shuangbin Xu
 #' @export 
 #' @examples
 #' data(test_otu_data)
