@@ -18,7 +18,7 @@
 #' @importFrom Biostrings readBStringSet
 #' @importFrom rentrez entrez_fetch
 #' @importFrom stringr str_trim
-#' @author ShuangbinXu
+#' @author Shuangbin Xu
 #' @export
 #' @examples
 #' retrieveSeq(ids=c("ADM52729.1", "AAF82637.1"), 
@@ -31,32 +31,28 @@ retrieveSeq <- function(ids, files,
     type="fasta", 
     times=3, checkids=FALSE){
     if (file.exists(files) && checkids){
-    	seqobj <- readBStringSet(files)
-    	tmpid <- names(seqobj)
-    	tmpid <- unlist(vapply(strsplit(tmpid, " "),function(x){x[1]},character(1)))
-    	ids <- setdiff(ids, tmpid)
+        seqobj <- readBStringSet(files)
+        tmpid <- names(seqobj)
+        tmpid <- unlist(vapply(strsplit(tmpid, " "),function(x){x[1]},character(1)))
+        ids <- setdiff(ids, tmpid)
     }
     if (length(ids)>400){
-    	stop("The length of ids vector should be shorter than 400!")
+        stop("The length of ids vector should be shorter than 400!")
     }
     if (length(ids)==0){
-    	return(NA)
+        return(NA)
     }
     cat(ids)
     cat("\n")
     tryCatch({tmprecs <- entrez_fetch(db=databases, ids, rettype=type)
-    	    tmprecs <- gsub("\n\n", "\n", tmprecs)
-    		tmprecs <- str_trim(tmprecs)
-     	   write(tmprecs, 
-    		      files,
-    	          append=TRUE)},
-    	error=function(e){do.call("retrieveSeq", 
-    				     args=list(ids=ids,
-    						 files=files,
-    						 checkids=TRUE))})
+              tmprecs <- gsub("\n\n", "\n", tmprecs)
+              tmprecs <- str_trim(tmprecs)
+              write(tmprecs, files, append=TRUE)
+    },error=function(e){do.call("retrieveSeq", 
+                        args=list(ids=ids, databases=databases, 
+                                  type=type, files=files, checkids=TRUE))})
     message(paste0("Sleeping ... ",times,"s"))
     Sys.sleep(times)
-
 }
 
 #' @title Retriveing Sequencing from NCBI By mapply
@@ -75,7 +71,7 @@ retrieveSeq <- function(ids, files,
 #' default is FALSE.
 #' @return the files of sequences downloaded by ids
 #' @seealso \code{\link[MicrobiotaProcess]{retrieveSeq}}
-#' @author ShuangbinXu
+#' @author Shuangbin Xu
 #' @export
 #' @examples
 #' idslist <- list(c("ADM52729.1", "AAF82637.1"), 
@@ -84,17 +80,17 @@ retrieveSeq <- function(ids, files,
 #'                   files="test.fasta",
 #'                   databases="protein",
 #'                   type="fasta",
-#'                    times=3,checkids=TRUE)
+#'                   times=3,checkids=TRUE)
 mapplyretrieveSeq <- function(idlist, files, 
     databases="protein", 
     type="fasta", 
     times=3, checkids=TRUE){
     invisible(mapply(retrieveSeq, 
-    		   idlist, 
-      	 	   MoreArgs=list(files=files,
-    					  databases=databases,
-    					  type=type,
-    			          times=times,
-                          checkids=checkids),
-    		   SIMPLIFY=FALSE))
+                     idlist, 
+                     MoreArgs=list(files=files,
+                                   databases=databases,
+                                   type=type,
+                                   times=times,
+                                   checkids=checkids),
+                     SIMPLIFY=FALSE))
 }
