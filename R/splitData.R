@@ -15,7 +15,7 @@
 #' seed before.
 #' @return the subset of x, vector or data.frame class.
 #' @export
-#' @author ShuangbinXu
+#' @author Shuangbin Xu
 #' @examples
 #' data(iris)
 #' irislist <- splitData(iris, 40)
