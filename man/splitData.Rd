@@ -34,5 +34,5 @@ dalist <- c(1:100)
 dalist <- splitData(dalist, 30)
 }
 \author{
-ShuangbinXu
+Shuangbin Xu
 }
