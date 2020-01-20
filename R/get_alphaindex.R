@@ -9,7 +9,7 @@
 #' @param sampleda data.frame,sample information, row sample * column factors.
 #' @param ... additional arguments.
 #' @return data.frame contained alpha Index.
-#' @author ShuangbinXu
+#' @author Shuangbin Xu
 #' @export
 #' @examples
 #' library(tidyverse)
