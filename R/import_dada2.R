@@ -15,7 +15,7 @@
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom ape read.tree
 #' @return phyloseq class contained the argument class.
-#' @author ShuangbinXu
+#' @author Shuangbin Xu
 #' @export
 #' @examples
 #' seqtabfile <- system.file("extdata", "seqtab.nochim.rds",
