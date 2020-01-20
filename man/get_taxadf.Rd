@@ -49,5 +49,5 @@ phybar <- ggbartax(phytax) +
          xlab(NULL) + ylab("relative abundance (\%)")
 }
 \author{
-ShuangbinXu
+Shuangbin Xu
 }
