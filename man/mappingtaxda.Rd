@@ -31,6 +31,6 @@ build the data.frame for `geom_bar` of `ggplot2`,
 if the data.frame was built, you can visulize with `ggbartax`.
 }
 \author{
-ShuangbinXu
+Shuangbin Xu
 }
 \keyword{internal}
