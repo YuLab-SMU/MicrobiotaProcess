@@ -81,5 +81,5 @@ pcaplot <- ggordpoint(pcares, biplot=TRUE,
                      factorNames=c("SampleType"), ellipse=TRUE)
 }
 \author{
-ShuangbinXu
+Shuangbin Xu
 }
