@@ -50,5 +50,5 @@ vennlist
 #             imagetype = "svg")
 }
 \author{
-ShuangbinXu
+Shuangbin Xu
 }
