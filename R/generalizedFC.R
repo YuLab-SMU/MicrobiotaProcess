@@ -19,7 +19,7 @@
 #' data, contain 'NA's. Defaults to 'getOption("na.action")'.
 #' @param ... additional arguments.
 #' @return list contained gfc, the mean and median of different group.
-#' @author ShuangbinXu
+#' @author Shuangbin Xu
 #' @export
 #' @examples
 #' set.seed(1024)
