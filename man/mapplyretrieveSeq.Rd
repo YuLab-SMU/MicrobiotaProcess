@@ -37,11 +37,11 @@ mapplyretrieveSeq(idlist=idslist,
                   files="test.fasta",
                   databases="protein",
                   type="fasta",
-                   times=3,checkids=TRUE)
+                  times=3,checkids=TRUE)
 }
 \seealso{
 \code{\link[MicrobiotaProcess]{retrieveSeq}}
 }
 \author{
-ShuangbinXu
+Shuangbin Xu
 }
