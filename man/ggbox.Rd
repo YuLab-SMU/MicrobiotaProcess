@@ -87,3 +87,6 @@ class(alphaobj2)
 head(as.data.frame(alphaobj2))
 p2 <- ggbox(alphaobj2, factorNames="group")
 }
+\author{
+Shuangbin Xu
+}
