@@ -63,5 +63,5 @@ alphatab2 <- get_alphaindex(test_otu_data)
 head(as.data.frame(alphatab2))
 }
 \author{
-ShuangbinXu
+Shuangbin Xu
 }
