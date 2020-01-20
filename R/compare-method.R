@@ -140,6 +140,20 @@ diff_analysis.phyloseq <- function(obj, ...){
     return(res)
 }
 
+#
+#' @keywords internal 
+#normalize_da <- function(data, method){
+#    if (all.equal(data, round(data))){
+#        if (is.null(method)){
+#	    data <- apply(data, 1, function(x)100*x/sum(x))
+#        }else{
+#            data <- decostand(data, method=method, ...)
+#        }
+#        data <- data.frame(data, check.names=FALSE)
+#    }
+#    return(data)
+#}
+
 #' @title get the table of abundance of all level taxonomy 
 #'
 #' @description
