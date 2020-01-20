@@ -40,5 +40,5 @@ retrieveSeq(ids=c("ADM52729.1", "AAF82637.1"),
             checkids=TRUE)
 }
 \author{
-ShuangbinXu
+Shuangbin Xu
 }
