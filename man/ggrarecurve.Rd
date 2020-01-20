@@ -65,5 +65,5 @@ prare <- ggrarecurve(test_otu_data,
                legend.text=element_text(size=6))
 }
 \author{
-ShuangbinXu
+Shuangbin Xu
 }
