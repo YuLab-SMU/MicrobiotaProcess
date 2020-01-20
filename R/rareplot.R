@@ -48,7 +48,7 @@ ggrarecurve.default <- function(obj,
 #' @param plotda boolean, default is TRUE, whether build the data.frame for
 #' `geom_bar` of `ggplot2`.
 #' @return data.frame for ggrarecurve.
-#' @author ShuangbinXu
+#' @author Shuangbin Xu
 #' @importFrom dplyr bind_rows
 #' @importFrom reshape melt
 #' @importFrom magrittr %>%
