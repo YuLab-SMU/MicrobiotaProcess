@@ -43,5 +43,5 @@ ps <- import_dada2(seqtab=seqtab, taxatab=taxa,
 ps
 }
 \author{
-ShuangbinXu
+Shuangbin Xu
 }
