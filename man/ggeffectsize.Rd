@@ -9,9 +9,10 @@
 ggeffectsize(obj, ...)
 
 \method{ggeffectsize}{data.frame}(obj, factorName, effectsizename,
-  factorLevels = NULL, ...)
+  factorLevels = NULL, setFacet = TRUE, ...)
 
-\method{ggeffectsize}{diffAnalysisClass}(obj, removeUnkown = TRUE, ...)
+\method{ggeffectsize}{diffAnalysisClass}(obj, removeUnkown = TRUE,
+  setFacet = TRUE, ...)
 }
 \arguments{
 \item{obj}{object, diffAnalysisClass see \code{\link[MicrobiotaProcess]{diff_analysis}},
@@ -25,6 +26,8 @@ or data.frame, contained effect size and the group information.}
 
 \item{factorLevels}{list, the levels of the factors, default is NULL,
 if you want to order the levels of factor, you can set this.}
+
+\item{setFacet}{logical, whether use facet to plot, default is TRUE.}
 
 \item{removeUnkown}{logical, whether do not show unkown taxonomy, default is TRUE.}
 }
