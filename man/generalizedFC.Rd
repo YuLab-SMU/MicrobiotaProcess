@@ -56,5 +56,5 @@ generalizedFC(B ~ group,data=data)
 generalizedFC(x=c(1,2,3,4,5),y=c(3,4,5,6,7))
 }
 \author{
-ShuangbinXu
+Shuangbin Xu
 }
