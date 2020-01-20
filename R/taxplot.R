@@ -52,7 +52,7 @@ ggbartax.default <- function(obj, mapping=NULL, position = "stack", stat="identi
 #' @param plotda boolean, default is TRUE, whether build the data.frame for
 #' `geom_bar` of `ggplot2`.
 #' @return the data.frame for ggbartax
-#' @author ShuangbinXu
+#' @author Shuangbin Xu
 #' @importFrom magrittr %>%
 #' @importFrom reshape melt
 #' @keywords internal
@@ -168,7 +168,7 @@ theme_taxbar <- function(axis.text.x=element_text(angle = -45, hjust = 0, size=1
 ###' @param ncol integer, the ncol of legend.
 ###' @param ..., additional parameter.
 ###' @return the guides of legend.
-###' @author ShuangbinXu
+###' @author Shuangbin Xu
 ###' @importFrom ggplot2 guides guide_legend
 ###' @export
 ##
