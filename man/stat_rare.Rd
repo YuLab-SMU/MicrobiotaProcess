@@ -28,6 +28,6 @@ data.frame for ggrarecurve.
 generating the data of ggrarecurve.
 }
 \author{
-ShuangbinXu
+Shuangbin Xu
 }
 \keyword{internal}
