@@ -76,7 +76,7 @@ get_pca.phyloseq <- function(obj, method="hellinger", ...){
 #' @param textlinesize numeric, the segment size in \code{\link[ggrepel]{geom_text_repel}}.
 #' @param ... additional parameters, see \code{\link[ggrepel]{geom_text_repel}}. 
 #' @return point figures of PCA or PCoA.
-#' @author ShuangbinXu
+#' @author Shuangbin Xu
 #' @export
 #' @examples
 #' library(phyloseq)
