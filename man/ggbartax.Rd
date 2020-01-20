@@ -61,5 +61,5 @@ otubar <- ggbartax(test_otu_data) +
          xlab(NULL) + ylab("relative abundance(\%)")
 }
 \author{
-ShuangbinXu
+Shuangbin Xu
 }
