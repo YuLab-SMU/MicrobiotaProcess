@@ -23,7 +23,6 @@ Imports:
   dplyr,
   Biostrings,
   ggrepel,
-  stringr,
   vegan,
   rentrez,
   reshape,
