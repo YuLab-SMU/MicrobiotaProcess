@@ -17,7 +17,6 @@
 #' @return the files of sequences downloaded by ids
 #' @importFrom Biostrings readBStringSet
 #' @importFrom rentrez entrez_fetch
-#' @importFrom stringr str_trim
 #' @author Shuangbin Xu
 #' @export
 #' @examples
@@ -46,7 +45,8 @@ retrieveSeq <- function(ids, files,
     cat("\n")
     tryCatch({tmprecs <- entrez_fetch(db=databases, ids, rettype=type)
               tmprecs <- gsub("\n\n", "\n", tmprecs)
-              tmprecs <- str_trim(tmprecs)
+              #tmprecs <- str_trim(tmprecs)
+              tmprecs <- substr(tmprecs, 1, nchar(tmprecs)-1)
               write(tmprecs, files, append=TRUE)
     },error=function(e){do.call("retrieveSeq", 
                         args=list(ids=ids, databases=databases, 
