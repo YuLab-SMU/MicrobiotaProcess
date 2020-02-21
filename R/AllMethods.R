@@ -123,6 +123,7 @@ get_taxadf.default <- function(obj, taxda,
     	sampleda <- sample_data(sampleda)
     }
     taxda <- fillNAtax(taxda)
+    if (inherits(taxlevel, "numeric")){taxlevel <- colnames(taxda)[taxlevel]}
     tmptax <- taxda[,match(taxlevel, colnames(taxda)), drop=FALSE]
     taxdf <- otu_table(CountOrRatios(data=obj, 
                                      tmptax, 
