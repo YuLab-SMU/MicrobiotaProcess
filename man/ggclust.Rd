@@ -56,7 +56,7 @@ hc_p <- ggclust(hcsample, layout = "rectangular",
                 pointsize=1, fontsize=0,
                 factorNames=c("SampleType")) +
         theme_tree2(legend.position="right",
-                    plot.title = element_text(face="bold", lineheight=25,hjust=0.5)
+                    plot.title = element_text(face="bold", lineheight=25,hjust=0.5))
 }
 \author{
 Shuangbin Xu
