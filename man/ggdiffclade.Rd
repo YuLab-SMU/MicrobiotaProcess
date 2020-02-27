@@ -8,10 +8,20 @@
 \usage{
 ggdiffclade(obj, ...)
 
-\method{ggdiffclade}{data.frame}(obj, nodedf, factorName,
-  layout = "circular", size = 0.6, skpointsize = 0.8, alpha = 0.4,
-  taxlevel = 6, cladetext = 2, factorLevels = NULL,
-  setColors = TRUE, ...)
+\method{ggdiffclade}{data.frame}(
+  obj,
+  nodedf,
+  factorName,
+  layout = "circular",
+  size = 0.6,
+  skpointsize = 0.8,
+  alpha = 0.4,
+  taxlevel = 6,
+  cladetext = 2,
+  factorLevels = NULL,
+  setColors = TRUE,
+  ...
+)
 
 \method{ggdiffclade}{diffAnalysisClass}(obj, removeUnkown = TRUE, ...)
 }

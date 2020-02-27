@@ -8,12 +8,17 @@
 \usage{
 get_dist(obj, ...)
 
-\method{get_dist}{default}(obj, distmethod = "euclidean",
-  taxa_are_rows = FALSE, sampleda = NULL, tree = NULL,
-  method = "hellinger", ...)
+\method{get_dist}{default}(
+  obj,
+  distmethod = "euclidean",
+  taxa_are_rows = FALSE,
+  sampleda = NULL,
+  tree = NULL,
+  method = "hellinger",
+  ...
+)
 
-\method{get_dist}{phyloseq}(obj, distmethod = "euclidean",
-  method = "hellinger", ...)
+\method{get_dist}{phyloseq}(obj, distmethod = "euclidean", method = "hellinger", ...)
 }
 \arguments{
 \item{obj}{phyloseq, phyloseq class or data.frame

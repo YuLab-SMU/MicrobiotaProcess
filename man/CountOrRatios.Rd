@@ -4,8 +4,13 @@
 \alias{CountOrRatios}
 \title{caculate the count or relative abundance of replicate element with a speficify column}
 \usage{
-CountOrRatios(data, featurelist, countmode = TRUE, multiplenum = 1,
-  rownamekeep = FALSE)
+CountOrRatios(
+  data,
+  featurelist,
+  countmode = TRUE,
+  multiplenum = 1,
+  rownamekeep = FALSE
+)
 }
 \arguments{
 \item{data}{dataframe; a dataframe contained one character column and others is numeric,
@@ -31,11 +36,11 @@ otudafile <- system.file("extdata", "otu_tax_table.txt",
                       package="MicrobiotaProcess")
 samplefile <- system.file("extdata", 
                  "sample_info.txt", package="MicrobiotaProcess")
-otuda <- read.table(otudafile, sep="\\t", header=TRUE, 
+otuda <- read.table(otudafile, sep="\t", header=TRUE, 
                     row.names=1, check.names=FALSE, 
                     skip=1, comment.char="")
 sampleda <- read.table(samplefile, 
-            sep="\\t", header=TRUE, row.names=1)
+            sep="\t", header=TRUE, row.names=1)
 taxdf <- otuda[!sapply(otuda, is.numeric)]
 taxdf <- splitStrtoList(taxdf)
 otuda <- otuda[sapply(otuda, is.numeric)]

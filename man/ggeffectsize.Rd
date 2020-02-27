@@ -8,11 +8,16 @@
 \usage{
 ggeffectsize(obj, ...)
 
-\method{ggeffectsize}{data.frame}(obj, factorName, effectsizename,
-  factorLevels = NULL, setFacet = TRUE, ...)
+\method{ggeffectsize}{data.frame}(
+  obj,
+  factorName,
+  effectsizename,
+  factorLevels = NULL,
+  setFacet = TRUE,
+  ...
+)
 
-\method{ggeffectsize}{diffAnalysisClass}(obj, removeUnkown = TRUE,
-  setFacet = TRUE, ...)
+\method{ggeffectsize}{diffAnalysisClass}(obj, removeUnkown = TRUE, setFacet = TRUE, ...)
 }
 \arguments{
 \item{obj}{object, diffAnalysisClass see \code{\link[MicrobiotaProcess]{diff_analysis}},

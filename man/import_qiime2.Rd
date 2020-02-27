@@ -4,9 +4,16 @@
 \alias{import_qiime2}
 \title{Import function to load the output of qiime2.}
 \usage{
-import_qiime2(otuqza, taxaqza = NULL, mapfilename = NULL,
-  refseqqza = NULL, treeqza = NULL, build_tree = FALSE,
-  parallel = FALSE, ...)
+import_qiime2(
+  otuqza,
+  taxaqza = NULL,
+  mapfilename = NULL,
+  refseqqza = NULL,
+  treeqza = NULL,
+  build_tree = FALSE,
+  parallel = FALSE,
+  ...
+)
 }
 \arguments{
 \item{otuqza}{character, the file contained otu table, the ouput of qiime2.}

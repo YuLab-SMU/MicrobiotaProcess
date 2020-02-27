@@ -10,8 +10,7 @@ get_taxadf(obj, ...)
 
 \method{get_taxadf}{phyloseq}(obj, taxlevel = 2, ...)
 
-\method{get_taxadf}{default}(obj, taxda, taxa_are_rows, taxlevel,
-  sampleda = NULL, ...)
+\method{get_taxadf}{default}(obj, taxda, taxa_are_rows, taxlevel, sampleda = NULL, ...)
 }
 \arguments{
 \item{obj}{phyloseq, phyloseq class or data.frame

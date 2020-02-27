@@ -8,8 +8,7 @@
 \usage{
 get_pca(obj, ...)
 
-\method{get_pca}{default}(obj, sampleda = NULL, method = "hellinger",
-  ...)
+\method{get_pca}{default}(obj, sampleda = NULL, method = "hellinger", ...)
 
 \method{get_pca}{phyloseq}(obj, method = "hellinger", ...)
 }

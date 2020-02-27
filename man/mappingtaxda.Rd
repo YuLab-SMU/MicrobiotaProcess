@@ -4,8 +4,14 @@
 \alias{mappingtaxda}
 \title{generate the mapping data}
 \usage{
-mappingtaxda(data, topn = 30, count = FALSE, sampleda = NULL,
-  factorLevels = NULL, plotda = TRUE)
+mappingtaxda(
+  data,
+  topn = 30,
+  count = FALSE,
+  sampleda = NULL,
+  factorLevels = NULL,
+  plotda = TRUE
+)
 }
 \arguments{
 \item{data}{data.frame, (nrow sample * ncol feature (factor))}

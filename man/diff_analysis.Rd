@@ -8,14 +8,33 @@
 \usage{
 diff_analysis(obj, ...)
 
-\method{diff_analysis}{data.frame}(obj, sampleda, class, subclass = NULL,
-  taxda = NULL, alltax = TRUE, standard_method = NULL,
-  mlfun = "lda", ratio = 0.7, firstcomfun = "kruskal.test",
-  padjust = "fdr", filtermod = "pvalue", firstalpha = 0.05,
-  strictmod = TRUE, fcfun = "generalizedFC",
-  secondcomfun = "wilcox.test", clmin = 5, clwilc = TRUE,
-  secondalpha = 0.05, subclmin = 3, subclwilc = TRUE, ldascore = 2,
-  normalization = 1e+06, bootnums = 30, ...)
+\method{diff_analysis}{data.frame}(
+  obj,
+  sampleda,
+  class,
+  subclass = NULL,
+  taxda = NULL,
+  alltax = TRUE,
+  standard_method = NULL,
+  mlfun = "lda",
+  ratio = 0.7,
+  firstcomfun = "kruskal.test",
+  padjust = "fdr",
+  filtermod = "pvalue",
+  firstalpha = 0.05,
+  strictmod = TRUE,
+  fcfun = "generalizedFC",
+  secondcomfun = "wilcox.test",
+  clmin = 5,
+  clwilc = TRUE,
+  secondalpha = 0.05,
+  subclmin = 3,
+  subclwilc = TRUE,
+  ldascore = 2,
+  normalization = 1e+06,
+  bootnums = 30,
+  ...
+)
 
 \method{diff_analysis}{phyloseq}(obj, ...)
 }

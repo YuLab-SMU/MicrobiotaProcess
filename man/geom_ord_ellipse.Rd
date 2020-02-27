@@ -4,8 +4,15 @@
 \alias{geom_ord_ellipse}
 \title{add confidence ellipse to ordinary plot}
 \usage{
-geom_ord_ellipse(data = NULL, mapping = NULL, ellipse_pro = 0.9,
-  alpha = 0.3, show.legend = NA, inherit.aes = TRUE, ...)
+geom_ord_ellipse(
+  data = NULL,
+  mapping = NULL,
+  ellipse_pro = 0.9,
+  alpha = 0.3,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  ...
+)
 }
 \arguments{
 \item{data, }{default is NULL.}

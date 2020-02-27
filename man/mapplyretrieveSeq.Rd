@@ -4,8 +4,14 @@
 \alias{mapplyretrieveSeq}
 \title{Retriveing Sequencing from NCBI By mapply}
 \usage{
-mapplyretrieveSeq(idlist, files, databases = "protein", type = "fasta",
-  times = 3, checkids = TRUE)
+mapplyretrieveSeq(
+  idlist,
+  files,
+  databases = "protein",
+  type = "fasta",
+  times = 3,
+  checkids = TRUE
+)
 }
 \arguments{
 \item{idlist}{vector, the accession version.}

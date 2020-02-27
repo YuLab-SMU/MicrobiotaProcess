@@ -9,12 +9,24 @@
 \usage{
 get_pcoa(obj, ...)
 
-\method{get_pcoa}{default}(obj, distmethod = "euclidean",
-  taxa_are_rows = FALSE, sampleda = NULL, tree = NULL,
-  method = "hellinger", ...)
+\method{get_pcoa}{default}(
+  obj,
+  distmethod = "euclidean",
+  taxa_are_rows = FALSE,
+  sampleda = NULL,
+  tree = NULL,
+  method = "hellinger",
+  ...
+)
 
-\method{get_pcoa}{dist}(obj, distmethod, data = NULL, sampleda = NULL,
-  method = "hellinger", ...)
+\method{get_pcoa}{dist}(
+  obj,
+  distmethod,
+  data = NULL,
+  sampleda = NULL,
+  method = "hellinger",
+  ...
+)
 
 \method{get_pcoa}{phyloseq}(obj, distmethod = "euclidean", ...)
 }

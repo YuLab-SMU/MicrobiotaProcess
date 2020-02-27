@@ -10,10 +10,21 @@ ggrarecurve(obj, ...)
 
 \method{ggrarecurve}{phyloseq}(obj, ...)
 
-\method{ggrarecurve}{default}(obj, sampleda, indexNames = "Observe",
-  linesize = 0.5, facetnrow = 1, mapping = NULL, chunks = 400,
-  factorNames, factorLevels, se = FALSE, method = "lm", formula = y ~
-  log(x), ...)
+\method{ggrarecurve}{default}(
+  obj,
+  sampleda,
+  indexNames = "Observe",
+  linesize = 0.5,
+  facetnrow = 1,
+  mapping = NULL,
+  chunks = 400,
+  factorNames,
+  factorLevels,
+  se = FALSE,
+  method = "lm",
+  formula = y ~ log(x),
+  ...
+)
 }
 \arguments{
 \item{obj}{phyloseq, phyloseq class or data.frame

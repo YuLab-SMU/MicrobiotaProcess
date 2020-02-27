@@ -10,8 +10,7 @@ get_vennlist(obj, ...)
 
 \method{get_vennlist}{phyloseq}(obj, ...)
 
-\method{get_vennlist}{default}(obj, sampleinfo = NULL,
-  factorNames = NULL, ...)
+\method{get_vennlist}{default}(obj, sampleinfo = NULL, factorNames = NULL, ...)
 }
 \arguments{
 \item{obj}{phyloseq, phyloseq class or data.frame

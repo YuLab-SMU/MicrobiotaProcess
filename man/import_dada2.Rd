@@ -4,8 +4,14 @@
 \alias{import_dada2}
 \title{Import function to load the feature table and taxanomy table of dada2}
 \usage{
-import_dada2(seqtab, taxatab = NULL, reftree = NULL, sampleda = NULL,
-  build_tree = FALSE, ...)
+import_dada2(
+  seqtab,
+  taxatab = NULL,
+  reftree = NULL,
+  sampleda = NULL,
+  build_tree = FALSE,
+  ...
+)
 }
 \arguments{
 \item{seqtab}{matrix, feature table, the output of \code{\link[dada2]{removeBimeraDenovo}}.}

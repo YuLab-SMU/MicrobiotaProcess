@@ -4,8 +4,7 @@
 \alias{sampledflist}
 \title{Generate random data list from a original data.}
 \usage{
-sampledflist(dalist, bootnums = 30, ratio = 0.7,
-  makerownames = FALSE)
+sampledflist(dalist, bootnums = 30, ratio = 0.7, makerownames = FALSE)
 }
 \arguments{
 \item{dalist}{list, a list contained multi data.frame.}

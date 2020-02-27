@@ -10,10 +10,21 @@ ggbartax(obj, ...)
 
 \method{ggbartax}{phyloseq}(obj, ...)
 
-\method{ggbartax}{default}(obj, mapping = NULL, position = "stack",
-  stat = "identity", width = 0.7, topn = 30, count = FALSE,
-  sampleda = NULL, factorLevels = NULL, facetNames = NULL,
-  plotgroup = FALSE, groupfun = mean, ...)
+\method{ggbartax}{default}(
+  obj,
+  mapping = NULL,
+  position = "stack",
+  stat = "identity",
+  width = 0.7,
+  topn = 30,
+  count = FALSE,
+  sampleda = NULL,
+  factorLevels = NULL,
+  facetNames = NULL,
+  plotgroup = FALSE,
+  groupfun = mean,
+  ...
+)
 }
 \arguments{
 \item{obj}{phyloseq, phyloseq class or data.frame, 

@@ -4,8 +4,14 @@
 \alias{splitStrtoList}
 \title{split a dataframe contained one column}
 \usage{
-splitStrtoList(strdataframe, prefix = "tax", sep = "; ",
-  extra = "drop", fill = "right", ...)
+splitStrtoList(
+  strdataframe,
+  prefix = "tax",
+  sep = "; ",
+  extra = "drop",
+  fill = "right",
+  ...
+)
 }
 \arguments{
 \item{strdataframe}{dataframe; a dataframe contained one column to split.}
@@ -31,11 +37,11 @@ otudafile <- system.file("extdata", "otu_tax_table.txt",
                       package="MicrobiotaProcess")
 samplefile <- system.file("extdata",
                  "sample_info.txt", package="MicrobiotaProcess")
-otuda <- read.table(otudafile, sep="\\t", header=TRUE,
+otuda <- read.table(otudafile, sep="\t", header=TRUE,
                     row.names=1, check.names=FALSE,
                     skip=1, comment.char="")
 sampleda <- read.table(samplefile,
-            sep="\\t", header=TRUE, row.names=1)
+            sep="\t", header=TRUE, row.names=1)
 taxdf <- otuda[!sapply(otuda, is.numeric)]
 taxdf <- splitStrtoList(taxdf)
 head(taxdf)

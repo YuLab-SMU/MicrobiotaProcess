@@ -8,13 +8,30 @@
 \usage{
 ggordpoint(obj, ...)
 
-\method{ggordpoint}{default}(obj, pc = c(1, 2), mapping = NULL,
-  sampleda = NULL, factorNames = NULL, factorLevels = NULL,
-  poinsize = 2, linesize = 0.3, arrowsize = 1.5,
-  arrowlinecolour = "grey", ellipse = FALSE, ellipse_pro = 0.9,
-  ellipse_alpha = 0.2, biplot = FALSE, topn = 5, settheme = TRUE,
-  speciesannot = FALSE, fontsize = 2.5, fontface = "bold.italic",
-  fontfamily = "sans", textlinesize = 0.02, ...)
+\method{ggordpoint}{default}(
+  obj,
+  pc = c(1, 2),
+  mapping = NULL,
+  sampleda = NULL,
+  factorNames = NULL,
+  factorLevels = NULL,
+  poinsize = 2,
+  linesize = 0.3,
+  arrowsize = 1.5,
+  arrowlinecolour = "grey",
+  ellipse = FALSE,
+  ellipse_pro = 0.9,
+  ellipse_alpha = 0.2,
+  biplot = FALSE,
+  topn = 5,
+  settheme = TRUE,
+  speciesannot = FALSE,
+  fontsize = 2.5,
+  fontface = "bold.italic",
+  fontfamily = "sans",
+  textlinesize = 0.02,
+  ...
+)
 
 \method{ggordpoint}{pcasample}(obj, ...)
 }

@@ -4,8 +4,14 @@
 \alias{multi.compare}
 \title{a container for performing two or more sample test.}
 \usage{
-multi.compare(fun = wilcox.test, data, feature, factorNames,
-  subgroup = NULL, ...)
+multi.compare(
+  fun = wilcox.test,
+  data,
+  feature,
+  factorNames,
+  subgroup = NULL,
+  ...
+)
 }
 \arguments{
 \item{fun}{character, the method for test, optional ""}

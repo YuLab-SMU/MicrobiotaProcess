@@ -8,8 +8,7 @@
 \usage{
 generalizedFC(x, ...)
 
-\method{generalizedFC}{default}(x, y, base = 10, steps = 0.05,
-  pseudo = 1e-05, ...)
+\method{generalizedFC}{default}(x, y, base = 10, steps = 0.05, pseudo = 1e-05, ...)
 
 \method{generalizedFC}{formula}(x, data, subset, na.action, ...)
 }

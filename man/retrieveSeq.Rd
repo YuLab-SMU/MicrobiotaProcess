@@ -4,8 +4,14 @@
 \alias{retrieveSeq}
 \title{Retriveing Sequencing from NCBI}
 \usage{
-retrieveSeq(ids, files, databases = "protein", type = "fasta",
-  times = 3, checkids = FALSE)
+retrieveSeq(
+  ids,
+  files,
+  databases = "protein",
+  type = "fasta",
+  times = 3,
+  checkids = FALSE
+)
 }
 \arguments{
 \item{ids}{vector, the accession number or accession.}
