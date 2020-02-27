@@ -190,7 +190,7 @@ setMethod("ggdiffbox", "diffAnalysisClass", function(obj, geom="boxplot",
     featureda <- featureda[,match(featurelist,colnames(featureda)),drop=FALSE]
     if (is.null(colorlist)){colorlist <- getCols(length(tmpgroup))}
     if (is.null(names(colorlist))){names(colorlist) <- tmpgroup}
-    if(is.null(getcall(obj,"standard_method")) & is.null(l_xlabtext)){
+    if(is.null(getcall(obj,"standard_method"))){
         ifelse(is.null(l_xlabtext), xlabtext<-"relative abundance", xlabtext <- l_xlabtext)
     }else{xlabtext<-"abundance"}
     p <- plotdiffbox(obj=featureda, sampleda=sampleda, factorNames=classname, factorLevels=factorLevels,
