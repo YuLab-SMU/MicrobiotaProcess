@@ -47,6 +47,7 @@ plot the result of hierarchical cluster analysis for the samples
 \examples{
 library(phyloseq)
 library(ggtree)
+library(ggplot2)
 data(GlobalPatterns)
 subGlobal <- subset_samples(GlobalPatterns,
          SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))

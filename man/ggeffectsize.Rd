@@ -57,8 +57,7 @@ diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
                         subclmin=3, subclwilc=TRUE,
                         secondalpha=0.01, ldascore=3) 
 library(ggplot2)
-effectplot <- ggeffectsize(diffres,
-                        setColors=FALSE) +
+effectplot <- ggeffectsize(diffres) +
               scale_color_manual(values=c('#00AED7', 
                                           '#FD9347', 
                                           '#C1E168'))+
