@@ -287,8 +287,8 @@ ggdifftaxbar.featureMeanMedian <- function(obj, featurename, class, subclass, xt
 #'                     feature="p__Actinobacteria", 
 #'                     subclass="body_site")
 #' #not run in example
-#' #fplot <- ggdifftaxbar(feameamed, featurename="p__Actinobacteria", 
-#' #                     class="oxygen_availability", subclass="body_site")
+#' fplot <- ggdifftaxbar(feameamed, featurename="p__Actinobacteria", 
+#'                      class="oxygen_availability", subclass="body_site")
 getMeanMedian <- function(datameta, feature, subclass){
     RelativeAbundance <- NULL
     factornames <- colnames(datameta)[!unlist(vapply(datameta,is.numeric,logical(1)))]
@@ -335,8 +335,7 @@ getMeanMedian <- function(datameta, feature, subclass){
 #'                         subclmin=3, subclwilc=TRUE,
 #'                         secondalpha=0.01, ldascore=3) 
 #' library(ggplot2)
-#' effectplot <- ggeffectsize(diffres,
-#'                         setColors=FALSE) +
+#' effectplot <- ggeffectsize(diffres) +
 #'               scale_color_manual(values=c('#00AED7', 
 #'                                           '#FD9347', 
 #'                                           '#C1E168'))+
