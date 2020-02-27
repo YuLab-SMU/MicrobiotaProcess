@@ -9,15 +9,26 @@
 \usage{
 get_clust(obj, ...)
 
-\method{get_clust}{dist}(obj, distmethod, sampleda = NULL,
-  hclustmethod = "average", ...)
+\method{get_clust}{dist}(obj, distmethod, sampleda = NULL, hclustmethod = "average", ...)
 
-\method{get_clust}{default}(obj, distmethod = "euclidean",
-  taxa_are_rows = FALSE, sampleda = NULL, tree = NULL,
-  method = "hellinger", hclustmethod = "average", ...)
+\method{get_clust}{default}(
+  obj,
+  distmethod = "euclidean",
+  taxa_are_rows = FALSE,
+  sampleda = NULL,
+  tree = NULL,
+  method = "hellinger",
+  hclustmethod = "average",
+  ...
+)
 
-\method{get_clust}{phyloseq}(obj, distmethod = "euclidean",
-  method = "hellinger", hclustmethod = "average", ...)
+\method{get_clust}{phyloseq}(
+  obj,
+  distmethod = "euclidean",
+  method = "hellinger",
+  hclustmethod = "average",
+  ...
+)
 }
 \arguments{
 \item{obj}{phyloseq, phyloseq class or dist class, or 
