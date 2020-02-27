@@ -9,7 +9,7 @@ Description: MicrobiotaProcess is an R package for analysis, visualization and
     index and provides functions to visualize rarefaction curves. Moreover, 
     it also supports visualizing the abundance of taxonomy of samples. And It 
     also provides functions to perform the PCA, PCoA and hierarchical cluster 
-    analysis. More importantly, MicrobiotaProcess also provides a method for 
+    analysis. In addition, MicrobiotaProcess also provides a method for 
     the biomarker discovery of metagenome or other datasets.
 Depends: 
   R (>= 3.6)
