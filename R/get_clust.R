@@ -115,11 +115,17 @@ get_clust.phyloseq <- function(obj,
 #' @export
 #' @examples
 #' library(phyloseq)
+#' library(ggtree)
 #' data(GlobalPatterns)
 #' subGlobal <- subset_samples(GlobalPatterns,
 #'          SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
 #' hcsample <- get_clust(subGlobal, distmethod="jaccard",
-#'                   method="hellinger", hclustmethod="average") 
+#'                   method="hellinger", hclustmethod="average")
+#' hc_p <- ggclust(hcsample, layout = "rectangular",
+#'                 pointsize=1, fontsize=0,
+#'                 factorNames=c("SampleType")) +
+#'         theme_tree2(legend.position="right",
+#'                     plot.title = element_text(face="bold", lineheight=25,hjust=0.5)
 ggclust <- function(obj,...){
     UseMethod("ggclust")
 }
@@ -142,34 +148,34 @@ ggclust.clustplotClass <- function(obj,
     samplehcp <- ggtree(phyloclass, 
                         layout=layout)
     if (!is.null(obj@sampleda)){
-    	sampleda <- data.frame(obj@sampleda, check.names=FALSE)
-    	phyloclass <- obj@hclustphylo
-    	sampleda <- sampleda[match(phyloclass$tip.label, rownames(sampleda)),,drop=FALSE]
-    	sampleda <- data.frame(sample=rownames(sampleda),sampleda, check.names=FALSE)
-    	rownames(sample) <- NULL
-    	if(!is.null(factorNames)){
-    		tmpfactormap <- getfactormap(factorNames)	
+        sampleda <- data.frame(obj@sampleda, check.names=FALSE)
+        phyloclass <- obj@hclustphylo
+        sampleda <- sampleda[match(phyloclass$tip.label, rownames(sampleda)),,drop=FALSE]
+        if (!"sample" %in% colnames(sampleda)){
+            sampleda <- data.frame(sample=rownames(sampleda),sampleda, check.names=FALSE)
+        }
+        rownames(sample) <- NULL
+        if(!is.null(factorNames)){
+            tmpfactormap <- getfactormap(factorNames)	
     	}else{
-    		tmpfactormap <- getfactormap(colnames(sampleda)[-1])
-    	}
-    	if(!is.null(factorLevels)){
-    		sampleda <- setfactorlevels(sampleda, factorLevels)
-    	}
-    	samplehcp <- samplehcp %<+% sampleda + 
+            tmpfactormap <- getfactormap(colnames(sampleda)[-1])
+        }
+        if(!is.null(factorLevels)){
+            sampleda <- setfactorlevels(sampleda, factorLevels)
+        }
+        samplehcp <- samplehcp %<+% sampleda + 
     			geom_tippoint(tmpfactormap, size=pointsize, ...)
     }
     if (layout=="circular"){
-    	samplehcp <- samplehcp + geom_tiplab2(size=fontsize, hjust=hjust)
+        samplehcp <- samplehcp + geom_tiplab2(size=fontsize, hjust=hjust)
     }else{
-    	samplehcp <- samplehcp + geom_tiplab(size=fontsize, hjust=hjust)	
+        samplehcp <- samplehcp + geom_tiplab(size=fontsize, hjust=hjust)	
     }
     samplehcp <- samplehcp + labs(title=paste0("Hierarchical Cluster of Samples ", "(", obj@distmethod, ")"))
     if (settheme){
-    	samplehcp <- samplehcp + 
+        samplehcp <- samplehcp + 
                      theme(plot.title = element_text(face="bold", lineheight=25, hjust=0.5))
     }
     return(samplehcp)
 }
-
-
 
