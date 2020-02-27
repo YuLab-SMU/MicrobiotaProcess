@@ -116,6 +116,7 @@ get_clust.phyloseq <- function(obj,
 #' @examples
 #' library(phyloseq)
 #' library(ggtree)
+#' library(ggplot2)
 #' data(GlobalPatterns)
 #' subGlobal <- subset_samples(GlobalPatterns,
 #'          SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
