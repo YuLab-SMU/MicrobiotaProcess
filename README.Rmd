@@ -16,7 +16,7 @@ Biocpkg <- function (pkg) {
 ```
 
 ```{r comment="", echo=FALSE, results='asis'}
- cat(packageDescription('MicrobiotaProcess')$Description)
+cat(packageDescription('MicrobiotaProcess')$Description)
 ```
 
 ## :writing_hand: Authors
