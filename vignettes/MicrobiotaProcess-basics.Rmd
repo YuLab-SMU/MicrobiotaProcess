@@ -1,0 +1,198 @@
+---
+title: "basics analysis using MicrobiotaProcess"
+author: |
+  | Shuangbin Xu 
+  | School of Basic Medical Sciences, Southern Medical University
+date: "`r Sys.Date()`"
+bibliography: MicrobiotaProcess.bib
+biblio-style: apalike
+output:
+  prettydoc::html_pretty:
+    toc: true
+    theme: cayman
+    highlight: vignette
+  pdf_document:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{ MicrobiotaProcess: basics analysis using MicrobiotaProcess.}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo=FALSE, results="asis", message=FALSE, KnitrSetUp}
+knitr::opts_chunk$set(tidy=FALSE,warning=FALSE,message=FALSE)
+Biocpkg <- function (pkg){
+    sprintf("[%s](http://bioconductor.org/packages/%s)", pkg, pkg)
+}
+
+CRANpkg <- function(pkg){
+    cran <- "https://CRAN.R-project.org/package" 
+    fmt <- "[%s](%s=%s)"
+    sprintf(fmt, pkg, cran, pkg) 
+}
+```
+
+```{r, echo=FALSE, results="hide", message=FALSE, Loadpackages}
+library(ggplot2)
+library(DT)
+library(tidyverse)
+library(phyloseq)
+library(ggtree)
+library(treeio)
+library(tidytree)
+library(MicrobiotaProcess)
+```
+
+# 1. Introduction
+
+`MicrobiotaProcess` is an R package for analysis, visualization and biomarker discovery of microbial datasets. It supports the import of microbiome census data, calculating alpha index and provides functions to visualize rarefaction curves. Moreover, it also supports visualizing the abundance of taxonomy of samples. And It also provides functions to perform the `PCA`, `PCoA` and hierarchical cluster analysis. In addition, `MicrobiotaProcess` also provides a method for the biomarker discovery of metagenome or other datasets.
+
+# 2. `MicrobiotaProcess` profiling
+
+## 2.1 import function
+
+`MicrobiotaProcess` has an feature to import phylogenetic sequencing data from `r Biocpkg("dada2")`[@callahan2016dada2] and [qiime2](https://qiime2.org/)[@bolyen2019qiime2] taxonomic clustering pipelines. The resulting object after import is `r Biocpkg("phyloseq")` object[@Paul2013phyloseq]
+
+```{r, error=TRUE, importFunction}
+# import data from dada2 pipeline.
+seqtabfile <- system.file("extdata", "seqtab.nochim.rds", package="MicrobiotaProcess")
+seqtab <- readRDS(seqtabfile)
+taxafile <- system.file("extdata", "taxa_tab.rds",package="MicrobiotaProcess")
+seqtab <- readRDS(seqtabfile)
+taxa <- readRDS(taxafile)
+# the seqtab and taxa are output of dada2
+sampleda <- system.file("extdata", "mouse.time.dada2.txt", package="MicrobiotaProcess")
+ps_dada2 <- import_dada2(seqtab=seqtab, taxatab=taxa, sampleda=sampleda)
+ps_dada2
+
+# import data from qiime2 pipeline
+otuqzafile <- system.file("extdata", "table.qza", package="MicrobiotaProcess")
+taxaqzafile <- system.file("extdata", "taxa.qza", package="MicrobiotaProcess")
+mapfile <- system.file("extdata", "metadata_qza.txt", package="MicrobiotaProcess")
+ps_qiime2 <- import_qiime2(otuqza=otuqzafile, taxaqza=taxaqzafile, mapfilename=mapfile)
+ps_qiime2
+```
+
+## 2.2 Rarefaction visualization
+
+Rarefaction, based on sampling technique, was used to compensate for the effect of sample size on the number of units observed in a sample[@siegel2004rarefaction]. `MicrobiotaProcess` provided `ggrarecurve` to plot the curves, based on `rrarefy` of `r CRANpkg("vegan")`[@Jari2019vegan].
+
+```{r, error=TRUE, fig.align="center", fig.height=3.2, fig.width=7.5, rarefaction}
+# for reproducibly random number 
+set.seed(1024)
+p_rare <- ggrarecurve(obj=ps_dada2, 
+                      indexNames=c("Observe","Chao1","ACE"), 
+                      chunks=300) +
+          theme(legend.spacing.y=unit(0.02,"cm"),
+                legend.text=element_text(size=6))
+p_rare
+
+```
+
+## 2.3 calculate alpha index and visualization
+
+`MicrobiotaProcess` provides `get_alphaindex` to calculate alpha index and the `ggbox` to visualize the result
+
+```{r, error=TRUE, fig.width=7.5, fig.height=3.2, fig.align="center", alphaindex}
+alphaobj <- get_alphaindex(ps_dada2)
+head(as.data.frame(alphaobj))
+p_alpha <- ggbox(alphaobj, geom="violin", factorNames="time") + 
+	scale_fill_manual(values=c("#2874C5", "#EABF00"))+
+	theme(strip.background = element_rect(colour=NA, fill="grey"))
+p_alpha
+```
+
+## 2.4 The visualization of taxonomy abundance
+
+`MicrobiotaProcess` presents the `ggbartax` for the visualization of composition of microbial communities.
+
+```{r, error=TRUE, fig.align="center", fig.height=4.5, fig.width=7, taxabar}
+# relative abundance
+otubar <- ggbartax(obj=ps_dada2) +
+	  xlab(NULL) +
+	  ylab("relative abundance (%)")
+otubar
+```
+
+If you want to get the abundance of specific levels of class, You can use `get_taxadf` then use `ggbartax` to visualize.
+
+```{r, error=TRUE, fig.align="center", fig.height=4.5, fig.width=7, phylumAbundance}
+phytax <- get_taxadf(obj=ps_dada2, taxlevel=2)
+phybar <- ggbartax(obj=phytax) +
+          xlab(NULL) + ylab("relative abundance (%)")
+phybar
+```
+
+ Moreover, the abundance (count) of taxonomy also can be visualized by setting count to TRUE, and the facet of plot can be showed by setting the facetNames.
+
+```{r, error=TRUE, fig.align="center", fig.height=4.5, fig.width=7, classAbundance}
+phybar2 <- ggbartax(obj=phytax, facetNames="time", count=TRUE) + xlab(NULL) + ylab("abundance")
+phybar2
+classtax <- get_taxadf(obj=ps_dada2, taxlevel=3)
+classbar <- ggbartax(obj=classtax, facetNames="time", count=FALSE) +
+                xlab(NULL) + ylab("relative abundance (%)")
+classbar
+```
+
+## 2.5 PCA and PCoA analysis
+
+`PCA` (Principal component analysis) and `PCoA` (Principal Coordinate Analysis) are general statistical procedures to compare groups of samples. And `PCoA` can based on the phylogenetic or count-based distance metrics, such as `Bray-Curtis`, `Jaccard`, `Unweighted-UniFrac` and `weighted-UniFrac`. `MicrobiotaProcess` presents the `get_pca`, `get_pcoa` and `ggordpoint` for the analysis.
+
+```{r, error=TRUE, fig.align="center", fig.height=4.5, fig.width=6, ordanalysis}
+pcares <- get_pca(obj=ps_dada2, method="hellinger")
+# Visulizing the result
+pcaplot <- ggordpoint(obj=pcares, biplot=TRUE, speciesannot=TRUE,
+                      factorNames=c("time"), ellipse=TRUE) + 
+           scale_color_manual(values=c("#2874C5", "#EABF00"))
+pcaplot
+
+pcoares <- get_pcoa(obj=ps_dada2, distmethod="euclidean", method="hellinger")
+# Visualizing the result
+pcoaplot <- ggordpoint(obj=pcoares, biplot=TRUE, speciesannot=TRUE,
+                       factorNames=c("time"), ellipse=TRUE) +
+            scale_color_manual(values=c("#2874C5", "#EABF00"))
+pcoaplot
+```
+
+## 2.6 Hierarchical cluster analysis
+
+`beta diversity` metrics can assess the differences between microbial communities. It can be visualized with `PCA` or `PCoA`, this can also be visualized with hierarchical clustering. `MicrobiotaProcess` also  implements the analysis based on ggtree[@yu2017ggtree].
+
+```{r, fig.align="center", fig.height=5, fig.width=6, error=TRUE, hclustAnalysis}
+hcsample <- get_clust(obj=ps_dada2, distmethod="euclidean",
+		      method="hellinger", hclustmethod="average")
+# rectangular layout
+clustplot1 <- ggclust(obj=hcsample,
+                      layout = "rectangular",
+                      pointsize=1,
+                      fontsize=0,
+                      factorNames=c("time")) +
+              scale_color_manual(values=c("#2874C5", "#EABF00")) +
+              theme_tree2(legend.position="right",
+                          plot.title = element_text(face="bold", lineheight=25,hjust=0.5))
+clustplot1
+# circular layout
+clustplot2 <- ggclust(obj=hcsample,
+                      layout = "circular",
+                      pointsize=1,
+                      fontsize=2,
+                      factorNames=c("time")) +
+              scale_color_manual(values=c("#2874C5", "#EABF00")) +
+              theme(legend.position="right")
+clustplot2
+```
+
+# 3. Need helps?
+
+If you have questions/issues, please visit [github issue tracker](https://github.com/YuLab-SMU/MicrobiotaProcess/issues).
+
+# 4. Session information
+
+Here is the output of sessionInfo() on the system on which this document was compiled:
+
+```{r, echo=FALSE}
+sessionInfo()
+```
+
+# 5. References

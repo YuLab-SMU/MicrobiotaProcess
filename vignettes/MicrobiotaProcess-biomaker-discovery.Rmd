@@ -1,0 +1,219 @@
+---
+title: "biomarker discovery using MicrobiotaProcess"
+author: |
+  | Shuangbin Xu 
+  | School of Basic Medical Sciences, Southern Medical University
+  | 
+date: "`r Sys.Date()`"
+bibliography: MicrobiotaProcess.bib
+biblio-style: apalike
+output:
+  prettydoc::html_pretty:
+    toc: true
+    theme: cayman
+    highlight: vignette
+  pdf_document:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{ MicrobiotaProcess: biomarker discovery using MicrobiotaProcess.}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo=FALSE, results="asis", message=FALSE, KnitrSetUp}
+knitr::opts_chunk$set(tidy=FALSE,warning=FALSE,message=FALSE)
+Biocpkg <- function (pkg){
+    sprintf("[%s](http://bioconductor.org/packages/%s)", pkg, pkg)
+}
+
+CRANpkg <- function(pkg){
+    cran <- "https://CRAN.R-project.org/package" 
+    fmt <- "[%s](%s=%s)"
+    sprintf(fmt, pkg, cran, pkg) 
+}
+```
+
+```{r, echo=FALSE, results="hide", message=FALSE, Loadpackages}
+library(tidyverse)
+library(phyloseq)
+library(ggtree)
+library(treeio)
+library(tidytree)
+library(MicrobiotaProcess)
+```
+
+# 1. Biomarker discovery
+
+Biomarker discovery has proven to be capacity to convert genomic data into clinical practice[@tothill2008novel; @banerjee2015computed]. And many reports have shown that the microbial communities can be used as biomarkers for human disease[@kostic2012genomic; @zhang2019leveraging; @yu2017metagenomic; @ren2019gut]. `MicrobiotaProcess` presents `diff_analysis` for the biomarker discovery. And It also provided the `ggdiffclade`, based on the `ggtree`[@yu2017ggtree; @yu2018two], to visualize the results of `diff_analysis`. The rule of `diff_analysis` is similar with the `LEfSe`[@Nicola2011LEfSe]. First, all features are tested whether values in different classes are differentially distributed. Second, the significantly different features are tested whether all pairwise comparisons between subclass in different classes distinctly consistent with the class trend. Finally, the significantly discriminative features are assessed by `LDA` (`linear discriminant analysis`) or `rf`(`randomForest`). However, `diff_analysis` is more flexible. The test method of two step can be set by user, and we used the general fold change[@wirbel2019meta] and `wilcox.test`(default) to test whether all pairwise comparisons between subclass in different classes distinctly consistent with the class trend. Moreover, `MicrobiotaProcess` implements more flexible and convenient tools, (`ggdiffclade`, `ggdiffbox`, `ggeffectsize` and `ggdifftaxbar`) to produce publication-quality figures. Here, we present several examples to demonstrate how to perform different analysis with `MicrobiotaProcess`.
+
+## 1.1 colorectal cancer dataset.
+
+```{r, error=TRUE, KosticCRCdata}
+data(kostic2012crc)
+kostic2012crc
+#datatable(sample_data(kostic2012crc), options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
+table(sample_data(kostic2012crc)$DIAGNOSIS)
+```
+
+This datasets contained 86 Colorectal Carcinoma samples and 91 Control samples(remove the none sample information and low depth sample).In the research, they found the *Fusobacterium* sequences were enriched in carcinomas, confirmed by quantitative PCR and 16S rDNA, while the *Firmicutes* and *Bacteroidetes* phyla were depleted in tumors[@kostic2012genomic].
+
+```{r, error=TRUE, KosticCRCdiff_analysis}
+set.seed(1024)
+diffres <- diff_analysis(obj=kostic2012crc, class="DIAGNOSIS",
+                         mlfun="lda",
+                         filtermod="fdr",
+                         firstcomfun = "kruskal.test",
+                         firstalpha=0.05,
+                         strictmod=TRUE,
+                         secondcomfun = "wilcox.test",
+                         subclmin=3,
+                         subclwilc=TRUE,
+                         secondalpha=0.01, 
+                         lda=3)
+diffres
+```
+
+The results of `diff_analysis` is a `S4` class, contained the original feature datasets, results of first test, results of second test, results of `LDA` or `rf` assessed and the record of some arguments. It can be visualized by `ggeffectsize`. The horizontal ordinate represents the effect size (`LDA` or `MeanDecreaseAccuracy`), the vertical ordinate represents the feature of significantly discriminative. And the colors represent the class that the relevant feature is positive.
+
+```{r, fig.align="center", fig.height=5, fig.width=6, error=TRUE, KosticCRCplotEffectSize}
+plotes <- ggeffectsize(obj=diffres) + scale_color_manual(values=c("#00AED7", "#FD9347"))
+plotes
+```
+
+The results also can be visualized using `ggdiffbox`.
+
+```{r, fig.align="center", fig.height=5, fig.width=7, error=TRUE, KosticCRCLDAtax}
+plotes_ab <- ggdiffbox(obj=diffres, box_notch=FALSE, colorlist=c("#00AED7", "#FD9347"))
+plotes_ab
+```
+
+If the `taxda` was provided, it also can be visualized by `ggdiffclade`. The colors represent the relevant features enriched in the relevant class. The size of point colored represent the `-log10(pvalue)`.
+
+```{r, fig.width=7, fig.height=7, fig.align="center", error=TRUE, KosticCRCdiffclade}
+diffcladeplot <- ggdiffclade(obj=diffres,
+                             alpha=0.3, size=0.2, 
+                             skpointsize=0.6,
+                             taxlevel=3,
+                             settheme=FALSE, 
+                             setColors=FALSE) +
+                 scale_fill_manual(values=c("#00AED7", "#FD9347"))+
+                 guides(color = guide_legend(keywidth = 0.1,
+                                             keyheight = 0.6,
+                                             order = 3, 
+                                             ncol=1)) + 
+                 theme(panel.background=element_rect(fill=NA),
+                       legend.position="right",
+                       plot.margin=margin(0,0,0,0),
+                       legend.spacing.y = unit(0.02, "cm"),
+                       legend.title=element_text(size=7),
+                       legend.text=element_text(size=6),
+                       legend.box.spacing=unit(0.02,"cm"))
+diffcladeplot
+```
+
+Moreover, the abundance of the features can be visualized by `ggdifftaxbar`. This will generate the figures in specific directory. And the horizontal ordinate of figures represent the sample of different class, the vertical ordinate represent relative abundance of relevant features (sum is 1).
+
+```r
+ggdifftaxbar(obj=diffres, xtextsize=1.5, output="./kostic2012crc_biomarkder_barplot")
+```
+
+And we also provided `as.data.frame` to produce the table of results of `diff_analysis`.
+
+```{r, KosticCRCdiffTab, error=TRUE}
+crcdiffTab <- as.data.frame(diffres)
+#datatable(crcdiffTab, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+```
+
+As show in the results of `diff_analysis`, we also found *Fusobacterium* sequences were enriched in carcinomas, and *Firmicutes*, *Bacteroides*, *Clostridiales* were depleted in tumors. These results were consistent with the original article[@kostic2012genomic]. In addition, we also found *Campylobacter* were enriched in tumors, but the relative abundance of it is lower than *Fusobacterium*. And the species of *Campylobacter* has been proven to associated with the colorectal cancer[@He289; @wu2013dysbiosis; @amer2017microbiome].
+
+## 1.2 a small subset of HMP dataset.
+
+```{r, hmpdatasets}
+data(hmp_aerobiosis_small)
+# contained "featureda" "sampleda"  "taxda" datasets.
+#datatable(featureda, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+#datatable(sampleda, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+#datatable(taxda, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+dim(featureda)
+dim(sampleda)
+dim(taxda)
+```
+
+This dataset is from a small subset of the `HMP` 16S dataset[@Nicola2011LEfSe], contained 55 samples from 6 body sites. The dataset isn't `phyloseq` class, because `diff_analysis` also supported the matrix datasets as input. The `featureda` contained the relative abundance of different levels features. The `sampleda` contained the information of the samples. And the `taxda` contained the information of the hierarchical relationship of taxonomy. We set the `oxygen_availability` in `sampleda` as `class`, and `body_site` also in `sampleda` as `subclass`.
+
+```{r, hmpdiff_analysis, error=TRUE}
+set.seed(1024)
+hmpdiffres <- diff_analysis(obj=featureda, 
+                            sampleda=sampleda, 
+                            taxda=taxda, 
+                            alltax=FALSE, 
+                            class="oxygen_availability",
+                            subclass="body_site",
+                            filtermod="fdr",
+                            firstalpha=0.01,
+                            strictmod=TRUE,
+                            subclmin=3,
+                            subclwilc=TRUE,
+                            secondalpha=0.05,
+                            ldascore=2)
+hmpdiffres
+```
+
+```{r, fig.align="center", fig.height=7, fig.width=5.5, error=TRUE, hmpplotEffectSize}
+hmpeffetsieze <- ggeffectsize(obj=hmpdiffres, 
+                              setColors=FALSE,
+                              settheme=FALSE) + 
+                 scale_color_manual(values=c('#00AED7', '#FD9347', '#C1E168'))+
+                 theme_bw()+
+                 theme(strip.background=element_rect(fill=NA),
+                       panel.grid=element_blank(),
+                       strip.text.y=element_blank())
+hmpeffetsieze
+```
+
+```{r, fig.align="center", fig.height=7, fig.width=7, error=TRUE, hmpplotEffectSizeTax}
+hmpes_ab <- ggdiffbox(obj=hmpdiffres, colorlist=c("#00AED7", "#FD9347", '#C1E168'), 
+                      box_notch=FALSE, l_xlabtext="relative abundance(%)")
+hmpes_ab
+```
+
+The explanation of figures refer to the previous section.
+
+```{r, fig.width=7, fig.height=7, fig.align="center", error=TRUE, hmpdiffclade}
+hmpdiffclade <- ggdiffclade(obj=hmpdiffres, alpha=0.3, size=0.2, 
+                            skpointsize=0.4, taxlevel=3,
+                            settheme=TRUE,
+                            setColors=FALSE) +
+                scale_fill_manual(values=c('#00AED7', '#FD9347', '#C1E168'))
+hmpdiffclade
+```
+
+The explanation of figures refer to the previous section. 
+
+```r
+ggdifftaxbar(obj=hmpdiffres, output="./hmp_biomarker_barplot")
+```
+
+Finally, we found the *Staphylococcus*, *Propionibacterium* and some species of *Actinobacteria* was enriched in `High_O2`, these species mainly live in high oxygen environment. Some species of *Bacteroides*, species of *Clostridia* and species of *Erysipelotrichi* was enriched in `Low_O2`, these species mainly inhabit in the gut of human. These results were consistent with the reality.
+
+```{r, hmpdiffTab, error=TRUE}
+hmpdiffTab <- as.data.frame(hmpdiffres)
+#datatable(hmpdiffTab, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
+```
+
+# 2. Need helps?
+
+If you have questions/issues, please visit [github issue tracker](https://github.com/YuLab-SMU/MicrobiotaProcess/issues).
+
+# 3. Session information
+
+Here is the output of `sessionInfo()` on the system on which this document was compiled:
+
+```{r, echo=FALSE}
+sessionInfo()
+```
+
+# 4. References
+
