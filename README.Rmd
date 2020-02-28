@@ -5,4 +5,37 @@ output:
 html_preview: false
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file --> 
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# MicrobiotaProcess: an package for analysis, visualization and biomarker discovery of microbiome
+
+```{r, echo=FALSE, results="hide", message=FALSE}
+Biocpkg <- function (pkg) {
+    sprintf("[%s](http://bioconductor.org/packages/%s)", pkg, pkg)
+}
+```
+
+```{r comment="", echo=FALSE, results='asis'}
+ cat(packageDescription('MicrobiotaProcess')$Description)
+```
+
+## :writing_hand: Authors
+
+[Shuangbin Xu](https://github.com/xiangpin) and [Guangchuang Yu](https://guangchuangyu.github.io)
+
+School of Basic Medical Sciences, Southern Medical University
+
+## :arrow_double_down: Installation
+
+the development version from github:
+
+```r
+if (!requireNamespace("devtools", quietly=TRUE))
+    install.packages("devtools")
+devtools::install_github("xiangpin/MicrobiotaProcess")
+```
+
+## :sparkling_heart: Contributing
+
+We welcome any contributions! By participating in this project you agree to bide 
+by the terms outlined in the [Contributor Code of Conduct](CONDUCT.md).
