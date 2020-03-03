@@ -7,7 +7,7 @@
 #' see also \code{\link[phyloseq]{distanceMethodList}}
 #' @param taxa_are_rows logical, default is FALSE.
 #' @param sampleda data.frame, nrow sample * ncol factors.
-#' @param tree phylo, see also \code{\link[ape]{phylo}}.
+#' @param tree object, the phylo class, see also \code{\link[ape]{as.phylo}}.
 #' @param ..., additional parameters.
 #' @return distance class contianed distmethod and originalD attr
 #' @export
@@ -32,14 +32,14 @@ get_dist.default <- function(obj,
     method="hellinger",
     ...){
     objphyloseq <- new("phyloseq",
-    				   otu_table=otu_table(obj, 
-    							taxa_are_rows=taxa_are_rows),
-    				   sam_data=sampleda,
-    				   phy_tree=tree)
+                       otu_table=otu_table(obj, 
+                       taxa_are_rows=taxa_are_rows),
+                       sam_data=sampleda,
+                       phy_tree=tree)
     return(get_dist.phyloseq(objphyloseq, 
-    						distmethod=distmethod, 
-    						method=method,
-    						...))
+                             distmethod=distmethod, 
+                             method=method,
+                             ...))
     
 }
 
@@ -64,7 +64,7 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
     		tmpotu <- data.frame(obj@otu_table)
     	}
     	obj@otu_table <- otu_table(decostand(tmpotu, method=method), 
-    							   taxa_are_rows=FALSE)
+                                   taxa_are_rows=FALSE)
     }
     disres <- distance(obj, method=distmethod, type="sample", ...)
     attr(disres, "distmethod") <- distmethod
@@ -92,13 +92,14 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' library(phyloseq)
-#' data(GlobalPatterns)
-#' subGlobal <- subset_samples(GlobalPatterns, 
-#'               SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
-#' pcoares <- get_pcoa(subGlobal, 
-#'                    distmethod="euclidean",
-#'                    method="hellinger")
+#' #don't run in examples
+#' #library(phyloseq)
+#' #data(GlobalPatterns)
+#' #subGlobal <- subset_samples(GlobalPatterns, 
+#' #              SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#' #pcoares <- get_pcoa(subGlobal, 
+#' #                   distmethod="euclidean",
+#' #                   method="hellinger")
 #' # pcoaplot <- ggordpoint(pcoares, biplot=FALSE,
 #' #                        speciesannot=FALSE,
 #' #                        factorNames=c("SampleType"), 
@@ -119,18 +120,18 @@ get_pcoa.default <- function(obj,
     method="hellinger",
     ...){
     tmpdist <- get_dist.default(obj, 
-    						   distmethod=distmethod,
-    						   taxa_are_rows=taxa_are_rows,
-    						   sampleda=sampleda,
-    						   tree=tree,
-    						   #type=type,
-    						   method=method,
-    						   ...)
+                                distmethod=distmethod,
+                                taxa_are_rows=taxa_are_rows,
+                                sampleda=sampleda,
+                                tree=tree,
+                                #type=type,
+                                method=method,
+                                ...)
     data <- attr(tmpdist, "originalD")
     pcoares <- get_pcoa.dist(tmpdist, 
-    						distmethod=distmethod, 
-    						data=data,
-    						sampleda=sampleda)
+                             distmethod=distmethod, 
+                             data=data,
+                             sampleda=sampleda)
     return(pcoares)
 }
 
@@ -141,28 +142,28 @@ get_pcoa.default <- function(obj,
 #' @export
 get_pcoa.dist <- function(obj, distmethod, data=NULL, sampleda=NULL, method="hellinger", ...){
     if (missing(distmethod)){
-    	if (!is.null(attr(obj, "distmethod"))){
-    		distmethod <- attr(obj, "distmethod")
-    	}else{
-    		distmethod <- NULL
-    	}
+        if (!is.null(attr(obj, "distmethod"))){
+            distmethod <- attr(obj, "distmethod")
+        }else{
+            distmethod <- NULL
+        }
     }
     pcoares <- pcoa(obj, ...)
     attr(pcoares, "distmethod") <- distmethod
     if (!is.null(data)){
-    	n <- nrow(data)
-    	points.stand <- scale(pcoares$vectors)
-    	S <- cov(data, points.stand)
-    	tmpEig <- pcoares$values$Eigenvalues
-    	tmpEig <- tmpEig[seq_len(dim(S)[2])]
-    	diagtmp <- diag((tmpEig/(n-1))^(-0.5))
-    	U <- S %*% diagtmp
-    	colnames(U) <- colnames(pcoares$vectors)
-    	attr(pcoares, "varcorr") <- U
+        n <- nrow(data)
+        points.stand <- scale(pcoares$vectors)
+        S <- cov(data, points.stand)
+        tmpEig <- pcoares$values$Eigenvalues
+        tmpEig <- tmpEig[seq_len(dim(S)[2])]
+        diagtmp <- diag((tmpEig/(n-1))^(-0.5))
+        U <- S %*% diagtmp
+        colnames(U) <- colnames(pcoares$vectors)
+        attr(pcoares, "varcorr") <- U
     }
     res <- new("pcasample", 
-    		   pca=pcoares,
-    		   sampleda=sampleda)
+               pca=pcoares,
+               sampleda=sampleda)
     return(res)
 }
 
@@ -174,9 +175,9 @@ get_pcoa.phyloseq <- function(obj,distmethod="euclidean",...){
     tmpdist <- get_dist.phyloseq(obj, distmethod=distmethod,...)
     otuda <- attr(tmpdist, "originalD")
     pcoares <- get_pcoa.dist(tmpdist, 
-    						distmethod=distmethod, 
-    						data=otuda, 
-    						sampleda=sampleda)
+                             distmethod=distmethod, 
+                             data=otuda, 
+                             sampleda=sampleda)
     return(pcoares)
 }
 
@@ -193,11 +194,11 @@ get_coord.pcoa <- function(obj, pc){
     ylab_text <- paste0("PCoA", pc[2], "(", tmpvp2, "%)")
     title_text <- paste0("PCoA - PCoA",pc[1], " VS PCoA",pc[2], " (", attr(obj, "distmethod"), ")")
     ordplotclass <- new("ordplotClass",
-    					coord=coord,
-    					xlab=xlab_text,
-    					ylab=ylab_text,
-    					title=title_text
-    					)
+                        coord=coord,
+                        xlab=xlab_text,
+                        ylab=ylab_text,
+                        title=title_text
+                        )
     return(ordplotclass)
 }
 
@@ -206,21 +207,20 @@ get_coord.pcoa <- function(obj, pc){
 #' @export
 get_varct.pcoa <- function(obj,...){
     if (is.null(attr(obj,"varcorr"))){
-    	stop("The pcoa class have not `varcorr` attr")
+        stop("The pcoa class have not `varcorr` attr")
     }
     else{
-    	varcorr <- attr(obj, "varcorr")
-    	varcorr2 <- varcorr^2
-    	componentcos <- apply(varcorr2, 2, sum)
-    	varcontrib <- data.frame(t(apply(varcorr2,
-    									 1, 
-    									 contribution,
-    									 componentcos)),
-    							 check.names=FALSE)
-    
-    	res <- list(VarContribution=varcontrib,
-    				 VarCoordinates=varcorr)
-    	attr(res, "class") <- "VarContrib"
-    	return(res)
+        varcorr <- attr(obj, "varcorr")
+        varcorr2 <- varcorr^2
+        componentcos <- apply(varcorr2, 2, sum)
+        varcontrib <- data.frame(t(apply(varcorr2,
+                                         1, 
+                                         contribution,
+                                         componentcos)),
+                                         check.names=FALSE)
+        res <- list(VarContribution=varcontrib,
+                    VarCoordinates=varcorr)
+        attr(res, "class") <- "VarContrib"
+        return(res)
     }
 }
