@@ -60,12 +60,14 @@ clustplotClass object.
 Hierarchical cluster analysis for the samples
 }
 \examples{
-library(phyloseq)
-data(GlobalPatterns)
-subGlobal <- subset_samples(GlobalPatterns, 
-         SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
-hcsample <- get_clust(subGlobal, distmethod="jaccard",
-                  method="hellinger", hclustmethod="average")
+#don't run in examples
+#library(phyloseq)
+#data(GlobalPatterns)
+#subGlobal <- subset_samples(GlobalPatterns, 
+#         SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
+# don't run in examples
+#hcsample <- get_clust(subGlobal, distmethod="jaccard",
+#                  method="hellinger", hclustmethod="average")
 }
 \author{
 Shuangbin Xu
