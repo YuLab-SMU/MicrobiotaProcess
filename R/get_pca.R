@@ -8,11 +8,12 @@
 #' @return pcasample class, contained prcomp class and sample information.
 #' @export
 #' @examples
-#' library(phyloseq)
-#' data(GlobalPatterns)
-#' subGlobal <- subset_samples(GlobalPatterns, 
-#'          SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
-#' pcares <- get_pca(subGlobal, method="hellinger")
+#' # don't run in examples
+#' #library(phyloseq)
+#' #data(GlobalPatterns)
+#' #subGlobal <- subset_samples(GlobalPatterns, 
+#' #         SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#' #pcares <- get_pca(subGlobal, method="hellinger")
 #' #pcaplot <- ggordpoint(pcares, biplot=TRUE, 
 #' #                      speciesannot=TRUE,
 #' #                      factorNames=c("SampleType"), ellipse=TRUE)
@@ -79,14 +80,15 @@ get_pca.phyloseq <- function(obj, method="hellinger", ...){
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' library(phyloseq)
-#' data(GlobalPatterns)
-#' subGlobal <- subset_samples(GlobalPatterns,
-#'          SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
-#' pcares <- get_pca(subGlobal, method="hellinger")
-#' pcaplot <- ggordpoint(pcares, biplot=TRUE,
-#'                     speciesannot=TRUE,
-#'                      factorNames=c("SampleType"), ellipse=TRUE)
+#' #don't run in examples
+#' #library(phyloseq)
+#' #data(GlobalPatterns)
+#' #subGlobal <- subset_samples(GlobalPatterns,
+#' #         SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#' #pcares <- get_pca(subGlobal, method="hellinger")
+#' #pcaplot <- ggordpoint(pcares, biplot=TRUE,
+#' #                    speciesannot=TRUE,
+#' #                     factorNames=c("SampleType"), ellipse=TRUE)
 ggordpoint <- function(obj, ...){
 	UseMethod("ggordpoint")
 }
@@ -243,12 +245,13 @@ getellipsemap <- function(namelist){
 #' contribution and coordinate of features.
 #' @export
 #' @examples
-#' library(phyloseq)
-#' data(GlobalPatterns)
-#' subGlobal <- subset_samples(GlobalPatterns,
-#'          SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
-#' pcares <- get_pca(subGlobal, method="hellinger") 
-#' varres <- get_varct(pcares)
+#' #don't run in examples
+#' #library(phyloseq)
+#' #data(GlobalPatterns)
+#' #subGlobal <- subset_samples(GlobalPatterns,
+#' #         SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#' #pcares <- get_pca(subGlobal, method="hellinger") 
+#' #varres <- get_varct(pcares)
 get_varct <- function(obj,...){
     UseMethod("get_varct")
 }
