@@ -33,7 +33,7 @@ see also \code{\link[phyloseq]{distanceMethodList}}}
 
 \item{sampleda}{data.frame, nrow sample * ncol factors.}
 
-\item{tree}{phylo, see also \code{\link[ape]{phylo}}.}
+\item{tree}{object, the phylo class, see also \code{\link[ape]{as.phylo}}.}
 
 \item{method}{character, default is hellinger, 
 see alse \code{\link[vegan]{decostand}}}
