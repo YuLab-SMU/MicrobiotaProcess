@@ -34,7 +34,7 @@ ggbox(obj, factorNames, ...)
 
 \item{factorNames}{character, the names of factor contained in sampleda.}
 
-\item{...}{additional arguments, see also \code{\link[ggsignif]{geom_signif}}.}
+\item{...}{additional arguments, see also \code{\link[ggsignif]{stat_signif}}.}
 
 \item{sampleda}{data.frame, sample information if obj is data.frame, the 
 sampleda should be provided.}
@@ -50,16 +50,16 @@ if you want to order the levels of factor, you can set this.}
 \item{compare}{logical, whether test the features among groups,default is TRUE.}
 
 \item{testmethod}{character, the method of test, default is `wilcox.test`.
-see also \code{\link[ggsignif]{geom_signif}}.}
+see also \code{\link[ggsignif]{stat_signif}}.}
 
 \item{signifmap}{logical, whether the pvalue are directly written a annotaion
 or asterisks are used instead, default is (pvalue) FALSE. see also
-\code{\link[ggsignif]{geom_signif}}.}
+\code{\link[ggsignif]{stat_signif}}.}
 
 \item{p_textsize}{numeric, the size of text of pvalue or asterisks, 
 default is 2.}
 
-\item{step_increase}{numeric, see also \code{\link[ggsignif]{geom_signif}},
+\item{step_increase}{numeric, see also \code{\link[ggsignif]{stat_signif}},
 default is 0.1.}
 
 \item{boxwidth}{numeric, the width of boxplot when the geom is 'violin',
