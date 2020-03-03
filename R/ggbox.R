@@ -10,18 +10,18 @@
 #' if you want to order the levels of factor, you can set this.
 #' @param compare logical, whether test the features among groups,default is TRUE.
 #' @param testmethod character, the method of test, default is `wilcox.test`.
-#' see also \code{\link[ggsignif]{geom_signif}}.
+#' see also \code{\link[ggsignif]{stat_signif}}.
 #' @param signifmap logical, whether the pvalue are directly written a annotaion
 #' or asterisks are used instead, default is (pvalue) FALSE. see also
-#' \code{\link[ggsignif]{geom_signif}}.
+#' \code{\link[ggsignif]{stat_signif}}.
 #' @param p_textsize numeric, the size of text of pvalue or asterisks, 
 #' default is 2.
-#' @param step_increase numeric, see also \code{\link[ggsignif]{geom_signif}},
+#' @param step_increase numeric, see also \code{\link[ggsignif]{stat_signif}},
 #' default is 0.1.
 #' @param boxwidth numeric, the width of boxplot when the geom is 'violin',
 #' default is 0.2.
 #' @param facetnrow integer, the nrow of facet, default is 1.
-#' @param ... additional arguments, see also \code{\link[ggsignif]{geom_signif}}.
+#' @param ... additional arguments, see also \code{\link[ggsignif]{stat_signif}}.
 #' @return a 'ggplot' plot object, a box or violine plot.
 #' @author Shuangbin Xu
 #' @export
