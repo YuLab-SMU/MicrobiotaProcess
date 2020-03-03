@@ -17,12 +17,14 @@
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' library(phyloseq)
-#' data(GlobalPatterns)
-#' subGlobal <- subset_samples(GlobalPatterns, 
-#'          SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
-#' hcsample <- get_clust(subGlobal, distmethod="jaccard",
-#'                   method="hellinger", hclustmethod="average")
+#' #don't run in examples
+#' #library(phyloseq)
+#' #data(GlobalPatterns)
+#' #subGlobal <- subset_samples(GlobalPatterns, 
+#' #         SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#' # don't run in examples
+#' #hcsample <- get_clust(subGlobal, distmethod="jaccard",
+#' #                  method="hellinger", hclustmethod="average")
 get_clust <- function(obj,...){
     UseMethod("get_clust")
 }
@@ -114,19 +116,20 @@ get_clust.phyloseq <- function(obj,
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' library(phyloseq)
-#' library(ggtree)
-#' library(ggplot2)
-#' data(GlobalPatterns)
-#' subGlobal <- subset_samples(GlobalPatterns,
-#'          SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
-#' hcsample <- get_clust(subGlobal, distmethod="jaccard",
-#'                   method="hellinger", hclustmethod="average")
-#' hc_p <- ggclust(hcsample, layout = "rectangular",
-#'                 pointsize=1, fontsize=0,
-#'                 factorNames=c("SampleType")) +
-#'         theme_tree2(legend.position="right",
-#'                     plot.title = element_text(face="bold", lineheight=25,hjust=0.5))
+#' #don't run in examples
+#' #library(phyloseq)
+#' #library(ggtree)
+#' #library(ggplot2)
+#' #data(GlobalPatterns)
+#' #subGlobal <- subset_samples(GlobalPatterns,
+#' #         SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#' #hcsample <- get_clust(subGlobal, distmethod="jaccard",
+#' #                  method="hellinger", hclustmethod="average")
+#' #hc_p <- ggclust(hcsample, layout = "rectangular",
+#' #                pointsize=1, fontsize=0,
+#' #                factorNames=c("SampleType")) +
+#' #        theme_tree2(legend.position="right",
+#' #                    plot.title = element_text(face="bold", lineheight=25,hjust=0.5))
 ggclust <- function(obj,...){
     UseMethod("ggclust")
 }
