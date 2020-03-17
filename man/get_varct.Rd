@@ -28,11 +28,10 @@ contribution and coordinate of features.
 get the contribution of variables
 }
 \examples{
-#don't run in examples
-#library(phyloseq)
-#data(GlobalPatterns)
-#subGlobal <- subset_samples(GlobalPatterns,
-#         SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
+library(phyloseq)
+data(GlobalPatterns)
+subGlobal <- subset_samples(GlobalPatterns,
+         SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
 #pcares <- get_pca(subGlobal, method="hellinger") 
 #varres <- get_varct(pcares)
 }

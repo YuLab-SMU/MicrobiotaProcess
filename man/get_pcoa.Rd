@@ -61,11 +61,10 @@ pcoa and sampleda (data.frame).
 performs principal coordinate analysis (PCoA)
 }
 \examples{
-#don't run in examples
-#library(phyloseq)
-#data(GlobalPatterns)
-#subGlobal <- subset_samples(GlobalPatterns, 
-#              SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
+library(phyloseq)
+data(GlobalPatterns)
+subGlobal <- subset_samples(GlobalPatterns, 
+              SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
 #pcoares <- get_pcoa(subGlobal, 
 #                   distmethod="euclidean",
 #                   method="hellinger")
