@@ -154,20 +154,20 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' data(kostic2012crc)
-#' kostic2012crc
-#' head(phyloseq::sample_data(kostic2012crc),3)
-#' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,
-#'                               rngseed=1024)
-#' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
-#' set.seed(1024)
-#' diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
-#'                         mlfun="lda", filtermod="fdr",
-#'                         firstcomfun = "kruskal.test",
-#'                         firstalpha=0.05, strictmod=TRUE,
-#'                         secondcomfun = "wilcox.test",
-#'                         subclmin=3, subclwilc=TRUE,
-#'                         secondalpha=0.01, ldascore=3)
+#' #data(kostic2012crc)
+#' #kostic2012crc
+#' #head(phyloseq::sample_data(kostic2012crc),3)
+#' #kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,
+#' #                              rngseed=1024)
+#' #table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
+#' #set.seed(1024)
+#' #diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
+#' #                        mlfun="lda", filtermod="fdr",
+#' #                        firstcomfun = "kruskal.test",
+#' #                        firstalpha=0.05, strictmod=TRUE,
+#' #                        secondcomfun = "wilcox.test",
+#' #                        subclmin=3, subclwilc=TRUE,
+#' #                        secondalpha=0.01, ldascore=3)
 #' # not run in example
 #' #ggdifftaxbar(diffres, output="biomarker_barplot")
 ggdifftaxbar <- function(obj,...){
@@ -316,35 +316,39 @@ getMeanMedian <- function(datameta, feature, subclass){
 #' @param effectsizename character, the column name contained effect size information.
 #' @param factorLevels list, the levels of the factors, default is NULL,
 #' if you want to order the levels of factor, you can set this.
+#' @param linecolor character, the color of horizontal error bars, default is grey50.
+#' @param linewidth numeric, the width of horizontal error bars, default is 0.4.
+#' @param lineheight numeric, the height of horizontal error bars, default is 0.2.
+#' @param pointsize numeric, the size of points, default is 1.5.
 #' @param setFacet logical, whether use facet to plot, default is TRUE.
 #' @param ... additional arguments.
-#' @return the figures of effect size show the LDA or MeanDecreaseAccuracy.
+#' @return the figures of effect size show the LDA or MDA (MeanDecreaseAccuracy).
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' data(kostic2012crc)
-#' kostic2012crc
-#' head(phyloseq::sample_data(kostic2012crc),3)
-#' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
-#' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
-#' set.seed(1024)
-#' diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
-#'                         mlfun="lda", filtermod="fdr",
-#'                         firstcomfun = "kruskal.test",
-#'                         firstalpha=0.05, strictmod=TRUE,
-#'                         secondcomfun = "wilcox.test", 
-#'                         subclmin=3, subclwilc=TRUE,
-#'                         secondalpha=0.01, ldascore=3) 
-#' library(ggplot2)
-#' effectplot <- ggeffectsize(diffres) +
-#'               scale_color_manual(values=c('#00AED7', 
-#'                                           '#FD9347', 
-#'                                           '#C1E168'))+
-#'               theme_bw()+
-#'               theme(strip.background=element_rect(fill=NA),
-#'                     panel.spacing = unit(0.2, "mm"),
-#'                     panel.grid=element_blank(),
-#'                     strip.text.y=element_blank())
+#' #data(kostic2012crc)
+#' #kostic2012crc
+#' #head(phyloseq::sample_data(kostic2012crc),3)
+#' #kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
+#' #table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
+#' #set.seed(1024)
+#' #diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
+#' #                        mlfun="lda", filtermod="fdr",
+#' #                        firstcomfun = "kruskal.test",
+#' #                        firstalpha=0.05, strictmod=TRUE,
+#' #                        secondcomfun = "wilcox.test", 
+#' #                        subclmin=3, subclwilc=TRUE,
+#' #                        secondalpha=0.01, ldascore=3) 
+#' #library(ggplot2)
+#' #effectplot <- ggeffectsize(diffres) +
+#' #              scale_color_manual(values=c('#00AED7', 
+#' #                                          '#FD9347', 
+#' #                                          '#C1E168'))+
+#' #              theme_bw()+
+#' #              theme(strip.background=element_rect(fill=NA),
+#' #                    panel.spacing = unit(0.2, "mm"),
+#' #                    panel.grid=element_blank(),
+#' #                    strip.text.y=element_blank())
 ggeffectsize <- function(obj,...){
     UseMethod("ggeffectsize")
 }
@@ -352,34 +356,50 @@ ggeffectsize <- function(obj,...){
 #' @method ggeffectsize data.frame
 #' @rdname ggeffectsize
 #' @importFrom ggplot2 facet_grid ylab xlab scale_color_manual theme_bw element_text element_blank unit element_rect
-#' @importFrom ggplot2 geom_segment scale_x_continuous
+#' @importFrom ggplot2 geom_errorbarh geom_point scale_x_continuous
 #' @export 
 ggeffectsize.data.frame <- function(obj, 
     factorName, 
     effectsizename,
     factorLevels=NULL,
+    linecolor="grey50",
+    linewidth=0.4,
+    lineheight=0.2,
+    pointsize=1.5,
     setFacet=TRUE,
     ...){
     if (effectsizename %in% "LDA"){
     	xlabtext <- bquote(paste(Log[10],"(",.("LDA"), ")"))
+        xtext <- "LDAmean"
+        xmintext <- "LDAlower"
+        xmaxtext <- "LDAupper"
     }else{
     	xlabtext <- effectsizename
+        xtext <- "MDAmean"
+        xmintext <- "MDAlower"
+        xmaxtext <- "MDAupper"
     }
     if (!is.null(factorLevels)){
     	obj <- setfactorlevels(obj,factorLevels)
     }
-    p <- ggplot(data=obj, 
-    	        aes_(x=as.formula(paste0("~",effectsizename)),
-    		     y=~f)) + 
-    	geom_segment(aes_(xend=0, yend=~f), 
-    		     color="grey") + 
-    	geom_point(aes_(color=as.formula(paste0("~",factorName)))) 
+    #p <- ggplot(data=obj, 
+    # 	        aes_(x=as.formula(paste0("~",effectsizename)),
+    # 		     y=~f)) + 
+    # 	geom_segment(aes_(xend=0, yend=~f), 
+    #		     color="grey") + 
+    p <- ggplot(data=obj, aes_(y=~f)) +
+         geom_errorbarh(aes_(xmin=as.formula(paste0("~", xmintext)), 
+                             xmax=as.formula(paste0("~", xmaxtext))),
+                        color=linecolor, size=linewidth, height=lineheight) +
+         geom_point(aes_(x=as.formula(paste0("~",xtext)),
+                         color=as.formula(paste0("~",factorName))),
+                    size=pointsize) 
     if (setFacet) {
         p <- p + facet_grid(as.formula(paste0(factorName," ~.")),
     			   scales = "free_y", space = "free_y")
     }
-    p <- p + scale_x_continuous(expand=c(0,0), 
-        limits=c(0, max(obj[[effectsizename]])*1.1))+
+    p <- p + #scale_x_continuous(expand=c(0,0), 
+        #limits=c(0, max(obj[[xmaxtext]])*1.1))+
     	ylab(NULL) + xlab(xlabtext) 
     #if (setColors){
     tmpn <- length(unique(as.vector(obj[[factorName]])))
@@ -406,7 +426,7 @@ ggeffectsize.diffAnalysisClass <- function(obj, removeUnkown=TRUE, setFacet=TRUE
     if (removeUnkown && length(grep("__un_",efres$f))){
     	efres <- efres[-grep("__un_",efres$f),,drop=FALSE]
     }
-    if ("LDA" %in% colnames(obj@mlres)){
+    if ("LDAmean" %in% colnames(obj@mlres)){
     	effectsizename <- "LDA"
     }else{
     	effectsizename <- "MeanDecreaseAccuracy" 
