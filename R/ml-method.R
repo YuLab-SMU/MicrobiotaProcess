@@ -1,7 +1,7 @@
 #' @importFrom dplyr select
 #' @importFrom MASS lda
 #' @keywords internal
-LDAeffectsize <- function(datalist, compareclass, class, bootnums=30, LDA=2){
+LDAeffectsize <- function(datalist, compareclass, class, bootnums=30, LDA=2, ci=0.95){
     res <- list()
     tmpformula <- as.formula(paste0(class, " ~. "))
     for (i in seq_len(bootnums)){
@@ -27,20 +27,23 @@ LDAeffectsize <- function(datalist, compareclass, class, bootnums=30, LDA=2){
     compareres <- do.call("rbind", compareres)
     res[[i]] <- compareres
     }
-    res <- Reduce("+", res)
-    res <- apply(res/bootnums, 2, function(x)max(x))
-    res <- log(1+res,10)
-    res <- data.frame(f=names(res), LDA=res)
-    res$f <- gsub("`", "", as.vector(res$f))
-    res <- res[res$LDA>=LDA,]
+    res <- cal_ci(x=res, class=class, ci=ci, method="lda")
+    colnames(res) <- c("f", paste0("LDA", colnames(res)[-1]))
+    res <- res[res$LDAmean>=LDA,]
+    #res <- Reduce("+", res)
+    #res <- apply(res/bootnums, 2, function(x)max(x))
+    #res <- log(1+res,10)
+    #res <- data.frame(f=names(res), LDA=res)
+    #res$f <- gsub("`", "", as.vector(res$f))
+    #res <- res[res$LDA>=LDA,]
     if (!nrow(res)>0){stop("No features with significant differences after LDA analysis.")}
-    rownames(res) <- NULL
+    #rownames(res) <- NULL
     return(res)
 }
 
 #' @importFrom randomForest randomForest importance
 #' @keywords internal
-rfimportance <- function(datalist, class, bootnums, effsize=2){
+rfimportance <- function(datalist, class, bootnums, effsize=2, ci=0.95){
     rfres <- list()
     #tmpformula <- as.formula(paste0(class, " ~. "))
     for (i in seq_len(bootnums)){
@@ -53,10 +56,12 @@ rfimportance <- function(datalist, class, bootnums, effsize=2){
         imres <- importance(dfres, type=1)
         rfres[[i]] <- imres
     }
-    rfres <- Reduce("+", rfres)
-    rfres <- data.frame(rfres/bootnums)
-    rfres <- data.frame(f=rownames(rfres), MeanDecreaseAccuracy=rfres$MeanDecreaseAccuracy)
-    rfres <- rfres[rfres$MeanDecreaseAccuracy>=effsize,]
+    rfres <- cal_ci(x=rfres, class=class, ci=ci, method="rf")
+    colnames(rfres) <- c("f", paste0("MDA", colnames(rfres)[-1]))
+    #rfres <- Reduce("+", rfres)
+    #rfres <- data.frame(rfres/bootnums)
+    #rfres <- data.frame(f=rownames(rfres), MeanDecreaseAccuracy=rfres$MeanDecreaseAccuracy)
+    #rfres <- rfres[rfres$MeanDecreaseAccuracy>=effsize,]
     return(rfres)
 }
 
@@ -105,3 +110,19 @@ removeconstant <- function(dflist){
     return(dflist)
 }
 
+#' @importFrom tibble rownames_to_column
+#' @importFrom Rmisc CI
+cal_ci <- function(x, class, ci=0.95, method){
+    if (method=="rf"){
+        x <- do.call("cbind", x)
+        x <- data.frame(t(x), check.names=FALSE)
+    }else{
+        x <- do.call("rbind", x)
+    }
+    x <- apply(x, 2, CI, ci=ci)
+    x <- data.frame(t(x), check.names=FALSE)
+    x <- log(1+x, 10)
+    rownames(x) <- gsub("`", "", rownames(x))
+    x <- rownames_to_column(x, var="f")
+    return(x)
+}
