@@ -33,6 +33,7 @@ diff_analysis(obj, ...)
   ldascore = 2,
   normalization = 1e+06,
   bootnums = 30,
+  ci = 0.95,
   ...
 )
 
@@ -103,6 +104,8 @@ uneven distributions, or `wilcox_test` of `coin`, or you can also use `lm`,
 for the LDA score, or you can set NULL for no normalization, default is 1000000.}
 
 \item{bootnums}{integer, set the number of bootstrap iteration for lda or rf, default is 30.}
+
+\item{ci}{numeric, the confidence interval of effect size (LDA or MDA), default is 0.95.}
 }
 \value{
 diff_analysis class.
@@ -111,19 +114,19 @@ diff_analysis class.
 Differential expression analysis
 }
 \examples{
-data(kostic2012crc)
-kostic2012crc
-head(phyloseq::sample_data(kostic2012crc),3)
-kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
-table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
-set.seed(1024)
-diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
-                        mlfun="lda", filtermod="fdr",
-                        firstcomfun = "kruskal.test",
-                        firstalpha=0.05, strictmod=TRUE,
-                        secondcomfun = "wilcox.test",
-                        subclmin=3, subclwilc=TRUE,
-                        secondalpha=0.01, ldascore=3)
+#data(kostic2012crc)
+#kostic2012crc
+#head(phyloseq::sample_data(kostic2012crc),3)
+#kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
+#table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
+#set.seed(1024)
+#diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
+#                        mlfun="lda", filtermod="fdr",
+#                        firstcomfun = "kruskal.test",
+#                        firstalpha=0.05, strictmod=TRUE,
+#                        secondcomfun = "wilcox.test",
+#                        subclmin=3, subclwilc=TRUE,
+#                        secondalpha=0.01, ldascore=3)
 }
 \author{
 Shuangbin Xu

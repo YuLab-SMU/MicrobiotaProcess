@@ -13,6 +13,10 @@ ggeffectsize(obj, ...)
   factorName,
   effectsizename,
   factorLevels = NULL,
+  linecolor = "grey50",
+  linewidth = 0.4,
+  lineheight = 0.2,
+  pointsize = 1.5,
   setFacet = TRUE,
   ...
 )
@@ -32,40 +36,48 @@ or data.frame, contained effect size and the group information.}
 \item{factorLevels}{list, the levels of the factors, default is NULL,
 if you want to order the levels of factor, you can set this.}
 
+\item{linecolor}{character, the color of horizontal error bars, default is grey50.}
+
+\item{linewidth}{numeric, the width of horizontal error bars, default is 0.4.}
+
+\item{lineheight}{numeric, the height of horizontal error bars, default is 0.2.}
+
+\item{pointsize}{numeric, the size of points, default is 1.5.}
+
 \item{setFacet}{logical, whether use facet to plot, default is TRUE.}
 
 \item{removeUnkown}{logical, whether do not show unkown taxonomy, default is TRUE.}
 }
 \value{
-the figures of effect size show the LDA or MeanDecreaseAccuracy.
+the figures of effect size show the LDA or MDA (MeanDecreaseAccuracy).
 }
 \description{
 visualization of effect size by the Linear Discriminant Analysis or randomForest
 }
 \examples{
-data(kostic2012crc)
-kostic2012crc
-head(phyloseq::sample_data(kostic2012crc),3)
-kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
-table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
-set.seed(1024)
-diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
-                        mlfun="lda", filtermod="fdr",
-                        firstcomfun = "kruskal.test",
-                        firstalpha=0.05, strictmod=TRUE,
-                        secondcomfun = "wilcox.test", 
-                        subclmin=3, subclwilc=TRUE,
-                        secondalpha=0.01, ldascore=3) 
-library(ggplot2)
-effectplot <- ggeffectsize(diffres) +
-              scale_color_manual(values=c('#00AED7', 
-                                          '#FD9347', 
-                                          '#C1E168'))+
-              theme_bw()+
-              theme(strip.background=element_rect(fill=NA),
-                    panel.spacing = unit(0.2, "mm"),
-                    panel.grid=element_blank(),
-                    strip.text.y=element_blank())
+#data(kostic2012crc)
+#kostic2012crc
+#head(phyloseq::sample_data(kostic2012crc),3)
+#kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
+#table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
+#set.seed(1024)
+#diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
+#                        mlfun="lda", filtermod="fdr",
+#                        firstcomfun = "kruskal.test",
+#                        firstalpha=0.05, strictmod=TRUE,
+#                        secondcomfun = "wilcox.test", 
+#                        subclmin=3, subclwilc=TRUE,
+#                        secondalpha=0.01, ldascore=3) 
+#library(ggplot2)
+#effectplot <- ggeffectsize(diffres) +
+#              scale_color_manual(values=c('#00AED7', 
+#                                          '#FD9347', 
+#                                          '#C1E168'))+
+#              theme_bw()+
+#              theme(strip.background=element_rect(fill=NA),
+#                    panel.spacing = unit(0.2, "mm"),
+#                    panel.grid=element_blank(),
+#                    strip.text.y=element_blank())
 }
 \author{
 Shuangbin Xu

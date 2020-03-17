@@ -62,22 +62,22 @@ of diffAnalysisClass.
 boxplot for the result of diff_analysis
 }
 \examples{
-data(kostic2012crc)
-kostic2012crc
-head(phyloseq::sample_data(kostic2012crc),3)
-kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,
-                 rngseed=1024)
-table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
-set.seed(1024)
-diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
-                         mlfun="lda", filtermod="fdr",
-                         firstcomfun = "kruskal.test",
-                         firstalpha=0.05, strictmod=TRUE,
-                         secondcomfun = "wilcox.test",
-                         subclmin=3, subclwilc=TRUE,
-                         secondalpha=0.01, ldascore=3)
-library(ggplot2)
-p <- ggdiffbox(diffres, box_notch=FALSE)
+#data(kostic2012crc)
+#kostic2012crc
+#head(phyloseq::sample_data(kostic2012crc),3)
+#kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,
+#                 rngseed=1024)
+#table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
+#set.seed(1024)
+#diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
+#                         mlfun="lda", filtermod="fdr",
+#                         firstcomfun = "kruskal.test",
+#                         firstalpha=0.05, strictmod=TRUE,
+#                         secondcomfun = "wilcox.test",
+#                         subclmin=3, subclwilc=TRUE,
+#                         secondalpha=0.01, ldascore=3)
+#library(ggplot2)
+#p <- ggdiffbox(diffres, box_notch=FALSE, l_xlabtext="relative abundance")
 }
 \author{
 Shuangbin Xu
