@@ -85,7 +85,7 @@ plotes
 The results also can be visualized using `ggdiffbox`.
 
 ```{r, fig.align="center", fig.height=5, fig.width=7, error=TRUE, KosticCRCLDAtax}
-plotes_ab <- ggdiffbox(obj=diffres, box_notch=FALSE, colorlist=c("#00AED7", "#FD9347"))
+plotes_ab <- ggdiffbox(obj=diffres, box_notch=FALSE, colorlist=c("#00AED7", "#FD9347"), l_xlabtext="relative abundance")
 plotes_ab
 ```
 
