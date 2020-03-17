@@ -92,11 +92,10 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' #don't run in examples
-#' #library(phyloseq)
-#' #data(GlobalPatterns)
-#' #subGlobal <- subset_samples(GlobalPatterns, 
-#' #              SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#' library(phyloseq)
+#' data(GlobalPatterns)
+#' subGlobal <- subset_samples(GlobalPatterns, 
+#'               SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
 #' #pcoares <- get_pcoa(subGlobal, 
 #' #                   distmethod="euclidean",
 #' #                   method="hellinger")

@@ -81,7 +81,7 @@ setMethod("ggbox", "data.frame",
         indexNames <- unique(as.vector(obj$feature))[seq_len(6)]
     }
     obj <- obj %>% filter(.data$feature %in% indexNames)
-    comparelist <- get_comparelist(obj, factorNames)
+    comparelist <- get_comparelist(data=obj, class=factorNames)
     mapping <- aes_string(x=factorNames,y="value",fill=factorNames)
     p <- ggplot(data=obj,mapping)
     ifelse(geom=="boxplot",p <- p + geom_boxplot(outlier.size=0.5,outlier.shape=21),
@@ -140,22 +140,22 @@ setMethod("ggbox", "alphasample", function(obj,factorNames,...){
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' #data(kostic2012crc)
-#' #kostic2012crc
-#' #head(phyloseq::sample_data(kostic2012crc),3)
-#' #kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,
-#' #                 rngseed=1024)
-#' #table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
-#' #set.seed(1024)
-#' #diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
-#' #                         mlfun="lda", filtermod="fdr",
-#' #                         firstcomfun = "kruskal.test",
-#' #                         firstalpha=0.05, strictmod=TRUE,
-#' #                         secondcomfun = "wilcox.test",
-#' #                         subclmin=3, subclwilc=TRUE,
-#' #                         secondalpha=0.01, ldascore=3)
-#' #library(ggplot2)
-#' #p <- ggdiffbox(diffres, box_notch=FALSE, l_xlabtext="relative abundance")
+#' data(kostic2012crc)
+#' kostic2012crc
+#' head(phyloseq::sample_data(kostic2012crc),3)
+#' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,
+#'                  rngseed=1024)
+#' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
+#' set.seed(1024)
+#' diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
+#'                          mlfun="lda", filtermod="fdr",
+#'                          firstcomfun = "kruskal.test",
+#'                          firstalpha=0.05, strictmod=TRUE,
+#'                          secondcomfun = "wilcox.test",
+#'                          subclmin=3, subclwilc=TRUE,
+#'                          secondalpha=0.01, ldascore=3)
+#' library(ggplot2)
+#' p <- ggdiffbox(diffres, box_notch=FALSE, l_xlabtext="relative abundance")
 setGeneric("ggdiffbox", function(obj, ...){standardGeneric("ggdiffbox")})
 
 #' @aliases ggdiffbox,diffAnalysisClass
@@ -272,8 +272,8 @@ plotdiffbox <- function(obj, sampleda, factorNames, dodge_width=0.6, box_width=0
 
 #' @keywords internal
 get_comparelist <- function(data, class){
-    groups <- getclasslevels(data, class)
-    comparelist <- getcompareclass(groups)
+    groups <- getclasslevels(sampleda=data, class=class)
+    comparelist <- getcompareclass(classlevels=groups)
     comparelist <- split(comparelist, slice.index(comparelist, 1))
     names(comparelist) <- NULL
     return(comparelist)
