@@ -38,6 +38,7 @@
 #' @param normalization integer, set the normalization value, set a big number if to get more meaningful values 
 #' for the LDA score, or you can set NULL for no normalization, default is 1000000.
 #' @param bootnums integer, set the number of bootstrap iteration for lda or rf, default is 30.
+#' @param ci numeric, the confidence interval of effect size (LDA or MDA), default is 0.95.
 #' @param ..., additional parameters.
 #' @return diff_analysis class.
 #' @author Shuangbin Xu
@@ -46,19 +47,19 @@
 #' @importFrom magrittr %>%
 #' @export
 #' @examples
-#' data(kostic2012crc)
-#' kostic2012crc
-#' head(phyloseq::sample_data(kostic2012crc),3)
-#' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
-#' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
-#' set.seed(1024)
-#' diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
-#'                         mlfun="lda", filtermod="fdr",
-#'                         firstcomfun = "kruskal.test",
-#'                         firstalpha=0.05, strictmod=TRUE,
-#'                         secondcomfun = "wilcox.test",
-#'                         subclmin=3, subclwilc=TRUE,
-#'                         secondalpha=0.01, ldascore=3)
+#' #data(kostic2012crc)
+#' #kostic2012crc
+#' #head(phyloseq::sample_data(kostic2012crc),3)
+#' #kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
+#' #table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
+#' #set.seed(1024)
+#' #diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
+#' #                        mlfun="lda", filtermod="fdr",
+#' #                        firstcomfun = "kruskal.test",
+#' #                        firstalpha=0.05, strictmod=TRUE,
+#' #                        secondcomfun = "wilcox.test",
+#' #                        subclmin=3, subclwilc=TRUE,
+#' #                        secondalpha=0.01, ldascore=3)
 diff_analysis <- function(obj, ...){
 	UseMethod("diff_analysis")
 }
@@ -72,7 +73,7 @@ diff_analysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=
     ratio=0.7, firstcomfun='kruskal.test', padjust="fdr",filtermod="pvalue",
     firstalpha=0.05, strictmod=TRUE, fcfun="generalizedFC", secondcomfun="wilcox.test",
     clmin=5, clwilc=TRUE, secondalpha=0.05, subclmin=3, subclwilc=TRUE,	ldascore=2,
-    normalization=1000000, bootnums=30,	...){
+    normalization=1000000, bootnums=30, ci=0.95, ...){
     if (!is.null(taxda)){taxda <- fillNAtax(taxda)
         if (alltax){obj <- getalltaxdf(obj, taxda, method=standard_method)}
     }
@@ -109,12 +110,12 @@ diff_analysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=
     dameta <- dameta %>% select(c(secondvarsvectors, class))
     dameta <- split(dameta, dameta[,match(class,colnames(dameta))])
     dameta <- sampledflist(dameta, bootnums=bootnums, ratio=ratio)
-    dameta <- removeconstant(dameta) 
-    if (mlfun=="lda"){mlres <- LDAeffectsize(dameta, compareclass, class, bootnums=bootnums, LDA=ldascore)}
-    if (mlfun=="rf"){mlres <- rfimportance(dameta, class, bootnums=bootnums, effsize=ldascore)}
-    tmpfun <- ifelse(!"funname" %in% names(match.call()),NA,"diff_analysis.data.frame")
-    res <- new("diffAnalysisClass",originalD=obj,sampleda=sampleda,taxda=taxda,kwres=kwres,
-               secondvars=secondvars,mlres=mlres,call=match.call.defaults(fun=tmpfun))
+    dameta <- removeconstant(dameta)
+    if (mlfun=="lda"){mlres <- LDAeffectsize(dameta, compareclass, class, bootnums=bootnums, LDA=ldascore, ci=ci)}
+    if (mlfun=="rf"){mlres <- rfimportance(dameta, class, bootnums=bootnums, effsize=ldascore, ci=ci)}
+    tmpfun <- ifelse(!"funname" %in% names(match.call()), NA, "diff_analysis.data.frame")
+    res <- new("diffAnalysisClass", originalD=obj, sampleda=sampleda, taxda=taxda, kwres=kwres,
+               secondvars=secondvars, mlres=mlres, call=match.call.defaults(fun=tmpfun))
     return(res)
 }
 
@@ -285,16 +286,16 @@ as.data.frame.alphasample <- function(x, ...){
 
 #' @keywords internal
 tidyEffectSize <- function(obj){
-    f <- LDA <- MeanDecreaseAccuracy <- NULL
+    f <- LDAmean <- MDAmean <- NULL
     secondvars <- getsecondTRUEvar(obj)
     classname <- getcall(obj, "class")
     efres <- merge(obj@mlres, secondvars, by.x="f", by.y="f") %>%
              select (-c("gfc", "Freq"))
-    if ("LDA" %in% colnames(efres)){
-        efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)), LDA)]))
+    if ("LDAmean" %in% colnames(efres)){
+        efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)), LDAmean)]))
     }else{
         efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)),
-                                                         MeanDecreaseAccuracy)]))
+                                                         MDAmean)]))
     }
     return(efres)
 }
