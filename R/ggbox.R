@@ -140,22 +140,22 @@ setMethod("ggbox", "alphasample", function(obj,factorNames,...){
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' data(kostic2012crc)
-#' kostic2012crc
-#' head(phyloseq::sample_data(kostic2012crc),3)
-#' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,
-#'                  rngseed=1024)
-#' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
-#' set.seed(1024)
-#' diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
-#'                          mlfun="lda", filtermod="fdr",
-#'                          firstcomfun = "kruskal.test",
-#'                          firstalpha=0.05, strictmod=TRUE,
-#'                          secondcomfun = "wilcox.test",
-#'                          subclmin=3, subclwilc=TRUE,
-#'                          secondalpha=0.01, ldascore=3)
-#' library(ggplot2)
-#' p <- ggdiffbox(diffres, box_notch=FALSE)
+#' #data(kostic2012crc)
+#' #kostic2012crc
+#' #head(phyloseq::sample_data(kostic2012crc),3)
+#' #kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,
+#' #                 rngseed=1024)
+#' #table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
+#' #set.seed(1024)
+#' #diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
+#' #                         mlfun="lda", filtermod="fdr",
+#' #                         firstcomfun = "kruskal.test",
+#' #                         firstalpha=0.05, strictmod=TRUE,
+#' #                         secondcomfun = "wilcox.test",
+#' #                         subclmin=3, subclwilc=TRUE,
+#' #                         secondalpha=0.01, ldascore=3)
+#' #library(ggplot2)
+#' #p <- ggdiffbox(diffres, box_notch=FALSE, l_xlabtext="relative abundance")
 setGeneric("ggdiffbox", function(obj, ...){standardGeneric("ggdiffbox")})
 
 #' @aliases ggdiffbox,diffAnalysisClass
@@ -191,14 +191,14 @@ setMethod("ggdiffbox", "diffAnalysisClass", function(obj, geom="boxplot",
     if (is.null(colorlist)){colorlist <- getCols(length(tmpgroup))}
     if (is.null(names(colorlist))){names(colorlist) <- tmpgroup}
     if(is.null(getcall(obj,"standard_method"))){
-        ifelse(is.null(l_xlabtext), xlabtext<-"relative abundance", xlabtext <- l_xlabtext)
+        ifelse(is.null(l_xlabtext), xlabtext<-"abundance", xlabtext <- l_xlabtext)
     }else{xlabtext<-"abundance"}
     p <- plotdiffbox(obj=featureda, sampleda=sampleda, factorNames=classname, factorLevels=factorLevels,
                      featurelist=featurelist, geom=geom, box_notch=box_notch,
                      dodge_width=dodge_width, box_width=box_width) + coord_flip() +
          scale_fill_manual(values=colorlist) + ylab(xlabtext) 
     if (addLDA){
-        ifelse ("LDA" %in% colnames(obj@mlres), 
+        ifelse ("LDAmean" %in% colnames(obj@mlres), 
                 effectsizename<-"LDA", effectsizename <- "MeanDecreaseAccuracy")
         colorlist <- colorlist[unique(as.vector(nodedfres[[classname]]))]
         p2 <- ggeffectsize.data.frame(obj=nodedfres, factorName=classname,
