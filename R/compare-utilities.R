@@ -123,7 +123,7 @@ getanova <- function(obj){
 
 #' @keywords internal
 getclasslevels <- function(sampleda, class){
-    levelstmp <- levels(sampleda[,match(class, colnames(sampleda))])
+    levelstmp <- unique(as.vector(sampleda[,match(class, colnames(sampleda))]))
     return(levelstmp)
 }
 
@@ -139,7 +139,7 @@ getclass2sub <- function(sampleda, class, subclass){
 #' @importFrom gtools combinations
 #' @keywords internal
 getcompareclass <- function(classlevels){
-    combinations(length(classlevels), 2, classlevels,
+    combinations(n=length(classlevels), r=2, v=classlevels,
     						  repeats.allowed=FALSE)
 }
 
