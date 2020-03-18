@@ -25,7 +25,7 @@ ggbartax.default <- function(obj, mapping=NULL, position = "stack", stat="identi
          geom_bar(position = position,stat=stat, width=width) + 
          scale_y_continuous(expand=c(0,0))
     if ("fill" %in% names(mapping)){
-        tmpn <- length(levels(obj[,as_name(mapping[["fill"]])]))
+        tmpn <- length(unique(as.vector(obj[,as_name(mapping[["fill"]])])))
     }else{
         tmpn <- nrow(obj)
     }
