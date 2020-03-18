@@ -26,7 +26,7 @@
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' library(tidyverse)
+#' library(magrittr)
 #' otudafile <- system.file("extdata", "otu_tax_table.txt",
 #'                          package="MicrobiotaProcess")
 #' otuda <- read.table(otudafile, sep="\t", 
@@ -78,7 +78,7 @@ setMethod("ggbox", "data.frame",
         obj <- setfactorlevels(obj, factorLevels)
     }
     if (missing(indexNames)||is.null(indexNames)){
-        indexNames <- unique(as.vector(obj$feature))[seq_len(6)]
+        indexNames <- unique(as.vector(obj$feature))
     }
     obj <- obj %>% filter(.data$feature %in% indexNames)
     comparelist <- get_comparelist(data=obj, class=factorNames)
@@ -178,7 +178,7 @@ setMethod("ggdiffbox", "diffAnalysisClass", function(obj, geom="boxplot",
     nodedfres <- tidyEffectSize(obj) 
     nodedfres <- set_newlevels(data=nodedfres, newlevels=tmpgroup, factorNames=classname)
     if (is.null(featurelist)){
-        featurelist <- levels(nodedfres$f)
+        featurelist <- unique(as.vector(nodedfres$f))
     }else{
         featurelist <- featurelist
     }
