@@ -74,7 +74,7 @@ a 'ggplot' plot object, a box or violine plot.
 A box or violin plot with significance test
 }
 \examples{
-library(tidyverse)
+library(magrittr)
 otudafile <- system.file("extdata", "otu_tax_table.txt",
                          package="MicrobiotaProcess")
 otuda <- read.table(otudafile, sep="\t", 
