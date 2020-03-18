@@ -1,11 +1,14 @@
 #' @author Shuangbin Xu, GuangChuang Yu
 #' @keywords internal 
 getcladedf <- function(ggtree, node){
-    data <- ggtree$data 
+    data <- ggtree$data
     if ("nodeClass" %in% colnames(data)){
-    	levelsnum <- length(levels(data$nodeClass)) + 1
-    	tmpnum <- levelsnum - as.numeric(data$nodeClass)
-    	data$extend <- get_extend(tmpnum)
+        data <- set_newlevels(data=data, 
+                newlevels=taxlevel[seq_len(length(unique(data$nodeClass)))],
+                factorNames="nodeClass")
+        levelsnum <- length(levels(data$nodeClass)) + 1
+        tmpnum <- levelsnum - as.numeric(data$nodeClass)
+        data$extend <- get_extend(tmpnum)
     }
     df <-lapply(node, function(x)get_clade_position_(data=data, node=x))
     df <- do.call("rbind", df)
@@ -18,8 +21,11 @@ getcladedf <- function(ggtree, node){
 #' @author Shuangbin Xu, GuangChuang Yu
 #' @keywords internal
 getlabeldf <- function(ggtree, node, angle="auto"){
-    data <- ggtree$data 
+    data <- ggtree$data
     if ("nodeClass" %in% colnames(data)){
+        data <- set_newlevels(data=data,
+                newlevels=taxlevel[seq_len(length(unique(data$nodeClass)))],
+                factorNames="nodeClass")
     	levelsnum <- length(levels(data$nodeClass)) + 1
     	tmpnum <- levelsnum - as.numeric(data$nodeClass)
     	data$levelindex <- tmpnum
