@@ -1,3 +1,5 @@
 ^CODE_OF_CONDUCT\.md$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+CONDUCT.md
+README.Rmd
