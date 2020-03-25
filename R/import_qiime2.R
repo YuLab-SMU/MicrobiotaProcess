@@ -103,12 +103,18 @@ import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
 read.qza <- function(qzafile, build_tree=FALSE, parallel=FALSE, ...){
     tmpdir <- tempdir()
     unzipfiles <- unzip(qzafile, exdir=tmpdir)
-    metaflag <- read_yaml(unzipfiles[1])
+    tmp <- grep("yaml", unzipfiles)[1]
+    metaflag <- read_yaml(unzipfiles[tmp])
     formatflag <- metaflag$format
-    datafile <- unzipfiles[3]
     formats <- c("BIOMV210DirFmt", "TSVTaxonomyDirectoryFormat", 
                  "NewickDirectoryFormat","DNASequencesDirectoryFormat")
     formatflag <- match.arg(formatflag, formats)
+    switch(formatflag,
+           BIOMV210DirFmt={x <- grep("biom", unzipfiles)},
+           TSVTaxonomyDirectoryFormat={x <- grep("tsv", unzipfiles)},
+           DNASequencesDirectoryFormat={x <- grep("fasta", unzipfiles)},
+           NewickDirectoryFormat = {x <- grep("nwk", unzipfiles)})
+    datafile <- unzipfiles[x]
     switch(formatflag,
            BIOMV210DirFmt={x <- read.featuretab(datafile, build_tree=build_tree, ...)},
            TSVTaxonomyDirectoryFormat={x <- read.taxa(datafile, parallel=parallel)},
