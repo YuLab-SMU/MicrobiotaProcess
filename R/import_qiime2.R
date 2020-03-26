@@ -11,7 +11,8 @@
 #' @param refseqqza character, the file contained refrentent sequences, default is
 #' NULL.
 #' @param treeqza character, the file contained the tree file, default is NULL.
-#' @param build_tree logical, whether building the tree, default is FALSE.
+#' @param build_tree logical, whether building the tree, when the rownames of 
+#'  feature table contains the sequence, default is FALSE.
 #' @param parallel logical, whether parsing the column of taxonomy multi-parallel, default is FALSE.
 #' @param ..., additional parameters, see alos\code{\link{build_tree}}.
 #' @return phyloseq-class contained the argument class.
@@ -32,18 +33,31 @@
 import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL, 
                           refseqqza=NULL, treeqza=NULL,
                           build_tree=FALSE, parallel=FALSE, ...){
-    otux <- read.qza(otuqza, build_tree=build_tree, parallel=parallel, ...)
+    otux <- read.qza(otuqza, parallel=parallel)
     otutab <- otu_table(otux$otutab,taxa_are_rows=TRUE)
     if (!is.null(taxaqza)){
-        taxax <- read.qza(taxaqza, build_tree=FALSE, parallel=parallel)
-        if (!is.null(taxax$refseq) & !is.null(otux$refseq)){
-            matchnames <- names(taxax$refseq[match(otux$refseq, taxax$refseq)])
-            rownames(taxax$taxtab[match(matchnames, rownames(taxax$taxtab)),]) <- names(otux$refseq)
+        taxax <- read.qza(taxaqza, parallel=parallel)
+        taxax <- taxax[match(rownames(otutab), rownames(taxax)),,drop=FALSE]
+        if (!is.null(otux$taxtab)){
+            taxax <- otux$taxtab
         }
-        taxtab <- tax_table(taxax$taxtab)
-    }
-    if (!is.null(otux$taxtab)){
-        taxtab <- tax_table(otux$taxtab)
+        flag <- guess_rownames(rownames(otutab))
+        if (flag=="DNA"){
+            refseq <- rownames(otutab)
+            refseqnm <- paste0("OTU_", seq_len(length(refseq)))
+            rownames(otutab) <- refseqnm
+            rownames(taxax) <- refseqnm
+            names(refseq) <- refseqnm
+            if (build_tree){
+                reftree <- build_tree(DNAStringSet(refseq), ...)
+            }else{
+                reftree <- NULL
+            }
+        }else{
+            refseq <- NULL
+            reftree <- NULL
+        }
+        taxtab <- tax_table(taxax)
     }
     if (!is.null(mapfilename)){
         sampleda <- import_qiime_sample_data(mapfilename)
@@ -51,11 +65,8 @@ import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
     if (!is.null(refseqqza)){
         refseq <- read.qza(refseqqza)
     }
-    if (!is.null(otux$refseq)){
-        refseq <- DNAStringSet(otux$refseq)
-    }
-    if (!is.null(otux$reftree)){
-        reftree <- otux$reftree
+    if (!is.null(refseq)){
+        refseq <- DNAStringSet(refseq)
     }
     if (!is.null(treeqza)){
         reftree <- read.qza(treeqza)
@@ -63,13 +74,13 @@ import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
     if (is.null(mapfilename)){
         sampleda <- NULL
     }
-    if (is.null(taxaqza) & is.null(otux$taxtab)){
+    if (is.null(taxaqza) && is.null(taxtab)){
         taxtab <- NULL
     }
-    if (is.null(refseqqza) & is.null(otux$refseq)){
+    if (is.null(refseqqza) && is.null(refseq)){
         refseq <- NULL
     }
-    if (is.null(treeqza) & is.null(otux$reftree)){
+    if (is.null(treeqza) && is.null(reftree)){
         reftree <- NULL
     }
     arglist <- list(otutab, sampleda, taxtab, refseq, reftree)
@@ -84,10 +95,8 @@ import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
 #' @param qzafile character, the format of file should be one of
 #' `BIOMV210DirFmt`, `TSVTaxonomyDirectoryFormat`, `NewickDirectoryFormat`
 #' and `DNASequencesDirectoryFormat`.
-#' @param build_tree logical, whether building the tree, default is FALSE.
 #' @param parallel logical, whether parsing the taxonomy by multi-parallel, 
 #' efault is FALSE.
-#' @param ..., additional parameters, see also \code{\link{build_tree}}.
 #' @return list contained one or multiple object of feature table, 
 #' taxonomy table, tree and represent sequences.
 #' @importFrom yaml read_yaml
@@ -100,45 +109,39 @@ import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
 #'                           package="MicrobiotaProcess")
 #' otuqza <- read.qza(otuqzafile)
 #' str(otuqza)
-read.qza <- function(qzafile, build_tree=FALSE, parallel=FALSE, ...){
+read.qza <- function(qzafile, parallel=FALSE){
     tmpdir <- tempdir()
     unzipfiles <- unzip(qzafile, exdir=tmpdir)
-    metaflag <- read_yaml(unzipfiles[1])
+    metadafile <- unzipfiles[grep("metadata.yaml", unzipfiles)[1]]
+    metaflag <- read_yaml(metadafile)
     formatflag <- metaflag$format
     datafile <- unzipfiles[3]
     formats <- c("BIOMV210DirFmt", "TSVTaxonomyDirectoryFormat", 
                  "NewickDirectoryFormat","DNASequencesDirectoryFormat")
     formatflag <- match.arg(formatflag, formats)
     switch(formatflag,
-           BIOMV210DirFmt={x <- read.featuretab(datafile, build_tree=build_tree, ...)},
-           TSVTaxonomyDirectoryFormat={x <- read.taxa(datafile, parallel=parallel)},
-           DNASequencesDirectoryFormat={x <- readDNAStringSet(datafile)},
-           NewickDirectoryFormat = {x <- read.tree(datafile)})
+           BIOMV210DirFmt={
+               datafile <- unzipfiles[grep(".biom", unzipfiles)]
+               x <- read.featuretab(datafile)},
+           TSVTaxonomyDirectoryFormat={
+               datafile <- unzipfiles[grep("data/taxonomy.tsv", unzipfiles)]
+               x <- read.taxa(datafile, parallel=parallel)},
+           DNASequencesDirectoryFormat={
+               datafile <- unzipfiles[grep("data/.*\\.fasta", unzipfiles)]
+               x <- readDNAStringSet(datafile)},
+           NewickDirectoryFormat = {
+               datafile <- unzipfiles[grep("data/tree.nwk", unzipfiles)]
+               x <- read.tree(datafile)})
     return(x)
 }
 
 #' @importFrom biomformat read_biom biom_data
 #' @importFrom phyloseq parse_taxonomy_greengenes
 #' @keywords internal
-read.featuretab <- function(file, build_tree=FALSE, ...){
+read.featuretab <- function(file){
     biomobj <- suppressWarnings(read_biom(file))
     x <- data.frame(as(biom_data(biomobj),"matrix"), check.names=FALSE)
     taxflag <- all(unlist(lapply(biomobj$rows, function(i){length(i$metadata)}))==0)
-    flag <- guess_rownames(rownames(x))
-    if (flag=="DNA"){
-        refseq <- rownames(x)
-        refseqnm <- paste0("OTU_", seq_len(length(refseq)))
-        rownames(x) <- refseqnm
-        names(refseq) <- refseqnm
-        if (build_tree){
-            reftree <- build_tree(DNAStringSet(refseq), ...)
-        }else{
-            reftree <- NULL
-        }
-    }else{
-        refseq <- NULL
-        reftree <- NULL        
-    }
     if (taxflag){
         taxtab <- NULL
     }else{
@@ -146,7 +149,7 @@ read.featuretab <- function(file, build_tree=FALSE, ...){
         names(taxtab) <- rownames(x)
         taxtab <- build_tax_table(taxtab)
     }
-    return(list(otutab = x, taxtab=taxtab, refseq = refseq, reftree= reftree))
+    return(list(otutab = x, taxtab=taxtab))
 }
 
 #' @importFrom plyr llply
@@ -155,20 +158,11 @@ read.featuretab <- function(file, build_tree=FALSE, ...){
 #' @keywords internal 
 read.taxa <- function(file, parallel=FALSE){
     x <- read.table(file, sep="\t", row.names=1, header=TRUE)
-    flag <- guess_rownames(rownames(x))
-    if (flag=="DNA"){
-        refseq <- rownames(x)
-        refseqnm <- paste0("OTU_", seq_len(length(refseq)))
-        rownames(x) <- refseqnm
-        names(refseq) <- refseqnm
-    }else{
-        refseq <- NULL
-    }
     taxstring <- as.vector(x[[1]])
     taxtab <- suppressWarnings(llply(taxstring, parse_taxonomy_qiime, .parallel = parallel))
     names(taxtab) <- rownames(x)
     taxtab <- build_tax_table(taxtab)
-    return(list(taxtab=taxtab, refseq=refseq))
+    return(taxtab)
 }
 
 #' @keywords internal
