@@ -22,9 +22,9 @@ School of Basic Medical Sciences, Southern Medical University
 the development version from github:
 
 ``` r
-if (!requireNamespace("devtools", quietly=TRUE))
-    install.packages("devtools")
-devtools::install_github("xiangpin/MicrobiotaProcess")
+if (!requireNamespace("remotes", quietly=TRUE))
+    install.packages("remotes")
+remotes::install_github("YuLab-SMU/MicrobiotaProcess")
 ```
 
 ## :sparkling\_heart: Contributing
