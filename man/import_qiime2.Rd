@@ -29,7 +29,8 @@ NULL.}
 
 \item{treeqza}{character, the file contained the tree file, default is NULL.}
 
-\item{build_tree}{logical, whether building the tree, default is FALSE.}
+\item{build_tree}{logical, whether building the tree, when the rownames of 
+feature table contains the sequence, default is FALSE.}
 
 \item{parallel}{logical, whether parsing the column of taxonomy multi-parallel, default is FALSE.}
 
