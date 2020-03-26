@@ -4,19 +4,15 @@
 \alias{read.qza}
 \title{read the qza file, output of qiime2.}
 \usage{
-read.qza(qzafile, build_tree = FALSE, parallel = FALSE, ...)
+read.qza(qzafile, parallel = FALSE)
 }
 \arguments{
 \item{qzafile}{character, the format of file should be one of
 `BIOMV210DirFmt`, `TSVTaxonomyDirectoryFormat`, `NewickDirectoryFormat`
 and `DNASequencesDirectoryFormat`.}
 
-\item{build_tree}{logical, whether building the tree, default is FALSE.}
-
 \item{parallel}{logical, whether parsing the taxonomy by multi-parallel, 
 efault is FALSE.}
-
-\item{..., }{additional parameters, see also \code{\link{build_tree}}.}
 }
 \value{
 list contained one or multiple object of feature table, 
