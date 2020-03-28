@@ -1,9 +1,9 @@
 #' @importFrom dplyr select
 #' @importFrom MASS lda
 #' @keywords internal
-LDAeffectsize <- function(datalist, compareclass, class, bootnums=30, LDA=2, ci=0.95){
+LDAeffectsize <- function(datalist, compareclass, classgroup, bootnums=30, LDA=2, ci=0.95){
     res <- list()
-    tmpformula <- as.formula(paste0(class, " ~. "))
+    tmpformula <- as.formula(paste0(classgroup, " ~. "))
     for (i in seq_len(bootnums)){
     compareres <- list()
     df <- datalist[[i]]
@@ -12,10 +12,10 @@ LDAeffectsize <- function(datalist, compareclass, class, bootnums=30, LDA=2, ci=
         z <- suppressWarnings(lda(tmpformula,data=df, tol=1e-6))
         w <- z$scaling[,1]
         w.unit <- w/sqrt(sum(w^2))
-        ss <- df %>% select(-c(class)) %>% as.matrix()
+        ss <- df %>% select(-c(classgroup)) %>% as.matrix()
         LD <- ss %*% w.unit
-        tmpp1 <- df[[match(class, colnames(df))]]==tmppairs[1]
-        tmpp2 <- df[[match(class, colnames(df))]]==tmppairs[2]
+        tmpp1 <- df[[match(classgroup, colnames(df))]]==tmppairs[1]
+        tmpp2 <- df[[match(classgroup, colnames(df))]]==tmppairs[2]
         effect.size <- abs(mean(LD[tmpp1,])-mean(LD[tmpp2,]))
         wfinal <- w.unit * effect.size
         coeff <- abs(wfinal)
@@ -27,7 +27,7 @@ LDAeffectsize <- function(datalist, compareclass, class, bootnums=30, LDA=2, ci=
     compareres <- do.call("rbind", compareres)
     res[[i]] <- compareres
     }
-    res <- cal_ci(x=res, class=class, ci=ci, method="lda")
+    res <- cal_ci(x=res, classgroup=classgroup, ci=ci, method="lda")
     colnames(res) <- c("f", paste0("LDA", colnames(res)[-1]))
     res <- res[res$LDAmean>=LDA,]
     #res <- Reduce("+", res)
@@ -43,12 +43,12 @@ LDAeffectsize <- function(datalist, compareclass, class, bootnums=30, LDA=2, ci=
 
 #' @importFrom randomForest randomForest importance
 #' @keywords internal
-rfimportance <- function(datalist, class, bootnums, effsize=2, ci=0.95){
+rfimportance <- function(datalist, classgroup, bootnums, effsize=2, ci=0.95){
     rfres <- list()
     #tmpformula <- as.formula(paste0(class, " ~. "))
     for (i in seq_len(bootnums)){
         df <- datalist[[i]]
-        classindex <- match(class, colnames(df))
+        classindex <- match(classgroup, colnames(df))
         X <- df[,-classindex]
         X <- apply(X, 2, function(x)(x-min(x))/(max(x)-min(x)))
         Y <- df[, classindex]
@@ -56,7 +56,7 @@ rfimportance <- function(datalist, class, bootnums, effsize=2, ci=0.95){
         imres <- importance(dfres, type=1)
         rfres[[i]] <- imres
     }
-    rfres <- cal_ci(x=rfres, class=class, ci=ci, method="rf")
+    rfres <- cal_ci(x=rfres, classgroup=classgroup, ci=ci, method="rf")
     colnames(rfres) <- c("f", paste0("MDA", colnames(rfres)[-1]))
     #rfres <- Reduce("+", rfres)
     #rfres <- data.frame(rfres/bootnums)
@@ -112,7 +112,7 @@ removeconstant <- function(dflist){
 
 #' @importFrom tibble rownames_to_column
 #' @importFrom Rmisc CI
-cal_ci <- function(x, class, ci=0.95, method){
+cal_ci <- function(x, classgroup, ci=0.95, method){
     if (method=="rf"){
         x <- do.call("cbind", x)
         x <- data.frame(t(x), check.names=FALSE)
