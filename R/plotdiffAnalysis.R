@@ -35,7 +35,7 @@
 #'                          rngseed=1024)
 #' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
 #' set.seed(1024)
-#' diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
+#' diffres <- diff_analysis(kostic2012crc, classgroup="DIAGNOSIS",
 #'                         mlfun="lda", filtermod="fdr",
 #'                         firstcomfun = "kruskal.test",
 #'                         firstalpha=0.05, strictmod=TRUE,
@@ -115,7 +115,7 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
     #nodedfres <- nodedfres[as.vector(nodedfres$f)%in%as.vector(obj@mlres$f),]
     #nodedfres <- merge(nodedfres, obj@mlres$f, by.x="f", by.y="f")
     nodedfres <- as.data.frame(obj)
-    classname <- getcall(obj, "class")
+    classname <- getcall(obj, "classgroup")
     if (removeUnkown){
     	tmpflag <- grep("__un_",as.vector(nodedfres$f))
     	if (length(tmpflag)>0){
@@ -142,7 +142,7 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
 #' @param figheight numeric, the height of figures, default is 3.
 #' @param ylabel character, the label of y, default is 'relative abundance'.
 #' @param featurename character, the feature name, contained at the objet.
-#' @param class character, factor name.
+#' @param classgroup character, factor name.
 #' @param subclass character, factor name. 
 #' @param factorLevels list,  the levels of the factors, default is NULL,
 #' if you want to order the levels of factor, you can set this. 
@@ -160,7 +160,7 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
 #'                               rngseed=1024)
 #' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
 #' #set.seed(1024)
-#' #diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
+#' #diffres <- diff_analysis(kostic2012crc, classgroup="DIAGNOSIS",
 #' #                        mlfun="lda", filtermod="fdr",
 #' #                        firstcomfun = "kruskal.test",
 #' #                        firstalpha=0.05, strictmod=TRUE,
@@ -189,7 +189,7 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
     ylabel="relative abundance",
     ...){
     featureda <- obj@originalD
-    classname <- getcall(obj, "class")
+    classname <- getcall(obj, "classgroup")
     normalization <- getcall(obj, "normalization")
     if (!is.null(normalization)){
     	featureda <- featureda / normalization
@@ -233,7 +233,7 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
 #' @importFrom ggplot2 aes geom_errorbar scale_linetype_manual unit theme_bw scale_y_continuous labs xlab facet_grid
 #' @importFrom ggplot2 guide_legend element_text element_rect element_blank scale_fill_manual
 #' @export
-ggdifftaxbar.featureMeanMedian <- function(obj, featurename, class, subclass, xtextsize=3,
+ggdifftaxbar.featureMeanMedian <- function(obj, featurename, classgroup, subclass, xtextsize=3,
     factorLevels=NULL, coloslist=NULL, ylabel="relative abundance", ...){
     data <- obj$singlefedf
     dastatistic <- obj$singlefestat
@@ -241,13 +241,13 @@ ggdifftaxbar.featureMeanMedian <- function(obj, featurename, class, subclass, xt
     	data <- setfactorlevels(data, factorLevels)
     	dastatistic <- setfactorlevels(dastatistic, factorLevels)
     }
-    if (missing(subclass)){subclass <- class}
+    if (missing(subclass)){subclass <- classgroup}
     p <- ggplot(data, aes_(x=~sample, y=~RelativeAbundance, fill=as.formula(paste0("~",subclass))))+
     	geom_bar(stat="identity") +
     	geom_errorbar(data=dastatistic, aes_(x=~sample, ymax=~value, ymin=~value, linetype=~statistic), 
 	              size=0.5, width=1, inherit.aes=FALSE)+
     	scale_linetype_manual(values=c("solid", "dotted"))+
-    	facet_grid(as.formula(paste0("~",class)), space="free_x", scales="free_x") + 
+    	facet_grid(as.formula(paste0("~",classgroup)), space="free_x", scales="free_x") + 
     	labs(title=featurename) + xlab(NULL)+ ylab(ylabel)+
     	scale_y_continuous(expand=c(0,0), limits=c(0,max(data$RelativeAbundance)*1.05))
     p <- p + theme_bw() + guides(fill= guide_legend(keywidth = 0.5, keyheight = 0.5, order=1),
@@ -288,7 +288,7 @@ ggdifftaxbar.featureMeanMedian <- function(obj, featurename, class, subclass, xt
 #'                     subclass="body_site")
 #' #not run in example
 #' #fplot <- ggdifftaxbar(feameamed, featurename="p__Actinobacteria", 
-#' #                     class="oxygen_availability", subclass="body_site")
+#' #                     classgroup="oxygen_availability", subclass="body_site")
 getMeanMedian <- function(datameta, feature, subclass){
     RelativeAbundance <- NULL
     factornames <- colnames(datameta)[!unlist(vapply(datameta,is.numeric,logical(1)))]
@@ -331,7 +331,7 @@ getMeanMedian <- function(datameta, feature, subclass){
 #' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
 #' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
 #' #set.seed(1024)
-#' #diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
+#' #diffres <- diff_analysis(kostic2012crc, classgroup="DIAGNOSIS",
 #' #                        mlfun="lda", filtermod="fdr",
 #' #                        firstcomfun = "kruskal.test",
 #' #                        firstalpha=0.05, strictmod=TRUE,
@@ -421,7 +421,7 @@ ggeffectsize.data.frame <- function(obj,
 #' @export
 ggeffectsize.diffAnalysisClass <- function(obj, removeUnkown=TRUE, setFacet=TRUE,...){
     efres <- tidyEffectSize(obj)
-    classname <- getcall(obj, "class")
+    classname <- getcall(obj, "classgroup")
     if (removeUnkown && length(grep("__un_",efres$f))){
     	efres <- efres[-grep("__un_",efres$f),,drop=FALSE]
     }
