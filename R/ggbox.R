@@ -81,7 +81,7 @@ setMethod("ggbox", "data.frame",
         indexNames <- unique(as.vector(obj$feature))
     }
     obj <- obj %>% filter(.data$feature %in% indexNames)
-    comparelist <- get_comparelist(data=obj, class=factorNames)
+    comparelist <- get_comparelist(data=obj, classgroup=factorNames)
     mapping <- aes_string(x=factorNames,y="value",fill=factorNames)
     p <- ggplot(data=obj,mapping)
     ifelse(geom=="boxplot",p <- p + geom_boxplot(outlier.size=0.5,outlier.shape=21),
@@ -147,7 +147,7 @@ setMethod("ggbox", "alphasample", function(obj,factorNames,...){
 #'                  rngseed=1024)
 #' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
 #' set.seed(1024)
-#' diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
+#' diffres <- diff_analysis(kostic2012crc, classgroup="DIAGNOSIS",
 #'                          mlfun="lda", filtermod="fdr",
 #'                          firstcomfun = "kruskal.test",
 #'                          firstalpha=0.05, strictmod=TRUE,
@@ -168,7 +168,7 @@ setMethod("ggdiffbox", "diffAnalysisClass", function(obj, geom="boxplot",
           addLDA=TRUE, factorLevels=NULL, featurelist=NULL,
           removeUnkown=TRUE, colorlist=NULL, l_xlabtext=NULL,...){
     featureda <- obj@originalD
-    classname <- getcall(obj, "class")
+    classname <- getcall(obj, "classgroup")
     normalization <- getcall(obj, "normalization")
     if (!is.null(normalization)){
         featureda <- featureda / normalization
@@ -271,8 +271,8 @@ plotdiffbox <- function(obj, sampleda, factorNames, dodge_width=0.6, box_width=0
 }
 
 #' @keywords internal
-get_comparelist <- function(data, class){
-    groups <- getclasslevels(sampleda=data, class=class)
+get_comparelist <- function(data, classgroup){
+    groups <- getclasslevels(sampleda=data, classgroup=classgroup)
     comparelist <- getcompareclass(classlevels=groups)
     comparelist <- split(comparelist, slice.index(comparelist, 1))
     names(comparelist) <- NULL
