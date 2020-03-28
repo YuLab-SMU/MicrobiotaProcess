@@ -23,7 +23,7 @@ method extensions to show for diffAnalysisClass objects.
 #kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
 #table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
 #set.seed(1024)
-#diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
+#diffres <- diff_analysis(kostic2012crc, classgroup="DIAGNOSIS",
 #                        mlfun="lda", filtermod="fdr",
 #                        firstcomfun = "kruskal.test",
 #                        firstalpha=0.05, strictmod=TRUE, 

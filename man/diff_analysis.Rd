@@ -11,7 +11,7 @@ diff_analysis(obj, ...)
 \method{diff_analysis}{data.frame}(
   obj,
   sampleda,
-  class,
+  classgroup,
   subclass = NULL,
   taxda = NULL,
   alltax = TRUE,
@@ -48,7 +48,7 @@ or data.frame, nrow sample * ncol features.}
 \item{sampleda}{data.frame, nrow sample * ncol factor, the sample names of 
 sampleda and data should be the same.}
 
-\item{class}{character, the factor name in sampleda.}
+\item{classgroup}{character, the factor name in sampleda.}
 
 \item{subclass}{character, the factor name in sampleda, default is NULL, 
 meaning no subclass compare.}
@@ -88,9 +88,9 @@ you can use lm, glm, or glm.nb (for negative binomial distribution), or `kruskal
 uneven distributions, or `wilcox_test` of `coin`, or you can also use `lm`,
 `glm`, `glm.nb`(for negative binomial distribution in `MASS`).}
 
-\item{clmin}{integer, the minimum number of samples per class for performing test, default is 5.}
+\item{clmin}{integer, the minimum number of samples per classgroup for performing test, default is 5.}
 
-\item{clwilc}{logical, whether to perform test of per class, default is TRUE.}
+\item{clwilc}{logical, whether to perform test of per classgroup, default is TRUE.}
 
 \item{secondalpha}{numeric, the alpha value for the second test, default is 0.05.}
 
@@ -120,7 +120,7 @@ head(phyloseq::sample_data(kostic2012crc),3)
 kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
 table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
 set.seed(1024)
-diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
+diffres <- diff_analysis(kostic2012crc, classgroup="DIAGNOSIS",
                         mlfun="lda", filtermod="fdr",
                         firstcomfun = "kruskal.test",
                         firstalpha=0.05, strictmod=TRUE,

@@ -31,7 +31,7 @@ feameamed <- getMeanMedian(datameta=featureda,
                     subclass="body_site")
 #not run in example
 #fplot <- ggdifftaxbar(feameamed, featurename="p__Actinobacteria", 
-#                     class="oxygen_availability", subclass="body_site")
+#                     classgroup="oxygen_availability", subclass="body_site")
 }
 \author{
 Shuangbin Xu

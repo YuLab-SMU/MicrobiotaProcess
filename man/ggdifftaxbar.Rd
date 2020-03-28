@@ -23,7 +23,7 @@ ggdifftaxbar(obj, ...)
 \method{ggdifftaxbar}{featureMeanMedian}(
   obj,
   featurename,
-  class,
+  classgroup,
   subclass,
   xtextsize = 3,
   factorLevels = NULL,
@@ -53,7 +53,7 @@ see also \code{\link[MicrobiotaProcess]{getMeanMedian}}.}
 
 \item{featurename}{character, the feature name, contained at the objet.}
 
-\item{class}{character, factor name.}
+\item{classgroup}{character, factor name.}
 
 \item{subclass}{character, factor name.}
 
@@ -79,7 +79,7 @@ kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,
                               rngseed=1024)
 table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
 #set.seed(1024)
-#diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
+#diffres <- diff_analysis(kostic2012crc, classgroup="DIAGNOSIS",
 #                        mlfun="lda", filtermod="fdr",
 #                        firstcomfun = "kruskal.test",
 #                        firstalpha=0.05, strictmod=TRUE,
