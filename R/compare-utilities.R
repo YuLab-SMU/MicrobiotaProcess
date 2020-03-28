@@ -122,14 +122,14 @@ getanova <- function(obj){
 }
 
 #' @keywords internal
-getclasslevels <- function(sampleda, class){
-    levelstmp <- unique(as.vector(sampleda[,match(class, colnames(sampleda))]))
+getclasslevels <- function(sampleda, classgroup){
+    levelstmp <- unique(as.vector(sampleda[,match(classgroup, colnames(sampleda))]))
     return(levelstmp)
 }
 
 #' @keywords internal
-getclass2sub <- function(sampleda, class, subclass){
-    tmpsplit <- sampleda[,match(class, colnames(sampleda))]
+getclass2sub <- function(sampleda, classgroup, subclass){
+    tmpsplit <- sampleda[,match(classgroup, colnames(sampleda))]
     if (!missing(subclass)){
     	samplelist <- split(sampleda, tmpsplit) 
     	lapply(samplelist, function(x)unique(as.vector(x[,match(subclass, colnames(x))])))
@@ -155,7 +155,7 @@ getcomparesubclass <- function(xlevel, ylevel, class2sublist){
 diffclass <- function(datasample,
                       features,
                       comclass,
-                      class,
+                      classgroup,
                       fcfun="generalizedFC",
                       secondcomfun="wilcox.test",
                       classmin=3,
@@ -166,15 +166,15 @@ diffclass <- function(datasample,
     for (i in seq_len(nrow(comclass))){
         classtmp <- as.vector(comclass[i,])
         #clsize <- min(table(datasample[[class]]))
-        datatmp <- datasample %>% filter(eval(parse(text=class)) %in% classtmp)
-        datatmp[[match(class, colnames(datatmp))]] <- factor(datatmp[[match(class,colnames(datatmp))]], 
+        datatmp <- datasample %>% filter(eval(parse(text=classgroup)) %in% classtmp)
+        datatmp[[match(classgroup, colnames(datatmp))]] <- factor(datatmp[[match(classgroup,colnames(datatmp))]], 
                                                              levels=classtmp)
-        clsize <- min(table(datatmp[[match(class,colnames(datatmp))]]))
+        clsize <- min(table(datatmp[[match(classgroup,colnames(datatmp))]]))
         resgfoldC <- getgfcwilc(datasample=datatmp,
                                 fun1=fcfun,
                                 classlevelsnum=clsize,
                                 vars=features,
-                                classname=class,
+                                classname=classgroup,
                                 minnum=classmin,
                                 fun2=secondcomfun, 
                                 wilc=clwilc,
@@ -189,7 +189,7 @@ diffclass <- function(datasample,
 diffsubclass <- function(datasample,
                          features,
                          comsubclass, 
-                         class, 
+                         classgroup, 
                          subclass, 
                          fcfun="generalizedFC",
                          secondcomfun="wilcox.test",
@@ -204,7 +204,7 @@ diffsubclass <- function(datasample,
         for (j in seq_len(nrow(comsubclass[[i]]))){
             subclasstmp <- as.vector(unlist(comsubclass[[i]][j,])) 
             datatmp <- datasample %>% 
-                       filter(eval(parse(text=class)) %in% classtmp & eval(parse(text=subclass)) %in%subclasstmp)
+                       filter(eval(parse(text=classgroup)) %in% classtmp & eval(parse(text=subclass)) %in%subclasstmp)
             datatmp[[match(subclass, colnames(datatmp))]] <- factor(datatmp[[match(subclass,colnames(datatmp))]],
                                                                              levels=subclasstmp)
             subclsize <- min(table(datatmp[[match(subclass,colnames(datatmp))]]))
@@ -270,7 +270,7 @@ getcompareres <- function(reslist, pfold){
 
 #' @keywords internal
 getconsistentfeatures <- function(diffsubclassfeature, 
-                                  class,
+                                  classgroup,
                                   classlevels, ...){
     leftfeature <- list()
     for (i in classlevels){
@@ -287,7 +287,7 @@ getconsistentfeatures <- function(diffsubclassfeature,
         tmpkeepfeature <- data.frame(table(tmpkeepfeature[,colnames(tmpkeepfeature) %in% c("f", "gfc")]))
         tmpkeepfeature <- tmpkeepfeature[tmpkeepfeature$Freq==length(tmpindex),]
         if(nrow(tmpkeepfeature)>0){
-            tmpkeepfeature[[class]] <- i
+            tmpkeepfeature[[classgroup]] <- i
             leftfeature[[i]] <- tmpkeepfeature
         }
     }
