@@ -61,7 +61,7 @@ This datasets contained 86 Colorectal Carcinoma samples and 91 Control samples(r
 
 ```{r, error=TRUE, KosticCRCdiff_analysis}
 set.seed(1024)
-diffres <- diff_analysis(obj=kostic2012crc, class="DIAGNOSIS",
+diffres <- diff_analysis(obj=kostic2012crc, classgroup="DIAGNOSIS",
                          mlfun="lda",
                          filtermod="fdr",
                          firstcomfun = "kruskal.test",
@@ -75,7 +75,7 @@ diffres <- diff_analysis(obj=kostic2012crc, class="DIAGNOSIS",
 diffres
 ```
 
-The results of `diff_analysis` is a `S4` class, contained the original feature datasets, results of first test, results of second test, results of `LDA` or `rf` assessed and the record of some arguments. It can be visualized by `ggeffectsize`. The horizontal ordinate represents the effect size (`LDA` or `MeanDecreaseAccuracy`), the vertical ordinate represents the feature of significantly discriminative. And the colors represent the class that the relevant feature is positive.
+The results of `diff_analysis` is a `S4` class, contained the original feature datasets, results of first test, results of second test, results of `LDA` or `rf` assessed and the record of some arguments. It can be visualized by `ggeffectsize`. The horizontal ordinate represents the effect size (`LDA` or `MeanDecreaseAccuracy`), the vertical ordinate represents the feature of significantly discriminative. And the colors represent the classgroup that the relevant feature is positive.
 
 ```{r, fig.align="center", fig.height=5, fig.width=6, error=TRUE, KosticCRCplotEffectSize}
 plotes <- ggeffectsize(obj=diffres) + scale_color_manual(values=c("#00AED7", "#FD9347"))
@@ -89,7 +89,7 @@ plotes_ab <- ggdiffbox(obj=diffres, box_notch=FALSE, colorlist=c("#00AED7", "#FD
 plotes_ab
 ```
 
-If the `taxda` was provided, it also can be visualized by `ggdiffclade`. The colors represent the relevant features enriched in the relevant class. The size of point colored represent the `-log10(pvalue)`.
+If the `taxda` was provided, it also can be visualized by `ggdiffclade`. The colors represent the relevant features enriched in the relevant classgroup. The size of point colored represent the `-log10(pvalue)`.
 
 ```{r, fig.width=7, fig.height=7, fig.align="center", error=TRUE, KosticCRCdiffclade}
 diffcladeplot <- ggdiffclade(obj=diffres,
@@ -113,7 +113,7 @@ diffcladeplot <- ggdiffclade(obj=diffres,
 diffcladeplot
 ```
 
-Moreover, the abundance of the features can be visualized by `ggdifftaxbar`. This will generate the figures in specific directory. And the horizontal ordinate of figures represent the sample of different class, the vertical ordinate represent relative abundance of relevant features (sum is 1).
+Moreover, the abundance of the features can be visualized by `ggdifftaxbar`. This will generate the figures in specific directory. And the horizontal ordinate of figures represent the sample of different classgroup, the vertical ordinate represent relative abundance of relevant features (sum is 1).
 
 ```r
 ggdifftaxbar(obj=diffres, xtextsize=1.5, output="./kostic2012crc_biomarkder_barplot")
@@ -141,7 +141,7 @@ dim(sampleda)
 dim(taxda)
 ```
 
-This dataset is from a small subset of the `HMP` 16S dataset[@Nicola2011LEfSe], contained 55 samples from 6 body sites. The dataset isn't `phyloseq` class, because `diff_analysis` also supported the matrix datasets as input. The `featureda` contained the relative abundance of different levels features. The `sampleda` contained the information of the samples. And the `taxda` contained the information of the hierarchical relationship of taxonomy. We set the `oxygen_availability` in `sampleda` as `class`, and `body_site` also in `sampleda` as `subclass`.
+This dataset is from a small subset of the `HMP` 16S dataset[@Nicola2011LEfSe], contained 55 samples from 6 body sites. The dataset isn't `phyloseq` class, because `diff_analysis` also supported the matrix datasets as input. The `featureda` contained the relative abundance of different levels features. The `sampleda` contained the information of the samples. And the `taxda` contained the information of the hierarchical relationship of taxonomy. We set the `oxygen_availability` in `sampleda` as `classgroup`, and `body_site` also in `sampleda` as `subclass`.
 
 ```{r, hmpdiff_analysis, error=TRUE}
 set.seed(1024)
@@ -149,7 +149,7 @@ hmpdiffres <- diff_analysis(obj=featureda,
                             sampleda=sampleda, 
                             taxda=taxda, 
                             alltax=FALSE, 
-                            class="oxygen_availability",
+                            classgroup="oxygen_availability",
                             subclass="body_site",
                             filtermod="fdr",
                             firstalpha=0.01,
