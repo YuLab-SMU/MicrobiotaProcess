@@ -3,7 +3,7 @@
 #' or data.frame, nrow sample * ncol features.
 #' @param sampleda data.frame, nrow sample * ncol factor, the sample names of 
 #' sampleda and data should be the same.
-#' @param class character, the factor name in sampleda.
+#' @param classgroup character, the factor name in sampleda.
 #' @param subclass character, the factor name in sampleda, default is NULL, 
 #' meaning no subclass compare.
 #' @param taxda data.frame, the classification of the feature in data. 
@@ -29,8 +29,8 @@
 #' @param secondcomfun character, the method for one-against-one, default is "wilcox.test" for 
 #' uneven distributions, or `wilcox_test` of `coin`, or you can also use `lm`,
 #' `glm`, `glm.nb`(for negative binomial distribution in `MASS`).
-#' @param clmin integer, the minimum number of samples per class for performing test, default is 5.
-#' @param clwilc logical, whether to perform test of per class, default is TRUE.
+#' @param clmin integer, the minimum number of samples per classgroup for performing test, default is 5.
+#' @param clwilc logical, whether to perform test of per classgroup, default is TRUE.
 #' @param secondalpha numeric, the alpha value for the second test, default is 0.05.
 #' @param subclmin integer, the minimum number of samples per suclass for performing test, default is 3.
 #' @param subclwilc logical, whether to perform test of per subclass, default is TRUE, meaning more strict. 
@@ -53,7 +53,7 @@
 #' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
 #' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
 #' set.seed(1024)
-#' diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
+#' diffres <- diff_analysis(kostic2012crc, classgroup="DIAGNOSIS",
 #'                         mlfun="lda", filtermod="fdr",
 #'                         firstcomfun = "kruskal.test",
 #'                         firstalpha=0.05, strictmod=TRUE,
@@ -69,7 +69,7 @@ diff_analysis <- function(obj, ...){
 #' @importFrom tibble column_to_rownames
 #' @importFrom stats p.adjust
 #' @export
-diff_analysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=NULL,alltax=TRUE, standard_method=NULL, mlfun="lda", 
+diff_analysis.data.frame <- function(obj, sampleda, classgroup, subclass=NULL, taxda=NULL,alltax=TRUE, standard_method=NULL, mlfun="lda", 
     ratio=0.7, firstcomfun='kruskal.test', padjust="fdr",filtermod="pvalue",
     firstalpha=0.05, strictmod=TRUE, fcfun="generalizedFC", secondcomfun="wilcox.test",
     clmin=5, clwilc=TRUE, secondalpha=0.05, subclmin=3, subclwilc=TRUE,	ldascore=2,
@@ -77,11 +77,13 @@ diff_analysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=
     if (!is.null(taxda)){taxda <- fillNAtax(taxda)
         if (alltax){obj <- getalltaxdf(obj, taxda, method=standard_method)}
     }
-    sampleda <- sampleda %>% select(c(class, subclass))
+    sampleda <- sampleda %>% select(c(classgroup, subclass))
     if (ncol(sampleda)>1){sampleda <- duplicatedtaxcheck(sampleda) %>% column_to_rownames(var="rowname")}
     vars <- colnames(obj)
     datameta <- merge(obj, sampleda, by=0)
-    kwres <- multi.compare(fun=firstcomfun, data=datameta, feature=vars, factorNames=class)
+    if (!is.factor(datameta[,match(x=classgroup, colnames(datameta))])){
+        datameta[,match(x=classgroup, colnames(datameta))]<- as.factor(datameta[,match(x=classgroup, colnames(datameta))])}
+    kwres <- multi.compare(fun=firstcomfun, data=datameta, feature=vars, factorNames=classgroup)
     kwres <- lapply(kwres, function(x)getpvalue(x))
     kwres <- do.call("rbind", kwres)
     rownames(kwres) <- vars
@@ -90,29 +92,29 @@ diff_analysis.data.frame <- function(obj, sampleda, class, subclass=NULL, taxda=
     if (!filtermod=="pvalue"){varsfirst <- as.vector(kwres[kwres$fdr<=firstalpha& !is.na(kwres$fdr),,drop=FALSE]$f)
     }else{varsfirst <- as.vector(kwres[kwres$pvalue<=firstalpha&!is.na(kwres$pvalue),,drop=FALSE]$f)}
     if (!length(varsfirst)>0){stop("There are not significantly discriminative features before internal wilcoxon!")}
-    classlevels <- getclasslevels(sampleda, class)
+    classlevels <- getclasslevels(sampleda, classgroup)
     compareclass <- getcompareclass(classlevels)
     if (!is.null(subclass) && strictmod){
-        class2sub <- getclass2sub(sampleda, class, subclass)
+        class2sub <- getclass2sub(sampleda, classgroup, subclass)
         comsubclass <- apply(compareclass,1,function(x)getcomparesubclass(x[1],x[2],class2sub))
-        secondvars <- diffsubclass(datasample=datameta, features=varsfirst, comsubclass=comsubclass,class=class,subclass=subclass,
+        secondvars <- diffsubclass(datasample=datameta, features=varsfirst, comsubclass=comsubclass,classgroup=classgroup,subclass=subclass,
                                    fcfun=fcfun, secondcomfun=secondcomfun, submin=subclmin, subclwilc=subclwilc, pfold=secondalpha, ...)
     }else{
-        secondvars <- diffclass(datasample=datameta, features=varsfirst, comclass=compareclass, class=class, fcfun=fcfun,
+        secondvars <- diffclass(datasample=datameta, features=varsfirst, comclass=compareclass, classgroup=classgroup, fcfun=fcfun,
                                 secondcomfun=secondcomfun,classmin=clmin,clwilc=clwilc,pfold=secondalpha, ...)
     }
     if (!length(secondvars)>0){stop("There are not significantly discriminative features after internal wilcoxon!")}
     leaveclasslevels <- unlist(lapply(names(secondvars), function(x){unlist(strsplit(x,"-vs-"))}))
-    secondvars <- getconsistentfeatures(diffsubclassfeature=secondvars,	class=class,classlevels=leaveclasslevels)
+    secondvars <- getconsistentfeatures(diffsubclassfeature=secondvars,	classgroup=classgroup,classlevels=leaveclasslevels)
     secondvarsvectors <- getsecondvarlist(secondvars=secondvars)
     if (!is.null(normalization)){obj <- obj * normalization}
     dameta <- merge(obj, sampleda, by=0) %>% column_to_rownames(var="Row.names")
-    dameta <- dameta %>% select(c(secondvarsvectors, class))
-    dameta <- split(dameta, dameta[,match(class,colnames(dameta))])
+    dameta <- dameta %>% select(c(secondvarsvectors, classgroup))
+    dameta <- split(dameta, dameta[,match(classgroup,colnames(dameta))])
     dameta <- sampledflist(dameta, bootnums=bootnums, ratio=ratio)
     dameta <- removeconstant(dameta)
-    if (mlfun=="lda"){mlres <- LDAeffectsize(dameta, compareclass, class, bootnums=bootnums, LDA=ldascore, ci=ci)}
-    if (mlfun=="rf"){mlres <- rfimportance(dameta, class, bootnums=bootnums, effsize=ldascore, ci=ci)}
+    if (mlfun=="lda"){mlres <- LDAeffectsize(dameta, compareclass, classgroup, bootnums=bootnums, LDA=ldascore, ci=ci)}
+    if (mlfun=="rf"){mlres <- rfimportance(dameta, classgroup, bootnums=bootnums, effsize=ldascore, ci=ci)}
     tmpfun <- ifelse(!"funname" %in% names(match.call()), NA, "diff_analysis.data.frame")
     res <- new("diffAnalysisClass", originalD=obj, sampleda=sampleda, taxda=taxda, kwres=kwres,
                secondvars=secondvars, mlres=mlres, call=match.call.defaults(fun=tmpfun))
@@ -249,7 +251,7 @@ transformdf <- function(data, method, ...){
 ###' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
 ###' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
 ###' set.seed(1024)
-###' diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
+###' diffres <- diff_analysis(kostic2012crc, classgroup="DIAGNOSIS",
 ###'                         mlfun="lda", filtermod="fdr",
 ###'                         firstcomfun = "kruskal.test",
 ###'                         firstalpha=0.05, strictmod=TRUE,
@@ -288,7 +290,7 @@ as.data.frame.alphasample <- function(x, ...){
 tidyEffectSize <- function(obj){
     f <- LDAmean <- MDAmean <- NULL
     secondvars <- getsecondTRUEvar(obj)
-    classname <- getcall(obj, "class")
+    classname <- getcall(obj, "classgroup")
     efres <- merge(obj@mlres, secondvars, by.x="f", by.y="f") %>%
              select (-c("gfc", "Freq"))
     if ("LDAmean" %in% colnames(efres)){
