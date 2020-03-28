@@ -35,11 +35,14 @@ import_dada2 <- function(seqtab, taxatab=NULL, reftree=NULL,
     refseqnm <- paste0("OTU_",seq_len(length(refseq)))
     colnames(seqtab) <- refseqnm
     names(refseq) <- refseqnm
-    rownames(taxatab) <- refseqnm
-    refseq <- DNAStringSet(refseq)
     if (!is.null(taxatab)){
+        if (!identical(colnames(seqtab), rownames(taxatab))){
+            taxatab <- taxatab[match(refseq, rownames(taxatab)),,drop=FALSE]
+        }
+        rownames(taxatab) <- refseqnm
         taxatab <- tax_table(as.matrix(taxatab))
     }
+    refseq <- DNAStringSet(refseq)
     if (is.null(reftree)){
         if (build_tree){
             reftree <- build_tree(refseq, ...)
