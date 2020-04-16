@@ -2,29 +2,30 @@
 % Please edit documentation in R/AllMethods.R, R/get_vennlist.R
 \name{get_vennlist}
 \alias{get_vennlist}
-\alias{get_vennlist.phyloseq}
-\alias{get_vennlist.default}
+\alias{get_vennlist,phyloseq-method}
+\alias{get_vennlist,phyloseq}
+\alias{get_vennlist,data.frame-method}
+\alias{get_vennlist,data.framet}
 \title{generate a vennlist for VennDiagram}
 \usage{
 get_vennlist(obj, ...)
 
-\method{get_vennlist}{phyloseq}(obj, ...)
+\S4method{get_vennlist}{phyloseq}(obj, factorNames, ...)
 
-\method{get_vennlist}{default}(obj, sampleinfo = NULL, factorNames = NULL, ...)
+\S4method{get_vennlist}{data.frame}(obj, sampleinfo = NULL, factorNames = NULL, ...)
 }
 \arguments{
 \item{obj}{phyloseq, phyloseq class or data.frame
 a dataframe contained one character column and the others are numeric.
 or all columns should be numeric if sampleinfo isn't NULL.}
 
-\item{...}{additional parameters,
-see also \code{\link[MicrobiotaProcess]{count_or_ratios}}.}
-
-\item{sampleinfo}{dataframe; a sample information, default is NULL.}
+\item{..., }{additional parameters}
 
 \item{factorNames}{character, a column name of sampleinfo, 
 when sampleinfo isn't NULL, factorNames shouldn't be NULL, default is NULL,
 when the input is phyloseq, the factorNames should be provided.}
+
+\item{sampleinfo}{dataframe; a sample information, default is NULL.}
 }
 \value{
 return a list for VennDiagram.

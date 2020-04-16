@@ -7,9 +7,6 @@
 #' if featurelist is NULL. Or a numeirc dataframe, if featurelist is non't NULL, all columns 
 #' should be numeric.
 #' @param featurelist dataframe; a dataframe contained one chatacter column, default is NULL.
-#' @param countmode boolean; whether return the count results (TRUE),or relative abundance (FALSE).
-#' @param multiplenum numeric; the multiple you want to increase,default is 1.
-#' @param rownamekeep boolean; whether you return a dataframe contained the rownames,default is FALSE.
 #' @return mean of data.frame by featurelist
 #' @export 
 #' @author Shuangbin Xu
@@ -28,14 +25,10 @@
 #' taxdf <- otuda[!sapply(otuda, is.numeric)]
 #' taxdf <- split_str_to_list(taxdf)
 #' otuda <- otuda[sapply(otuda, is.numeric)]
-#' phycount <- count_or_ratios(otuda, taxdf[,2,drop=FALSE])
-#' phyratios <- count_or_ratios(otuda, taxdf[,2,drop=FALSE], 
-#'                            countmode=FALSE)
-count_or_ratios <- function(data, 
-                          featurelist, 
-                          countmode=TRUE, 
-                          multiplenum=1, 
-                          rownamekeep=FALSE){
+#' phycount <- get_count(otuda, taxdf[,2,drop=FALSE])
+#' phyratios <- get_ratio(otuda, taxdf[,2,drop=FALSE])
+get_count <- function(data,
+                      featurelist){ 
     if (missing(featurelist) || is.null(featurelist)){
         data <- data
     }else{
@@ -49,13 +42,21 @@ count_or_ratios <- function(data,
     	     check.names=FALSE, stringsAsFactors=FALSE)   
     rownames(data) <- as.vector(data[[group]])
     data[[group]] <- NULL
-    if (!isTRUE(countmode)){
-       	data <- data.frame(prop.table(as.matrix(data), 2), check.names=FALSE, stringsAsFactors=FALSE)
-    	data <- data*multiplenum
-    }
-    if (isTRUE(rownamekeep)){
-    	data <- data.frame(cbind(feature=rownames(data), data), check.names=FALSE, stringsAsFactors=FALSE)
-    }
+    #if (!isTRUE(countmode)){
+    #   	data <- data.frame(prop.table(as.matrix(data), 2), check.names=FALSE, stringsAsFactors=FALSE)
+    #	data <- data*multiplenum
+    #}
+    #if (isTRUE(rownamekeep)){
+    #	data <- data.frame(cbind(feature=rownames(data), data), check.names=FALSE, stringsAsFactors=FALSE)
+    #}
     return (data)
 }
 
+
+#' @rdname get_count
+#' @export
+get_ratio <- function(data, featurelist){
+    data <- get_count(data=data, featurelist=featurelist)
+    data <- data.frame(prop.table(as.matrix(data),2), check.names=FALSE)
+    return(data)
+}

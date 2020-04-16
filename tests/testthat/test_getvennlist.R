@@ -9,10 +9,9 @@ test_that("getvennlist work",{
 	otuda <- data.frame(t(otuda))
 	sampleda <- read.table(file.path(dir, "sample_info.txt"), 
 						   header=TRUE, row.names=1)
-	vennlist1 <- get_vennlist(obj=otuda, sampleinfo=sampleda, 
-							 factorNames="group")
+	vennlist1 <- get_vennlist(obj=otuda, sampleinfo=sampleda, factorNames="group")
 	testph <- import_qiime(file.path(dir,"otu_tax_table.txt"),
 						   file.path(dir, "sample_info.txt")) 
-	vennlist2 <- get_vennlist(testph,factorNames="group")
+	vennlist2 <- get_vennlist(testph, factorNames="group")
 	expect_equal(vennlist1, vennlist2)
 })

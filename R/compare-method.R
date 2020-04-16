@@ -111,8 +111,8 @@ diff_analysis.data.frame <- function(obj, sampleda, classgroup, subclass=NULL, t
     dameta <- merge(obj, sampleda, by=0) %>% column_to_rownames(var="Row.names")
     dameta <- dameta %>% select(c(secondvarsvectors, classgroup))
     dameta <- split(dameta, dameta[,match(classgroup,colnames(dameta))])
-    dameta <- sampledflist(dameta, bootnums=bootnums, ratio=ratio)
-    dameta <- removeconstant(dameta)
+    dameta <- get_sampledflist(dameta, bootnums=bootnums, ratio=ratio)
+    dameta <- remove_constant(dameta)
     if (mlfun=="lda"){mlres <- LDAeffectsize(dameta, compareclass, classgroup, bootnums=bootnums, LDA=ldascore, ci=ci)}
     if (mlfun=="rf"){mlres <- rfimportance(dameta, classgroup, bootnums=bootnums, effsize=ldascore, ci=ci)}
     tmpfun <- ifelse(!"funname" %in% names(match.call()), NA, "diff_analysis.data.frame")
@@ -212,11 +212,9 @@ get_alltaxdf <- function(data, taxda, method=NULL, ...){
     dt <- list()
     for (i in seq_len(ncol(taxda))){
         if (is.null(method)){
-            dat <- count_or_ratios(data, taxda[,i,drop=FALSE],
-                                 countmode=FALSE, rownamekeep=FALSE)
+            dat <- get_count(data, taxda[,i,drop=FALSE])
         }else{
-            dat <- count_or_ratios(data, taxda[,i,drop=FALSE], 
-                                 countmode=TRUE, rownamekeep=FALSE)
+            dat <- get_ratio(data, taxda[,i,drop=FALSE])
             if(method=="count"){
                 dat <- dat
             }else{

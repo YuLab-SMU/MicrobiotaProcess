@@ -10,7 +10,7 @@
 \usage{
 get_upset(obj, ...)
 
-\S4method{get_upset}{data.frame}(obj, sampleda, factorNames, threshold = 0, ...)
+\S4method{get_upset}{data.frame}(obj, sampleda, factorNames, threshold = 0)
 
 \S4method{get_upset}{phyloseq}(obj, ...)
 }

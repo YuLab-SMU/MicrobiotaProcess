@@ -78,8 +78,8 @@ rfimportance <- function(datalist, classgroup, bootnums, effsize=2, ci=0.95){
 #' data(iris)
 #' irislist <- split(iris, iris$Species)
 #' set.seed(1024)
-#' irislist <- sampledflist(irislist)
-sampledflist <- function(dalist, 
+#' irislist <- get_sampledflist(irislist)
+get_sampledflist <- function(dalist, 
     bootnums=30, 
     ratio=0.7, 
     makerownames=FALSE){
@@ -94,7 +94,7 @@ sampledflist <- function(dalist,
 
 #' @importFrom stats var
 #' @keywords internal
-removeconstant <- function(dflist){
+remove_constant <- function(dflist){
     noconstant <- list()
     factornames <- colnames(dflist[[1]][!vapply(dflist[[1]],
 					is.numeric,logical(1))])

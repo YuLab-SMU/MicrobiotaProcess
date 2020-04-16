@@ -18,10 +18,10 @@
 #' @author Shuangbin Xu
 #' @examples
 #' data(iris)
-#' irislist <- splitData(iris, 40)
+#' irislist <- split_data(iris, 40)
 #' dalist <- c(1:100)
-#' dalist <- splitData(dalist, 30)
-splitData <- function(x, 
+#' dalist <- split_data(dalist, 30)
+split_data <- function(x, 
     nums, 
     chunks=NULL, 
     random=FALSE){

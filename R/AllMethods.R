@@ -61,8 +61,7 @@ ggbartax.phyloseq <- function(obj, ...){
 #' @param taxlevel character, the column names of taxda that you want to get.
 #' when the input is phyloseq class, you can use 1 to 7.
 #' @param sampleda data.frame, the sample information.
-#' @param ... additional parameters, see also 
-#' \code{\link[MicrobiotaProcess]{count_or_ratios}}
+#' @param ..., additional parameters.
 #' @return phyloseq class contained tax data.frame and sample information.
 #' @author Shuangbin Xu
 #' @export
@@ -74,15 +73,13 @@ ggbartax.phyloseq <- function(obj, ...){
 #' head(phyloseq::otu_table(phytax))
 #' phybar <- ggbartax(phytax) + 
 #'          xlab(NULL) + ylab("relative abundance (%)")
-get_taxadf <- function(obj,...){
-    UseMethod("get_taxadf")
-}
+setGeneric("get_taxadf", function(obj, ...)standardGeneric("get_taxadf"))
 
-#' @method get_taxadf phyloseq
+#' @aliases get_taxadf,phyloseq
 #' @importFrom phyloseq otu_table tax_table taxa_are_rows rank_names
 #' @rdname get_taxadf
 #' @export
-get_taxadf.phyloseq <- function(obj, taxlevel=2, ...){
+setMethod("get_taxadf", "phyloseq", function(obj, taxlevel=2, ...){
     if (is.null(obj@tax_table)){
     	stop("The tax table is empty!")
     }else{
@@ -99,23 +96,23 @@ get_taxadf.phyloseq <- function(obj, taxlevel=2, ...){
     	}
     }
     #taxlevel <- rank_names(obj)[taxlevel]
-    taxdf <- get_taxadf.default(obj=otuda, 
-                               taxda=taxdf, 
-                               taxlevel=taxlevel,
-                               sampleda=sampleda,
-                               taxa_are_rows=FALSE,...)
+    taxdf <- get_taxadf(obj=otuda, 
+                        taxda=taxdf, 
+                        taxlevel=taxlevel,
+                        sampleda=sampleda,
+                        taxa_are_rows=FALSE,...)
     return(taxdf)
-}
+})
 
-#' @method get_taxadf default
+#' @aliases get_taxadf,data.frame
 #' @importFrom phyloseq phyloseq otu_table tax_table
 #' @rdname get_taxadf
 #' @export 
-get_taxadf.default <- function(obj, taxda, 
-                              taxa_are_rows,
-                              taxlevel,
-                              sampleda=NULL,
-                              ...){
+setMethod("get_taxadf", "data.frame", 
+          function(obj, taxda, 
+                   taxa_are_rows,
+                   taxlevel,
+                   sampleda=NULL, ...){
     if (!taxa_are_rows){
     	obj <- data.frame(t(obj), check.names=FALSE)
     }
@@ -125,14 +122,12 @@ get_taxadf.default <- function(obj, taxda,
     taxda <- fillNAtax(taxda)
     if (inherits(taxlevel, "numeric")){taxlevel <- colnames(taxda)[taxlevel]}
     tmptax <- taxda[,match(taxlevel, colnames(taxda)), drop=FALSE]
-    taxdf <- otu_table(count_or_ratios(data=obj, 
-                                     tmptax, 
-                                     rownamekeep=FALSE,...), 
-                                     taxa_are_rows=TRUE)
+    taxdf <- otu_table(get_count(data=obj, 
+                                 featurelist=tmptax), 
+                       taxa_are_rows=TRUE)
     taxdf <- phyloseq(taxdf, sampleda)
-    return(taxdf)
-    
-}
+    return(taxdf)  
+})
 
 #' @title Rarefaction alpha index
 #' @param obj phyloseq, phyloseq class or data.frame
@@ -189,8 +184,7 @@ ggrarecurve.phyloseq <- function(obj, ...){
 #' @param  factorNames character, a column name of sampleinfo, 
 #' when sampleinfo isn't NULL, factorNames shouldn't be NULL, default is NULL,
 #' when the input is phyloseq, the factorNames should be provided. 
-#' @param ... additional parameters,
-#' see also \code{\link[MicrobiotaProcess]{count_or_ratios}}.
+#' @param ..., additional parameters
 #' @return return a list for VennDiagram.
 #' @author Shuangbin Xu
 #' @export 
@@ -209,20 +203,18 @@ ggrarecurve.phyloseq <- function(obj, ...){
 #' #             margin = 0.1, lwd = 3, 
 #' #             lty ='dotted', 
 #' #             imagetype = "svg")
-get_vennlist <- function(obj,...){
-    UseMethod("get_vennlist")
-}
+setGeneric("get_vennlist", function(obj, ...)standardGeneric("get_vennlist"))
 
-#' @method get_vennlist phyloseq
+#' @aliases get_vennlist,phyloseq
 #' @rdname get_vennlist
 #' @export 
-get_vennlist.phyloseq <- function(obj, ...){
+setMethod("get_vennlist", "phyloseq", function(obj, factorNames, ...){
     otuda <- checkotu(obj)
     sampleda <- checksample(obj)
     #tmpfactors <- colnames(sampleda)[factorNamesIndex]
-    vennlist <- get_vennlist.default(obj=otuda,
-                                     sampleinfo=sampleda,
-                                     #factorNames=factorNames,
-                                     ...)
+    if(is.null(factorNames)){stop("The object is phyloseq, factorNames should not be NULL.")}
+    vennlist <- get_vennlist(obj=otuda,
+                             sampleinfo=sampleda,
+                             factorNames=factorNames, ...)
     return(vennlist)
-}
+})

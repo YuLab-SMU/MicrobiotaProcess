@@ -37,7 +37,7 @@ setGeneric("get_upset", function(obj, ...)standardGeneric("get_upset"))
 #' @rdname get_upset
 #' @importFrom stats na.omit
 #' @export
-setMethod("get_upset", "data.frame", function(obj, sampleda, factorNames, threshold=0, ...){
+setMethod("get_upset", "data.frame", function(obj, sampleda, factorNames, threshold=0){
     flaglen <- length(na.omit(match(rownames(obj),rownames(sampleda))))
     sampleda <- sampleda[,match(factorNames, colnames(sampleda)),drop=FALSE]
     if (flaglen==0){
@@ -50,7 +50,7 @@ setMethod("get_upset", "data.frame", function(obj, sampleda, factorNames, thresh
     dameta <- merge(obj, sampleda, by=0)
     rownames(dameta) <- as.vector(dameta$Row.names)
     dameta$Row.names <- NULL
-    dameta <- count_or_ratios(dameta)
+    dameta <- get_count(dameta)
     daupset <- apply(dameta, 1, 
                      function(x){unlist(lapply(x, function(x){if(x>threshold){1}else{0}}))})
     daupset <- data.frame(daupset, check.names=FALSE)

@@ -33,10 +33,10 @@
 import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL, 
                           refseqqza=NULL, treeqza=NULL,
                           build_tree=FALSE, parallel=FALSE, ...){
-    otux <- read.qza(otuqza, parallel=parallel)
+    otux <- read_qza(otuqza, parallel=parallel)
     otutab <- otu_table(otux$otutab,taxa_are_rows=TRUE)
     if (!is.null(taxaqza)){
-        taxax <- read.qza(taxaqza, parallel=parallel)
+        taxax <- read_qza(taxaqza, parallel=parallel)
         taxax <- taxax[match(rownames(otutab), rownames(taxax)),,drop=FALSE]
         if (!is.null(otux$taxtab)){
             taxax <- otux$taxtab
@@ -63,13 +63,13 @@ import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
         sampleda <- import_qiime_sample_data(mapfilename)
     }
     if (!is.null(refseqqza)){
-        refseq <- read.qza(refseqqza)
+        refseq <- read_qza(refseqqza)
     }
     if (!is.null(refseq)){
         refseq <- DNAStringSet(refseq)
     }
     if (!is.null(treeqza)){
-        reftree <- read.qza(treeqza)
+        reftree <- read_qza(treeqza)
     }
     if (is.null(mapfilename)){
         sampleda <- NULL
@@ -107,9 +107,9 @@ import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
 #' @examples
 #' otuqzafile <- system.file("extdata", "table.qza",
 #'                           package="MicrobiotaProcess")
-#' otuqza <- read.qza(otuqzafile)
+#' otuqza <- read_qza(otuqzafile)
 #' str(otuqza)
-read.qza <- function(qzafile, parallel=FALSE){
+read_qza <- function(qzafile, parallel=FALSE){
     tmpdir <- tempdir()
     unzipfiles <- unzip(qzafile, exdir=tmpdir)
     metadafile <- unzipfiles[grep("metadata.yaml", unzipfiles)[1]]

@@ -2,15 +2,17 @@
 % Please edit documentation in R/AllMethods.R
 \name{get_taxadf}
 \alias{get_taxadf}
-\alias{get_taxadf.phyloseq}
-\alias{get_taxadf.default}
+\alias{get_taxadf,phyloseq-method}
+\alias{get_taxadf,phyloseq}
+\alias{get_taxadf,data.frame-method}
+\alias{get_taxadf,data.frame}
 \title{get the data of specified taxonomy}
 \usage{
 get_taxadf(obj, ...)
 
-\method{get_taxadf}{phyloseq}(obj, taxlevel = 2, ...)
+\S4method{get_taxadf}{phyloseq}(obj, taxlevel = 2, ...)
 
-\method{get_taxadf}{default}(obj, taxda, taxa_are_rows, taxlevel, sampleda = NULL, ...)
+\S4method{get_taxadf}{data.frame}(obj, taxda, taxa_are_rows, taxlevel, sampleda = NULL, ...)
 }
 \arguments{
 \item{obj}{phyloseq, phyloseq class or data.frame
@@ -18,8 +20,7 @@ the shape of data.frame (nrow sample * column feature
 taxa_are_rows set FALSE, nrow feature * ncol sample, 
 taxa_are_rows set TRUE).}
 
-\item{...}{additional parameters, see also 
-\code{\link[MicrobiotaProcess]{count_or_ratios}}}
+\item{..., }{additional parameters.}
 
 \item{taxlevel}{character, the column names of taxda that you want to get.
 when the input is phyloseq class, you can use 1 to 7.}
