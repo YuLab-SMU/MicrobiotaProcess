@@ -9,14 +9,14 @@ diffres <- diff_analysis(kostic2012crc, class="DIAGNOSIS",
 	                secondcomfun = "wilcox.test",
 	                secondalpha=0.01, lda=3)
 
-test_that("getcall",{
+test_that("get_call",{
     expect_true(is(diffres@call, "call"))
 })
 
-context("getcall function")
-test_that("getcall",{
-    expect_equal("kruskal.test", MicrobiotaProcess:::getcall(diffres, "firstcomfun"))
-    expect_equal("wilcox.test", MicrobiotaProcess:::getcall(diffres, "secondcomfun"))
-    expect_equal("lda", MicrobiotaProcess:::getcall(diffres, "mlfun"))
+context("get_call function")
+test_that("get_call",{
+    expect_equal("kruskal.test", MicrobiotaProcess:::get_call(diffres, "firstcomfun"))
+    expect_equal("wilcox.test", MicrobiotaProcess:::get_call(diffres, "secondcomfun"))
+    expect_equal("lda", MicrobiotaProcess:::get_call(diffres, "mlfun"))
 })
 

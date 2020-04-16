@@ -19,7 +19,7 @@ taxa_are_rows set FALSE, nrow feature * ncol sample,
 taxa_are_rows set TRUE).}
 
 \item{...}{additional parameters, see also 
-\code{\link[MicrobiotaProcess]{CountOrRatios}}}
+\code{\link[MicrobiotaProcess]{count_or_ratios}}}
 
 \item{taxlevel}{character, the column names of taxda that you want to get.
 when the input is phyloseq class, you can use 1 to 7.}

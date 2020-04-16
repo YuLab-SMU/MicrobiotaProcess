@@ -35,7 +35,7 @@ ggdifftaxbar(obj, ...)
 \arguments{
 \item{obj}{object, diffAnalysisClass see also 
 \code{\link[MicrobiotaProcess]{diff_analysis}} or feMeanMedian class, 
-see also \code{\link[MicrobiotaProcess]{getMeanMedian}}.}
+see also \code{\link[MicrobiotaProcess]{get_mean_median}}.}
 
 \item{...}{additional arguments.}
 

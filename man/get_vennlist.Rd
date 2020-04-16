@@ -18,7 +18,7 @@ a dataframe contained one character column and the others are numeric.
 or all columns should be numeric if sampleinfo isn't NULL.}
 
 \item{...}{additional parameters,
-see also \code{\link[MicrobiotaProcess]{CountOrRatios}}.}
+see also \code{\link[MicrobiotaProcess]{count_or_ratios}}.}
 
 \item{sampleinfo}{dataframe; a sample information, default is NULL.}
 
