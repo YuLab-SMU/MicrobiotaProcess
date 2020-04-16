@@ -38,7 +38,7 @@ ggbartax.phyloseq <- function(obj, ...){
     if (is.null(obj@otu_table)){
     	stop("The otu table is empty!")
     }else{
-    	otudata <- getotudata(obj)
+    	otudata <- get_otudata(obj)
     }
     if (!is.null(obj@sam_data)){
     	sampleda <- data.frame(sample_data(obj), check.names=FALSE)
@@ -62,7 +62,7 @@ ggbartax.phyloseq <- function(obj, ...){
 #' when the input is phyloseq class, you can use 1 to 7.
 #' @param sampleda data.frame, the sample information.
 #' @param ... additional parameters, see also 
-#' \code{\link[MicrobiotaProcess]{CountOrRatios}}
+#' \code{\link[MicrobiotaProcess]{count_or_ratios}}
 #' @return phyloseq class contained tax data.frame and sample information.
 #' @author Shuangbin Xu
 #' @export
@@ -89,7 +89,7 @@ get_taxadf.phyloseq <- function(obj, taxlevel=2, ...){
     	taxdf <- tax_table(obj)
     }
     otuda <- checkotu(obj)
-    sampleda <- getsample(obj)
+    sampleda <- get_sample(obj)
     if (inherits(taxlevel, 'numeric')){taxlevel <- rank_names(obj)[taxlevel]}
     if (inherits(taxlevel, 'character')){
     	if (!taxlevel %in% rank_names(obj)){
@@ -125,7 +125,7 @@ get_taxadf.default <- function(obj, taxda,
     taxda <- fillNAtax(taxda)
     if (inherits(taxlevel, "numeric")){taxlevel <- colnames(taxda)[taxlevel]}
     tmptax <- taxda[,match(taxlevel, colnames(taxda)), drop=FALSE]
-    taxdf <- otu_table(CountOrRatios(data=obj, 
+    taxdf <- otu_table(count_or_ratios(data=obj, 
                                      tmptax, 
                                      rownamekeep=FALSE,...), 
                                      taxa_are_rows=TRUE)
@@ -175,7 +175,7 @@ ggrarecurve <- function(obj, ...){
 #' @export
 ggrarecurve.phyloseq <- function(obj, ...){
     otuda <- checkotu(obj)
-    sampleda <- data.frame(getsample(obj),check.names=FALSE)
+    sampleda <- data.frame(get_sample(obj),check.names=FALSE)
     p <- ggrarecurve.default(obj=otuda, sampleda=sampleda, ...)
     return(p)	
 }
@@ -190,7 +190,7 @@ ggrarecurve.phyloseq <- function(obj, ...){
 #' when sampleinfo isn't NULL, factorNames shouldn't be NULL, default is NULL,
 #' when the input is phyloseq, the factorNames should be provided. 
 #' @param ... additional parameters,
-#' see also \code{\link[MicrobiotaProcess]{CountOrRatios}}.
+#' see also \code{\link[MicrobiotaProcess]{count_or_ratios}}.
 #' @return return a list for VennDiagram.
 #' @author Shuangbin Xu
 #' @export 

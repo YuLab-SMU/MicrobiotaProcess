@@ -20,12 +20,12 @@
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' retrieveSeq(ids=c("ADM52729.1", "AAF82637.1"), 
+#' retrieve_seq(ids=c("ADM52729.1", "AAF82637.1"), 
 #'             files="test.fasta",
 #'             databases="protein",
 #'             type="fasta",
 #'             checkids=TRUE)
-retrieveSeq <- function(ids, files, 
+retrieve_seq <- function(ids, files, 
     databases="protein", 
     type="fasta", 
     times=3, checkids=FALSE){
@@ -48,7 +48,7 @@ retrieveSeq <- function(ids, files,
               #tmprecs <- str_trim(tmprecs)
               tmprecs <- substr(tmprecs, 1, nchar(tmprecs)-1)
               write(tmprecs, files, append=TRUE)
-    },error=function(e){do.call("retrieveSeq", 
+    },error=function(e){do.call("retrieve_seq", 
                         args=list(ids=ids, databases=databases, 
                                   type=type, files=files, checkids=TRUE))})
     message(paste0("Sleeping ... ",times,"s"))
@@ -70,22 +70,22 @@ retrieveSeq <- function(ids, files,
 #' @param checkids logical, whether check the sequence of ids has been retrieved.
 #' default is FALSE.
 #' @return the files of sequences downloaded by ids
-#' @seealso \code{\link[MicrobiotaProcess]{retrieveSeq}}
+#' @seealso \code{\link[MicrobiotaProcess]{retrieve_seq}}
 #' @author Shuangbin Xu
 #' @export
 #' @examples
 #' idslist <- list(c("ADM52729.1", "AAF82637.1"), 
 #'                 c("CAA24729.1", "CAA83510.1"))
-#' mapplyretrieveSeq(idlist=idslist,
+#' mapply_retrieve_seq(idlist=idslist,
 #'                   files="test.fasta",
 #'                   databases="protein",
 #'                   type="fasta",
 #'                   times=3,checkids=TRUE)
-mapplyretrieveSeq <- function(idlist, files, 
+mapply_retrieve_seq <- function(idlist, files, 
     databases="protein", 
     type="fasta", 
     times=3, checkids=TRUE){
-    invisible(mapply(retrieveSeq, 
+    invisible(mapply(retrieve_seq, 
                      idlist, 
                      MoreArgs=list(files=files,
                                    databases=databases,

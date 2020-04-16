@@ -50,7 +50,7 @@ setMethod("get_upset", "data.frame", function(obj, sampleda, factorNames, thresh
     dameta <- merge(obj, sampleda, by=0)
     rownames(dameta) <- as.vector(dameta$Row.names)
     dameta$Row.names <- NULL
-    dameta <- CountOrRatios(dameta)
+    dameta <- count_or_ratios(dameta)
     daupset <- apply(dameta, 1, 
                      function(x){unlist(lapply(x, function(x){if(x>threshold){1}else{0}}))})
     daupset <- data.frame(daupset, check.names=FALSE)

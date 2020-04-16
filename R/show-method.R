@@ -37,19 +37,19 @@ setMethod("show",
       else{cat("The taxda is NULL",fill=TRUE)}
       kwres <- object@kwres
       numfirstf <- nrow(kwres[kwres$pvalue<=0.05 & !is.na(kwres$pvalue),])
-      firstfun <- getcall(object, "firstcomfun")
-      filtermod <- getcall(object, "filtermod")
-      alphafold <- getcall(object, "firstalpha")
+      firstfun <- get_call(object, "firstcomfun")
+      filtermod <- get_call(object, "filtermod")
+      alphafold <- get_call(object, "firstalpha")
       cat(paste0("after first test (",firstfun,") number of feature (", filtermod,"<=",alphafold,"):", 
       numfirstf),fill=TRUE)
-      secondvars <- getsecondTRUEvar(object)
-      secondfun <- getcall(object, "secondcomfun")
+      secondvars <- get_second_true_var(object)
+      secondfun <- get_call(object, "secondcomfun")
       cat(paste0("after second test (",secondfun,") number of significantly discriminative feature:", 
       		   nrow(secondvars)),
       		   fill=TRUE)
       mlres <- as.data.frame(object) 
       uncertain <- length(grep("__un_", mlres$f))
-      mlmethod <- getcall(object, "mlfun")
+      mlmethod <- get_call(object, "mlfun")
       cat(paste0("after ",mlmethod,", Number of discriminative features: ", 
       		   nrow(mlres), " (certain taxonomy classification:", 
       		   nrow(mlres) -uncertain , 

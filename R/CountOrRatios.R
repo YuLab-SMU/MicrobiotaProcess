@@ -1,4 +1,4 @@
-#' @title caculate the count or relative abundance of replicate element with a speficify column
+#' @title calculate the count or relative abundance of replicate element with a speficify column
 #' 
 #' @description
 #' Caculate the count or relative abundance of replicate element with a speficify columns
@@ -26,12 +26,12 @@
 #' sampleda <- read.table(samplefile, 
 #'             sep="\t", header=TRUE, row.names=1)
 #' taxdf <- otuda[!sapply(otuda, is.numeric)]
-#' taxdf <- splitStrtoList(taxdf)
+#' taxdf <- split_str_to_list(taxdf)
 #' otuda <- otuda[sapply(otuda, is.numeric)]
-#' phycount <- CountOrRatios(otuda, taxdf[,2,drop=FALSE])
-#' phyratios <- CountOrRatios(otuda, taxdf[,2,drop=FALSE], 
+#' phycount <- count_or_ratios(otuda, taxdf[,2,drop=FALSE])
+#' phyratios <- count_or_ratios(otuda, taxdf[,2,drop=FALSE], 
 #'                            countmode=FALSE)
-CountOrRatios <- function(data, 
+count_or_ratios <- function(data, 
                           featurelist, 
                           countmode=TRUE, 
                           multiplenum=1, 

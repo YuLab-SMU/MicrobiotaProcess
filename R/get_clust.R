@@ -160,9 +160,9 @@ ggclust.clustplotClass <- function(obj,
         }
         rownames(sample) <- NULL
         if(!is.null(factorNames)){
-            tmpfactormap <- getfactormap(factorNames)	
+            tmpfactormap <- get_factormap(factorNames)	
     	}else{
-            tmpfactormap <- getfactormap(colnames(sampleda)[-1])
+            tmpfactormap <- get_factormap(colnames(sampleda)[-1])
         }
         if(!is.null(factorLevels)){
             sampleda <- setfactorlevels(sampleda, factorLevels)

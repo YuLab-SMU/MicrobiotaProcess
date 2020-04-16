@@ -16,15 +16,15 @@
 #'                      B=rnorm(2:11, mean=6), 
 #'                      group=c(rep("case",5),rep("control",5)))
 #' head(datest)
-#' multi.compare(fun=wilcox.test,data=datest,
+#' multi_compare(fun=wilcox.test,data=datest,
 #'               feature=c("A", "B"),factorNames="group")
 #' da2 <- data.frame(A=rnorm(1:15,mean=5),
 #'                   B=rnorm(2:16,mean=6),
 #'                   group=c(rep("case1",5),rep("case2",5),rep("control",5)))
-#' multi.compare(fun=wilcox.test,data=da2,
+#' multi_compare(fun=wilcox.test,data=da2,
 #'               feature=c("A", "B"),factorNames="group",
 #'               subgroup=c("case1", "case2"))
-multi.compare <- function(fun = wilcox.test, 
+multi_compare <- function(fun = wilcox.test, 
                           data, 
                           feature, 
                           factorNames, 
@@ -48,66 +48,66 @@ multi.compare <- function(fun = wilcox.test,
 #' @examples
 #' library(nlme)
 #' lmeres <- lme(distance ~ Sex,data=Orthodont)
-#' pvalue <- getpvalue(lmeres)
-getpvalue <- function(obj){
-    UseMethod("getpvalue")
+#' pvalue <- get_pvalue(lmeres)
+get_pvalue <- function(obj){
+    UseMethod("get_pvalue")
 }
 
-#' @method getpvalue htest
-#' @rdname getpvalue
+#' @method get_pvalue htest
+#' @rdname get_pvalue
 #' @export
-getpvalue.htest <- function(obj){
+get_pvalue.htest <- function(obj){
     pvalue <- obj$p.value
     return(pvalue)
 }
 
-#' @method getpvalue lme
-#' @rdname getpvalue
+#' @method get_pvalue lme
+#' @rdname get_pvalue
 #' @export
-getpvalue.lme <- function(obj){
-    anres <- getanova(obj)
+get_pvalue.lme <- function(obj){
+    anres <- get_anova(obj)
     pvalue <- anres[2,4]
     return (pvalue)
 }
 
-#' @method getpvalue negbin
-#' @rdname getpvalue
+#' @method get_pvalue negbin
+#' @rdname get_pvalue
 #' @export
-getpvalue.negbin <- function(obj){
-    anres <- getanova(obj)
+get_pvalue.negbin <- function(obj){
+    anres <- get_anova(obj)
     pvalue <- anres[2,5]
     return (pvalue)
 }
 
-#' @method getpvalue ScalarIndependenceTest
-#' @rdname getpvalue
+#' @method get_pvalue ScalarIndependenceTest
+#' @rdname get_pvalue
 #' @importFrom coin pvalue
 #' @export
-getpvalue.ScalarIndependenceTest <- function(obj){
+get_pvalue.ScalarIndependenceTest <- function(obj){
     pvalue(obj)
 }
 
-#' @method getpvalue QuadTypeIndependenceTest
-#' @rdname getpvalue
+#' @method get_pvalue QuadTypeIndependenceTest
+#' @rdname get_pvalue
 #' @export
-getpvalue.QuadTypeIndependenceTest <- function(obj){
-    getpvalue.ScalarIndependenceTest(obj)
+get_pvalue.QuadTypeIndependenceTest <- function(obj){
+    get_pvalue.ScalarIndependenceTest(obj)
 }
 
-#' @method getpvalue lm
-#' @rdname getpvalue
+#' @method get_pvalue lm
+#' @rdname get_pvalue
 #' @export
-getpvalue.lm <- function(obj){
-    anres <- getanova(obj)
+get_pvalue.lm <- function(obj){
+    anres <- get_anova(obj)
     pvalue <- anres[1,5]
     return(pvalue)
 }
 
-#' @method getpvalue glm
-#' @rdname getpvalue
+#' @method get_pvalue glm
+#' @rdname get_pvalue
 #' @importFrom stats pnorm
 #' @export
-getpvalue.glm <- function(obj){
+get_pvalue.glm <- function(obj){
     anres <- summary(obj)
     pvalue <- 2*pnorm(abs(anres$coeff[2,3]),
 					  lower.tail=FALSE)
@@ -116,19 +116,19 @@ getpvalue.glm <- function(obj){
 
 #' @importFrom stats anova
 #' @keywords internal 
-getanova <- function(obj){
+get_anova <- function(obj){
     anres <- suppressWarnings(anova(obj))
     return (anres)
 }
 
 #' @keywords internal
-getclasslevels <- function(sampleda, classgroup){
+get_classlevels <- function(sampleda, classgroup){
     levelstmp <- unique(as.vector(sampleda[,match(classgroup, colnames(sampleda))]))
     return(levelstmp)
 }
 
 #' @keywords internal
-getclass2sub <- function(sampleda, classgroup, subclass){
+get_class2sub <- function(sampleda, classgroup, subclass){
     tmpsplit <- sampleda[,match(classgroup, colnames(sampleda))]
     if (!missing(subclass)){
     	samplelist <- split(sampleda, tmpsplit) 
@@ -138,13 +138,13 @@ getclass2sub <- function(sampleda, classgroup, subclass){
 
 #' @importFrom gtools combinations
 #' @keywords internal
-getcompareclass <- function(classlevels){
+get_compareclass <- function(classlevels){
     combinations(n=length(classlevels), r=2, v=classlevels,
     						  repeats.allowed=FALSE)
 }
 
 #' @keywords internal
-getcomparesubclass <- function(xlevel, ylevel, class2sublist){
+get_comparesubclass <- function(xlevel, ylevel, class2sublist){
     res <- expand.grid(class2sublist[[xlevel]],
     				   class2sublist[[ylevel]])
     colnames(res) <- c(xlevel, ylevel)
@@ -170,7 +170,7 @@ diffclass <- function(datasample,
         datatmp[[match(classgroup, colnames(datatmp))]] <- factor(datatmp[[match(classgroup,colnames(datatmp))]], 
                                                              levels=classtmp)
         clsize <- min(table(datatmp[[match(classgroup,colnames(datatmp))]]))
-        resgfoldC <- getgfcwilc(datasample=datatmp,
+        resgfoldC <- get_gfc_wilc(datasample=datatmp,
                                 fun1=fcfun,
                                 classlevelsnum=clsize,
                                 vars=features,
@@ -179,7 +179,7 @@ diffclass <- function(datasample,
                                 fun2=secondcomfun, 
                                 wilc=clwilc,
                                 ...)
-        resgfoldC <- getcompareres(resgfoldC, pfold=pfold)
+        resgfoldC <- get_compareres(resgfoldC, pfold=pfold)
         keepfeature[[paste(classtmp, collapse="-vs-")]] <- resgfoldC[resgfoldC$Freq==1,]
     }
     return(keepfeature)
@@ -208,7 +208,7 @@ diffsubclass <- function(datasample,
             datatmp[[match(subclass, colnames(datatmp))]] <- factor(datatmp[[match(subclass,colnames(datatmp))]],
                                                                              levels=subclasstmp)
             subclsize <- min(table(datatmp[[match(subclass,colnames(datatmp))]]))
-            resgfoldC <- getgfcwilc(datasample=datatmp, 
+            resgfoldC <- get_gfc_wilc(datasample=datatmp, 
                                     classlevelsnum=subclsize,
                                     fun1=fcfun,
                                     vars=features,
@@ -220,7 +220,7 @@ diffsubclass <- function(datasample,
             reslist[[j]] <- resgfoldC
         }
         reslist <- do.call("rbind", reslist)
-        reslist <- getcompareres(reslist, pfold=pfold)
+        reslist <- get_compareres(reslist, pfold=pfold)
         reslist <- reslist[reslist$Freq==nrow(comsubclass[[i]]),]
         if (nrow(reslist)>0){
             keepfeature[[paste(classtmp, collapse="-vs-")]] <- reslist
@@ -230,17 +230,17 @@ diffsubclass <- function(datasample,
 }
 
 #' @keywords internal
-getgfcwilc <- function(datasample, classlevelsnum, fun1='generalizedFC', 
+get_gfc_wilc <- function(datasample, classlevelsnum, fun1='generalizedFC', 
                        vars, classname, minnum, fun2='wilcox.test', wilc,...){
-    resgfoldC <- multi.compare(fun=fun1, data=datasample,
+    resgfoldC <- multi_compare(fun=fun1, data=datasample,
                                feature=vars, factorNames=classname)
     resgfoldC <- lapply(resgfoldC, function(x)x$gfc)
     resgfoldC <- do.call("rbind", resgfoldC)
     rownames(resgfoldC) <- vars
     if (classlevelsnum>= minnum &&  wilc){
-        tmpres <- multi.compare(fun=fun2, data=datasample,
+        tmpres <- multi_compare(fun=fun2, data=datasample,
                                 feature=vars, factorNames=classname, ...)
-        pvaluetmp <- lapply(tmpres, function(x)getpvalue(x))
+        pvaluetmp <- lapply(tmpres, function(x)get_pvalue(x))
         pvaluetmp <- do.call("rbind", pvaluetmp)
         rownames(pvaluetmp) <- vars
         resgfoldC <- merge(resgfoldC, pvaluetmp, by=0)
@@ -252,7 +252,7 @@ getgfcwilc <- function(datasample, classlevelsnum, fun1='generalizedFC',
 }
 
 #' @keywords internal
-getcompareres <- function(reslist, pfold){
+get_compareres <- function(reslist, pfold){
     if (ncol(reslist)<3){
     	reslist <- data.frame(f=rownames(reslist),gfc=reslist[,1], stringsAsFactors =FALSE)
     	reslist$gfc <- reslist$gfc >0
@@ -269,7 +269,7 @@ getcompareres <- function(reslist, pfold){
 }
 
 #' @keywords internal
-getconsistentfeatures <- function(diffsubclassfeature, 
+get_consistentfeatures <- function(diffsubclassfeature, 
                                   classgroup,
                                   classlevels, ...){
     leftfeature <- list()
@@ -295,7 +295,7 @@ getconsistentfeatures <- function(diffsubclassfeature,
 }
 
 #' @keywords internal
-getsecondvarlist <- function(secondvars){
+get_secondvarlist <- function(secondvars){
     vars <- as.vector(unique(unlist(lapply(secondvars, 
                      function(x){as.vector(x$f)}))))
     return(vars)

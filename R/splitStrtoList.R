@@ -23,9 +23,9 @@
 #' sampleda <- read.table(samplefile,
 #'             sep="\t", header=TRUE, row.names=1)
 #' taxdf <- otuda[!sapply(otuda, is.numeric)]
-#' taxdf <- splitStrtoList(taxdf)
+#' taxdf <- split_str_to_list(taxdf)
 #' head(taxdf)
-splitStrtoList <- function(strdataframe, 
+split_str_to_list <- function(strdataframe, 
     prefix="tax", 
     sep="; ", 
     extra="drop",

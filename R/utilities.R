@@ -2,7 +2,7 @@
 #' @importFrom grDevices colorRampPalette
 #' @keywords internal
 # this is from `ggtree`
-getCols <- function (n){
+get_cols <- function (n){
     col <- c("#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3",
              "#fdb462", "#b3de69", "#fccde5", "#d9d9d9", "#bc80bd",
              "#ccebc5", "#ffed6f")
@@ -28,7 +28,7 @@ setfactorlevels <- function(data, factorlist){
 }
 
 #' @keywords internal
-getotudata <- function(obj){
+get_otudata <- function(obj){
     if(taxa_are_rows(obj)){
     	otudata <- data.frame(t(otu_table(obj)), check.names=FALSE)
     }else{
@@ -41,7 +41,7 @@ checkotu <- function(obj){
     if (is.null(obj@otu_table)){
     	stop("The otu table is empty!")
     }else{
-    	otuda <- getotudata(obj)
+    	otuda <- get_otudata(obj)
     	return(otuda)
     }
 }
@@ -51,14 +51,14 @@ checksample <- function(obj){
     if (is.null(obj@sam_data)){
     	stop("The sample_data is empty")
     }else{
-    	sampleda <- getsample(obj)
+    	sampleda <- get_sample(obj)
     	return(sampleda)
     }
 }
 
 #' @importFrom phyloseq sample_data
 #' @keywords internal.
-getsample <- function(obj){
+get_sample <- function(obj){
     if (is.null(obj@sam_data)){
     	sampleda <- NULL
     }else{
@@ -164,7 +164,7 @@ match.call.defaults <- function(fun) {
 }
 
 #' @keywords internal
-getcall <- function(obj, arg){
+get_call <- function(obj, arg){
     if (!"call" %in% slotNames(obj)){
 	stop("The object don't have call slot!")
     }else{

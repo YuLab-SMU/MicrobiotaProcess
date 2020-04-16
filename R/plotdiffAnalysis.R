@@ -66,17 +66,17 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", s
     treedata <- convert_to_treedata(obj)
     layout %<>% match.arg(c("rectangular", "circular", "slanted", "radial"))
     if (!is.null(factorLevels)){nodedf <- setfactorlevels(nodedf, factorLevels)}
-    nodedf <- getnode(treedata, nodedf)
+    nodedf <- get_node(treedata, nodedf)
     p <- treeskeleton(treedata,	layout=layout,size=size,pointsize=skpointsize)
-    cladecoord <- getcladedf(p, nodedf$node)
+    cladecoord <- get_cladedf(p, nodedf$node)
     cladecoord <- merge(cladecoord, nodedf, by.x="node", by.y="node")
     if (layout %in% c("rectangular","slanted")){
         taxlevel <- 7
-        labelannotcoord <- getlabeldf(p, nodedf$node, angle="others")
+        labelannotcoord <- get_labeldf(p, nodedf$node, angle="others")
     }else{
-        labelannotcoord <- getlabeldf(p, nodedf$node)
+        labelannotcoord <- get_labeldf(p, nodedf$node)
     }
-    labelannotcoord <- getannotlabel(labelannotcoord, classlevel=taxlevel)
+    labelannotcoord <- get_annotlabel(labelannotcoord, classlevel=taxlevel)
     labelcoord <- labelannotcoord$labeldf
     annotcoord <- labelannotcoord$annotdf
     if ("pvalue" %in% colnames(nodedf)){
@@ -95,7 +95,7 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", s
     	scale_size_continuous(range = c(1, 3))
     if (setColors){
     	tmpn <- length(unique(as.vector(nodedf[[match(factorName,colnames(nodedf))]])))
-    	p <- p + scale_fill_manual(values=getCols(tmpn))
+    	p <- p + scale_fill_manual(values=get_cols(tmpn))
     }
     p <- p + theme_diffclade() + guides_diffclade() 
     return(p)
@@ -109,13 +109,13 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", s
 #' @export
 ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
     taxda <- obj@taxda
-    #secondvars <- getsecondTRUEvar(obj)
+    #secondvars <- get_second_true_var(obj)
     #nodedfres <- merge(obj@kwres, secondvars, by.x="f", by.y="f") %>% 
     #			select(-c("gfc", "Freq"))
     #nodedfres <- nodedfres[as.vector(nodedfres$f)%in%as.vector(obj@mlres$f),]
     #nodedfres <- merge(nodedfres, obj@mlres$f, by.x="f", by.y="f")
     nodedfres <- as.data.frame(obj)
-    classname <- getcall(obj, "classgroup")
+    classname <- get_call(obj, "classgroup")
     if (removeUnkown){
     	tmpflag <- grep("__un_",as.vector(nodedfres$f))
     	if (length(tmpflag)>0){
@@ -133,7 +133,7 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
 #' @title significantly discriminative feature barplot
 #' @param obj object, diffAnalysisClass see also 
 #' \code{\link[MicrobiotaProcess]{diff_analysis}} or feMeanMedian class, 
-#' see also \code{\link[MicrobiotaProcess]{getMeanMedian}}.
+#' see also \code{\link[MicrobiotaProcess]{get_mean_median}}.
 #' @param filepath character, default is NULL, meaning current path. 
 #' @param output character, the output dir name, default is "biomarker_barplot".
 #' @param xtextsize numeric, the size of axis x label, default is 3.
@@ -189,8 +189,8 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
     ylabel="relative abundance",
     ...){
     featureda <- obj@originalD
-    classname <- getcall(obj, "classgroup")
-    normalization <- getcall(obj, "normalization")
+    classname <- get_call(obj, "classgroup")
+    normalization <- get_call(obj, "normalization")
     if (!is.null(normalization)){
     	featureda <- featureda / normalization
     }
@@ -211,7 +211,7 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
     filepath <- file.path(filepath, output)
     dir.create(filepath, showWarnings = FALSE)
     for (vars in featurelist){
-    	resdf <- getMeanMedian(datameta=featureda, 
+    	resdf <- get_mean_median(datameta=featureda, 
     			       feature=vars, 
     			       subclass=subclass)
     	p <- ggdifftaxbar.featureMeanMedian(resdf,
@@ -258,7 +258,7 @@ ggdifftaxbar.featureMeanMedian <- function(obj, featurename, classgroup, subclas
     	       panel.spacing = unit(0.2, "mm"), strip.background = element_rect(colour=NA,fill="grey"))
     if (is.null(coloslist)){
         tmpn <- length(unique(as.vector(data[[match(subclass,colnames(data))]])))
-        p <- p + scale_fill_manual(values=getCols(tmpn))
+        p <- p + scale_fill_manual(values=get_cols(tmpn))
     }else{
         p <- p + scale_fill_manual(values=coloslist)
     }
@@ -283,13 +283,13 @@ ggdifftaxbar.featureMeanMedian <- function(obj, featurename, classgroup, subclas
 #' featureda <- merge(featureda, sampleda, by=0)
 #' rownames(featureda) <- as.vector(featureda$Row.names)
 #' featureda$Row.names <- NULL
-#' feameamed <- getMeanMedian(datameta=featureda, 
+#' feameamed <- get_mean_median(datameta=featureda, 
 #'                     feature="p__Actinobacteria", 
 #'                     subclass="body_site")
 #' #not run in example
 #' #fplot <- ggdifftaxbar(feameamed, featurename="p__Actinobacteria", 
 #' #                     classgroup="oxygen_availability", subclass="body_site")
-getMeanMedian <- function(datameta, feature, subclass){
+get_mean_median <- function(datameta, feature, subclass){
     RelativeAbundance <- NULL
     factornames <- colnames(datameta)[!unlist(vapply(datameta,is.numeric,logical(1)))]
     featuredatmp <- datameta %>% rownames_to_column(var="sample") %>%
@@ -402,7 +402,7 @@ ggeffectsize.data.frame <- function(obj,
     	ylab(NULL) + xlab(xlabtext) 
     #if (setColors){
     tmpn <- length(unique(as.vector(obj[[factorName]])))
-    p <- p + scale_color_manual(values=getCols(tmpn))
+    p <- p + scale_color_manual(values=get_cols(tmpn))
     #}
     p <- p + theme_bw()+
     	theme(axis.text.y = element_text(size=12),
@@ -421,7 +421,7 @@ ggeffectsize.data.frame <- function(obj,
 #' @export
 ggeffectsize.diffAnalysisClass <- function(obj, removeUnkown=TRUE, setFacet=TRUE,...){
     efres <- tidyEffectSize(obj)
-    classname <- getcall(obj, "classgroup")
+    classname <- get_call(obj, "classgroup")
     if (removeUnkown && length(grep("__un_",efres$f))){
     	efres <- efres[-grep("__un_",efres$f),,drop=FALSE]
     }
@@ -441,7 +441,7 @@ ggeffectsize.diffAnalysisClass <- function(obj, removeUnkown=TRUE, setFacet=TRUE
 
 #' @importFrom dplyr rename_
 #' @keywords internal
-getnode <- function(treedata, nodedf){
+get_node <- function(treedata, nodedf){
     if (is.null(treedata@data)){stop("The data slot of treedata should't be NULL.")}
     nodelist <- treedata@data[match(as.vector(nodedf[,1]), as.vector(treedata@data$labelnames)),]$node
     if (!"node" %in% colnames(nodedf)){

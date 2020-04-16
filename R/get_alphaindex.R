@@ -1,7 +1,7 @@
 #' @title alpha index
 #' 
 #' @description
-#' caculate the alpha index (Obseve,Chao1,Shannon,Simpson) of sample
+#' calculate the alpha index (Obseve,Chao1,Shannon,Simpson) of sample
 #' with \code{\link[vegan]{diversity}}
 #' @param obj object, data.frame of (nrow sample * ncol taxonomy(feature)) 
 #' or phyloseq.

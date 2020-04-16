@@ -111,11 +111,11 @@ ggordpoint.default <-  function(obj, pc=c(1,2), mapping=NULL, sampleda=NULL, fac
     if(!is.null(sampleda)){
     	plotcoord <- merge(plotcoord, sampleda, by=0)
     	if (!is.null(factorNames)){
-    		tmpfactormap <- getfactormap(factorNames)
-    		ellipsemapping <- getellipsemap(factorNames)
+    		tmpfactormap <- get_factormap(factorNames)
+    		ellipsemapping <- get_ellipsemap(factorNames)
     	} else{
-    		tmpfactormap <- getfactormap(colnames(sampleda))
-    		ellipsemapping <- getellipsemap(colnames(sampleda))
+    		tmpfactormap <- get_factormap(colnames(sampleda))
+    		ellipsemapping <- get_ellipsemap(colnames(sampleda))
     	}
     	mapping <- modifyList(mapping, tmpfactormap)
     	ellipsemapping <- modifyList(mapping, ellipsemapping)
@@ -128,7 +128,7 @@ ggordpoint.default <-  function(obj, pc=c(1,2), mapping=NULL, sampleda=NULL, fac
     	varcontrib <- get_varct(obj)
     	varcontr <- varcontrib$VarContribution[,pc]
     	tmpvars <- names(sort(rowSums(varcontr), decreasing=TRUE))
-    	varlist <- getvarlist(namevector=tmpvars, n=topn)
+    	varlist <- get_varlist(namevector=tmpvars, n=topn)
     	biplotcoord <- varcontrib$VarCoordinates[match(varlist, rownames(varcontrib$VarCoordinates)),pc, drop=FALSE]
     	biplotcoord <- data.frame(biplotcoord, check.names=FALSE)
     	biplotmapping <- aes_string(x="0", y="0", xend=colnames(biplotcoord)[1], yend=colnames(biplotcoord)[2])
@@ -147,7 +147,7 @@ ggordpoint.default <-  function(obj, pc=c(1,2), mapping=NULL, sampleda=NULL, fac
 }
 
 #' @keywords internal
-getvarlist <- function(namevector, n){
+get_varlist <- function(namevector, n){
     if (inherits(n, "integer") || inherits(n, "numeric")){
     	if (length(n)==2){
     		varnames <- namevector[n[1]:n[2]]
@@ -218,7 +218,7 @@ get_coord.prcomp <- function(obj, pc){
 
 #' @importFrom ggplot2 aes_string
 #' @keywords internal
-getfactormap <- function(namelist){
+get_factormap <- function(namelist){
     if (length(namelist)==1){
     	tmpfactormap <- aes_string(color=namelist[1])
     }else{
@@ -231,7 +231,7 @@ getfactormap <- function(namelist){
 #' @importFrom ggplot2 aes_string
 #' @importFrom stats as.formula
 #' @keywords internal
-getellipsemap <- function(namelist){
+get_ellipsemap <- function(namelist){
     tmpellipsemap <- aes_string(color=namelist[1],
                                 group=namelist[1])
     return(tmpellipsemap)

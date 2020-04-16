@@ -29,7 +29,7 @@ ggbartax.default <- function(obj, mapping=NULL, position = "stack", stat="identi
     }else{
         tmpn <- nrow(obj)
     }
-    p <- p + scale_fill_manual(values=getCols(tmpn))
+    p <- p + scale_fill_manual(values=get_cols(tmpn))
     if (!is.null(facetNames) & !plotgroup){
         tmpformula <- as.formula(paste0("~ ", facetNames))
         p <- p + facet_grid(tmpformula, scales="free_x", space="free_x")

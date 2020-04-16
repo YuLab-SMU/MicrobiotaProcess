@@ -1,6 +1,6 @@
 #' @author Shuangbin Xu, GuangChuang Yu
 #' @keywords internal 
-getcladedf <- function(ggtree, node){
+get_cladedf <- function(ggtree, node){
     data <- ggtree$data
     if ("nodeClass" %in% colnames(data)){
         data <- set_newlevels(data=data, 
@@ -20,7 +20,7 @@ getcladedf <- function(ggtree, node){
 
 #' @author Shuangbin Xu, GuangChuang Yu
 #' @keywords internal
-getlabeldf <- function(ggtree, node, angle="auto"){
+get_labeldf <- function(ggtree, node, angle="auto"){
     data <- ggtree$data
     if ("nodeClass" %in% colnames(data)){
         data <- set_newlevels(data=data,
@@ -31,7 +31,7 @@ getlabeldf <- function(ggtree, node, angle="auto"){
     	data$levelindex <- tmpnum
     	data$extend <- get_extend(tmpnum)*0.9
     }
-    df <- lapply(node, function(x)getcladelabelposition(data, 
+    df <- lapply(node, function(x)get_cladelabelposition(data, 
                  x, angle=angle, angleoff=90))
     df <- do.call("rbind", df)
     df$node <- node
@@ -45,7 +45,7 @@ getlabeldf <- function(ggtree, node, angle="auto"){
 
 #' @author GuangChuang Yu, Shuangbin Xu
 #' @keywords internal
-getcladelabelposition <- function(data, 
+get_cladelabelposition <- function(data, 
                                   node, angle = "auto", 
                                   adjustRatio=1, angleoff=90, 
                                   extend = 0) { 
@@ -83,7 +83,7 @@ getcladelabelposition <- function(data,
 
 #' @author Shuangbin Xu, GuangChuang Yu
 #' @keywords internal
-getannotlabel <- function(labeldf,classlevel=4){
+get_annotlabel <- function(labeldf,classlevel=4){
     df <- labeldf[labeldf$levelindex <= classlevel, ]
     dat <- labeldf[labeldf$levelindex > classlevel, ]
     lett <- c(letters, toupper(letters))

@@ -12,7 +12,7 @@ get_vennlist.default <- function(obj,
     if (!is.null(sampleinfo) && is.null(factorNames)){
     	stop("when sampleinfo isn't NULL, factorNames shouldn't be NULL")
     }
-    obj <- CountOrRatios(obj, 
+    obj <- count_or_ratios(obj, 
     			featurelist=sampleinfo, 
     			countmode=TRUE,
     			multiplenum=1,

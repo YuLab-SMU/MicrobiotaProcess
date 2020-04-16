@@ -168,8 +168,8 @@ setMethod("ggdiffbox", "diffAnalysisClass", function(obj, geom="boxplot",
           addLDA=TRUE, factorLevels=NULL, featurelist=NULL,
           removeUnkown=TRUE, colorlist=NULL, l_xlabtext=NULL,...){
     featureda <- obj@originalD
-    classname <- getcall(obj, "classgroup")
-    normalization <- getcall(obj, "normalization")
+    classname <- get_call(obj, "classgroup")
+    normalization <- get_call(obj, "normalization")
     if (!is.null(normalization)){
         featureda <- featureda / normalization
     }
@@ -188,9 +188,9 @@ setMethod("ggdiffbox", "diffAnalysisClass", function(obj, geom="boxplot",
     nodedfres$f <- factor(nodedfres$f, levels=as.vector(nodedfres$f))
     featurelist <- as.vector(nodedfres$f)
     featureda <- featureda[,match(featurelist,colnames(featureda)),drop=FALSE]
-    if (is.null(colorlist)){colorlist <- getCols(length(tmpgroup))}
+    if (is.null(colorlist)){colorlist <- get_cols(length(tmpgroup))}
     if (is.null(names(colorlist))){names(colorlist) <- tmpgroup}
-    if(is.null(getcall(obj,"standard_method"))){
+    if(is.null(get_call(obj,"standard_method"))){
         ifelse(is.null(l_xlabtext), xlabtext<-"abundance", xlabtext <- l_xlabtext)
     }else{xlabtext<-"abundance"}
     p <- plotdiffbox(obj=featureda, sampleda=sampleda, factorNames=classname, factorLevels=factorLevels,
@@ -272,8 +272,8 @@ plotdiffbox <- function(obj, sampleda, factorNames, dodge_width=0.6, box_width=0
 
 #' @keywords internal
 get_comparelist <- function(data, classgroup){
-    groups <- getclasslevels(sampleda=data, classgroup=classgroup)
-    comparelist <- getcompareclass(classlevels=groups)
+    groups <- get_classlevels(sampleda=data, classgroup=classgroup)
+    comparelist <- get_compareclass(classlevels=groups)
     comparelist <- split(comparelist, slice.index(comparelist, 1))
     names(comparelist) <- NULL
     return(comparelist)
