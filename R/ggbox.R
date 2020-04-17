@@ -289,7 +289,7 @@ plotdiffbox <- function(obj, sampleda, factorNames, dodge_width=0.6, box_width=0
 #' @keywords internal
 get_comparelist <- function(data, classgroup, controlgroup){
     groups <- get_classlevels(sampleda=data, classgroup=classgroup)
-    if (is.null(controlgroup)){
+    if (!is.null(controlgroup)){
         groups <- setdiff(groups, controlgroup)
         tmplen <- length(groups)
         comparelist <- matrix(data=c(rep(controlgroup, tmplen), groups), nrow=tmplen)
