@@ -63,7 +63,7 @@ mappingtaxda <- function(data, topn=30, count=FALSE, sampleda=NULL,
     dat <- data[, tmpfeature,drop=FALSE] %>% t() %>% data.frame(check.names=FALSE)
     if(!count){dat <- apply(dat, 2, function(x){100*x/sum(x)}) %>% data.frame(check.names=FALSE)}
     dat$sums <- apply(dat, 1, sum)
-    dat <- dat[order(dat$sum, decreasing = TRUE),,drop=FALSE]
+    dat <- dat[order(dat$sums, decreasing = TRUE),,drop=FALSE]
     dat$sums <- NULL
     tmpsums <- matrix(colSums(dat),nrow=1) %>% data.frame()
     if (topn < nrow(dat)){
