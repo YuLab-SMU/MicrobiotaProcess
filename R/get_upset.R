@@ -8,6 +8,7 @@
 #' @param ..., additional parameters.
 #' @return a data.frame for the input of `upset` of `UpSetR`.
 #' @author Shuangbin Xu
+#' @rdname get_upset
 #' @export
 #' @examples
 #' data(test_otu_data)

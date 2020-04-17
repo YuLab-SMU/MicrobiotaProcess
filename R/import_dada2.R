@@ -9,7 +9,7 @@
 #' @param reftree phylo or character, the phylo class of tree, or the tree file.
 #' @param sampleda data.frame or character, the data.frame of sample information,
 #' or the file of sample information, nrow samples X ncol factors.
-#' @param build_tree logical, whether building the tree, default is FALSE. 
+#' @param btree logical, whether building the tree, default is FALSE. 
 #' @param ..., additional parameters, see also \code{\link{build_tree}}.
 #' @importFrom phyloseq phyloseq otu_table sample_data tax_table phy_tree import_qiime_sample_data
 #' @importFrom Biostrings DNAStringSet
@@ -30,7 +30,7 @@
 #'                    sampleda=sampleda)
 #' ps
 import_dada2 <- function(seqtab, taxatab=NULL, reftree=NULL, 
-                         sampleda=NULL, build_tree=FALSE, ...){
+                         sampleda=NULL, btree=FALSE, ...){
     refseq <- colnames(seqtab)
     refseqnm <- paste0("OTU_",seq_len(length(refseq)))
     colnames(seqtab) <- refseqnm
@@ -44,7 +44,7 @@ import_dada2 <- function(seqtab, taxatab=NULL, reftree=NULL,
     }
     refseq <- DNAStringSet(refseq)
     if (is.null(reftree)){
-        if (build_tree){
+        if (btree){
             reftree <- build_tree(refseq, ...)
         }
     }

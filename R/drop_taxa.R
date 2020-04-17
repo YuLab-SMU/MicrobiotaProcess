@@ -13,6 +13,7 @@
 #' threshold will be dropped, default is 0.
 #' @param ..., additional parameters.
 #' @return dataframe of new features.
+#' @rdname drop_taxa
 #' @export
 #' @author Shuangbin Xu
 #' @examples

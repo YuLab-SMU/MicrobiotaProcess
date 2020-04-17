@@ -9,7 +9,7 @@ import_dada2(
   taxatab = NULL,
   reftree = NULL,
   sampleda = NULL,
-  build_tree = FALSE,
+  btree = FALSE,
   ...
 )
 }
@@ -24,7 +24,7 @@ or the ouput of \code{\link[dada2]{addSpecies}}.}
 \item{sampleda}{data.frame or character, the data.frame of sample information,
 or the file of sample information, nrow samples X ncol factors.}
 
-\item{build_tree}{logical, whether building the tree, default is FALSE.}
+\item{btree}{logical, whether building the tree, default is FALSE.}
 
 \item{..., }{additional parameters, see also \code{\link{build_tree}}.}
 }

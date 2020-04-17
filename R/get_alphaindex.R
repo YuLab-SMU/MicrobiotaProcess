@@ -10,6 +10,7 @@
 #' @param ... additional arguments.
 #' @return data.frame contained alpha Index.
 #' @author Shuangbin Xu
+#' @rdname get_alphaindex
 #' @export
 #' @examples
 #' library(tidyverse)

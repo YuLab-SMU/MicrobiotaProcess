@@ -65,6 +65,7 @@ ggbartax.phyloseq <- function(obj, ...){
 #' @return phyloseq class contained tax data.frame and sample information.
 #' @author Shuangbin Xu
 #' @export
+#' @rdname get_taxadf
 #' @examples
 #' library(ggplot2)
 #' data(test_otu_data)
@@ -76,8 +77,8 @@ ggbartax.phyloseq <- function(obj, ...){
 setGeneric("get_taxadf", function(obj, ...)standardGeneric("get_taxadf"))
 
 #' @aliases get_taxadf,phyloseq
-#' @importFrom phyloseq otu_table tax_table taxa_are_rows rank_names
 #' @rdname get_taxadf
+#' @importFrom phyloseq otu_table tax_table taxa_are_rows rank_names
 #' @export
 setMethod("get_taxadf", "phyloseq", function(obj, taxlevel=2, ...){
     if (is.null(obj@tax_table)){
@@ -105,8 +106,8 @@ setMethod("get_taxadf", "phyloseq", function(obj, taxlevel=2, ...){
 })
 
 #' @aliases get_taxadf,data.frame
-#' @importFrom phyloseq phyloseq otu_table tax_table
 #' @rdname get_taxadf
+#' @importFrom phyloseq phyloseq otu_table tax_table
 #' @export 
 setMethod("get_taxadf", "data.frame", 
           function(obj, taxda, 
