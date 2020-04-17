@@ -21,6 +21,9 @@
 #' @param boxwidth numeric, the width of boxplot when the geom is 'violin',
 #' default is 0.2.
 #' @param facetnrow integer, the nrow of facet, default is 1.
+#' @param controlgroup character, the names of control group, if it was set, the other groups 
+#' will compare to it, default is NULL.
+#' @param comparelist list, the list of vector, default is NULL.
 #' @param ... additional arguments, see also \code{\link[ggsignif]{stat_signif}}.
 #' @return a 'ggplot' plot object, a box or violine plot.
 #' @author Shuangbin Xu
@@ -49,6 +52,14 @@
 #' class(alphaobj2)
 #' head(as.data.frame(alphaobj2))
 #' p2 <- ggbox(alphaobj2, factorNames="group")
+#' # set factor levels.
+#' #p3 <- ggbox(obj=alphaobj2, factorNames="group", 
+#' #            factorLevels=list(group=c("M", "N", "B", "D")))
+#' # set control group.
+#' #p4 <- ggbox(obj=alphaobj2, factorNames="group", controlgroup="B")
+#' # set comparelist
+#' #p5 <- ggbox(obj=alphaobj2, factorNames="group", 
+#' #            comparelist=list(c("B", "D"), c("B", "M"), c("B", "N")))
 setGeneric("ggbox", function(obj, factorNames, ...){standardGeneric("ggbox")})
 
 #' @aliases ggbox,data.frame
@@ -62,7 +73,7 @@ setMethod("ggbox", "data.frame",
           function(obj, sampleda, factorNames, indexNames, geom="boxplot",
                    factorLevels=NULL, compare=TRUE, testmethod="wilcox.test",
                    signifmap=FALSE, p_textsize=2, step_increase=0.1, boxwidth=0.2,
-                   facetnrow=1,...){
+                   facetnrow=1, controlgroup=NULL, comparelist=NULL, ...){
     if (missing(sampleda) || is.null(sampleda)){
         stop("the sampleda should be provided!")
     }
@@ -81,8 +92,10 @@ setMethod("ggbox", "data.frame",
         indexNames <- unique(as.vector(obj$feature))
     }
     obj <- obj %>% filter(.data$feature %in% indexNames)
-    comparelist <- get_comparelist(data=obj, classgroup=factorNames)
-    mapping <- aes_string(x=factorNames,y="value",fill=factorNames)
+    if (is.null(comparelist)){
+        comparelist <- get_comparelist(data=obj, classgroup=factorNames, controlgroup=controlgroup)
+    }
+    mapping <- aes_string(x=factorNames, y="value", fill=factorNames)
     p <- ggplot(data=obj,mapping)
     ifelse(geom=="boxplot",p <- p + geom_boxplot(outlier.size=0.5,outlier.shape=21),
            p <- p + geom_violin(trim=FALSE)+
@@ -156,6 +169,9 @@ setMethod("ggbox", "alphasample", function(obj,factorNames,...){
 #'                          secondalpha=0.01, ldascore=3)
 #' library(ggplot2)
 #' p <- ggdiffbox(diffres, box_notch=FALSE, l_xlabtext="relative abundance")
+#' # set factor levels
+#' #p2 <- ggdiffbox(diffres, box_notch=FALSE, l_xlabtext="relative abundance", 
+#' #                factorLevels=list(DIAGNOSIS=c("Tumor", "Healthy")))
 setGeneric("ggdiffbox", function(obj, ...){standardGeneric("ggdiffbox")})
 
 #' @aliases ggdiffbox,diffAnalysisClass
@@ -271,9 +287,15 @@ plotdiffbox <- function(obj, sampleda, factorNames, dodge_width=0.6, box_width=0
 }
 
 #' @keywords internal
-get_comparelist <- function(data, classgroup){
+get_comparelist <- function(data, classgroup, controlgroup){
     groups <- get_classlevels(sampleda=data, classgroup=classgroup)
-    comparelist <- get_compareclass(classlevels=groups)
+    if (is.null(controlgroup)){
+        groups <- setdiff(groups, controlgroup)
+        tmplen <- length(groups)
+        comparelist <- matrix(data=c(rep(controlgroup, tmplen), groups), nrow=tmplen)
+    }else{
+        comparelist <- get_compareclass(classlevels=groups)
+    }
     comparelist <- split(comparelist, slice.index(comparelist, 1))
     names(comparelist) <- NULL
     return(comparelist)
