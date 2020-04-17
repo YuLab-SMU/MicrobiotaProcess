@@ -24,6 +24,8 @@ ggbox(obj, factorNames, ...)
   step_increase = 0.1,
   boxwidth = 0.2,
   facetnrow = 1,
+  controlgroup = NULL,
+  comparelist = NULL,
   ...
 )
 
@@ -66,6 +68,11 @@ default is 0.1.}
 default is 0.2.}
 
 \item{facetnrow}{integer, the nrow of facet, default is 1.}
+
+\item{controlgroup}{character, the names of control group, if it was set, the other groups 
+will compare to it, default is NULL.}
+
+\item{comparelist}{list, the list of vector, default is NULL.}
 }
 \value{
 a 'ggplot' plot object, a box or violine plot.
@@ -97,6 +104,14 @@ alphaobj2 <- get_alphaindex(test_otu_data)
 class(alphaobj2)
 head(as.data.frame(alphaobj2))
 p2 <- ggbox(alphaobj2, factorNames="group")
+# set factor levels.
+#p3 <- ggbox(obj=alphaobj2, factorNames="group", 
+#            factorLevels=list(group=c("M", "N", "B", "D")))
+# set control group.
+#p4 <- ggbox(obj=alphaobj2, factorNames="group", controlgroup="B")
+# set comparelist
+#p5 <- ggbox(obj=alphaobj2, factorNames="group", 
+#            comparelist=list(c("B", "D"), c("B", "M"), c("B", "N")))
 }
 \author{
 Shuangbin Xu

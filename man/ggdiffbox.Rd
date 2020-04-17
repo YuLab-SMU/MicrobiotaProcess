@@ -78,6 +78,9 @@ diffres <- diff_analysis(kostic2012crc, classgroup="DIAGNOSIS",
                          secondalpha=0.01, ldascore=3)
 library(ggplot2)
 p <- ggdiffbox(diffres, box_notch=FALSE, l_xlabtext="relative abundance")
+# set factor levels
+#p2 <- ggdiffbox(diffres, box_notch=FALSE, l_xlabtext="relative abundance", 
+#                factorLevels=list(DIAGNOSIS=c("Tumor", "Healthy")))
 }
 \author{
 Shuangbin Xu
