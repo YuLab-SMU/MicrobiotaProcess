@@ -4,3 +4,10 @@
 README.Rmd
 README.md
 CONDUCT.md
+Makefile
+.gitignore
+.svnignore
+.travis.yml
+appveyor.yml
+mkdocs
+docs
