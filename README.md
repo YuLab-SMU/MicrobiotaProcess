@@ -1,6 +1,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# MicrobiotaProcess: an package for analysis, visualization and biomarker discovery of microbiome
+# MicrobiotaProcess: an R package for analysis, visualization and biomarker discovery of microbiome
 
 MicrobiotaProcess is an R package for analysis, visualization and
 biomarker discovery of microbial datasets. It supports calculating alpha

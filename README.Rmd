@@ -7,7 +7,7 @@ html_preview: false
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# MicrobiotaProcess: an package for analysis, visualization and biomarker discovery of microbiome
+# MicrobiotaProcess: an R package for analysis, visualization and biomarker discovery of microbiome
 
 ```{r, echo=FALSE, results="hide", message=FALSE}
 Biocpkg <- function (pkg) {
