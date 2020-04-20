@@ -1,9 +1,9 @@
 Package: MicrobiotaProcess
 Type: Package
-Title: an package for analysis, visualization and biomarker discovery of microbiome 
+Title: an R package for analysis, visualization and biomarker discovery of microbiome 
 Version: 0.99.9
 Authors@R: c(person("Shuangbin", "Xu", email = "xshuangbin@163.com", role = c("aut", "cre"), comment=c(ORCID="0000-0003-3513-5362")),
-             person("Guangchuang", "Yu", email = "guangchuangyu@gmail.com", role = c("aut", "ctb")))
+             person("Guangchuang", "Yu", email = "guangchuangyu@gmail.com", role = c("aut", "ctb"), comment = c(ORCID = "0000-0002-6485-8781")))
 Description: MicrobiotaProcess is an R package for analysis, visualization and 
     biomarker discovery of microbial datasets. It supports calculating alpha 
     index and provides functions to visualize rarefaction curves. Moreover, 
@@ -55,7 +55,7 @@ Suggests:
   testthat,
   knitr,
   nlme
-License: GPL (>= 2.0)
+License: GPL (>= 3.0)
 URL: https://github.com/YuLab-SMU/MicrobiotaProcess/
 BugReports: https://github.com/YuLab-SMU/MicrobiotaProcess/issues
 VignetteBuilder: knitr
