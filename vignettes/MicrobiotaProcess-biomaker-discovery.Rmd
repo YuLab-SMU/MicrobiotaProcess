@@ -49,7 +49,7 @@ Biomarker discovery has proven to be capacity to convert genomic data into clini
 
 ## 1.1 colorectal cancer dataset.
 
-```{r, error=TRUE, KosticCRCdata}
+```{r, error=FALSE, KosticCRCdata}
 data(kostic2012crc)
 kostic2012crc
 #datatable(sample_data(kostic2012crc), options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
@@ -59,7 +59,7 @@ table(sample_data(kostic2012crc)$DIAGNOSIS)
 
 This datasets contained 86 Colorectal Carcinoma samples and 91 Control samples(remove the none sample information and low depth sample).In the research, they found the *Fusobacterium* sequences were enriched in carcinomas, confirmed by quantitative PCR and 16S rDNA, while the *Firmicutes* and *Bacteroidetes* phyla were depleted in tumors[@kostic2012genomic].
 
-```{r, error=TRUE, KosticCRCdiff_analysis}
+```{r, error=FALSE, KosticCRCdiff_analysis}
 set.seed(1024)
 diffres <- diff_analysis(obj=kostic2012crc, classgroup="DIAGNOSIS",
                          mlfun="lda",
@@ -77,21 +77,21 @@ diffres
 
 The results of `diff_analysis` is a `S4` class, contained the original feature datasets, results of first test, results of second test, results of `LDA` or `rf` assessed and the record of some arguments. It can be visualized by `ggeffectsize`. The horizontal ordinate represents the effect size (`LDA` or `MeanDecreaseAccuracy`), the vertical ordinate represents the feature of significantly discriminative. And the colors represent the classgroup that the relevant feature is positive.
 
-```{r, fig.align="center", fig.height=5, fig.width=6, error=TRUE, KosticCRCplotEffectSize}
+```{r, fig.align="center", fig.height=5, fig.width=6, error=FALSE, KosticCRCplotEffectSize}
 plotes <- ggeffectsize(obj=diffres) + scale_color_manual(values=c("#00AED7", "#FD9347"))
 plotes
 ```
 
 The results also can be visualized using `ggdiffbox`.
 
-```{r, fig.align="center", fig.height=5, fig.width=7, error=TRUE, KosticCRCLDAtax}
+```{r, fig.align="center", fig.height=5, fig.width=7, error=FALSE, KosticCRCLDAtax}
 plotes_ab <- ggdiffbox(obj=diffres, box_notch=FALSE, colorlist=c("#00AED7", "#FD9347"), l_xlabtext="relative abundance")
 plotes_ab
 ```
 
 If the `taxda` was provided, it also can be visualized by `ggdiffclade`. The colors represent the relevant features enriched in the relevant classgroup. The size of point colored represent the `-log10(pvalue)`.
 
-```{r, fig.width=7, fig.height=7, fig.align="center", error=TRUE, KosticCRCdiffclade}
+```{r, fig.width=7, fig.height=7, fig.align="center", error=FALSE, KosticCRCdiffclade}
 diffcladeplot <- ggdiffclade(obj=diffres,
                              alpha=0.3, size=0.2, 
                              skpointsize=0.6,
@@ -121,7 +121,7 @@ ggdifftaxbar(obj=diffres, xtextsize=1.5, output="./kostic2012crc_biomarkder_barp
 
 And we also provided `as.data.frame` to produce the table of results of `diff_analysis`.
 
-```{r, KosticCRCdiffTab, error=TRUE}
+```{r, KosticCRCdiffTab, error=FALSE}
 crcdiffTab <- as.data.frame(diffres)
 #datatable(crcdiffTab, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
 ```
@@ -143,7 +143,7 @@ dim(taxda)
 
 This dataset is from a small subset of the `HMP` 16S dataset[@Nicola2011LEfSe], contained 55 samples from 6 body sites. The dataset isn't `phyloseq` class, because `diff_analysis` also supported the matrix datasets as input. The `featureda` contained the relative abundance of different levels features. The `sampleda` contained the information of the samples. And the `taxda` contained the information of the hierarchical relationship of taxonomy. We set the `oxygen_availability` in `sampleda` as `classgroup`, and `body_site` also in `sampleda` as `subclass`.
 
-```{r, hmpdiff_analysis, error=TRUE}
+```{r, hmpdiff_analysis, error=FALSE}
 set.seed(1024)
 hmpdiffres <- diff_analysis(obj=featureda, 
                             sampleda=sampleda, 
@@ -161,7 +161,7 @@ hmpdiffres <- diff_analysis(obj=featureda,
 hmpdiffres
 ```
 
-```{r, fig.align="center", fig.height=7, fig.width=5.5, error=TRUE, hmpplotEffectSize}
+```{r, fig.align="center", fig.height=7, fig.width=5.5, error=FALSE, hmpplotEffectSize}
 hmpeffetsieze <- ggeffectsize(obj=hmpdiffres, 
                               setColors=FALSE,
                               settheme=FALSE) + 
@@ -173,7 +173,7 @@ hmpeffetsieze <- ggeffectsize(obj=hmpdiffres,
 hmpeffetsieze
 ```
 
-```{r, fig.align="center", fig.height=7, fig.width=7, error=TRUE, hmpplotEffectSizeTax}
+```{r, fig.align="center", fig.height=7, fig.width=7, error=FALSE, hmpplotEffectSizeTax}
 hmpes_ab <- ggdiffbox(obj=hmpdiffres, colorlist=c("#00AED7", "#FD9347", '#C1E168'), 
                       box_notch=FALSE, l_xlabtext="relative abundance(%)")
 hmpes_ab
@@ -181,7 +181,7 @@ hmpes_ab
 
 The explanation of figures refer to the previous section.
 
-```{r, fig.width=7, fig.height=7, fig.align="center", error=TRUE, hmpdiffclade}
+```{r, fig.width=7, fig.height=7, fig.align="center", error=FALSE, hmpdiffclade}
 hmpdiffclade <- ggdiffclade(obj=hmpdiffres, alpha=0.3, size=0.2, 
                             skpointsize=0.4, taxlevel=3,
                             settheme=TRUE,
@@ -198,7 +198,7 @@ ggdifftaxbar(obj=hmpdiffres, output="./hmp_biomarker_barplot")
 
 Finally, we found the *Staphylococcus*, *Propionibacterium* and some species of *Actinobacteria* was enriched in `High_O2`, these species mainly live in high oxygen environment. Some species of *Bacteroides*, species of *Clostridia* and species of *Erysipelotrichi* was enriched in `Low_O2`, these species mainly inhabit in the gut of human. These results were consistent with the reality.
 
-```{r, hmpdiffTab, error=TRUE}
+```{r, hmpdiffTab, error=FALSE}
 hmpdiffTab <- as.data.frame(hmpdiffres)
 #datatable(hmpdiffTab, options=list(scrollX=TRUE, scrollY="400px", scrollCollapse=TRUE))
 ```

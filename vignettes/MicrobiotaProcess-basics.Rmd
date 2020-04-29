@@ -54,7 +54,7 @@ library(MicrobiotaProcess)
 
 `MicrobiotaProcess` has an feature to import phylogenetic sequencing data from `r Biocpkg("dada2")`[@callahan2016dada2] and [qiime2](https://qiime2.org/)[@bolyen2019qiime2] taxonomic clustering pipelines. The resulting object after import is `r Biocpkg("phyloseq")` object[@Paul2013phyloseq]
 
-```{r, error=TRUE, importFunction}
+```{r, error=FALSE, importFunction}
 # import data from dada2 pipeline.
 seqtabfile <- system.file("extdata", "seqtab.nochim.rds", package="MicrobiotaProcess")
 seqtab <- readRDS(seqtabfile)
@@ -78,7 +78,7 @@ ps_qiime2
 
 Rarefaction, based on sampling technique, was used to compensate for the effect of sample size on the number of units observed in a sample[@siegel2004rarefaction]. `MicrobiotaProcess` provided `ggrarecurve` to plot the curves, based on `rrarefy` of `r CRANpkg("vegan")`[@Jari2019vegan].
 
-```{r, error=TRUE, fig.align="center", fig.height=3.2, fig.width=7.5, rarefaction}
+```{r, error=FALSE, fig.align="center", fig.height=3.2, fig.width=7.5, rarefaction}
 # for reproducibly random number 
 set.seed(1024)
 p_rare <- ggrarecurve(obj=ps_dada2, 
@@ -94,7 +94,7 @@ p_rare
 
 `MicrobiotaProcess` provides `get_alphaindex` to calculate alpha index and the `ggbox` to visualize the result
 
-```{r, error=TRUE, fig.width=7.5, fig.height=3.2, fig.align="center", alphaindex}
+```{r, error=FALSE, fig.width=7.5, fig.height=3.2, fig.align="center", alphaindex}
 alphaobj <- get_alphaindex(ps_dada2)
 head(as.data.frame(alphaobj))
 p_alpha <- ggbox(alphaobj, geom="violin", factorNames="time") + 
@@ -107,7 +107,7 @@ p_alpha
 
 `MicrobiotaProcess` presents the `ggbartax` for the visualization of composition of microbial communities.
 
-```{r, error=TRUE, fig.align="center", fig.height=4.5, fig.width=7, taxabar}
+```{r, error=FALSE, fig.align="center", fig.height=4.5, fig.width=7, taxabar}
 # relative abundance
 otubar <- ggbartax(obj=ps_dada2) +
 	  xlab(NULL) +
@@ -117,7 +117,7 @@ otubar
 
 If you want to get the abundance of specific levels of class, You can use `get_taxadf` then use `ggbartax` to visualize.
 
-```{r, error=TRUE, fig.align="center", fig.height=4.5, fig.width=7, phylumAbundance}
+```{r, error=FALSE, fig.align="center", fig.height=4.5, fig.width=7, phylumAbundance}
 phytax <- get_taxadf(obj=ps_dada2, taxlevel=2)
 phybar <- ggbartax(obj=phytax) +
           xlab(NULL) + ylab("relative abundance (%)")
@@ -126,7 +126,7 @@ phybar
 
  Moreover, the abundance (count) of taxonomy also can be visualized by setting count to TRUE, and the facet of plot can be showed by setting the facetNames.
 
-```{r, error=TRUE, fig.align="center", fig.height=4.5, fig.width=7, classAbundance}
+```{r, error=FALSE, fig.align="center", fig.height=4.5, fig.width=7, classAbundance}
 phybar2 <- ggbartax(obj=phytax, facetNames="time", count=TRUE) + xlab(NULL) + ylab("abundance")
 phybar2
 classtax <- get_taxadf(obj=ps_dada2, taxlevel=3)
@@ -139,7 +139,7 @@ classbar
 
 `PCA` (Principal component analysis) and `PCoA` (Principal Coordinate Analysis) are general statistical procedures to compare groups of samples. And `PCoA` can based on the phylogenetic or count-based distance metrics, such as `Bray-Curtis`, `Jaccard`, `Unweighted-UniFrac` and `weighted-UniFrac`. `MicrobiotaProcess` presents the `get_pca`, `get_pcoa` and `ggordpoint` for the analysis.
 
-```{r, error=TRUE, fig.align="center", fig.height=4.5, fig.width=6, ordanalysis}
+```{r, error=FALSE, fig.align="center", fig.height=4.5, fig.width=6, ordanalysis}
 pcares <- get_pca(obj=ps_dada2, method="hellinger")
 # Visulizing the result
 pcaplot <- ggordpoint(obj=pcares, biplot=TRUE, speciesannot=TRUE,
@@ -159,7 +159,7 @@ pcoaplot
 
 `beta diversity` metrics can assess the differences between microbial communities. It can be visualized with `PCA` or `PCoA`, this can also be visualized with hierarchical clustering. `MicrobiotaProcess` also  implements the analysis based on ggtree[@yu2017ggtree].
 
-```{r, fig.align="center", fig.height=5, fig.width=6, error=TRUE, hclustAnalysis}
+```{r, fig.align="center", fig.height=5, fig.width=6, error=FALSE, hclustAnalysis}
 hcsample <- get_clust(obj=ps_dada2, distmethod="euclidean",
 		      method="hellinger", hclustmethod="average")
 # rectangular layout
