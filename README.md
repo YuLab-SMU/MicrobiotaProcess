@@ -19,6 +19,17 @@ School of Basic Medical Sciences, Southern Medical University
 
 ## :arrow\_double\_down: Installation
 
+Get the released version from
+[Bioconductor](https://bioconductor.org/packages/release/bioc/html/MicrobiotaProcess.html):
+
+``` r
+## try http:// if https:// URLs are not supported ## the url of mirror
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+## BiocManager::install("BiocUpgrade") ## you may need this
+BiocManager::install("MicrobiotaProcess")
+```
+
 the development version from github:
 
 ``` r

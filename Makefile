@@ -50,6 +50,9 @@ clean:
 	cd ..;\
 	$(RM) -r $(PKGNAME).Rcheck/
 
+clean2:
+	cd ..;\
+	$(RM) $(PKGNAME)_$(PKGVERS).tar.gz
 
 gitmaintain:
 	git gc --auto;\
@@ -60,7 +63,7 @@ rmoldrelease:
 	git branch -D RELEASE_3_9
 
 release:
-	git checkout RELEASE_3_10;\
+	git checkout RELEASE_3_11;\
 	git fetch --all
 
 update:
