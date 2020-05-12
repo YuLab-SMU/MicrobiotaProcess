@@ -12,7 +12,8 @@
 #' default is TRUE.
 #' @param standard_method character, the method of standardization, 
 #' see also \code{\link[vegan]{decostand}}, default is NULL, 
-#' it represents that the relative abundance of taxonomy will be used.
+#' it represents that the relative abundance of taxonomy will be used. If count was set,
+#' it represents the count reads of taxonomy will be used.
 #' @param mlfun character, the method for calculating the effect size of features, 
 #' choose "lda" or "rf", default is "lda".
 #' @param ratio numeric, range from 0 to 1, the proportion of samples for calculating the effect 
@@ -212,9 +213,9 @@ get_alltaxdf <- function(data, taxda, method=NULL, ...){
     dt <- list()
     for (i in seq_len(ncol(taxda))){
         if (is.null(method)){
-            dat <- get_count(data, taxda[,i,drop=FALSE])
-        }else{
             dat <- get_ratio(data, taxda[,i,drop=FALSE])
+        }else{
+            dat <- get_count(data, taxda[,i,drop=FALSE])
             if(method=="count"){
                 dat <- dat
             }else{

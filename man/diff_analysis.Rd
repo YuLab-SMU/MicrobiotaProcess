@@ -61,7 +61,8 @@ default is TRUE.}
 
 \item{standard_method}{character, the method of standardization, 
 see also \code{\link[vegan]{decostand}}, default is NULL, 
-it represents that the relative abundance of taxonomy will be used.}
+it represents that the relative abundance of taxonomy will be used. If count was set,
+it represents the count reads of taxonomy will be used.}
 
 \item{mlfun}{character, the method for calculating the effect size of features, 
 choose "lda" or "rf", default is "lda".}
