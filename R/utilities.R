@@ -104,6 +104,7 @@ addtaxlevel <- function(taxdf){
 #' @importFrom tibble column_to_rownames
 #' @keywords internal
 fillNAtax <- function(taxdf){
+    if (any(is.na(taxdf[,1]))){taxdf[is.na(taxdf[,1]),1] <- "Unknown"}
     if (!grepl("^k__", taxdf[1,1])){
     	tmprownames <- rownames(taxdf)
     	tmpcolnames <- colnames(taxdf)
