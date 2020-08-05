@@ -71,8 +71,8 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", s
     cladecoord <- get_cladedf(p, nodedf$node)
     cladecoord <- merge(cladecoord, nodedf, by.x="node", by.y="node")
     if (layout %in% c("rectangular","slanted")){
-        taxlevel <- 7
-        labelannotcoord <- get_labeldf(p, nodedf$node, angle="others")
+        #taxlevel <- 7
+        labelannotcoord <- get_labeldf(p, nodedf$node, angle=90)
     }else{
         labelannotcoord <- get_labeldf(p, nodedf$node)
     }
@@ -270,7 +270,7 @@ ggdifftaxbar.featureMeanMedian <- function(obj, featurename, classgroup, subclas
 #' @param datameta data.frame, nrow sample * ncol feature + factor.
 #' @param feature character vector, the feature contained in datameta.
 #' @param subclass character, factor name.
-#' @importFrom dplyr rename group_by_ mutate
+#' @importFrom dplyr rename group_by mutate
 #' @importFrom magrittr %>%
 #' @importFrom stats median
 #' @return featureMeanMedian object, contained the abundance of feature, and the 
@@ -296,9 +296,9 @@ get_mean_median <- function(datameta, feature, subclass){
     		select(c("sample", feature, factornames)) %>%
     		rename(RelativeAbundance=feature) %>% 
     		mutate(sample = factor(sample, levels=sample[order(eval(parse(text=subclass)), -RelativeAbundance)]))
-    meantmp <- featuredatmp %>% group_by_(subclass) %>% 
+    meantmp <- featuredatmp %>% group_by(eval(parse(text=subclass))) %>% 
     		mutate(value = mean(RelativeAbundance)) %>% mutate(statistic="mean")
-    mediantmp <- featuredatmp %>% group_by_(subclass) %>% 
+    mediantmp <- featuredatmp %>% group_by(eval(parse(text=subclass))) %>% 
     		mutate(value = median(RelativeAbundance)) %>% mutate(statistic="median")
     festatic <- rbind(meantmp, mediantmp) %>% data.frame(check.names=FALSE)
     res <- structure(list(singlefedf=featuredatmp, singlefestat=festatic), 
@@ -439,7 +439,8 @@ ggeffectsize.diffAnalysisClass <- function(obj, removeUnkown=TRUE, setFacet=TRUE
 }
 
 
-#' @importFrom dplyr rename_
+#' @importFrom dplyr rename
+#' @importFrom rlang .data
 #' @keywords internal
 get_node <- function(treedata, nodedf){
     if (is.null(treedata@data)){stop("The data slot of treedata should't be NULL.")}
@@ -447,7 +448,7 @@ get_node <- function(treedata, nodedf){
     if (!"node" %in% colnames(nodedf)){
     	nodedf$node <- nodelist
     }else{
-    	nodedf %>% rename_(nodetmp=~node)
+    	nodedf %>% rename(nodetmp=.data$node)
     	nodedf$node <- nodelist
     }
     return(nodedf)
