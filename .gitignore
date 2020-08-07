@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 .DS_Store
+vignettes/*.html
+vignettes/*.R
