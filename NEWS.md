@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.1.4
+
++ add `tax_table` information to result of `get_taxadf`. (2020-08-07, Fri)
+
 # MicrobiotaProcess 1.1.3
 
 + change according to dplyr (v=1.0.0) (2020-08-05, Wed)
