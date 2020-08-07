@@ -122,12 +122,15 @@ setMethod("get_taxadf", "data.frame",
     }
     taxda <- fillNAtax(taxda)
     if (inherits(taxlevel, "numeric")){taxlevel <- colnames(taxda)[taxlevel]}
-    tmptax <- taxda[,match(taxlevel, colnames(taxda)), drop=FALSE]
+    tmptax <- taxda[, match(taxlevel, colnames(taxda)), drop=FALSE]
+    tmptaxda <- taxda[, seq(from=1, to=match(taxlevel, colnames(taxda))), drop=FALSE]
+    tmptaxda <- tmptaxda[!duplicated(tmptaxda),,drop=FALSE]
+    rownames(tmptaxda) <- as.vector(tmptaxda[, match(taxlevel, colnames(tmptaxda))])
     taxdf <- otu_table(get_count(data=obj, 
                                  featurelist=tmptax), 
                        taxa_are_rows=TRUE)
-    taxdf <- phyloseq(taxdf, sampleda)
-    return(taxdf)  
+    taxdf <- phyloseq(taxdf, sampleda, tax_table(as.matrix(tmptaxda)))
+    return(taxdf)
 })
 
 #' @title Rarefaction alpha index
