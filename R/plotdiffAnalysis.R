@@ -146,8 +146,11 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
 #' @param subclass character, factor name. 
 #' @param factorLevels list,  the levels of the factors, default is NULL,
 #' if you want to order the levels of factor, you can set this. 
+#' @param format character, the format of figure, default is svg,
+#' png, tiff also be supported.
 #' @param coloslist vector, color vector, if the input is phyloseq, 
 #' you should use this to adjust the color, not scale_color_manual.
+#' @param dpi numeric, the dpi of output, default is 300.
 #' @param ... additional arguments.
 #' @return the figures of features show the distributions in samples.
 #' @author Shuangbin Xu
@@ -187,44 +190,50 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
     figwidth=6,
     figheight=3,
     ylabel="relative abundance",
+    format="svg",
+    dpi=300,
     ...){
     featureda <- obj@originalD
     classname <- get_call(obj, "classgroup")
     normalization <- get_call(obj, "normalization")
     if (!is.null(normalization)){
-    	featureda <- featureda / normalization
+        featureda <- featureda / normalization
     }
     sampleda <- obj@sampleda
     featureda <- merge(featureda, sampleda, by=0) %>%
-    		column_to_rownames(var="Row.names")
+        column_to_rownames(var="Row.names")
     nodedfres <- as.data.frame(obj)
     featurelist <- as.vector(nodedfres$f)
     if (removeUnkown && length(grep("__un_", featurelist))>0){
-    		featurelist <- featurelist[-grep("__un_", featurelist)]
+        featurelist <- featurelist[-grep("__un_", featurelist)]
     }
     if (ncol(sampleda)>1){
-    	subclass <- colnames(sampleda)[-match(classname, colnames(sampleda))]
+        subclass <- colnames(sampleda)[-match(classname, colnames(sampleda))]
     }else{
-    	subclass <- classname
+        subclass <- classname
     }
     if(is.null(filepath)){filepath <- getwd()}
     filepath <- file.path(filepath, output)
     dir.create(filepath, showWarnings = FALSE)
     for (vars in featurelist){
-    	resdf <- get_mean_median(datameta=featureda, 
-    			       feature=vars, 
-    			       subclass=subclass)
-    	p <- ggdifftaxbar.featureMeanMedian(resdf,
-    				            vars,
-    					    classname,
-    					    subclass,
-                                            ylabel=ylabel,
-                                            ...)
-	if (grepl("/", vars)){
+        resdf <- get_mean_median(
+                      datameta=featureda, 
+                      feature=vars, 
+                      subclass=subclass
+                      )
+        p <- ggdifftaxbar.featureMeanMedian(
+                  obj=resdf,
+                  featurename=vars,
+                  classgroup=classname,
+                  subclass=subclass,
+                  ylabel=ylabel,
+                  ...
+                  )
+        if (grepl("/", vars)){
             vars <- sub("/", "--", vars)
-	}
-        filename <- file.path(filepath, paste0(vars,".svg"))	
-        ggsave(filename, p, device="svg", width = figwidth, height=figheight)
+        }
+        filename <- file.path(filepath, paste(vars, format, sep="."))
+        ggsave(filename, p, device=format, width = figwidth, height=figheight, dpi=dpi, limitsize = FALSE)
     }
 })
 
