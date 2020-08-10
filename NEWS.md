@@ -1,3 +1,8 @@
+# MicrobiotaProcess 1.1.5
+
++ `ggdifftaxbar` supports `png`, `tiff` format. (2020-08-10, Mon)
++ add stop information to state the class argument in `diff_analysis`. (2020-08-10, Mon)
+
 # MicrobiotaProcess 1.1.4
 
 + add `tax_table` information to result of `get_taxadf`. (2020-08-07, Fri)
