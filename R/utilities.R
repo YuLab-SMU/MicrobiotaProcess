@@ -167,7 +167,7 @@ match.call.defaults <- function(fun) {
 #' @keywords internal
 get_call <- function(obj, arg){
     if (!"call" %in% slotNames(obj)){
-	stop("The object don't have call slot!")
+        stop("The object don't have call slot!")
     }else{
         callres <- as.list(obj@call)
         argres <- callres[[match(arg,names(callres))]]
