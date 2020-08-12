@@ -29,6 +29,8 @@ ggbartax.default <- function(obj, mapping=NULL, position = "stack", stat="identi
     }else{
         tmpn <- nrow(obj)
     }
+    message("The color has been set automatically, you can reset it 
+            manually by adding scale_fill_manual(values=yourcolors)")
     p <- p + scale_fill_manual(values=get_cols(tmpn))
     if (!is.null(facetNames) & !plotgroup){
         tmpformula <- as.formula(paste0("~ ", facetNames))

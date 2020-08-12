@@ -115,10 +115,10 @@ setMethod("get_taxadf", "data.frame",
                    taxlevel,
                    sampleda=NULL, ...){
     if (!taxa_are_rows){
-    	obj <- data.frame(t(obj), check.names=FALSE)
+        obj <- data.frame(t(obj), check.names=FALSE)
     }
     if(!is.null(sampleda) && !inherits(sampleda, "sample_data")){
-    	sampleda <- sample_data(sampleda)
+        sampleda <- sample_data(sampleda)
     }
     taxda <- fillNAtax(taxda)
     if (inherits(taxlevel, "numeric")){taxlevel <- colnames(taxda)[taxlevel]}

@@ -28,6 +28,7 @@ ggrarecurve.default <- function(obj,
         #p <- p + geom_errorbar(alpha=0.5)
         p <- p + geom_ribbon(alpha=0.3, color=NA, show.legend=FALSE)
     }    
+    message("The color has been set automatically, you can reset it manually by adding scale_color_manual(values=yourcolors)")
     p <- p + geom_smooth(se=se, method = method, size=linesize,formula = formula,...)+
          scale_y_continuous(limits=c(0,NA), oob=squish) +
          facet_wrap(~ Alpha, scales="free", nrow=facetnrow) +
