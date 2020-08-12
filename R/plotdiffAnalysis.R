@@ -9,10 +9,11 @@
 #' @param nodedf data.frame, contained the tax and the factor 
 #' information and(or pvalue).
 #' @param factorName character, the names of factor in nodedf.
-#' @param removeUnkown logical, whether do not show unkown taxonomy, 
+#' @param removeUnknown logical, whether do not show unknown taxonomy, 
 #' default is TRUE.
-#' @param layout character, the layout of ggtree, but only "rectangular" 
-#' , "radial", "slanted" and "circular" in here, default is circular.
+#' @param layout character, the layout of ggtree, but only "rectangular",
+#' "radial", "slanted", "inward_circular" and "circular" in here, 
+#' default is circular.
 #' @param size numeric, the size of segment of ggtree, default is 0.6.
 #' @param skpointsize numeric, the point size of skeleton of tree, 
 #' default is 0.8 .
@@ -23,6 +24,11 @@
 #' if you want to order the levels of factor, you can set this.
 #' @param setColors logical, whether set the color of clade, default is TRUE, 
 #' or set FALSE,then use 'scale_fill_manual' setting.
+#' @param xlim numeric, the x limits, only works for 'inward_circular' layout,
+#' default is 12.
+#' @param reduce logical, whether remove the unassigned taxonomy, which will 
+#' remove the clade of unassigned taxonomy, but the result of `diff_analysis`
+#' should remove the unknown taxonomy, default is FALSE. 
 #' @param ..., additional parameters.
 #' @return figures of tax clade show the significant different feature.
 #' @author Shuangbin Xu
@@ -62,12 +68,17 @@ ggdiffclade <- function(obj,...){
 #' @export
 ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", size=0.6, 
     skpointsize=0.8, alpha=0.4, taxlevel=6, cladetext=2, factorLevels=NULL, setColors=TRUE,
+    xlim=12, reduce=FALSE,
     ...){
     treedata <- convert_to_treedata(obj)
-    layout %<>% match.arg(c("rectangular", "circular", "slanted", "radial"))
+    layout %<>% match.arg(c("rectangular", "circular", "slanted", "radial", "inward_circular"))
     if (!is.null(factorLevels)){nodedf <- setfactorlevels(nodedf, factorLevels)}
     nodedf <- get_node(treedata, nodedf)
-    p <- treeskeleton(treedata,	layout=layout,size=size,pointsize=skpointsize)
+    p <- treeskeleton(treedata,	layout=layout,size=size,pointsize=skpointsize,xlim=xlim)
+    if (reduce){
+        df <- p$data[!grepl("__un_",p$data$label),]
+        p <- treeskeleton(treedata=df, layout=layout,size=size,pointsize=skpointsize,xlim=xlim) 
+    }
     cladecoord <- get_cladedf(p, nodedf$node)
     cladecoord <- merge(cladecoord, nodedf, by.x="node", by.y="node")
     if (layout %in% c("rectangular","slanted")){
@@ -94,8 +105,9 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", s
     	geom_point(data=annotcoord, aes_(x=0,y=0, color=~label), size=0, stroke=0) +
     	scale_size_continuous(range = c(1, 3))
     if (setColors){
-    	tmpn <- length(unique(as.vector(nodedf[[match(factorName,colnames(nodedf))]])))
-    	p <- p + scale_fill_manual(values=get_cols(tmpn))
+        message("The color has been set automatically, you can reset it manually by adding scale_fill_manual(values=yourcolors)")
+        tmpn <- length(unique(as.vector(nodedf[[match(factorName,colnames(nodedf))]])))
+        p <- p + scale_fill_manual(values=get_cols(tmpn))
     }
     p <- p + theme_diffclade() + guides_diffclade() 
     return(p)
@@ -107,7 +119,12 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", s
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter select
 #' @export
-ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
+ggdiffclade.diffAnalysisClass <- function(obj, removeUnknown=TRUE, ...){
+    params <- list(...)
+    if (!is.null(params$removeUnkown) && inherits(params$removeUnkown, "logical")){
+        message("The `removeUnkown` has been deprecated, Please use `removeUnknown` instead!")
+        removeUnknown <- params$removeUnkown
+    }
     taxda <- obj@taxda
     #secondvars <- get_second_true_var(obj)
     #nodedfres <- merge(obj@kwres, secondvars, by.x="f", by.y="f") %>% 
@@ -116,11 +133,11 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
     #nodedfres <- merge(nodedfres, obj@mlres$f, by.x="f", by.y="f")
     nodedfres <- as.data.frame(obj)
     classname <- get_call(obj, "classgroup")
-    if (removeUnkown){
-    	tmpflag <- grep("__un_",as.vector(nodedfres$f))
-    	if (length(tmpflag)>0){
-    		nodedfres <- nodedfres[-tmpflag,,drop=FALSE]
-    	}
+    if (removeUnknown){
+        tmpflag <- grep("__un_",as.vector(nodedfres$f))
+        if (length(tmpflag)>0){
+   	        nodedfres <- nodedfres[-tmpflag,,drop=FALSE]
+        }
     }
     p <- ggdiffclade.data.frame(obj=taxda,
     			        nodedf=nodedfres,
@@ -137,7 +154,7 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnkown=TRUE, ...){
 #' @param filepath character, default is NULL, meaning current path. 
 #' @param output character, the output dir name, default is "biomarker_barplot".
 #' @param xtextsize numeric, the size of axis x label, default is 3.
-#' @param removeUnkown logical, whether do not show unkown taxonomy, default is TRUE.
+#' @param removeUnknown logical, whether do not show unknown taxonomy, default is TRUE.
 #' @param figwidth numeric, the width of figures, default is 6.
 #' @param figheight numeric, the height of figures, default is 3.
 #' @param ylabel character, the label of y, default is 'relative abundance'.
@@ -186,7 +203,7 @@ setGeneric("ggdifftaxbar")
 setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
     filepath=NULL,
     output="biomarker_barplot",
-    removeUnkown=TRUE,
+    removeUnknown=TRUE,
     figwidth=6,
     figheight=3,
     ylabel="relative abundance",
@@ -204,8 +221,13 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
         column_to_rownames(var="Row.names")
     nodedfres <- as.data.frame(obj)
     featurelist <- as.vector(nodedfres$f)
-    if (removeUnkown && length(grep("__un_", featurelist))>0){
-        featurelist <- featurelist[-grep("__un_", featurelist)]
+    params <- list(...)
+    if (!is.null(params$removeUnkown) && inherits(params$removeUnkown, "logical")){
+        message("The `removeUnkown` has been deprecated, Please use `removeUnknown` instead!")
+        removeUnknown <- params$removeUnkown
+    }
+    if (removeUnknown && length(grep("__un_", featurelist))>0){
+        featurelist <- featurelist[!grepl("__un_", featurelist)]
     }
     if (ncol(sampleda)>1){
         subclass <- colnames(sampleda)[-match(classname, colnames(sampleda))]
@@ -312,14 +334,13 @@ get_mean_median <- function(datameta, feature, subclass){
     festatic <- rbind(meantmp, mediantmp) %>% data.frame(check.names=FALSE)
     res <- structure(list(singlefedf=featuredatmp, singlefestat=festatic), 
     				 class="featureMeanMedian")
-    #attr(res, "class") <- "featureMeanMedian" 
     return (res)
 }
 
 #' @title visualization of effect size by the Linear Discriminant Analysis or randomForest
 #' @param obj object, diffAnalysisClass see \code{\link[MicrobiotaProcess]{diff_analysis}},
 #' or data.frame, contained effect size and the group information.
-#' @param removeUnkown logical, whether do not show unkown taxonomy, default is TRUE.
+#' @param removeUnknown logical, whether do not show unknown taxonomy, default is TRUE.
 #' @param factorName character, the column name contained group information in data.frame.
 #' @param effectsizename character, the column name contained effect size information.
 #' @param factorLevels list, the levels of the factors, default is NULL,
@@ -411,6 +432,7 @@ ggeffectsize.data.frame <- function(obj,
     	ylab(NULL) + xlab(xlabtext) 
     #if (setColors){
     tmpn <- length(unique(as.vector(obj[[factorName]])))
+    message("The color has been set automatically, you can reset it manually by adding scale_color_manual(values=yourcolors)")
     p <- p + scale_color_manual(values=get_cols(tmpn))
     #}
     p <- p + theme_bw()+
@@ -428,10 +450,15 @@ ggeffectsize.data.frame <- function(obj,
 #' @method ggeffectsize diffAnalysisClass
 #' @rdname ggeffectsize
 #' @export
-ggeffectsize.diffAnalysisClass <- function(obj, removeUnkown=TRUE, setFacet=TRUE,...){
+ggeffectsize.diffAnalysisClass <- function(obj, removeUnknown=TRUE, setFacet=TRUE,...){
     efres <- tidyEffectSize(obj)
     classname <- get_call(obj, "classgroup")
-    if (removeUnkown && length(grep("__un_",efres$f))){
+    params <- list(...)
+    if (!is.null(params$removeUnkown) && inherits(params$removeUnkown, "logical")){
+        message("The `removeUnkown` has been deprecated, Please use `removeUnknown` instead!")
+        removeUnknown <- params$removeUnkown
+    }
+    if (removeUnknown && length(grep("__un_",efres$f))){
     	efres <- efres[-grep("__un_",efres$f),,drop=FALSE]
     }
     if ("LDAmean" %in% colnames(obj@mlres)){
@@ -467,14 +494,29 @@ get_node <- function(treedata, nodedf){
 #' @importFrom ggtree ggtree
 #' @importFrom ggtree geom_point
 #' @keywords internal
-treeskeleton <- function(treedata, layout, size, pointsize=1){
-    p <- ggtree(treedata,
-    	        layout=layout,
-    	        size=size) +
-    	 geom_point(size=pointsize,
-    		    shape=21, 
-    		    fill="white",
-    		    color="black")
+treeskeleton <- function(treedata, layout, size, pointsize=1, xlim=12){
+    if (layout=="inward_circular"){
+        p <- ggtree(
+                 treedata, 
+                 layout=layout, 
+                 size=size,
+                 xlim=c(xlim,NA)
+                 )
+    
+    }else{
+        p <- ggtree(
+                 treedata,
+    	         layout=layout,
+    	         size=size
+                 )
+    }
+    p <- p + 
+         geom_point(
+             size=pointsize,
+             shape=21, 
+             fill="white",
+             color="black"
+         )
     return(p)
 }
 

@@ -20,10 +20,12 @@ ggdiffclade(obj, ...)
   cladetext = 2,
   factorLevels = NULL,
   setColors = TRUE,
+  xlim = 12,
+  reduce = FALSE,
   ...
 )
 
-\method{ggdiffclade}{diffAnalysisClass}(obj, removeUnkown = TRUE, ...)
+\method{ggdiffclade}{diffAnalysisClass}(obj, removeUnknown = TRUE, ...)
 }
 \arguments{
 \item{obj}{object, diffAnalysisClass, the results of diff_analysis 
@@ -37,8 +39,9 @@ information and(or pvalue).}
 
 \item{factorName}{character, the names of factor in nodedf.}
 
-\item{layout}{character, the layout of ggtree, but only "rectangular" 
-, "radial", "slanted" and "circular" in here, default is circular.}
+\item{layout}{character, the layout of ggtree, but only "rectangular",
+"radial", "slanted", "inward_circular" and "circular" in here, 
+default is circular.}
 
 \item{size}{numeric, the size of segment of ggtree, default is 0.6.}
 
@@ -57,7 +60,14 @@ if you want to order the levels of factor, you can set this.}
 \item{setColors}{logical, whether set the color of clade, default is TRUE, 
 or set FALSE,then use 'scale_fill_manual' setting.}
 
-\item{removeUnkown}{logical, whether do not show unkown taxonomy, 
+\item{xlim}{numeric, the x limits, only works for 'inward_circular' layout,
+default is 12.}
+
+\item{reduce}{logical, whether remove the unassigned taxonomy, which will 
+remove the clade of unassigned taxonomy, but the result of `diff_analysis`
+should remove the unknown taxonomy, default is FALSE.}
+
+\item{removeUnknown}{logical, whether do not show unknown taxonomy, 
 default is TRUE.}
 }
 \value{
