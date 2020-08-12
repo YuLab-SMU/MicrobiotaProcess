@@ -1,3 +1,10 @@
+# MicrobiotaProcess 1.1.6
+
++ `removeUnkown` argument has been replaced with `removeUnknown` in `ggdiffbox`,
+  `ggeffectsize`, `ggdifftaxbar` and `ggdiffclade`. (2020-08-12, Wed)
++ `class` argument has been replaced with `classgroup` in `diff_analysis`. (2020-08-12, Wed)
++ add `inward_circular` layout in `ggdiffclade`. (2020-08-12, Wed)
+
 # MicrobiotaProcess 1.1.5
 
 + `ggdifftaxbar` supports `png`, `tiff` format. (2020-08-10, Mon)
