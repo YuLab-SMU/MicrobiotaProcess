@@ -13,7 +13,7 @@ ggdifftaxbar(obj, ...)
   obj,
   filepath = NULL,
   output = "biomarker_barplot",
-  removeUnkown = TRUE,
+  removeUnknown = TRUE,
   figwidth = 6,
   figheight = 3,
   ylabel = "relative abundance",
@@ -45,7 +45,7 @@ see also \code{\link[MicrobiotaProcess]{get_mean_median}}.}
 
 \item{output}{character, the output dir name, default is "biomarker_barplot".}
 
-\item{removeUnkown}{logical, whether do not show unkown taxonomy, default is TRUE.}
+\item{removeUnknown}{logical, whether do not show unknown taxonomy, default is TRUE.}
 
 \item{figwidth}{numeric, the width of figures, default is 6.}
 

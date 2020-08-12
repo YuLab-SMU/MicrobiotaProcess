@@ -21,7 +21,7 @@ ggeffectsize(obj, ...)
   ...
 )
 
-\method{ggeffectsize}{diffAnalysisClass}(obj, removeUnkown = TRUE, setFacet = TRUE, ...)
+\method{ggeffectsize}{diffAnalysisClass}(obj, removeUnknown = TRUE, setFacet = TRUE, ...)
 }
 \arguments{
 \item{obj}{object, diffAnalysisClass see \code{\link[MicrobiotaProcess]{diff_analysis}},
@@ -46,7 +46,7 @@ if you want to order the levels of factor, you can set this.}
 
 \item{setFacet}{logical, whether use facet to plot, default is TRUE.}
 
-\item{removeUnkown}{logical, whether do not show unkown taxonomy, default is TRUE.}
+\item{removeUnknown}{logical, whether do not show unknown taxonomy, default is TRUE.}
 }
 \value{
 the figures of effect size show the LDA or MDA (MeanDecreaseAccuracy).

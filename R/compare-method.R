@@ -75,8 +75,10 @@ diff_analysis.data.frame <- function(obj, sampleda, classgroup, subclass=NULL, t
     firstalpha=0.05, strictmod=TRUE, fcfun="generalizedFC", secondcomfun="wilcox.test",
     clmin=5, clwilc=TRUE, secondalpha=0.05, subclmin=3, subclwilc=TRUE,	ldascore=2,
     normalization=1000000, bootnums=30, ci=0.95, ...){
-    if (is.character(class) && !is.null(class)){
-        stop("The class argument has been deprecated. Please use `classgroup` instead!")
+    params <- list(...)
+    if (!is.null(params$class) && inherits(class,"character")){
+        message("The class argument has been deprecated. Please use `classgroup` instead!")
+        classgroup <- params$class
     }
     if (!is.null(taxda)){taxda <- fillNAtax(taxda)
         if (alltax){obj <- get_alltaxdf(obj, taxda, method=standard_method)}

@@ -17,7 +17,7 @@ ggdiffbox(obj, ...)
   addLDA = TRUE,
   factorLevels = NULL,
   featurelist = NULL,
-  removeUnkown = TRUE,
+  removeUnknown = TRUE,
   colorlist = NULL,
   l_xlabtext = NULL,
   ...
@@ -46,7 +46,7 @@ if you want to order the levels of factor, you can set this.}
 \item{featurelist}{vector, the character vector, the sub feature of
 originalD in diffAnalysisClass,default is NULL.}
 
-\item{removeUnkown}{logical, whether remove the unknow taxonomy,
+\item{removeUnknown}{logical, whether remove the unknown taxonomy,
 default is TRUE.}
 
 \item{colorlist}{character, the color vector, default is NULL.}

@@ -96,6 +96,7 @@ setMethod("ggbox", "data.frame",
         comparelist <- get_comparelist(data=obj, classgroup=factorNames, controlgroup=controlgroup)
     }
     mapping <- aes_string(x=factorNames, y="value", fill=factorNames)
+    message("The color has been set automatically, you can reset it manually by adding scale_fill_manual(values=yourcolors)")
     p <- ggplot(data=obj,mapping)
     ifelse(geom=="boxplot",p <- p + geom_boxplot(outlier.size=0.5,outlier.shape=21),
            p <- p + geom_violin(trim=FALSE)+
@@ -142,7 +143,7 @@ setMethod("ggbox", "alphasample", function(obj,factorNames,...){
 #' if you want to order the levels of factor, you can set this.
 #' @param featurelist vector, the character vector, the sub feature of
 #' originalD in diffAnalysisClass,default is NULL.
-#' @param removeUnkown logical, whether remove the unknow taxonomy,
+#' @param removeUnknown logical, whether remove the unknown taxonomy,
 #' default is TRUE.
 #' @param colorlist character, the color vector, default is NULL.
 #' @param l_xlabtext character, the x axis text of left panel,
@@ -182,7 +183,7 @@ setGeneric("ggdiffbox", function(obj, ...){standardGeneric("ggdiffbox")})
 setMethod("ggdiffbox", "diffAnalysisClass", function(obj, geom="boxplot", 
           box_notch=TRUE, box_width=0.05, dodge_width=0.6,
           addLDA=TRUE, factorLevels=NULL, featurelist=NULL,
-          removeUnkown=TRUE, colorlist=NULL, l_xlabtext=NULL,...){
+          removeUnknown=TRUE, colorlist=NULL, l_xlabtext=NULL, ...){
     featureda <- obj@originalD
     classname <- get_call(obj, "classgroup")
     normalization <- get_call(obj, "normalization")
@@ -198,7 +199,12 @@ setMethod("ggdiffbox", "diffAnalysisClass", function(obj, geom="boxplot",
     }else{
         featurelist <- featurelist
     }
-    featurelist <- keep_know_taxa(featurelist, removeUnkown=removeUnkown)
+    params <- list(...)
+    if (!is.null(params$removeUnkown) && inherits(params$removeUnkown, "logical")){
+        message("The `removeUnkown` has been deprecated, Please use `removeUnknown` instead!")
+        removeUnknown <- params$removeUnkown
+    }
+    featurelist <- keep_know_taxa(featurelist, removeUnknown=removeUnknown)
     nodedfres <- nodedfres[nodedfres$f%in%featurelist,,drop=FALSE]
     nodedfres <- nodedfres[order(nodedfres[,2], decreasing=TRUE),,drop=FALSE]
     nodedfres$f <- factor(nodedfres$f, levels=as.vector(nodedfres$f))
@@ -302,8 +308,8 @@ get_comparelist <- function(data, classgroup, controlgroup){
 }
 
 #' @keywords internal
-keep_know_taxa <- function(featurelist, removeUnkown=TRUE){
-    if (isTRUE(removeUnkown)){
+keep_know_taxa <- function(featurelist, removeUnknown=TRUE){
+    if (isTRUE(removeUnknown)){
         tmpflag <- grep("__un_",featurelist)
         if (length(tmpflag)>0){
             featurelist <- featurelist[-tmpflag]
