@@ -14,7 +14,7 @@
 #' @param layout character, the layout of ggtree, but only "rectangular",
 #' "radial", "slanted", "inward_circular" and "circular" in here, 
 #' default is circular.
-#' @param size numeric, the size of segment of ggtree, default is 0.6.
+#' @param linewd numeric, the size of segment of ggtree, default is 0.6.
 #' @param skpointsize numeric, the point size of skeleton of tree, 
 #' default is 0.8 .
 #' @param alpha numeric, the alpha of clade, default is 0.4.
@@ -49,7 +49,7 @@
 #'                         subclmin=3, subclwilc=TRUE,
 #'                         secondalpha=0.01, ldascore=3)
 #' #library(ggplot2)
-#' #diffcladeplot <- ggdiffclade(diffres,alpha=0.3, size=0.2, 
+#' #diffcladeplot <- ggdiffclade(diffres,alpha=0.3, linewd=0.2, 
 #' #                        skpointsize=0.4, 
 #' #                        taxlevel=3,
 #' #                        setColors=FALSE) +
@@ -66,18 +66,23 @@ ggdiffclade <- function(obj,...){
 #' @importFrom magrittr %<>%
 #' @importFrom stats as.formula
 #' @export
-ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", size=0.6, 
+ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", linewd=0.6, 
     skpointsize=0.8, alpha=0.4, taxlevel=6, cladetext=2, factorLevels=NULL, setColors=TRUE,
     xlim=12, reduce=FALSE,
     ...){
+    params <- list(...)
+    if (!is.null(params$size)){
+        message("The `size` has been deprecated, Please use `linewd` instead!")
+        linewd <- params$size
+    }
     treedata <- convert_to_treedata(obj)
     layout %<>% match.arg(c("rectangular", "circular", "slanted", "radial", "inward_circular"))
     if (!is.null(factorLevels)){nodedf <- setfactorlevels(nodedf, factorLevels)}
     nodedf <- get_node(treedata, nodedf)
-    p <- treeskeleton(treedata,	layout=layout,size=size,pointsize=skpointsize,xlim=xlim)
+    p <- treeskeleton(treedata, layout=layout, size=linewd, pointsize=skpointsize, xlim=xlim)
     if (reduce){
         df <- p$data[!grepl("__un_",p$data$label),]
-        p <- treeskeleton(treedata=df, layout=layout,size=size,pointsize=skpointsize,xlim=xlim) 
+        p <- treeskeleton(treedata=df, layout=layout,size=linewd, pointsize=skpointsize, xlim=xlim) 
     }
     cladecoord <- get_cladedf(p, nodedf$node)
     cladecoord <- merge(cladecoord, nodedf, by.x="node", by.y="node")
@@ -98,9 +103,9 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", s
     }
     p <- p + geom_rect(data=cladecoord,aes_(fill=as.formula(paste("~",factorName)), 
     		                            xmin=~xmin, ymin=~ymin, xmax=~xmax, ymax=~ymax),
-    		       alpha=alpha,
+                       alpha=alpha,
     	               show.legend=FALSE) +
-    	geom_text(data=labelcoord, aes_(x=~x,y=~y, label=~label, angle=~angle), size=2) +
+    	geom_text(data=labelcoord, aes_(x=~x,y=~y, label=~label, angle=~angle), size=cladetext) +
     	geom_point(data=cladecoord, pointmapping, shape=21)+
     	geom_point(data=annotcoord, aes_(x=0,y=0, color=~label), size=0, stroke=0) +
     	scale_size_continuous(range = c(1, 3))

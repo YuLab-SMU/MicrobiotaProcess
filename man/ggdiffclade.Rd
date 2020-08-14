@@ -13,7 +13,7 @@ ggdiffclade(obj, ...)
   nodedf,
   factorName,
   layout = "circular",
-  size = 0.6,
+  linewd = 0.6,
   skpointsize = 0.8,
   alpha = 0.4,
   taxlevel = 6,
@@ -43,7 +43,7 @@ information and(or pvalue).}
 "radial", "slanted", "inward_circular" and "circular" in here, 
 default is circular.}
 
-\item{size}{numeric, the size of segment of ggtree, default is 0.6.}
+\item{linewd}{numeric, the size of segment of ggtree, default is 0.6.}
 
 \item{skpointsize}{numeric, the point size of skeleton of tree, 
 default is 0.8 .}
@@ -94,7 +94,7 @@ diffres <- diff_analysis(kostic2012crc, classgroup="DIAGNOSIS",
                         subclmin=3, subclwilc=TRUE,
                         secondalpha=0.01, ldascore=3)
 #library(ggplot2)
-#diffcladeplot <- ggdiffclade(diffres,alpha=0.3, size=0.2, 
+#diffcladeplot <- ggdiffclade(diffres,alpha=0.3, linewd=0.2, 
 #                        skpointsize=0.4, 
 #                        taxlevel=3,
 #                        setColors=FALSE) +
