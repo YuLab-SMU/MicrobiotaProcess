@@ -1,3 +1,9 @@
+# MicrobiotaProcess 1.1.7
+
++ bugfix: `cladetext` argument has been omitted in `ggdiffclade`, now it has been fixed. (2020-08-14, Fri)
++ deprecated argument: the `size` argument controlled the width of line of tree has been deprecated.
+  The `linewd` replace it (2020-08-14, Fri).
+
 # MicrobiotaProcess 1.1.6
 
 + `removeUnkown` argument has been replaced with `removeUnknown` in `ggdiffbox`,
