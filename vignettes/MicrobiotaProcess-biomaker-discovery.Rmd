@@ -91,7 +91,7 @@ plotes_ab
 
 If the `taxda` was provided, it also can be visualized by `ggdiffclade`. The colors represent the relevant features enriched in the relevant classgroup. The size of point colored represent the `-log10(pvalue)`.
 
-```{r, fig.width=7, fig.height=7, fig.align="center", error=FALSE, KosticCRCdiffclade}
+```{r, fig.width=7, fig.height=7, fig.align="center", error=FALSE, dpi=300, KosticCRCdiffclade}
 diffcladeplot <- ggdiffclade(obj=diffres,
                              alpha=0.3, size=0.2, 
                              skpointsize=0.6,
@@ -181,7 +181,7 @@ hmpes_ab
 
 The explanation of figures refer to the previous section.
 
-```{r, fig.width=7, fig.height=7, fig.align="center", error=FALSE, hmpdiffclade}
+```{r, fig.width=7, fig.height=7, fig.align="center", error=FALSE, dpi=300, hmpdiffclade}
 hmpdiffclade <- ggdiffclade(obj=hmpdiffres, alpha=0.3, size=0.2, 
                             skpointsize=0.4, taxlevel=3,
                             settheme=TRUE,
