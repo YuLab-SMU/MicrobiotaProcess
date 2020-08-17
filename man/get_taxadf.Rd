@@ -10,9 +10,17 @@
 \usage{
 get_taxadf(obj, ...)
 
-\S4method{get_taxadf}{phyloseq}(obj, taxlevel = 2, ...)
+\S4method{get_taxadf}{phyloseq}(obj, taxlevel = 2, type = "species", ...)
 
-\S4method{get_taxadf}{data.frame}(obj, taxda, taxa_are_rows, taxlevel, sampleda = NULL, ...)
+\S4method{get_taxadf}{data.frame}(
+  obj,
+  taxda,
+  taxa_are_rows,
+  taxlevel,
+  sampleda = NULL,
+  type = "species",
+  ...
+)
 }
 \arguments{
 \item{obj}{phyloseq, phyloseq class or data.frame
@@ -24,6 +32,10 @@ taxa_are_rows set TRUE).}
 
 \item{taxlevel}{character, the column names of taxda that you want to get.
 when the input is phyloseq class, you can use 1 to 7.}
+
+\item{type}{character, the type of datasets, default is "species", 
+if the dataset is not about species, such as dataset of kegg function, 
+you should set it to "others".}
 
 \item{taxda}{data.frame, the classifies of feature contained 
 in obj(data.frame).}

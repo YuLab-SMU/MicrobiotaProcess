@@ -22,6 +22,7 @@ ggdiffclade(obj, ...)
   setColors = TRUE,
   xlim = 12,
   reduce = FALSE,
+  type = "species",
   ...
 )
 
@@ -66,6 +67,10 @@ default is 12.}
 \item{reduce}{logical, whether remove the unassigned taxonomy, which will 
 remove the clade of unassigned taxonomy, but the result of `diff_analysis`
 should remove the unknown taxonomy, default is FALSE.}
+
+\item{type}{character, the type of datasets, default is "species", 
+if the dataset is not about species, such as dataset of kegg function, 
+you should set it to "others".}
 
 \item{removeUnknown}{logical, whether do not show unknown taxonomy, 
 default is TRUE.}

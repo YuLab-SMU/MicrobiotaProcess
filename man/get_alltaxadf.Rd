@@ -10,9 +10,16 @@
 \usage{
 get_alltaxadf(obj, ...)
 
-\S4method{get_alltaxadf}{phyloseq}(obj, method = NULL, ...)
+\S4method{get_alltaxadf}{phyloseq}(obj, method = NULL, type = "species", ...)
 
-\S4method{get_alltaxadf}{data.frame}(obj, taxda, taxa_are_rows = FALSE, method = NULL, ...)
+\S4method{get_alltaxadf}{data.frame}(
+  obj,
+  taxda,
+  taxa_are_rows = FALSE,
+  method = NULL,
+  type = "species",
+  ...
+)
 }
 \arguments{
 \item{obj}{object, phyloseq or data.frame}

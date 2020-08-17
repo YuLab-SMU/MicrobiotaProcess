@@ -1,5 +1,6 @@
 #' @title convert dataframe contained hierarchical relationship or other classes to treedata class
 #' @param data data.frame, such like the tax_table of phyloseq.
+#' @param type character, the type of datasets, default is "species", if the dataset is not about species,                                                                                                         #' such as dataset of kegg function, you should set it to "others".
 #' @param ..., additional parameters.
 #' @return treedata class.
 #' @author Shuangbin Xu
@@ -10,8 +11,8 @@
 #' data(hmp_aerobiosis_small)
 #' head(taxda)
 #' treedat <- convert_to_treedata(taxda)
-convert_to_treedata <- function(data,...){
-    data <- fillNAtax(data)
+convert_to_treedata <- function(data, type="species", ...){
+    data <- fillNAtax(data, type=type)
     data <- data.frame(root=rep("r__root", nrow(data)), data)
     datalist <- list()
     for (i in seq_len(ncol(data)-1)){

@@ -40,6 +40,8 @@
 #' for the LDA score, or you can set NULL for no normalization, default is 1000000.
 #' @param bootnums integer, set the number of bootstrap iteration for lda or rf, default is 30.
 #' @param ci numeric, the confidence interval of effect size (LDA or MDA), default is 0.95.
+#' @param type character, the type of datasets, default is "species", if the dataset is not about species, 
+#' such as dataset of kegg function, you should set it to "others".
 #' @param ..., additional parameters.
 #' @return diff_analysis class.
 #' @author Shuangbin Xu
@@ -74,13 +76,13 @@ diff_analysis.data.frame <- function(obj, sampleda, classgroup, subclass=NULL, t
     ratio=0.7, firstcomfun='kruskal.test', padjust="fdr",filtermod="pvalue",
     firstalpha=0.05, strictmod=TRUE, fcfun="generalizedFC", secondcomfun="wilcox.test",
     clmin=5, clwilc=TRUE, secondalpha=0.05, subclmin=3, subclwilc=TRUE,	ldascore=2,
-    normalization=1000000, bootnums=30, ci=0.95, ...){
+    normalization=1000000, bootnums=30, ci=0.95, type="species", ...){
     params <- list(...)
     if (!is.null(params$class) && inherits(class,"character")){
         message("The class argument has been deprecated. Please use `classgroup` instead!")
         classgroup <- params$class
     }
-    if (!is.null(taxda)){taxda <- fillNAtax(taxda)
+    if (!is.null(taxda)){taxda <- fillNAtax(taxda, type=type)
         if (alltax){obj <- get_alltaxdf(obj, taxda, method=standard_method)}
     }
     sampleda <- sampleda %>% select(c(classgroup, subclass))
@@ -137,11 +139,11 @@ diff_analysis.phyloseq <- function(obj, ...){
     sampleda <- checksample(obj)
     taxda <- tax_table(obj)
     call <- match.call()
-    res <- diff_analysis.data.frame(obj=otuda,
-                                    sampleda=sampleda,
-                                    taxda=taxda,
-                                    funname=TRUE,
-                                    ...)
+    res <- diff_analysis(obj=otuda,
+                         sampleda=sampleda,
+                         taxda=taxda,
+                         funname=TRUE,
+                         ...)
     for (i in setdiff(names(as.list(res@call)), names(call))){
         call[i] <- list(as.list(res@call)[[i]])
     }
@@ -189,32 +191,35 @@ setGeneric("get_alltaxadf", function(obj, ...){standardGeneric("get_alltaxadf")}
 #' @rdname get_alltaxadf
 #' @importFrom phyloseq tax_table
 #' @export
-setMethod("get_alltaxadf", "phyloseq",function(obj, method=NULL, ...){
+setMethod("get_alltaxadf", "phyloseq",function(obj, method=NULL, type="species", ...){
     otuda <- checkotu(obj)
     if (is.null(obj@tax_table)){
         stop("The taxaonomy table is empty!")
     }else{
-        taxa <- fillNAtax(tax_table(obj)) 
+        taxa <- fillNAtax(tax_table(obj), type=type) 
     }
-    data <- get_alltaxdf(data=otuda, taxda=taxa, method=method, ...)
+    data <- get_alltaxdf(data=otuda, taxda=taxa, taxa_are_rows=FALSE, method=method, ...)
     return(data)
 })
 
 #' @aliases get_alltaxadf,data.frame
 #' @rdname get_alltaxadf
 #' @export
-setMethod("get_alltaxadf", "data.frame", function(obj, taxda, taxa_are_rows=FALSE, method=NULL, ...){
-    if (!taxa_are_rows){
-        obj <- data.frame(t(obj), check.names=FALSE)
-    }
-    data <- get_alltaxdf(data=obj, taxda=taxda, method=method,...)
+setMethod("get_alltaxadf", "data.frame", function(obj, taxda, taxa_are_rows=FALSE, method=NULL, type="species", ...){
+    #if (taxa_are_rows){
+    #    obj <- data.frame(t(obj), check.names=FALSE)
+    #}
+    taxda <- fillNAtax(taxda, type=type)
+    data <- get_alltaxdf(data=obj, taxda=taxda, taxa_are_rows=taxa_are_rows, method=method, ...)
     return(data)
 })
 
 #' @importFrom magrittr %>%
 #' @keywords internal
-get_alltaxdf <- function(data, taxda, method=NULL, ...){
-    data <- data.frame(t(data), check.names=FALSE)
+get_alltaxdf <- function(data, taxda, method=NULL, taxa_are_rows=FALSE, ...){
+    if (!taxa_are_rows){
+        data <- data.frame(t(data), check.names=FALSE)
+    }
     dt <- list()
     for (i in seq_len(ncol(taxda))){
         if (is.null(method)){

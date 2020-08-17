@@ -4,7 +4,7 @@ get_cladedf <- function(ggtree, node){
     data <- ggtree$data
     if ("nodeClass" %in% colnames(data)){
         data <- set_newlevels(data=data, 
-                newlevels=taxlevel[seq_len(length(unique(data$nodeClass)))],
+                newlevels=taxlevelchar[seq_len(length(unique(data$nodeClass)))],
                 factorNames="nodeClass")
         levelsnum <- length(levels(data$nodeClass)) + 1
         tmpnum <- levelsnum - as.numeric(data$nodeClass)
@@ -24,7 +24,7 @@ get_labeldf <- function(ggtree, node, angle="auto"){
     data <- ggtree$data
     if ("nodeClass" %in% colnames(data)){
         data <- set_newlevels(data=data,
-                newlevels=taxlevel[seq_len(length(unique(data$nodeClass)))],
+                newlevels=taxlevelchar[seq_len(length(unique(data$nodeClass)))],
                 factorNames="nodeClass")
     	levelsnum <- length(levels(data$nodeClass)) + 1
     	tmpnum <- levelsnum - as.numeric(data$nodeClass)

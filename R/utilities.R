@@ -67,15 +67,25 @@ get_sample <- function(obj){
     return(sampleda)
 }
 
-#' @keywords internal
-taxlevel <- c("k", "p", "c", "o", "f", "g", "s", "st")
+# #' @keywords internal
+# #taxlevelchar <- c("k", "p", "c", "o", "f", "g", "s", "st")
+
+newtaxname <- function(x, y){
+    y <- as.vector(y)
+    x[y] <- paste(taxlevelchar[y], x[y], sep="__un_")
+    x
+}
 
 #' @importFrom zoo na.locf
 #' @keywords internal
-filltaxname <- function(taxdf){
-    taxlevel <- taxlevel[seq_len(ncol(taxdf))]
+filltaxname <- function(taxdf){#, type="species"){
+   # if (type != "species"){
+   #     taxlevelchar <- paste0("d", seq_len(ncol(taxdf)))
+   # }else{
+   #     taxlevelchar <- taxlevelchar[seq_len(ncol(taxdf))]
+   # }
     tmprownames <- rownames(taxdf)
-    indexmark <- apply(taxdf, 2, function(x){nchar(x, keepNA = TRUE)})==3
+    indexmark <- apply(taxdf, 2, function(x){nchar(x, keepNA = TRUE)})<=4
     taxdf[indexmark] <- NA
     indextmp <- apply(is.na(taxdf), 1, which)
     if(length(indextmp)==0){
@@ -84,34 +94,44 @@ filltaxname <- function(taxdf){
     }
     taxdf <- apply(taxdf, 1, na.locf)
     taxdf <- lapply(seq_len(ncol(taxdf)), function(i) taxdf[,i])
-    newtaxname <- function(x, y){
-        y <- as.vector(y)
-        x[y] <- paste(taxlevel[y], x[y], sep="__un_")
-        x
-    }
+    #newtaxname <- function(x, y){
+    #    y <- as.vector(y)
+    #    x[y] <- paste(taxlevelchar[y], x[y], sep="__un_")
+    #    x
+    #}
     taxdf <- data.frame(t(mapply(newtaxname, taxdf, indextmp)), 
-    					stringsAsFactors=FALSE)
+                        stringsAsFactors=FALSE)
     rownames(taxdf) <- tmprownames
     return(taxdf)
 }
 
 #' @keywords internal
-addtaxlevel <- function(taxdf){
-    taxlevel <- taxlevel[seq_len(length(taxdf))]
-    paste(taxlevel, taxdf, sep="__")
+addtaxlevel <- function(taxdf){#, type="species"){
+    #if (type != "species"){
+    #    taxlevelchar <- paste0("d", seq_len(ncol(taxdf)))
+    #}else{
+    #    taxlevelchar <- taxlevelchar[seq_len(ncol(taxdf))]
+    #}
+    taxlevelchar <- taxlevelchar[seq_len(length(taxdf))]
+    paste(taxlevelchar, taxdf, sep="__")
 }
 
 #' @importFrom tibble column_to_rownames
 #' @keywords internal
-fillNAtax <- function(taxdf){
+fillNAtax <- function(taxdf, type="species"){
+    if (type!="species"){
+        assign("taxlevelchar", paste0("d", seq_len(ncol(taxdf))), envir = .GlobalEnv)
+    }else{
+        assign("taxlevelchar", c("k", "p", "c", "o", "f", "g", "s", "st"), envir = .GlobalEnv)
+    }
     if (any(is.na(taxdf[,1]))){taxdf[is.na(taxdf[,1]),1] <- "Unknown"}
-    if (!grepl("^k__", taxdf[1,1])){
+    if (!(grepl("^k__", taxdf[1,1]) || grepl("^d1__", taxdf[1,1]))){
     	tmprownames <- rownames(taxdf)
     	tmpcolnames <- colnames(taxdf)
-    	taxdf <- t(apply(taxdf, 1, as.character))
-    	taxdf[is.na(taxdf)] <- ""
-    	taxdf <- data.frame(t(apply(taxdf, 1, addtaxlevel)),
-    						stringsAsFactors=FALSE)
+        taxdf <- t(apply(taxdf, 1, as.character))
+        taxdf[is.na(taxdf)] <- ""
+        taxdf <- data.frame(t(apply(taxdf, 1, addtaxlevel)),
+                            stringsAsFactors=FALSE)
     	rownames(taxdf) <- tmprownames
     	colnames(taxdf) <- tmpcolnames
     }
@@ -174,3 +194,6 @@ get_call <- function(obj, arg){
         return(argres)
     }
 }
+
+#' @importFrom utils globalVariables
+utils::globalVariables('taxlevelchar')

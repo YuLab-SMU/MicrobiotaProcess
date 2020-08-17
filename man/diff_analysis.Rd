@@ -34,6 +34,7 @@ diff_analysis(obj, ...)
   normalization = 1e+06,
   bootnums = 30,
   ci = 0.95,
+  type = "species",
   ...
 )
 
@@ -107,6 +108,9 @@ for the LDA score, or you can set NULL for no normalization, default is 1000000.
 \item{bootnums}{integer, set the number of bootstrap iteration for lda or rf, default is 30.}
 
 \item{ci}{numeric, the confidence interval of effect size (LDA or MDA), default is 0.95.}
+
+\item{type}{character, the type of datasets, default is "species", if the dataset is not about species, 
+such as dataset of kegg function, you should set it to "others".}
 }
 \value{
 diff_analysis class.

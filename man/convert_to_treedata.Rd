@@ -4,10 +4,12 @@
 \alias{convert_to_treedata}
 \title{convert dataframe contained hierarchical relationship or other classes to treedata class}
 \usage{
-convert_to_treedata(data, ...)
+convert_to_treedata(data, type = "species", ...)
 }
 \arguments{
 \item{data}{data.frame, such like the tax_table of phyloseq.}
+
+\item{type}{character, the type of datasets, default is "species", if the dataset is not about species,                                                                                                         #' such as dataset of kegg function, you should set it to "others".}
 
 \item{..., }{additional parameters.}
 }

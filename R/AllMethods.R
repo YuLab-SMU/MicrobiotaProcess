@@ -61,6 +61,9 @@ ggbartax.phyloseq <- function(obj, ...){
 #' @param taxlevel character, the column names of taxda that you want to get.
 #' when the input is phyloseq class, you can use 1 to 7.
 #' @param sampleda data.frame, the sample information.
+#' @param type character, the type of datasets, default is "species", 
+#' if the dataset is not about species, such as dataset of kegg function, 
+#' you should set it to "others". 
 #' @param ..., additional parameters.
 #' @return phyloseq class contained tax data.frame and sample information.
 #' @author Shuangbin Xu
@@ -80,7 +83,7 @@ setGeneric("get_taxadf", function(obj, ...)standardGeneric("get_taxadf"))
 #' @rdname get_taxadf
 #' @importFrom phyloseq otu_table tax_table taxa_are_rows rank_names
 #' @export
-setMethod("get_taxadf", "phyloseq", function(obj, taxlevel=2, ...){
+setMethod("get_taxadf", "phyloseq", function(obj, taxlevel=2, type="species",...){
     if (is.null(obj@tax_table)){
     	stop("The tax table is empty!")
     }else{
@@ -101,7 +104,9 @@ setMethod("get_taxadf", "phyloseq", function(obj, taxlevel=2, ...){
                         taxda=taxdf, 
                         taxlevel=taxlevel,
                         sampleda=sampleda,
-                        taxa_are_rows=FALSE,...)
+                        taxa_are_rows=FALSE,
+                        type=type, 
+                        ...)
     return(taxdf)
 })
 
@@ -113,14 +118,15 @@ setMethod("get_taxadf", "data.frame",
           function(obj, taxda, 
                    taxa_are_rows,
                    taxlevel,
-                   sampleda=NULL, ...){
+                   sampleda=NULL, 
+                   type="species", ...){
     if (!taxa_are_rows){
         obj <- data.frame(t(obj), check.names=FALSE)
     }
     if(!is.null(sampleda) && !inherits(sampleda, "sample_data")){
         sampleda <- sample_data(sampleda)
     }
-    taxda <- fillNAtax(taxda)
+    taxda <- fillNAtax(taxda, type=type)
     if (inherits(taxlevel, "numeric")){taxlevel <- colnames(taxda)[taxlevel]}
     tmptax <- taxda[, match(taxlevel, colnames(taxda)), drop=FALSE]
     tmptaxda <- taxda[, seq(from=1, to=match(taxlevel, colnames(taxda))), drop=FALSE]

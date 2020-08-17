@@ -29,6 +29,9 @@
 #' @param reduce logical, whether remove the unassigned taxonomy, which will 
 #' remove the clade of unassigned taxonomy, but the result of `diff_analysis`
 #' should remove the unknown taxonomy, default is FALSE. 
+#' @param type character, the type of datasets, default is "species", 
+#' if the dataset is not about species, such as dataset of kegg function, 
+#' you should set it to "others".
 #' @param ..., additional parameters.
 #' @return figures of tax clade show the significant different feature.
 #' @author Shuangbin Xu
@@ -68,14 +71,13 @@ ggdiffclade <- function(obj,...){
 #' @export
 ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", linewd=0.6, 
     skpointsize=0.8, alpha=0.4, taxlevel=6, cladetext=2, factorLevels=NULL, setColors=TRUE,
-    xlim=12, reduce=FALSE,
-    ...){
+    xlim=12, reduce=FALSE, type="species", ...){
     params <- list(...)
     if (!is.null(params$size)){
         message("The `size` has been deprecated, Please use `linewd` instead!")
         linewd <- params$size
     }
-    treedata <- convert_to_treedata(obj)
+    treedata <- convert_to_treedata(obj, type=type)
     layout %<>% match.arg(c("rectangular", "circular", "slanted", "radial", "inward_circular"))
     if (!is.null(factorLevels)){nodedf <- setfactorlevels(nodedf, factorLevels)}
     nodedf <- get_node(treedata, nodedf)
@@ -144,10 +146,11 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnknown=TRUE, ...){
    	        nodedfres <- nodedfres[-tmpflag,,drop=FALSE]
         }
     }
-    p <- ggdiffclade.data.frame(obj=taxda,
-    			        nodedf=nodedfres,
-    			        factorName=classname,
-    			        ...)
+    p <- ggdiffclade(obj=taxda,
+    			     nodedf=nodedfres,
+    			     factorName=classname,
+                     type=get_call(obj, "type"),
+    			     ...)
     return(p)
 }
 
