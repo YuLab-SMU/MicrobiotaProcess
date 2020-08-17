@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.1.8
+
++ `get_taxadf`, `get_alltaxadf` and `diff_analysis` has supported function datasets or other type datasets. (2020-08-17, Mon)
+
 # MicrobiotaProcess 1.1.7
 
 + bugfix: `cladetext` argument has been omitted in `ggdiffclade`, now it has been fixed. (2020-08-14, Fri)
