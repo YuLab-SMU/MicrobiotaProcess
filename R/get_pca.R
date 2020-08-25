@@ -55,7 +55,11 @@ get_pca.phyloseq <- function(obj, method="hellinger", ...){
 #' @title ordination plotter based on ggplot2.
 #' @param obj prcomp class or pcasample class,
 #' @param pc integer vector, the component index. 
-#' @param mapping set of aesthetic mapping of ggplot2, default is NULL.
+#' @param mapping set of aesthetic mapping of ggplot2, default is NULL
+#' when your want to set it by yourself, only alpha can be setted, and
+#' fill also can be setted when the shapes of points are hollow,
+#' the first element of factorNames has been setted to map color, and
+#' the second element of factorNames has been setted to map shape.
 #' @param sampleda data.frame, nrow sample * ncol factors, default is NULL. 
 #' @param factorNames vector, the names of factors contained sampleda.
 #' @param factorLevels list, the levels of the factors, default is NULL,
@@ -107,43 +111,48 @@ ggordpoint.default <-  function(obj, pc=c(1,2), mapping=NULL, sampleda=NULL, fac
     xlab_text <- plotcoordclass@xlab	
     ylab_text <- plotcoordclass@ylab
     title_text <- plotcoordclass@title
-    if(is.null(mapping)){mapping <- aes_string(x=colnames(plotcoord)[1], y=colnames(plotcoord)[2])}
+    defaultmapping <- aes_string(x=colnames(plotcoord)[1], y=colnames(plotcoord)[2])
+    if(is.null(mapping)){
+        mapping <- defaultmapping
+    }else{
+        mapping <- modifyList(defaultmapping, mapping)
+    }
     if(!is.null(sampleda)){
-    	plotcoord <- merge(plotcoord, sampleda, by=0)
-    	if (!is.null(factorNames)){
-    		tmpfactormap <- get_factormap(factorNames)
-    		ellipsemapping <- get_ellipsemap(factorNames)
-    	} else{
-    		tmpfactormap <- get_factormap(colnames(sampleda))
-    		ellipsemapping <- get_ellipsemap(colnames(sampleda))
-    	}
-    	mapping <- modifyList(mapping, tmpfactormap)
-    	ellipsemapping <- modifyList(mapping, ellipsemapping)
-	ellipsemapping <- modifyList(ellipsemapping,aes_string(shape=NULL))
-    	if (!is.null(factorLevels)){plotcoord <- setfactorlevels(plotcoord, factorLevels)}
+        plotcoord <- merge(plotcoord, sampleda, by=0)
+        if (!is.null(factorNames)){
+            tmpfactormap <- get_factormap(factorNames)
+            ellipsemapping <- get_ellipsemap(factorNames)
+        }else{
+            tmpfactormap <- get_factormap(colnames(sampleda))
+            ellipsemapping <- get_ellipsemap(colnames(sampleda))
+        }
+        mapping <- modifyList(mapping, tmpfactormap)
+        ellipsemapping <- modifyList(mapping, ellipsemapping)
+        ellipsemapping <- modifyList(ellipsemapping,aes_string(shape=NULL,size=NULL))
+        if (!is.null(factorLevels)){plotcoord <- setfactorlevels(plotcoord, factorLevels)}
     }
     p <- ggplot() + geom_point(data=plotcoord, mapping=mapping, size=poinsize) + labs(x=xlab_text, y=ylab_text, title=title_text)
     if (ellipse){p <- p + geom_ord_ellipse(data=plotcoord,mapping=ellipsemapping,ellipse_pro=ellipse_pro, alpha=ellipse_alpha, fill=NA, show.legend=FALSE, lty=3)}
     if (biplot){
-    	varcontrib <- get_varct(obj)
-    	varcontr <- varcontrib$VarContribution[,pc]
-    	tmpvars <- names(sort(rowSums(varcontr), decreasing=TRUE))
-    	varlist <- get_varlist(namevector=tmpvars, n=topn)
-    	biplotcoord <- varcontrib$VarCoordinates[match(varlist, rownames(varcontrib$VarCoordinates)),pc, drop=FALSE]
-    	biplotcoord <- data.frame(biplotcoord, check.names=FALSE)
-    	biplotmapping <- aes_string(x="0", y="0", xend=colnames(biplotcoord)[1], yend=colnames(biplotcoord)[2])
-    	p <- p + geom_segment(data=biplotcoord, mapping=biplotmapping, arrow=arrow(length=unit(arrowsize, "mm")), colour=arrowlinecolour, size=linesize)
-    	if(speciesannot){
-    		biplotcoord$tax <- rownames(biplotcoord)
-    		textmapping <- aes_string(x=colnames(biplotcoord)[1], y=colnames(biplotcoord)[2],label="tax")
-    		p<-p+geom_text_repel(data=biplotcoord, mapping=textmapping, fontface=fontface, family=fontfamily, size=fontsize,segment.size=textlinesize,...)
-    		}
-    	}
-       	if (settheme){
-    		p <- p + geom_vline(xintercept = 0,linetype='dashed',size=0.3,alpha=0.7)+ geom_hline(yintercept = 0,linetype='dashed',size=0.3,alpha=0.7)+
-    			 theme_bw() + theme(panel.grid=element_blank(), plot.title = element_text(face="bold",lineheight=25,hjust=0.5))
-    	}
-    return(p)	
+        varcontrib <- get_varct(obj)
+        varcontr <- varcontrib$VarContribution[,pc]
+        tmpvars <- names(sort(rowSums(varcontr), decreasing=TRUE))
+        varlist <- get_varlist(namevector=tmpvars, n=topn)
+        biplotcoord <- varcontrib$VarCoordinates[match(varlist, rownames(varcontrib$VarCoordinates)),pc, drop=FALSE]
+        biplotcoord <- data.frame(biplotcoord, check.names=FALSE)
+        biplotmapping <- aes_string(x="0", y="0", xend=colnames(biplotcoord)[1], yend=colnames(biplotcoord)[2])
+        p <- p + geom_segment(data=biplotcoord, mapping=biplotmapping, arrow=arrow(length=unit(arrowsize, "mm")), colour=arrowlinecolour, size=linesize)
+   	    if(speciesannot){
+            biplotcoord$tax <- rownames(biplotcoord)
+            textmapping <- aes_string(x=colnames(biplotcoord)[1], y=colnames(biplotcoord)[2],label="tax")
+            p<-p+geom_text_repel(data=biplotcoord, mapping=textmapping, fontface=fontface, family=fontfamily, size=fontsize,segment.size=textlinesize,...)
+        }
+   	}
+    if (settheme){
+        p <- p + geom_vline(xintercept = 0,linetype='dashed',size=0.3,alpha=0.7)+ geom_hline(yintercept = 0,linetype='dashed',size=0.3,alpha=0.7)+
+                 theme_bw() + theme(panel.grid=element_blank(), plot.title = element_text(face="bold",lineheight=25,hjust=0.5))
+    }
+    return(p)
 }
 
 #' @keywords internal
@@ -176,7 +185,7 @@ ggordpoint.pcasample <- function(obj,...){
     pcaobj <- obj@pca
     sampleda <- obj@sampleda
     p <- ggordpoint.default(pcaobj, 
-    				   sampleda=sampleda,...)
+                            sampleda=sampleda,...)
     return(p)
 }
 

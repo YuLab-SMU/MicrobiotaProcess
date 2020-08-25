@@ -42,7 +42,11 @@ ggordpoint(obj, ...)
 
 \item{pc}{integer vector, the component index.}
 
-\item{mapping}{set of aesthetic mapping of ggplot2, default is NULL.}
+\item{mapping}{set of aesthetic mapping of ggplot2, default is NULL
+when your want to set it by yourself, only alpha can be setted, and
+fill also can be setted when the shapes of points are hollow,
+the first element of factorNames has been setted to map color, and
+the second element of factorNames has been setted to map shape.}
 
 \item{sampleda}{data.frame, nrow sample * ncol factors, default is NULL.}
 
