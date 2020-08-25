@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.1.9
+
++ update `ggordpoint` to fit the usage when user want to set mapping by manually. (2020-08-25, Tue)
+
 # MicrobiotaProcess 1.1.8
 
 + `get_taxadf`, `get_alltaxadf` and `diff_analysis` has supported function datasets or other type datasets. (2020-08-17, Mon)
