@@ -84,6 +84,7 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", l
     p <- treeskeleton(treedata, layout=layout, size=linewd, pointsize=skpointsize, xlim=xlim)
     if (reduce){
         df <- p$data[!grepl("__un_",p$data$label),]
+        nodedf <- nodedf[!grepl("__un_", as.vector(nodedf[,1])),,drop=FALSE]
         p <- treeskeleton(treedata=df, layout=layout,size=linewd, pointsize=skpointsize, xlim=xlim) 
     }
     cladecoord <- get_cladedf(p, nodedf$node)
