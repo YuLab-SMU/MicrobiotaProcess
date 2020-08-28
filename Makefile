@@ -46,6 +46,8 @@ bioccheck:
 gpcheck:
 	Rscript -e 'goodpractice::gp()'
 
+debug: rd build2 install
+
 clean:
 	cd ..;\
 	$(RM) -r $(PKGNAME).Rcheck/

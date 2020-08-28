@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.1.10
+
++ update `ggdiffclade` to support data.frame input when `reduce` is `TRUE`. (2020-08-28, Fri)
+
 # MicrobiotaProcess 1.1.9
 
 + update `ggordpoint` to fit the usage when user want to set mapping by manually. (2020-08-25, Tue)
