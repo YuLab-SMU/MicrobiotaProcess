@@ -24,6 +24,7 @@
 #'                     check.names=FALSE, skip=1, 
 #'                     comment.char="")
 #' otuda <- otuda[sapply(otuda, is.numeric)]
+#' otuda <- data.frame(t(otuda), check.names=FALSE)
 #' dim(otuda)
 #' otudat <- drop_taxa(otuda, minocc=0.1, minabu=1)
 #' dim(otudat)
