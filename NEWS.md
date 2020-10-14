@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.1.11
+
++ update the examples of `drop_taxa`. (2020-10-14, Wed)
+
 # MicrobiotaProcess 1.1.10
 
 + update `ggdiffclade` to support data.frame input when `reduce` is `TRUE`. (2020-08-28, Fri)
