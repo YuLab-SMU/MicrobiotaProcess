@@ -1,3 +1,8 @@
+# MicrobiotaProcess 1.1.12
+
++ modified a bug in diff_analysis.phyloseq: change `tax_table(ps)` to `ps@tax_table` to 
+  avoid generate error when tax_table is NULL. (2020-10-15, Thu)
+
 # MicrobiotaProcess 1.1.11
 
 + update the examples of `drop_taxa`. (2020-10-14, Wed)
