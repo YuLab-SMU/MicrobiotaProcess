@@ -137,7 +137,7 @@ diff_analysis.data.frame <- function(obj, sampleda, classgroup, subclass=NULL, t
 diff_analysis.phyloseq <- function(obj, ...){
     otuda <- checkotu(obj)
     sampleda <- checksample(obj)
-    taxda <- tax_table(obj)
+    taxda <- obj@tax_table
     call <- match.call()
     res <- diff_analysis(obj=otuda,
                          sampleda=sampleda,
