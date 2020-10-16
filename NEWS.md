@@ -1,3 +1,8 @@
+# MicrobiotaProcess 1.1.13
+
++ removed `retrieve_seq` and `mapply_retrieve_seq` function, since these need internet. 
+  Which might cause time out when check. (2020-10-16, Fri)
+
 # MicrobiotaProcess 1.1.12
 
 + modified a bug in diff_analysis.phyloseq: change `tax_table(ps)` to `ps@tax_table` to 
