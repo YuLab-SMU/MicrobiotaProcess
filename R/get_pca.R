@@ -69,6 +69,7 @@ get_pca.phyloseq <- function(obj, method="hellinger", ...){
 #' @param arrowsize numeric, the size of arrow, default is 1.5.
 #' @param arrowlinecolour character, the color of segment, default is grey.
 #' @param ellipse logical, whether add confidence ellipse to ordinary plot, default is FALSE.
+#' @param showsample logical, whether show the labels of sample, default is FALSE
 #' @param ellipse_pro numeric, confidence value for the ellipse, default is 0.9.
 #' @param ellipse_alpha numeric, the alpha of ellipse, default is 0.2.
 #' @param biplot logical, whether plot the species, default is FALSE.
@@ -103,7 +104,7 @@ ggordpoint <- function(obj, ...){
 #' @rdname ggordpoint
 #' @export
 ggordpoint.default <-  function(obj, pc=c(1,2), mapping=NULL, sampleda=NULL, factorNames=NULL, factorLevels=NULL,
-    poinsize=2, linesize=0.3, arrowsize=1.5, arrowlinecolour="grey", ellipse=FALSE, ellipse_pro=0.9, 
+    poinsize=2, linesize=0.3, arrowsize=1.5, arrowlinecolour="grey", ellipse=FALSE, showsample=FALSE, ellipse_pro=0.9, 
     ellipse_alpha=0.2, biplot=FALSE, topn=5, settheme=TRUE, speciesannot=FALSE, fontsize=2.5,
     fontface="bold.italic", fontfamily="sans", textlinesize=0.02, ...){
     plotcoordclass <- get_coord(obj,pc)
@@ -133,6 +134,10 @@ ggordpoint.default <-  function(obj, pc=c(1,2), mapping=NULL, sampleda=NULL, fac
     }
     p <- ggplot() + geom_point(data=plotcoord, mapping=mapping, size=poinsize) + labs(x=xlab_text, y=ylab_text, title=title_text)
     if (ellipse){p <- p + geom_ord_ellipse(data=plotcoord,mapping=ellipsemapping,ellipse_pro=ellipse_pro, alpha=ellipse_alpha, fill=NA, show.legend=FALSE, lty=3)}
+    if (showsample){
+        labelmapping <- modifyList(defaultmapping, aes_string(label="Row.names"))
+        p <- p + geom_text_repel(data=plotcoord, mapping=labelmapping, size=fontsize, segment.size=textlinesize, ...)
+    }
     if (biplot){
         varcontrib <- get_varct(obj)
         varcontr <- varcontrib$VarContribution[,pc]

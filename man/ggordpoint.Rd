@@ -20,6 +20,7 @@ ggordpoint(obj, ...)
   arrowsize = 1.5,
   arrowlinecolour = "grey",
   ellipse = FALSE,
+  showsample = FALSE,
   ellipse_pro = 0.9,
   ellipse_alpha = 0.2,
   biplot = FALSE,
@@ -64,6 +65,8 @@ if you want to order the levels of factor, you can set this.}
 \item{arrowlinecolour}{character, the color of segment, default is grey.}
 
 \item{ellipse}{logical, whether add confidence ellipse to ordinary plot, default is FALSE.}
+
+\item{showsample}{logical, whether show the labels of sample, default is FALSE}
 
 \item{ellipse_pro}{numeric, confidence value for the ellipse, default is 0.9.}
 
