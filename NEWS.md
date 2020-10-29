@@ -1,3 +1,11 @@
+# MicrobiotaProcess 1.3.0.991
+
++ `ggordpoint` add `showsample` to show the labels of sample. (2020-10-29, Thu)
+
+# MicrobiotaProcess 1.2.0
+
++ Bioconductor 3.12 release (2020-10-28, Wed)
+
 # MicrobiotaProcess 1.1.13
 
 + removed `retrieve_seq` and `mapply_retrieve_seq` function, since these need internet. 
