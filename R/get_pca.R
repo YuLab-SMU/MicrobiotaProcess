@@ -57,9 +57,9 @@ get_pca.phyloseq <- function(obj, method="hellinger", ...){
 #' @param pc integer vector, the component index. 
 #' @param mapping set of aesthetic mapping of ggplot2, default is NULL
 #' when your want to set it by yourself, only alpha can be setted, and
-#' fill also can be setted when the shapes of points are hollow,
-#' the first element of factorNames has been setted to map color, and
-#' the second element of factorNames has been setted to map shape.
+#' the first element of factorNames has been setted to map fill, and
+#' the second element of factorNames has been setted to map starshape,
+#' you can use \code{\link[ggstar]{scale_starshape_manual}} set the shapes.
 #' @param sampleda data.frame, nrow sample * ncol factors, default is NULL. 
 #' @param factorNames vector, the names of factors contained sampleda.
 #' @param factorLevels list, the levels of the factors, default is NULL,
@@ -69,13 +69,15 @@ get_pca.phyloseq <- function(obj, method="hellinger", ...){
 #' @param arrowsize numeric, the size of arrow, default is 1.5.
 #' @param arrowlinecolour character, the color of segment, default is grey.
 #' @param ellipse logical, whether add confidence ellipse to ordinary plot, default is FALSE.
-#' @param showsample logical, whether show the labels of sample, default is FALSE
+#' @param showsample logical, whether show the labels of sample, default is FALSE.
+#' @param labelfactor character, the factor want to be show in label, default is NULL.
 #' @param ellipse_pro numeric, confidence value for the ellipse, default is 0.9.
 #' @param ellipse_alpha numeric, the alpha of ellipse, default is 0.2.
 #' @param biplot logical, whether plot the species, default is FALSE.
 #' @param topn integer or vector, the number species have top important contribution, default is 5.
 #' @param settheme logical, whether set the theme for the plot, default is TRUE.
 #' @param speciesannot logical, whether plot the species, default is FALSE. 
+#' @param stroke numeric, the line size of points, default is 0.1.
 #' @param fontsize numeric, the size of text, default is 2.5.
 #' @param fontface character, the font face, default is "blod.italic".
 #' @param fontfamily character, the font family, default is "sans".
@@ -99,15 +101,16 @@ ggordpoint <- function(obj, ...){
 }
 
 #' @method ggordpoint default
-#' @importFrom ggplot2 ggplot geom_point geom_segment aes_string labs arrow unit geom_vline geom_hline theme_bw element_blank element_text  
+#' @importFrom ggplot2 ggplot geom_segment aes_string labs arrow unit geom_vline geom_hline theme_bw element_blank element_text  
+#' @importFrom ggstar geom_star scale_starshape_manual 
 #' @importFrom ggrepel geom_text_repel
 #' @rdname ggordpoint
 #' @export
 ggordpoint.default <-  function(obj, pc=c(1,2), mapping=NULL, sampleda=NULL, factorNames=NULL, factorLevels=NULL,
     poinsize=2, linesize=0.3, arrowsize=1.5, arrowlinecolour="grey", ellipse=FALSE, showsample=FALSE, ellipse_pro=0.9, 
-    ellipse_alpha=0.2, biplot=FALSE, topn=5, settheme=TRUE, speciesannot=FALSE, fontsize=2.5,
+    ellipse_alpha=0.2, biplot=FALSE, topn=5, settheme=TRUE, speciesannot=FALSE, fontsize=2.5, labelfactor=NULL, stroke=0.1,
     fontface="bold.italic", fontfamily="sans", textlinesize=0.02, ...){
-    plotcoordclass <- get_coord(obj,pc)
+    plotcoordclass <- get_coord(obj, pc)
     plotcoord <- plotcoordclass@coord
     xlab_text <- plotcoordclass@xlab	
     ylab_text <- plotcoordclass@ylab
@@ -129,13 +132,20 @@ ggordpoint.default <-  function(obj, pc=c(1,2), mapping=NULL, sampleda=NULL, fac
         }
         mapping <- modifyList(mapping, tmpfactormap)
         ellipsemapping <- modifyList(mapping, ellipsemapping)
-        ellipsemapping <- modifyList(ellipsemapping,aes_string(shape=NULL,size=NULL))
+        ellipsemapping <- modifyList(ellipsemapping,aes_string(starshape=NULL,size=NULL))
         if (!is.null(factorLevels)){plotcoord <- setfactorlevels(plotcoord, factorLevels)}
     }
-    p <- ggplot() + geom_point(data=plotcoord, mapping=mapping, size=poinsize) + labs(x=xlab_text, y=ylab_text, title=title_text)
+    p <- ggplot() + geom_star(data=plotcoord, mapping=mapping, size=poinsize, starstroke=stroke) + labs(x=xlab_text, y=ylab_text, title=title_text)
+    if ("starshape" %in% names(mapping)){
+        shapes <- c(13, 15, 12, 6, 1, 2, 9, 29, 27, 5, 14, 22, 11, 23)[seq_len(length(unique(as.vector(plotcoord[[rlang::as_name(mapping$starshape)]]))))]
+        p <- p + scale_starshape_manual(values=shapes)
+    }
     if (ellipse){p <- p + geom_ord_ellipse(data=plotcoord,mapping=ellipsemapping,ellipse_pro=ellipse_pro, alpha=ellipse_alpha, fill=NA, show.legend=FALSE, lty=3)}
     if (showsample){
         labelmapping <- modifyList(defaultmapping, aes_string(label="Row.names"))
+        if (!is.null(labelfactor)){
+            labelmapping <- modifyList(labelmapping, aes_string(label=labelfactor))
+        }
         p <- p + geom_text_repel(data=plotcoord, mapping=labelmapping, size=fontsize, segment.size=textlinesize, ...)
     }
     if (biplot){
@@ -234,10 +244,10 @@ get_coord.prcomp <- function(obj, pc){
 #' @keywords internal
 get_factormap <- function(namelist){
     if (length(namelist)==1){
-    	tmpfactormap <- aes_string(color=namelist[1])
+    	tmpfactormap <- aes_string(fill=namelist[1])
     }else{
-    	tmpfactormap <- aes_string(color=namelist[1],
-                                   shape=namelist[2])
+    	tmpfactormap <- aes_string(fill=namelist[1],
+                                   starshape=namelist[2])
     }
     return(tmpfactormap)
 }

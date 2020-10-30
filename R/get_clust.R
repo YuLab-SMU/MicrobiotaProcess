@@ -160,9 +160,9 @@ ggclust.clustplotClass <- function(obj,
         }
         rownames(sample) <- NULL
         if(!is.null(factorNames)){
-            tmpfactormap <- get_factormap(factorNames)	
+            tmpfactormap <- set_factormap(factorNames)	
     	}else{
-            tmpfactormap <- get_factormap(colnames(sampleda)[-1])
+            tmpfactormap <- set_factormap(colnames(sampleda)[-1])
         }
         if(!is.null(factorLevels)){
             sampleda <- setfactorlevels(sampleda, factorLevels)
@@ -183,3 +183,14 @@ ggclust.clustplotClass <- function(obj,
     return(samplehcp)
 }
 
+#' @importFrom ggplot2 aes_string
+#' @keywords internal
+set_factormap <- function(namelist){
+    if (length(namelist)==1){
+        tmpfactormap <- aes_string(color=namelist[1])
+    }else{
+        tmpfactormap <- aes_string(color=namelist[1],
+                                   starshape=namelist[2])
+    }
+    return(tmpfactormap)
+}

@@ -28,6 +28,8 @@ ggordpoint(obj, ...)
   settheme = TRUE,
   speciesannot = FALSE,
   fontsize = 2.5,
+  labelfactor = NULL,
+  stroke = 0.1,
   fontface = "bold.italic",
   fontfamily = "sans",
   textlinesize = 0.02,
@@ -45,9 +47,9 @@ ggordpoint(obj, ...)
 
 \item{mapping}{set of aesthetic mapping of ggplot2, default is NULL
 when your want to set it by yourself, only alpha can be setted, and
-fill also can be setted when the shapes of points are hollow,
-the first element of factorNames has been setted to map color, and
-the second element of factorNames has been setted to map shape.}
+the first element of factorNames has been setted to map fill, and
+the second element of factorNames has been setted to map starshape,
+you can use \code{\link[ggstar]{scale_starshape_manual}} set the shapes.}
 
 \item{sampleda}{data.frame, nrow sample * ncol factors, default is NULL.}
 
@@ -66,7 +68,7 @@ if you want to order the levels of factor, you can set this.}
 
 \item{ellipse}{logical, whether add confidence ellipse to ordinary plot, default is FALSE.}
 
-\item{showsample}{logical, whether show the labels of sample, default is FALSE}
+\item{showsample}{logical, whether show the labels of sample, default is FALSE.}
 
 \item{ellipse_pro}{numeric, confidence value for the ellipse, default is 0.9.}
 
@@ -81,6 +83,10 @@ if you want to order the levels of factor, you can set this.}
 \item{speciesannot}{logical, whether plot the species, default is FALSE.}
 
 \item{fontsize}{numeric, the size of text, default is 2.5.}
+
+\item{labelfactor}{character, the factor want to be show in label, default is NULL.}
+
+\item{stroke}{numeric, the line size of points, default is 0.1.}
 
 \item{fontface}{character, the font face, default is "blod.italic".}
 
