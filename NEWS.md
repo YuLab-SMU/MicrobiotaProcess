@@ -1,6 +1,7 @@
 # MicrobiotaProcess 1.3.0.991
 
 + `ggordpoint` add `showsample` to show the labels of sample. (2020-10-29, Thu)
++ the point of `ggordpoint` use the points of [`ggstar`](https://github.com/xiangpin/ggstar). (2020-10-30, Fri)
 
 # MicrobiotaProcess 1.2.0
 

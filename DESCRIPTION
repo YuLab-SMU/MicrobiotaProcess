@@ -45,7 +45,8 @@ Imports:
   biomformat,
   yaml,
   phangorn,
-  patchwork
+  patchwork,
+  ggstar
 Suggests:
   DT,
   prettydoc,
