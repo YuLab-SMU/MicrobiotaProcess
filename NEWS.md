@@ -1,7 +1,10 @@
-# MicrobiotaProcess 1.3.0.991
+# MicrobiotaProcess 1.3.1
 
 + `ggordpoint` add `showsample` to show the labels of sample. (2020-10-29, Thu)
 + the point of `ggordpoint` use the points of [`ggstar`](https://github.com/xiangpin/ggstar). (2020-10-30, Fri)
++ to obtain the dynamic arguments of `diff_analysis`, the `call` was changed to `someparams`.
+  `someparams` contained the arguments used in other functions. (2020-11-09, Mon) 
+  - <https://github.com/YuLab-SMU/MicrobiotaProcess/issues/20>
 
 # MicrobiotaProcess 1.2.0
 
