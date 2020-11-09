@@ -140,7 +140,7 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnknown=TRUE, ...){
     #nodedfres <- nodedfres[as.vector(nodedfres$f)%in%as.vector(obj@mlres$f),]
     #nodedfres <- merge(nodedfres, obj@mlres$f, by.x="f", by.y="f")
     nodedfres <- as.data.frame(obj)
-    classname <- get_call(obj, "classgroup")
+    classname <- extract_args(obj, "classgroup")
     if (removeUnknown){
         tmpflag <- grep("__un_",as.vector(nodedfres$f))
         if (length(tmpflag)>0){
@@ -150,7 +150,7 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnknown=TRUE, ...){
     p <- ggdiffclade(obj=taxda,
     			     nodedf=nodedfres,
     			     factorName=classname,
-                     type=get_call(obj, "type"),
+                     type=extract_args(obj, "type"),
     			     ...)
     return(p)
 }
@@ -220,8 +220,8 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
     dpi=300,
     ...){
     featureda <- obj@originalD
-    classname <- get_call(obj, "classgroup")
-    normalization <- get_call(obj, "normalization")
+    classname <- extract_args(obj, "classgroup")
+    normalization <- extract_args(obj, "normalization")
     if (!is.null(normalization)){
         featureda <- featureda / normalization
     }
@@ -461,7 +461,7 @@ ggeffectsize.data.frame <- function(obj,
 #' @export
 ggeffectsize.diffAnalysisClass <- function(obj, removeUnknown=TRUE, setFacet=TRUE,...){
     efres <- tidyEffectSize(obj)
-    classname <- get_call(obj, "classgroup")
+    classname <- extract_args(obj, "classgroup")
     params <- list(...)
     if (!is.null(params$removeUnkown) && inherits(params$removeUnkown, "logical")){
         message("The `removeUnkown` has been deprecated, Please use `removeUnknown` instead!")

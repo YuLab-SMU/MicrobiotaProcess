@@ -116,7 +116,7 @@ setClassUnion("callOrNull", c("call", "function", "NULL"))
 #' feantures is enriched in relevant factorNames), 
 #' Freq(the number of TRUE or FALSE), factorNames.
 #' @slot mlres the results of LDA or randomForest,
-#' @slot call, the call of 
+#' @slot someparams, some arguments will be used in other functions
 #' \code{\link[MicrobiotaProcess]{diff_analysis}}
 #' @name diffAnalysisClass-class
 #' @rdname diffAnalysisClass-class
@@ -128,11 +128,11 @@ setClass("diffAnalysisClass",
     kwres="dataframeOrNull",
     secondvars="listOrNull",
     mlres="dataframeOrNull",
-    call="callOrNull"),
+    someparams="listOrNull"),
     prototype=prototype(originalD=NULL,
     sampleda=NULL,
     taxda=NULL,
     kwres=NULL,
     secondvars=NULL,
     mlres=NULL,
-    call=NULL))
+    someparams=NULL))

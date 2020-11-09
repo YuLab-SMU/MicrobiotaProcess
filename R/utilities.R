@@ -169,28 +169,29 @@ repduplicatedtaxcheck <- function(taxdf){
     return(taxdf)
 }
 
-#' @keywords internal
-## reference https://rdrr.io/cran/stackoverflow/man/match.call.defaults.html
-match.call.defaults <- function(fun) {
-    if (!is.na(fun)){
-        args(diff_analysis.data.frame)
-    }else{
-        call <- evalq(match.call(expand.dots=TRUE), parent.frame(1))
-        formals <- evalq(formals(), parent.frame(1))
-        for(i in setdiff(names(formals), c(names(call)))){
-            call[i] <- list(formals[[i]])
-        }
-        match.call(sys.function(sys.parent()), call)
-    }
-}
+## #' @keywords internal
+## ## reference https://rdrr.io/cran/stackoverflow/man/match.call.defaults.html
+## match.call.defaults <- function(fun) {
+##     if (!is.na(fun)){
+##         print(args(diff_analysis.data.frame))
+##         args(diff_analysis.data.frame)
+##     }else{
+##         call <- evalq(match.call(expand.dots=TRUE), parent.frame(1))
+##         formals <- evalq(formals(), parent.frame(1))
+##         for(i in setdiff(names(formals), c(names(call)))){
+##             call[i] <- list(formals[[i]])
+##         }
+##         match.call(sys.function(sys.parent()), call)
+##     }
+## }
 
 #' @keywords internal
-get_call <- function(obj, arg){
-    if (!"call" %in% slotNames(obj)){
-        stop("The object don't have call slot!")
+extract_args <- function(obj, arg){
+    if (!"someparams" %in% slotNames(obj)){
+        stop("The object don't have someparams slot!")
     }else{
-        callres <- as.list(obj@call)
-        argres <- callres[[match(arg,names(callres))]]
+        args <- obj@someparams
+        argres <- args[[arg]]
         return(argres)
     }
 }

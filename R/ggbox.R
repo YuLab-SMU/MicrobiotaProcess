@@ -185,8 +185,8 @@ setMethod("ggdiffbox", "diffAnalysisClass", function(obj, geom="boxplot",
           addLDA=TRUE, factorLevels=NULL, featurelist=NULL,
           removeUnknown=TRUE, colorlist=NULL, l_xlabtext=NULL, ...){
     featureda <- obj@originalD
-    classname <- get_call(obj, "classgroup")
-    normalization <- get_call(obj, "normalization")
+    classname <- extract_args(obj, "classgroup")
+    normalization <- extract_args(obj, "normalization")
     if (!is.null(normalization)){
         featureda <- featureda / normalization
     }
@@ -212,7 +212,7 @@ setMethod("ggdiffbox", "diffAnalysisClass", function(obj, geom="boxplot",
     featureda <- featureda[,match(featurelist,colnames(featureda)),drop=FALSE]
     if (is.null(colorlist)){colorlist <- get_cols(length(tmpgroup))}
     if (is.null(names(colorlist))){names(colorlist) <- tmpgroup}
-    if(is.null(get_call(obj,"standard_method"))){
+    if(is.null(extract_args(obj,"standard_method"))){
         ifelse(is.null(l_xlabtext), xlabtext<-"abundance", xlabtext <- l_xlabtext)
     }else{xlabtext<-"abundance"}
     p <- plotdiffbox(obj=featureda, sampleda=sampleda, factorNames=classname, factorLevels=factorLevels,

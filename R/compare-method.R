@@ -123,9 +123,11 @@ diff_analysis.data.frame <- function(obj, sampleda, classgroup, subclass=NULL, t
     dameta <- remove_constant(dameta)
     if (mlfun=="lda"){mlres <- LDAeffectsize(dameta, compareclass, classgroup, bootnums=bootnums, LDA=ldascore, ci=ci)}
     if (mlfun=="rf"){mlres <- rfimportance(dameta, classgroup, bootnums=bootnums, effsize=ldascore, ci=ci)}
-    tmpfun <- ifelse(!"funname" %in% names(match.call()), NA, "diff_analysis.data.frame")
+    params <- list("mlfun"=mlfun,"firstcomfun"=firstcomfun,"secondcomfun"=secondcomfun,
+                   "firstalpha"=firstalpha, "filtermod"=filtermod, "classgroup"=classgroup,
+                   "normalization"=normalization, "type"=type, "standard_method"=standard_method)
     res <- new("diffAnalysisClass", originalD=obj, sampleda=sampleda, taxda=taxda, kwres=kwres,
-               secondvars=secondvars, mlres=mlres, call=match.call.defaults(fun=tmpfun))
+               secondvars=secondvars, mlres=mlres, someparams=params)
     return(res)
 }
 
@@ -138,16 +140,10 @@ diff_analysis.phyloseq <- function(obj, ...){
     otuda <- checkotu(obj)
     sampleda <- checksample(obj)
     taxda <- obj@tax_table
-    call <- match.call()
-    res <- diff_analysis(obj=otuda,
+    res <- diff_analysis.data.frame(obj=otuda,
                          sampleda=sampleda,
                          taxda=taxda,
-                         funname=TRUE,
                          ...)
-    for (i in setdiff(names(as.list(res@call)), names(call))){
-        call[i] <- list(as.list(res@call)[[i]])
-    }
-    res@call <- call
     return(res)
 }
 
@@ -299,7 +295,7 @@ as.data.frame.alphasample <- function(x, ...){
 tidyEffectSize <- function(obj){
     f <- LDAmean <- MDAmean <- NULL
     secondvars <- get_second_true_var(obj)
-    classname <- get_call(obj, "classgroup")
+    classname <- extract_args(obj, "classgroup")
     efres <- merge(obj@mlres, secondvars, by.x="f", by.y="f") %>%
              select (-c("gfc", "Freq"))
     if ("LDAmean" %in% colnames(efres)){
