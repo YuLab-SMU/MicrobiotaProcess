@@ -141,10 +141,9 @@ setMethod("get_taxadf", "data.frame",
 
 #' @title Rarefaction alpha index
 #' @param obj phyloseq, phyloseq class or data.frame
-#' shape of data.frame (nrow sample * ncol feature (factor)) 
-#' or ' the data.frame for stat_smooth.
-#' @param mapping set of aesthetic mapping of ggplot2, default is NULL,
-#' if the data is the data.frame for stat_smooth, the mapping should be set. 
+#' shape of data.frame (nrow sample * ncol feature ( + factor)). 
+#' @param shadow logical, whether merge samples with group (factorNames) and
+#' display the ribbon of group, default is TRUE.
 #' @param linesize integer, default is 0.5. 
 #' @param chunks integer, the number of subsample in a sample,
 #'  default is 400.
@@ -167,7 +166,9 @@ setMethod("get_taxadf", "data.frame",
 #' data(test_otu_data)
 #' library(ggplot2)
 #' prare <- ggrarecurve(test_otu_data,
-#'                indexNames=c("Observe","Chao1","ACE"), 
+#'                indexNames=c("Observe","Chao1","ACE"),
+#'                shadow=FALSE,
+#'                factorNames="Group",
 #'                chunks=300) +
 #'          theme(legend.spacing.y=unit(0.02,"cm"),
 #'                legend.text=element_text(size=6))

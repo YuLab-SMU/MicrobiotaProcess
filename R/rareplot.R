@@ -8,23 +8,25 @@
 #' @export
 ggrarecurve.default <- function(obj,
     sampleda, indexNames="Observe", linesize=0.5, facetnrow=1,
-    mapping=NULL, chunks=400, factorNames, factorLevels, se=FALSE,
+    shadow=TRUE, chunks=400, factorNames, factorLevels, se=FALSE,
     method="lm", formula=y ~ log(x), ...){
-    if (is.null(mapping)){
-        obj <- stat_rare(data=obj, chunks=chunks, sampleda=sampleda, factorLevels=factorLevels, plotda=TRUE)
-        mapping <- aes_string(x="readsNums", y="value", color="sample")
-        if (!missing(factorNames)){
+    obj <- stat_rare(data=obj, chunks=chunks, sampleda=sampleda, factorLevels=factorLevels, plotda=TRUE)
+    mapping <- aes_string(x="readsNums", y="value", color="sample")
+    if (!missing(factorNames)){
+        if (shadow){
             obj <- summarySE(obj, measurevar="value", groupvars=c(factorNames, "readsNums", "Alpha"), na.rm=TRUE)
             obj$up <- obj$value - obj$sd
             obj$down <- obj$value + obj$sd
             mapping <- modifyList(mapping, aes_string(group=factorNames, color=factorNames, fill=factorNames, ymin="up", ymax="down"))
-    	}
+        }else{
+            mapping <- modifyList(mapping, aes_string(group="sample", color=factorNames))
+        }
     }
     if (!is.null(indexNames)){
         obj <- obj %>% filter(.data$Alpha %in% indexNames)
     }
     p <- ggplot(data=obj, mapping=mapping) #+
-    if (!missing(factorNames)){
+    if (!missing(factorNames) && shadow){
         #p <- p + geom_errorbar(alpha=0.5)
         p <- p + geom_ribbon(alpha=0.3, color=NA, show.legend=FALSE)
     }    

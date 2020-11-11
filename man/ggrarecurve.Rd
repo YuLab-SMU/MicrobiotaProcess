@@ -16,7 +16,7 @@ ggrarecurve(obj, ...)
   indexNames = "Observe",
   linesize = 0.5,
   facetnrow = 1,
-  mapping = NULL,
+  shadow = TRUE,
   chunks = 400,
   factorNames,
   factorLevels,
@@ -28,8 +28,7 @@ ggrarecurve(obj, ...)
 }
 \arguments{
 \item{obj}{phyloseq, phyloseq class or data.frame
-shape of data.frame (nrow sample * ncol feature (factor)) 
-or ' the data.frame for stat_smooth.}
+shape of data.frame (nrow sample * ncol feature ( + factor)).}
 
 \item{...}{additional parameters, 
 see also \code{\link{ggplot2}{ggplot}}.}
@@ -43,8 +42,8 @@ only for "Observe", "Chao1", "ACE", "Shannon", "Simpson", "J".}
 
 \item{facetnrow}{integer, the nrow of facet, default is 1.}
 
-\item{mapping}{set of aesthetic mapping of ggplot2, default is NULL,
-if the data is the data.frame for stat_smooth, the mapping should be set.}
+\item{shadow}{logical, whether merge samples with group (factorNames) and
+display the ribbon of group, default is TRUE.}
 
 \item{chunks}{integer, the number of subsample in a sample,
 default is 400.}
@@ -70,7 +69,9 @@ Rarefaction alpha index
 data(test_otu_data)
 library(ggplot2)
 prare <- ggrarecurve(test_otu_data,
-               indexNames=c("Observe","Chao1","ACE"), 
+               indexNames=c("Observe","Chao1","ACE"),
+               shadow=FALSE,
+               factorNames="Group",
                chunks=300) +
          theme(legend.spacing.y=unit(0.02,"cm"),
                legend.text=element_text(size=6))
