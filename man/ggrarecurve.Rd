@@ -3,23 +3,23 @@
 \name{ggrarecurve}
 \alias{ggrarecurve}
 \alias{ggrarecurve.phyloseq}
-\alias{ggrarecurve.default}
+\alias{ggrarecurve.data.frame}
+\alias{ggrarecurve.rarecurve}
 \title{Rarefaction alpha index}
 \usage{
 ggrarecurve(obj, ...)
 
-\method{ggrarecurve}{phyloseq}(obj, ...)
+\method{ggrarecurve}{phyloseq}(obj, chunks = 400, factorLevels = NULL, ...)
 
-\method{ggrarecurve}{default}(
+\method{ggrarecurve}{data.frame}(obj, sampleda, factorLevels, chunks = 400, ...)
+
+\method{ggrarecurve}{rarecurve}(
   obj,
-  sampleda,
   indexNames = "Observe",
   linesize = 0.5,
   facetnrow = 1,
   shadow = TRUE,
-  chunks = 400,
   factorNames,
-  factorLevels,
   se = FALSE,
   method = "lm",
   formula = y ~ log(x),
@@ -33,6 +33,12 @@ shape of data.frame (nrow sample * ncol feature ( + factor)).}
 \item{...}{additional parameters, 
 see also \code{\link{ggplot2}{ggplot}}.}
 
+\item{chunks}{integer, the number of subsample in a sample,
+default is 400.}
+
+\item{factorLevels}{list, the levels of the factors, default is NULL,
+if you want to order the levels of factor, you can set this.}
+
 \item{sampleda}{data.frame, (nrow sample * ncol factor)}
 
 \item{indexNames}{character, default is "Observe",
@@ -45,13 +51,7 @@ only for "Observe", "Chao1", "ACE", "Shannon", "Simpson", "J".}
 \item{shadow}{logical, whether merge samples with group (factorNames) and
 display the ribbon of group, default is TRUE.}
 
-\item{chunks}{integer, the number of subsample in a sample,
-default is 400.}
-
 \item{factorNames}{character, default is missing.}
-
-\item{factorLevels}{list, the levels of the factors, default is NULL,
-if you want to order the levels of factor, you can set this.}
 
 \item{se}{logical, default is FALSE.}
 
@@ -71,8 +71,8 @@ library(ggplot2)
 prare <- ggrarecurve(test_otu_data,
                indexNames=c("Observe","Chao1","ACE"),
                shadow=FALSE,
-               factorNames="Group",
-               chunks=300) +
+               factorNames="Group"
+         ) +
          theme(legend.spacing.y=unit(0.02,"cm"),
                legend.text=element_text(size=6))
 }

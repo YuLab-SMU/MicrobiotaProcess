@@ -1,4 +1,16 @@
-#' @method ggrarecurve default
+#' @method ggrarecurve data.frame
+#' @rdname ggrarecurve
+#' @export
+ggrarecurve.data.frame <- function(obj, sampleda, factorLevels, chunks=400, ...){
+    obj <- get_rarecurve(obj=obj, 
+                         sampleda=sampleda, 
+                         chunks=chunks, 
+                         factorLevels=factorLevels)
+    p <- ggrarecurve.rarecurve(obj=obj, ...)
+    return(p)
+}
+
+#' @method ggrarecurve rarecurve
 #' @importFrom ggplot2 ggplot geom_ribbon aes_string geom_smooth facet_wrap scale_y_continuous
 #' @importFrom dplyr filter
 #' @importFrom rlang .data
@@ -6,11 +18,21 @@
 #' @importFrom Rmisc summarySE
 #' @rdname ggrarecurve
 #' @export
-ggrarecurve.default <- function(obj,
-    sampleda, indexNames="Observe", linesize=0.5, facetnrow=1,
-    shadow=TRUE, chunks=400, factorNames, factorLevels, se=FALSE,
-    method="lm", formula=y ~ log(x), ...){
-    obj <- stat_rare(data=obj, chunks=chunks, sampleda=sampleda, factorLevels=factorLevels, plotda=TRUE)
+ggrarecurve.rarecurve <- function(obj,
+    #sampleda, 
+    indexNames="Observe", 
+    linesize=0.5, 
+    facetnrow=1,
+    shadow=TRUE, 
+    #chunks=400, 
+    factorNames, 
+    #factorLevels, 
+    se=FALSE,
+    method="lm", 
+    formula=y ~ log(x), ...){
+    obj <- obj$data 
+    #obj <- get_rarecurve(obj=obj, sampleda=sampleda, chunks=chunks, factorLevels=factorLevels)
+    #obj <- stat_rare(data=obj, chunks=chunks, sampleda=sampleda, factorLevels=factorLevels, plotda=TRUE)
     mapping <- aes_string(x="readsNums", y="value", color="sample")
     if (!missing(factorNames)){
         if (shadow){

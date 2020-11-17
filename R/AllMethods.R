@@ -168,8 +168,8 @@ setMethod("get_taxadf", "data.frame",
 #' prare <- ggrarecurve(test_otu_data,
 #'                indexNames=c("Observe","Chao1","ACE"),
 #'                shadow=FALSE,
-#'                factorNames="Group",
-#'                chunks=300) +
+#'                factorNames="Group"
+#'          ) +
 #'          theme(legend.spacing.y=unit(0.02,"cm"),
 #'                legend.text=element_text(size=6))
 ggrarecurve <- function(obj, ...){
@@ -179,10 +179,11 @@ ggrarecurve <- function(obj, ...){
 #' @method ggrarecurve phyloseq
 #' @rdname ggrarecurve
 #' @export
-ggrarecurve.phyloseq <- function(obj, ...){
-    otuda <- checkotu(obj)
-    sampleda <- data.frame(get_sample(obj),check.names=FALSE)
-    p <- ggrarecurve.default(obj=otuda, sampleda=sampleda, ...)
+ggrarecurve.phyloseq <- function(obj, chunks=400, factorLevels=NULL, ...){
+    #otuda <- checkotu(obj)
+    #sampleda <- data.frame(get_sample(obj),check.names=FALSE)
+    obj <- get_rarecurve(obj, chunks=chunks, factorLevels=factorLevels)
+    p <- ggrarecurve.rarecurve(obj=obj, ...)
     return(p)	
 }
 
