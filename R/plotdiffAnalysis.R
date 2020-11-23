@@ -80,8 +80,8 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", l
     treedata <- convert_to_treedata(obj, type=type)
     layout %<>% match.arg(c("rectangular", "circular", "slanted", "radial", "inward_circular"))
     if (!is.null(factorLevels)){nodedf <- setfactorlevels(nodedf, factorLevels)}
-    nodedf <- get_node(treedata, nodedf)
     p <- treeskeleton(treedata, layout=layout, size=linewd, pointsize=skpointsize, xlim=xlim)
+    nodedf <- get_node(treedata=p$data, nodedf=nodedf)
     if (reduce){
         df <- p$data[!grepl("__un_",p$data$label),]
         nodedf <- nodedf[!grepl("__un_", as.vector(nodedf[,1])),,drop=FALSE]
@@ -488,8 +488,8 @@ ggeffectsize.diffAnalysisClass <- function(obj, removeUnknown=TRUE, setFacet=TRU
 #' @importFrom rlang .data
 #' @keywords internal
 get_node <- function(treedata, nodedf){
-    if (is.null(treedata@data)){stop("The data slot of treedata should't be NULL.")}
-    nodelist <- treedata@data[match(as.vector(nodedf[,1]), as.vector(treedata@data$labelnames)),]$node
+    nodelist <- treedata[match(as.vector(nodedf[,1]),treedata$label),]$node
+    print(nodelist)
     if (!"node" %in% colnames(nodedf)){
     	nodedf$node <- nodelist
     }else{

@@ -41,8 +41,29 @@ convert_to_treedata <- function(data, type="species", ...){
     mapping <- mapping[order(mapping$node),]
     node.label <- as.vector(mapping$labelnames)[!mapping$isTip]
     tip.label <- as.vector(mapping$labelnames)[mapping$isTip]
+    mapping <- mapping[,colnames(mapping) %in% c("node", "nodeClass", "nodeSize")]
     taxphylo <- structure(list(edge=edges, node.label=node.label,
                                tip.label=tip.label, edge.length=rep(0.5, nrow(edges)),
                                Nnode = length(node.label)), class="phylo")
     res <- treedata(phylo=taxphylo, data=as_tibble(mapping))
 }
+
+#' convert taxonomyTable to treedata
+#'
+#' @title as.treedata
+#' @param tree object, This is for taxonomyTable class, 
+#' so it should be a taxonomyTable.
+#' @param ... additional parameters. 
+#' @method as.treedata taxonomyTable
+#' @rdname as.treedata
+#' @export
+#' @examples
+#' data(test_otu_data)
+#' tree <- as.treedata(phyloseq::tax_table(test_otu_data))
+as.treedata.taxonomyTable <- function(tree, ...){
+    convert_to_treedata(data.frame(tree, check.names=FALSE))
+}
+
+#' @importFrom tidytree as.treedata
+#' @export
+tidytree::as.treedata
