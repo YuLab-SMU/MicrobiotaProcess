@@ -1,11 +1,15 @@
+# MicrobiotaProcess 1.3.3
+
++ add `as.treedata` for `taxonomyTable` class. (2020-11-23, Mon)
+
 # MicrobiotaProcess 1.3.2
 
 + `ggrarecurve` can be set color with variable of group for each samples. (2020-11-11, Tue)
   - using `shadow=FALSE` and providing `factorNames`
   - <https://github.com/YuLab-SMU/MicrobiotaProcess/issues/21>
 + add `get_rarecurve` to avoid repeated calculation when displaying rare curve. (2020-11-17, Tue)
-  + rareres <- get_rarecurve(obj, chunks=400)
-    p <- ggrarecurve(rareres)
+  + `rareres <- get_rarecurve(obj, chunks=400)`
+    `p <- ggrarecurve(rareres)`
 
 # MicrobiotaProcess 1.3.1
 
