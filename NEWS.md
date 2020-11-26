@@ -1,3 +1,8 @@
+# MicrobiotaProcess 1.3.4
+
++ fix a bug for numeric sample name. (2020-11-26, Thu)
++ `geom_tiplab` also support circular layout, so remove `geom_tiplab2`. (2020-11-26, Thu)
+
 # MicrobiotaProcess 1.3.3
 
 + add `as.treedata` for `taxonomyTable` class. (2020-11-23, Mon)
