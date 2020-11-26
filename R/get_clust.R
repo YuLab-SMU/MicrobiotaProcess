@@ -136,7 +136,7 @@ ggclust <- function(obj,...){
 
 #' @method ggclust clustplotClass
 #' @rdname ggclust
-#' @importFrom ggtree ggtree %<+% geom_tippoint geom_tiplab geom_tiplab2
+#' @importFrom ggtree ggtree %<+% geom_tippoint geom_tiplab
 #' @importFrom ggplot2 labs element_text
 #' @export
 ggclust.clustplotClass <- function(obj, 
@@ -170,12 +170,9 @@ ggclust.clustplotClass <- function(obj,
         samplehcp <- samplehcp %<+% sampleda + 
     			geom_tippoint(tmpfactormap, size=pointsize, ...)
     }
-    if (layout=="circular"){
-        samplehcp <- samplehcp + geom_tiplab2(size=fontsize, hjust=hjust)
-    }else{
-        samplehcp <- samplehcp + geom_tiplab(size=fontsize, hjust=hjust)	
-    }
-    samplehcp <- samplehcp + labs(title=paste0("Hierarchical Cluster of Samples ", "(", obj@distmethod, ")"))
+    samplehcp <- samplehcp + 
+                 geom_tiplab(size=fontsize, hjust=hjust) + 
+                 labs(title=paste0("Hierarchical Cluster of Samples ", "(", obj@distmethod, ")"))
     if (settheme){
         samplehcp <- samplehcp + 
                      theme(plot.title = element_text(face="bold", lineheight=25, hjust=0.5))
