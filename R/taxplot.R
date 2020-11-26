@@ -101,6 +101,9 @@ mappingtaxda <- function(data, topn=30, count=FALSE, sampleda=NULL,
     	}
     	colnames(dat)[1] <- "sample"		
     }
+    if (is.numeric(dat$sample)){
+       dat$sample <- as.character(dat$sample)
+    }
     if (!is.null(factorLevels)){dat <- setfactorlevels(dat, factorLevels)}
     return(dat)
 }
