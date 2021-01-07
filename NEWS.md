@@ -1,3 +1,8 @@
+# MicrobiotaProcess 1.3.5
+
++ fix an error for example of `ggrarecurve`. (2021-01-07, Thu)
+  `factorNames="Group"` to `factorNames="group"`
+
 # MicrobiotaProcess 1.3.4
 
 + fix a bug for numeric sample name. (2020-11-26, Thu)
