@@ -71,7 +71,7 @@ library(ggplot2)
 prare <- ggrarecurve(test_otu_data,
                indexNames=c("Observe","Chao1","ACE"),
                shadow=FALSE,
-               factorNames="Group"
+               factorNames="group"
          ) +
          theme(legend.spacing.y=unit(0.02,"cm"),
                legend.text=element_text(size=6))
