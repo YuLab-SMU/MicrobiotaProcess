@@ -64,6 +64,3 @@ as.treedata.taxonomyTable <- function(tree, ...){
     convert_to_treedata(data.frame(tree, check.names=FALSE))
 }
 
-#' @importFrom tidytree as.treedata
-#' @export
-tidytree::as.treedata
