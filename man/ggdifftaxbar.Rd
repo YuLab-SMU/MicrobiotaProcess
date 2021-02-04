@@ -17,7 +17,7 @@ ggdifftaxbar(obj, ...)
   figwidth = 6,
   figheight = 3,
   ylabel = "relative abundance",
-  format = "svg",
+  format = "pdf",
   dpi = 300,
   ...
 )
@@ -53,7 +53,7 @@ see also \code{\link[MicrobiotaProcess]{get_mean_median}}.}
 
 \item{ylabel}{character, the label of y, default is 'relative abundance'.}
 
-\item{format}{character, the format of figure, default is svg,
+\item{format}{character, the format of figure, default is pdf,
 png, tiff also be supported.}
 
 \item{dpi}{numeric, the dpi of output, default is 300.}

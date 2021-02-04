@@ -172,7 +172,7 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnknown=TRUE, ...){
 #' @param subclass character, factor name. 
 #' @param factorLevels list,  the levels of the factors, default is NULL,
 #' if you want to order the levels of factor, you can set this. 
-#' @param format character, the format of figure, default is svg,
+#' @param format character, the format of figure, default is pdf,
 #' png, tiff also be supported.
 #' @param coloslist vector, color vector, if the input is phyloseq, 
 #' you should use this to adjust the color, not scale_color_manual.
@@ -216,7 +216,7 @@ setMethod("ggdifftaxbar","diffAnalysisClass",function(obj,
     figwidth=6,
     figheight=3,
     ylabel="relative abundance",
-    format="svg",
+    format="pdf",
     dpi=300,
     ...){
     featureda <- obj@originalD
@@ -489,7 +489,6 @@ ggeffectsize.diffAnalysisClass <- function(obj, removeUnknown=TRUE, setFacet=TRU
 #' @keywords internal
 get_node <- function(treedata, nodedf){
     nodelist <- treedata[match(as.vector(nodedf[,1]),treedata$label),]$node
-    print(nodelist)
     if (!"node" %in% colnames(nodedf)){
     	nodedf$node <- nodelist
     }else{

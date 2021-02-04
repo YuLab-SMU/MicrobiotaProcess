@@ -40,14 +40,14 @@ vennlist <- get_vennlist(test_otu_data,
 vennlist
 #library(VennDiagram)
 #venn.diagram(vennlist, height=5, 
-#             width=5, filename = "./test_venn.svg", 
+#             width=5, filename = "./test_venn.pdf", 
 #             alpha = 0.85, fontfamily = "serif", 
 #             fontface = "bold",cex = 1.2, 
 #             cat.cex = 1.2, cat.default.pos = "outer",
 #             cat.dist = c(0.22,0.22,0.12,0.12), 
 #             margin = 0.1, lwd = 3, 
 #             lty ='dotted', 
-#             imagetype = "svg")
+#             imagetype = "pdf")
 }
 \author{
 Shuangbin Xu
