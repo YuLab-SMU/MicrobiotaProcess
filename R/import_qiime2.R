@@ -35,6 +35,7 @@ import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
                           build_tree=FALSE, parallel=FALSE, ...){
     otux <- read_qza(otuqza, parallel=parallel)
     otutab <- otu_table(otux$otutab,taxa_are_rows=TRUE)
+    refseq <- reftree <- taxtab <- NULL
     if (!is.null(taxaqza)){
         taxax <- read_qza(taxaqza, parallel=parallel)
         taxax <- taxax[match(rownames(otutab), rownames(taxax)),,drop=FALSE]
@@ -50,12 +51,7 @@ import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
             names(refseq) <- refseqnm
             if (build_tree){
                 reftree <- build_tree(DNAStringSet(refseq), ...)
-            }else{
-                reftree <- NULL
             }
-        }else{
-            refseq <- NULL
-            reftree <- NULL
         }
         taxtab <- tax_table(taxax)
     }
@@ -73,15 +69,6 @@ import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
     }
     if (is.null(mapfilename)){
         sampleda <- NULL
-    }
-    if (is.null(taxaqza) && is.null(taxtab)){
-        taxtab <- NULL
-    }
-    if (is.null(refseqqza) && is.null(refseq)){
-        refseq <- NULL
-    }
-    if (is.null(treeqza) && is.null(reftree)){
-        reftree <- NULL
     }
     arglist <- list(otutab, sampleda, taxtab, refseq, reftree)
     arglist <- arglist[!unlist(lapply(arglist, function(x)is.null(x)))]
