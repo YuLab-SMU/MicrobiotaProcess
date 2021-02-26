@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.3.6.990
+
++ update `import_qiime2` to avoid error when only feature table is provided. (2021-02-26, Fri)
+
 # MicrobiotaProcess 1.3.6
 
 + convert `svg` dev to `pdf` dev. (2021-02-04, Thu)
