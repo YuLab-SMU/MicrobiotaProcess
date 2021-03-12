@@ -41,10 +41,8 @@ Imports:
   ggsignif,
   scales,
   Rmisc,
-  DECIPHER,
   biomformat,
   yaml,
-  phangorn,
   patchwork
 Suggests:
   DT,
@@ -53,7 +51,9 @@ Suggests:
   tidyverse,
   testthat,
   knitr,
-  nlme
+  nlme,
+  phangorn,
+  DECIPHER
 License: GPL (>= 3.0)
 URL: https://github.com/YuLab-SMU/MicrobiotaProcess/
 BugReports: https://github.com/YuLab-SMU/MicrobiotaProcess/issues

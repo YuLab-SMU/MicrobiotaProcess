@@ -90,23 +90,21 @@ setGeneric("build_tree", function(seqs, ...){standardGeneric("build_tree")})
 #' @aliases build_tree,DNAStringSet
 #' @rdname build_tree
 #' @importFrom Biostrings DNAStringSet
-#' @importFrom DECIPHER AlignSeqs
-#' @importFrom phangorn phyDat dist.ml NJ pml optim.pml pml.control
 #' @importFrom stats update
 #' @export
 setMethod("build_tree", "DNAStringSet", function(seqs, ...){
-    alignment <- AlignSeqs(seqs, anchor=NA, ...)
-    phalign <- phyDat(as(alignment, "matrix"), type="DNA")
-    dm <- dist.ml(phalign)
-    treeNJ <- NJ(dm)
-    fit <- pml(treeNJ, data=phalign)
+    alignment <- DECIPHER::AlignSeqs(seqs, anchor=NA, ...)
+    phalign <- phangorn::phyDat(as(alignment, "matrix"), type="DNA")
+    dm <- phangorn::dist.ml(phalign)
+    treeNJ <- phangorn::NJ(dm)
+    fit <- phangorn::pml(treeNJ, data=phalign)
     treeGTR <- update(fit, k=4, inv=0.2)
-    tree <- optim.pml(treeGTR, 
+    tree <- phangorn::optim.pml(treeGTR, 
                       model="GTR", 
                       optInv=TRUE, 
                       optGamma=TRUE,
                       rearrangement = "stochastic", 
-                      control = pml.control(trace = 0))
+                      control = phangorn::pml.control(trace = 0))
     tree <- tree$tree
     return(tree)
 })
