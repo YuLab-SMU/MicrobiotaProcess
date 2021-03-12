@@ -20,6 +20,7 @@ ggbartax(obj, ...)
   count = FALSE,
   sampleda = NULL,
   factorLevels = NULL,
+  sampleLevels = NULL,
   facetNames = NULL,
   plotgroup = FALSE,
   groupfun = mean,
@@ -48,8 +49,13 @@ if the data is the data.frame for geom_bar, the mapping should be set.}
 \item{sampleda}{data.frame, (nrow sample * ncol factor), the sample 
 information, if the data doesn't contain the information.}
 
-\item{factorLevels}{list, the levels of the factors, default is NULL,
+\item{factorLevels}{vector or list, the levels of the factors
+(contained names e.g. list(group=c("B","A","C")) or
+c(group=c("B","A","C"))), adjust the order of facet, default is NULL,
 if you want to order the levels of factor, you can set this.}
+
+\item{sampleLevels}{vector, adjust the order of x axis
+e.g. c("sample2", "sample4", "sample3"), default is NULL.}
 
 \item{facetNames}{character, default is NULL.}
 
