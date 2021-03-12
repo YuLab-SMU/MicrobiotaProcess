@@ -6,12 +6,12 @@
 #' @importFrom stats aggregate
 #' @export
 ggbartax.default <- function(obj, mapping=NULL, position = "stack", stat="identity",
-    width=0.7, topn=30, count=FALSE, sampleda=NULL, factorLevels=NULL,
+    width=0.7, topn=30, count=FALSE, sampleda=NULL, factorLevels=NULL, sampleLevels=NULL,
     facetNames=NULL, plotgroup=FALSE, groupfun=mean,...){
     if (is.null(mapping)){
-        mapping <- aes_(~sample, ~value, fill=~feature)
+        mapping <- aes_(x=~sample, y=~value, fill=~feature)
         obj <- mappingtaxda(data=obj, topn=topn, count=count, sampleda=sampleda, 
-                            factorLevels=factorLevels, plotda=TRUE)
+                            factorLevels=factorLevels, sampleLevels=sampleLevels)
         if(!is.null(facetNames) & plotgroup){
             formulatmp <- as.formula(paste0("value ~ ", 
                                      paste(c(as.name(facetNames), "feature"),collapse="+")))
@@ -49,8 +49,11 @@ ggbartax.default <- function(obj, mapping=NULL, position = "stack", stat="identi
 #' @param count boolean, default is FALSE.
 #' @param sampleda data.frame, (nrow sample * ncol factor) the 
 #' sample information, if the data doesn't contain the information.
-#' @param factorLevels list, the levels of the factors, default is NULL,
-#' if you want to order the levels of factor, you can set this. 
+#' @param factorLevels vector, the levels of the factors (contained names e.g. 
+#' list(group=c("B","A","C")) or c(group=c("B","A","C"))), adjust the order of
+#' facet, default is NULL, if you want to order the levels of factor, you can set this.
+#' @param sampleLevels vector, the levels of samples, adjust the order of x axis
+#' e.g. c("sample2", "sample4"), default is NULL.
 #' @param plotda boolean, default is TRUE, whether build the data.frame for
 #' `geom_bar` of `ggplot2`.
 #' @return the data.frame for ggbartax
@@ -58,8 +61,9 @@ ggbartax.default <- function(obj, mapping=NULL, position = "stack", stat="identi
 #' @importFrom magrittr %>%
 #' @importFrom reshape melt
 #' @keywords internal
+#' @noRd
 mappingtaxda <- function(data, topn=30, count=FALSE, sampleda=NULL, 
-    factorLevels=NULL, plotda=TRUE){
+    factorLevels=NULL, sampleLevels=NULL, plotda=TRUE){
     tmpfeature <- colnames(data)[vapply(data,is.numeric,logical(1))]
     tmpfactor <- colnames(data)[!vapply(data,is.numeric,logical(1))]
     dat <- data[, tmpfeature,drop=FALSE] %>% t() %>% data.frame(check.names=FALSE)
@@ -105,6 +109,7 @@ mappingtaxda <- function(data, topn=30, count=FALSE, sampleda=NULL,
        dat$sample <- as.character(dat$sample)
     }
     if (!is.null(factorLevels)){dat <- setfactorlevels(dat, factorLevels)}
+    if (!is.null(sampleLevels)){dat$sample <- factor(dat$sample, levels=sampleLevels)}
     return(dat)
 }
 

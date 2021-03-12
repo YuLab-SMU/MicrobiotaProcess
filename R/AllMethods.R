@@ -10,8 +10,12 @@
 #' @param count logical, whether show the relative abundance.  
 #' @param sampleda data.frame, (nrow sample * ncol factor), the sample 
 #' information, if the data doesn't contain the information.
-#' @param factorLevels list, the levels of the factors, default is NULL,
+#' @param factorLevels vector or list, the levels of the factors
+#' (contained names e.g. list(group=c("B","A","C")) or
+#' c(group=c("B","A","C"))), adjust the order of facet, default is NULL,
 #' if you want to order the levels of factor, you can set this.
+#' @param sampleLevels vector, adjust the order of x axis
+#' e.g. c("sample2", "sample4", "sample3"), default is NULL.
 #' @param facetNames character, default is NULL.
 #' @param plotgroup logical, whether calculate the mean or median etc 
 #' for each group, default is FALSE.

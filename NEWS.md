@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.3.6.991
+
++ add `sampleLevels` in `ggbartax` to adjust the order of axis label. (2021-03-12, Fri)
+
 # MicrobiotaProcess 1.3.6.990
 
 + update `import_qiime2` to avoid error when only feature table is provided. (2021-02-26, Fri)
