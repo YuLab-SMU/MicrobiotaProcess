@@ -125,7 +125,6 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", l
 #' @method ggdiffclade diffAnalysisClass
 #' @rdname ggdiffclade
 #' @importFrom magrittr %>%
-#' @importFrom dplyr filter select
 #' @export
 ggdiffclade.diffAnalysisClass <- function(obj, removeUnknown=TRUE, ...){
     params <- list(...)

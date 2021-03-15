@@ -41,7 +41,6 @@ LDAeffectsize <- function(datalist, compareclass, classgroup, bootnums=30, LDA=2
     return(res)
 }
 
-#' @importFrom randomForest randomForest importance
 #' @keywords internal
 rfimportance <- function(datalist, classgroup, bootnums, effsize=2, ci=0.95){
     rfres <- list()
@@ -52,8 +51,8 @@ rfimportance <- function(datalist, classgroup, bootnums, effsize=2, ci=0.95){
         X <- df[,-classindex]
         X <- apply(X, 2, function(x)(x-min(x))/(max(x)-min(x)))
         Y <- df[, classindex]
-        dfres <- randomForest(x=X, y=Y, importance=TRUE, proximity=TRUE)
-        imres <- importance(dfres, type=1)
+        dfres <- randomForest::randomForest(x=X, y=Y, importance=TRUE, proximity=TRUE)
+        imres <- randomForest::importance(dfres, type=1)
         rfres[[i]] <- imres
     }
     rfres <- cal_ci(x=rfres, classgroup=classgroup, ci=ci, method="rf")

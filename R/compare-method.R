@@ -310,6 +310,6 @@ tidyEffectSize <- function(obj){
 #' @keywords internal
 get_second_true_var <- function(obj){
     secondvars <- do.call("rbind",c(obj@secondvars,make.row.names=FALSE))
-    secondvars <- secondvars %>% filter(eval(parse(text="gfc"))%in%"TRUE")
+    secondvars <- secondvars %>% dplyr::filter(eval(parse(text="gfc"))%in%"TRUE")
     return(secondvars)
 }

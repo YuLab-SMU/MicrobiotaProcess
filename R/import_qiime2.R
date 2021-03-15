@@ -86,7 +86,6 @@ import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
 #' efault is FALSE.
 #' @return list contained one or multiple object of feature table, 
 #' taxonomy table, tree and represent sequences.
-#' @importFrom yaml read_yaml
 #' @importFrom ape read.tree
 #' @importFrom Biostrings readDNAStringSet
 #' @importFrom utils unzip
@@ -100,7 +99,7 @@ read_qza <- function(qzafile, parallel=FALSE){
     tmpdir <- tempdir()
     unzipfiles <- unzip(qzafile, exdir=tmpdir)
     metadafile <- unzipfiles[grep("metadata.yaml", unzipfiles)[1]]
-    metaflag <- read_yaml(metadafile)
+    metaflag <- yaml::read_yaml(metadafile)
     formatflag <- metaflag$format
     datafile <- unzipfiles[3]
     formats <- c("BIOMV210DirFmt", "TSVTaxonomyDirectoryFormat", 
@@ -122,12 +121,11 @@ read_qza <- function(qzafile, parallel=FALSE){
     return(x)
 }
 
-#' @importFrom biomformat read_biom biom_data
 #' @importFrom phyloseq parse_taxonomy_greengenes
 #' @keywords internal
 read.featuretab <- function(file){
-    biomobj <- suppressWarnings(read_biom(file))
-    x <- data.frame(as(biom_data(biomobj),"matrix"), check.names=FALSE)
+    biomobj <- suppressWarnings(biomformat::read_biom(file))
+    x <- data.frame(as(biomformat::biom_data(biomobj),"matrix"), check.names=FALSE)
     taxflag <- all(unlist(lapply(biomobj$rows, function(i){length(i$metadata)}))==0)
     if (taxflag){
         taxtab <- NULL

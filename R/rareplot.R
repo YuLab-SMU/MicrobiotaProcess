@@ -12,9 +12,7 @@ ggrarecurve.data.frame <- function(obj, sampleda, factorLevels, chunks=400, ...)
 
 #' @method ggrarecurve rarecurve
 #' @importFrom ggplot2 ggplot geom_ribbon aes_string geom_smooth facet_wrap scale_y_continuous
-#' @importFrom dplyr filter
 #' @importFrom rlang .data
-#' @importFrom scales squish
 #' @importFrom Rmisc summarySE
 #' @rdname ggrarecurve
 #' @export
@@ -45,7 +43,7 @@ ggrarecurve.rarecurve <- function(obj,
         }
     }
     if (!is.null(indexNames)){
-        obj <- obj %>% filter(.data$Alpha %in% indexNames)
+        obj <- obj %>% dplyr::filter(.data$Alpha %in% indexNames)
     }
     p <- ggplot(data=obj, mapping=mapping) #+
     if (!missing(factorNames) && shadow){
@@ -54,7 +52,7 @@ ggrarecurve.rarecurve <- function(obj,
     }    
     message("The color has been set automatically, you can reset it manually by adding scale_color_manual(values=yourcolors)")
     p <- p + geom_smooth(se=se, method = method, size=linesize,formula = formula,...)+
-         scale_y_continuous(limits=c(0,NA), oob=squish) +
+         scale_y_continuous(limits=c(0,NA), oob=scales::squish) +
          facet_wrap(~ Alpha, scales="free", nrow=facetnrow) +
          ylab("alpha metric")+xlab("number of reads")
     return(p)

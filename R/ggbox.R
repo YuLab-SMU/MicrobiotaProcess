@@ -67,7 +67,6 @@ setGeneric("ggbox", function(obj, factorNames, ...){standardGeneric("ggbox")})
 #' @importFrom ggplot2 ggplot geom_boxplot geom_violin aes_string facet_wrap 
 #' @importFrom ggsignif geom_signif
 #' @importFrom reshape melt
-#' @importFrom dplyr filter
 #' @export
 setMethod("ggbox", "data.frame", 
           function(obj, sampleda, factorNames, indexNames, geom="boxplot",
@@ -91,7 +90,7 @@ setMethod("ggbox", "data.frame",
     if (missing(indexNames)||is.null(indexNames)){
         indexNames <- unique(as.vector(obj$feature))
     }
-    obj <- obj %>% filter(.data$feature %in% indexNames)
+    obj <- obj %>% dplyr::filter(.data$feature %in% indexNames)
     if (is.null(comparelist)){
         comparelist <- get_comparelist(data=obj, classgroup=factorNames, controlgroup=controlgroup)
     }

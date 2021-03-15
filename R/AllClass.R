@@ -74,9 +74,9 @@ setClass("ordplotClass",
     ylab=NULL, 
     title=NULL))
 
-#' @importClassesFrom phyloseq phylo
-#' @keywords internal 
-setClassUnion("phyloOrNULL", c("phylo", "NULL"))
+# #' @importClassesFrom phyloseq phylo
+# #' @keywords internal 
+# #' setClassUnion("phyloOrNULL", c("phylo", "NULL"))
 
 
 #' @title clustplotClass class
@@ -86,12 +86,13 @@ setClassUnion("phyloOrNULL", c("phylo", "NULL"))
 #' @slot distmethod character the method of dist.
 #' @name clustplotClass-class
 #' @rdname clustplotClass-class
+#' @importClassesFrom phyloseq phylo
 #' @exportClass clustplotClass
 setClass("clustplotClass",
-    representation=representation(hclustphylo="phyloOrNULL",
+    representation=representation(hclustphylo="phylo",
     sampleda="dataframeOrNull",
     distmethod="characterOrNull"),
-    prototype=prototype(hclustphylo=NULL,
+    prototype=prototype(
     sampleda=NULL,
     distmethod=NULL))
 

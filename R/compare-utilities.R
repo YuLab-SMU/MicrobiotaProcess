@@ -166,7 +166,7 @@ diffclass <- function(datasample,
     for (i in seq_len(nrow(comclass))){
         classtmp <- as.vector(comclass[i,])
         #clsize <- min(table(datasample[[class]]))
-        datatmp <- datasample %>% filter(eval(parse(text=classgroup)) %in% classtmp)
+        datatmp <- datasample %>% dplyr::filter(eval(parse(text=classgroup)) %in% classtmp)
         datatmp[[match(classgroup, colnames(datatmp))]] <- factor(datatmp[[match(classgroup,colnames(datatmp))]], 
                                                              levels=classtmp)
         clsize <- min(table(datatmp[[match(classgroup,colnames(datatmp))]]))
@@ -204,7 +204,7 @@ diffsubclass <- function(datasample,
         for (j in seq_len(nrow(comsubclass[[i]]))){
             subclasstmp <- as.vector(unlist(comsubclass[[i]][j,])) 
             datatmp <- datasample %>% 
-                       filter(eval(parse(text=classgroup)) %in% classtmp & eval(parse(text=subclass)) %in%subclasstmp)
+                       dplyr::filter(eval(parse(text=classgroup)) %in% classtmp & eval(parse(text=subclass)) %in%subclasstmp)
             datatmp[[match(subclass, colnames(datatmp))]] <- factor(datatmp[[match(subclass,colnames(datatmp))]],
                                                                              levels=subclasstmp)
             subclsize <- min(table(datatmp[[match(subclass,colnames(datatmp))]]))
