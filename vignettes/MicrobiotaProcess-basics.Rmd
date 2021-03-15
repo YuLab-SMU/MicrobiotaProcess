@@ -139,7 +139,7 @@ classbar
 
 `PCA` (Principal component analysis) and `PCoA` (Principal Coordinate Analysis) are general statistical procedures to compare groups of samples. And `PCoA` can based on the phylogenetic or count-based distance metrics, such as `Bray-Curtis`, `Jaccard`, `Unweighted-UniFrac` and `weighted-UniFrac`. `MicrobiotaProcess` presents the `get_pca`, `get_pcoa` and `ggordpoint` for the analysis.
 
-```{r, error=FALSE, fig.align="center", fig.height=4.5, fig.width=6, dev = "svg", fig.ext = "svg", eval = capabilities("cairo"), ordanalysis}
+```{r, error=FALSE, fig.align="center", fig.height=4.5, fig.width=6, ordanalysis}
 pcares <- get_pca(obj=ps_dada2, method="hellinger")
 # Visulizing the result
 pcaplot <- ggordpoint(obj=pcares, biplot=TRUE, speciesannot=TRUE,
@@ -161,7 +161,7 @@ pcoaplot
 
 `beta diversity` metrics can assess the differences between microbial communities. It can be visualized with `PCA` or `PCoA`, this can also be visualized with hierarchical clustering. `MicrobiotaProcess` also  implements the analysis based on ggtree[@yu2017ggtree].
 
-```{r, fig.align="center", fig.height=5, fig.width=6, dev = "svg", fig.ext = "svg", eval = capabilities("cairo"), error=FALSE, hclustAnalysis}
+```{r, fig.align="center", fig.height=5, fig.width=6, error=FALSE, hclustAnalysis}
 hcsample <- get_clust(obj=ps_dada2, distmethod="euclidean",
 		      method="hellinger", hclustmethod="average")
 # rectangular layout
