@@ -34,7 +34,7 @@ get_dist.default <- function(obj,
     objphyloseq <- new("phyloseq",
                        otu_table=otu_table(obj, 
                        taxa_are_rows=taxa_are_rows),
-                       sam_data=sampleda,
+                       sam_data=phyloseq::sample_data(sampleda),
                        phy_tree=tree)
     return(get_dist.phyloseq(objphyloseq, 
                              distmethod=distmethod, 
