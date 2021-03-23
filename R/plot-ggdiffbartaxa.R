@@ -44,6 +44,10 @@ ggdifftaxbar <- function(obj,...){
     UseMethod("ggdifftaxbar")
 }
 
+#' @rdname ggdifftaxbar
+#' @export
+ggdiffbartaxa <- ggdifftaxbar
+
 #' @keywords internal
 setGeneric("ggdifftaxbar")
 
