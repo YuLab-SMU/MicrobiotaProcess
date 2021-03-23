@@ -1,3 +1,8 @@
+# MicrobiotaProcess 1.3.8 
+
++ rename files of code. (2021-03-23, Tue)
++ add aliases for `ggbartaxa` and `ggdiffbartaxa`. (2021-03-23, Tue)
+
 # MicrobiotaProcess 1.3.7
 
 + optimized import for installation. (2021-03-15, Mon) 
