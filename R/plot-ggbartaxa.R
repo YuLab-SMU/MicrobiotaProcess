@@ -50,20 +50,20 @@ ggbartax.phyloseq <- function(obj, ...){
     }
     if (!is.null(obj@sam_data)){
     	sampleda <- data.frame(sample_data(obj), check.names=FALSE)
-    	p <- ggbartax.default(obj=otudata, sampleda=sampleda, ...)
+    	p <- ggbartax.data.frame(obj=otudata, sampleda=sampleda, ...)
     }else{
-    	p <- ggbartax.default(obj=otudata,...)
+    	p <- ggbartax.data.frame(obj=otudata,...)
     }
     return(p)	
 }
-#' @method ggbartax default
+#' @method ggbartax data.frame
 #' @rdname ggbartax
 #' @importFrom ggplot2 ggplot aes_ geom_bar scale_fill_manual facet_grid
 #' @importFrom stats as.formula
 #' @importFrom rlang as_name
 #' @importFrom stats aggregate
 #' @export
-ggbartax.default <- function(obj, mapping=NULL, position = "stack", stat="identity",
+ggbartax.data.frame <- function(obj, mapping=NULL, position = "stack", stat="identity",
     width=0.7, topn=30, count=FALSE, sampleda=NULL, factorLevels=NULL, sampleLevels=NULL,
     facetNames=NULL, plotgroup=FALSE, groupfun=mean,...){
     if (is.null(mapping)){

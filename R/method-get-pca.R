@@ -48,6 +48,6 @@ get_pca.data.frame <- function(obj,
 get_pca.phyloseq <- function(obj, method="hellinger", ...){
     otuda <- checkotu(obj)
     sampleda <- checksample(obj)
-    pca <- get_pca.default(otuda, sampleda=sampleda, method=method, ...)
+    pca <- get_pca.data.frame(otuda, sampleda=sampleda, method=method, ...)
     return(pca)
 }

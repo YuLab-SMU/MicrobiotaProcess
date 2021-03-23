@@ -19,7 +19,7 @@ get_dist <- function(obj,...){
     UseMethod("get_dist")
 }
 
-#' @method get_dist default
+#' @method get_dist data.frame
 #' @rdname get_dist
 #' @importFrom vegan decostand
 #' @importFrom phyloseq otu_table 

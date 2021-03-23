@@ -44,7 +44,7 @@ get_pcoa.data.frame <- function(obj,
     #type="sample",
     method="hellinger",
     ...){
-    tmpdist <- get_dist.default(obj, 
+    tmpdist <- get_dist.data.frame(obj, 
                                 distmethod=distmethod,
                                 taxa_are_rows=taxa_are_rows,
                                 sampleda=sampleda,
