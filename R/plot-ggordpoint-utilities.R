@@ -13,6 +13,7 @@
 #' @author Guangchuang Yu
 #' @references \url{http://lchblogs.netlify.com/post/2017-12-22-r-addconfellipselda/}
 #' @keywords internal
+#' @noRd
 geom_ord_ellipse <- function(data=NULL, mapping = NULL, ellipse_pro = 0.9, alpha=0.3, show.legend=NA, inherit.aes = TRUE, ...) {
     #default_aes <- aes_(color = ~Groups, group = ~Groups)
     #if (is.null(mapping)) {

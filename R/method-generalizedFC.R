@@ -33,11 +33,11 @@ generalizedFC <- function(x, ...){
     UseMethod("generalizedFC")
 }
 
-#' @method generalizedFC default
+#' @method generalizedFC data.frame
 #' @rdname generalizedFC
 #' @importFrom stats median quantile
 #' @export
-generalizedFC.default <- function(x, y, base=10, steps=0.05, pseudo=0.00001,...){
+generalizedFC.data.frame <- function(x, y, base=10, steps=0.05, pseudo=0.00001,...){
     x.q <- quantile(log(x+pseudo, base), 
 		probs=seq(.05, .95, steps), na.rm=TRUE,...)
     y.q <- quantile(log(y+pseudo, base), 

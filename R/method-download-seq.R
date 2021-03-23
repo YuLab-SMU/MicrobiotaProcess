@@ -16,7 +16,6 @@
 ## #' ids has been retrieved. default is FALSE.
 ## #' @return the files of sequences downloaded by ids
 ## #' @importFrom Biostrings readBStringSet
-## #' @importFrom rentrez entrez_fetch
 ## #' @author Shuangbin Xu
 ## #' @export
 ## #' @examples
@@ -43,7 +42,7 @@
 ##     }
 ##     cat(ids)
 ##     cat("\n")
-##     tryCatch({tmprecs <- entrez_fetch(db=databases, ids, rettype=type)
+##     tryCatch({tmprecs <- rentrez::entrez_fetch(db=databases, ids, rettype=type)
 ##               tmprecs <- gsub("\n\n", "\n", tmprecs)
 ##               #tmprecs <- str_trim(tmprecs)
 ##               tmprecs <- substr(tmprecs, 1, nchar(tmprecs)-1)

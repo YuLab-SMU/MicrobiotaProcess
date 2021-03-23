@@ -1,3 +1,50 @@
+#' @title Rarefaction alpha index
+#' @param obj phyloseq, phyloseq class or data.frame
+#' shape of data.frame (nrow sample * ncol feature ( + factor)). 
+#' @param shadow logical, whether merge samples with group (factorNames) and
+#' display the ribbon of group, default is TRUE.
+#' @param linesize integer, default is 0.5. 
+#' @param chunks integer, the number of subsample in a sample,
+#'  default is 400.
+#' @param sampleda data.frame, (nrow sample * ncol factor)
+#' @param factorNames character, default is missing.
+#' @param facetnrow integer, the nrow of facet, default is 1.
+#' @param factorLevels list, the levels of the factors, default is NULL,
+#' if you want to order the levels of factor, you can set this.
+#' @param indexNames character, default is "Observe",
+#' only for "Observe", "Chao1", "ACE", "Shannon", "Simpson", "J".
+#' @param se logical, default is FALSE.
+#' @param method character, default is lm. 
+#' @param formula formula, default is `y ~ log(x)`
+#' @param ... additional parameters, 
+#' see also \code{\link{ggplot2}{ggplot}}.
+#' @return figure of rarefaction curves
+#' @author Shuangbin Xu
+#' @export
+#' @examples
+#' data(test_otu_data)
+#' library(ggplot2)
+#' prare <- ggrarecurve(test_otu_data,
+#'                indexNames=c("Observe","Chao1","ACE"),
+#'                shadow=FALSE,
+#'                factorNames="group"
+#'          ) +
+#'          theme(legend.spacing.y=unit(0.02,"cm"),
+#'                legend.text=element_text(size=6))
+ggrarecurve <- function(obj, ...){
+    UseMethod("ggrarecurve")
+}
+
+#' @method ggrarecurve phyloseq
+#' @rdname ggrarecurve
+#' @export
+ggrarecurve.phyloseq <- function(obj, chunks=400, factorLevels=NULL, ...){
+    #otuda <- checkotu(obj)
+    #sampleda <- data.frame(get_sample(obj),check.names=FALSE)
+    obj <- get_rarecurve(obj, chunks=chunks, factorLevels=factorLevels)
+    p <- ggrarecurve.rarecurve(obj=obj, ...)
+    return(p)	
+}
 #' @method ggrarecurve data.frame
 #' @rdname ggrarecurve
 #' @export
@@ -76,6 +123,7 @@ ggrarecurve.rarecurve <- function(obj,
 #' @importFrom reshape melt
 #' @importFrom magrittr %>%
 #' @keywords internal
+#' @noRd
 stat_rare <- function(data, 
     chunks=400, 
     sampleda,

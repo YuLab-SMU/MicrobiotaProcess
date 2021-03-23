@@ -1,3 +1,61 @@
+#' @title taxonomy barplot
+#' @param obj phyloseq, phyloseq class or data.frame, 
+#' (nrow sample * ncol feature (factor)) or the data.frame for geom_bar.
+#' @param mapping set of aesthetic mapping of ggplot2, default is NULL,
+#' if the data is the data.frame for geom_bar, the mapping should be set.
+#' @param position character, default is `stack`. 
+#' @param stat character, default is `identity`.
+#' @param width numeric, the width of bar, default is 0.7.
+#' @param topn integer, the top number of abundance taxonomy(feature).
+#' @param count logical, whether show the relative abundance.  
+#' @param sampleda data.frame, (nrow sample * ncol factor), the sample 
+#' information, if the data doesn't contain the information.
+#' @param factorLevels vector or list, the levels of the factors
+#' (contained names e.g. list(group=c("B","A","C")) or
+#' c(group=c("B","A","C"))), adjust the order of facet, default is NULL,
+#' if you want to order the levels of factor, you can set this.
+#' @param sampleLevels vector, adjust the order of x axis
+#' e.g. c("sample2", "sample4", "sample3"), default is NULL.
+#' @param facetNames character, default is NULL.
+#' @param plotgroup logical, whether calculate the mean or median etc 
+#' for each group, default is FALSE.
+#' @param groupfun character, how to calculate for feature in each group,
+#' the default is `mean`, this will plot the mean of feature in each group.
+#' @param ... additional parameters, see \code{\link[ggplot2]{ggplot}}
+#' @return barplot of tax
+#' @author Shuangbin Xu
+#' @export
+#' @examples
+#' library(ggplot2)
+#' data(test_otu_data)
+#' otubar <- ggbartax(test_otu_data) + 
+#'          xlab(NULL) + ylab("relative abundance(%)")
+ggbartax <- function(obj,...){
+    UseMethod("ggbartax")
+}
+
+#' @rdname ggbartax
+#' @export
+ggbartaxa <- ggbartax
+
+#' @method ggbartax phyloseq
+#' @importFrom phyloseq otu_table taxa_are_rows
+#' @rdname ggbartax
+#' @export
+ggbartax.phyloseq <- function(obj, ...){
+    if (is.null(obj@otu_table)){
+    	stop("The otu table is empty!")
+    }else{
+    	otudata <- get_otudata(obj)
+    }
+    if (!is.null(obj@sam_data)){
+    	sampleda <- data.frame(sample_data(obj), check.names=FALSE)
+    	p <- ggbartax.default(obj=otudata, sampleda=sampleda, ...)
+    }else{
+    	p <- ggbartax.default(obj=otudata,...)
+    }
+    return(p)	
+}
 #' @method ggbartax default
 #' @rdname ggbartax
 #' @importFrom ggplot2 ggplot aes_ geom_bar scale_fill_manual facet_grid
