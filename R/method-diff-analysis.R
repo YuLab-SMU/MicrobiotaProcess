@@ -82,7 +82,10 @@ diff_analysis.data.frame <- function(obj, sampleda, classgroup, subclass=NULL, t
         message("The class argument has been deprecated. Please use `classgroup` instead!")
         classgroup <- params$class
     }
-    if (!is.null(taxda)){taxda <- fillNAtax(taxda, type=type)
+    if (!is.null(taxda)){
+        if (!"fillNA" %in% names(attributes(taxda))){
+            taxda <- fillNAtax(taxda, type=type)
+        }
         if (alltax){obj <- get_alltaxdf(obj, taxda, method=standard_method)}
     }
     sampleda <- sampleda %>% select(c(classgroup, subclass))
@@ -192,7 +195,10 @@ setMethod("get_alltaxadf", "phyloseq",function(obj, method=NULL, type="species",
     if (is.null(obj@tax_table)){
         stop("The taxaonomy table is empty!")
     }else{
-        taxa <- fillNAtax(tax_table(obj), type=type) 
+        taxa <- tax_table(obj)
+        if (!"fillNA" %in% names(attributes(taxa))){
+            taxa <- fillNAtax(taxa, type = type)
+        }
     }
     data <- get_alltaxdf(data=otuda, taxda=taxa, taxa_are_rows=FALSE, method=method, ...)
     return(data)
@@ -205,7 +211,9 @@ setMethod("get_alltaxadf", "data.frame", function(obj, taxda, taxa_are_rows=FALS
     #if (taxa_are_rows){
     #    obj <- data.frame(t(obj), check.names=FALSE)
     #}
-    taxda <- fillNAtax(taxda, type=type)
+    if (!"fillNA" %in% names(attributes(taxda))){
+        taxda <- fillNAtax(taxda, type=type)
+    }
     data <- get_alltaxdf(data=obj, taxda=taxda, taxa_are_rows=taxa_are_rows, method=method, ...)
     return(data)
 })

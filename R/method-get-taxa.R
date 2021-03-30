@@ -36,7 +36,11 @@ setMethod("get_taxadf", "phyloseq", function(obj, taxlevel=2, type="species",...
     if (is.null(obj@tax_table)){
     	stop("The tax table is empty!")
     }else{
-    	taxdf <- tax_table(obj)
+        taxdf <- tax_table(obj)
+        
+        if (!"fillNA" %in% names(attributes(taxdf))){
+            taxdf <- fillNAtax(taxdf, type)
+        }
     }
     otuda <- checkotu(obj)
     sampleda <- get_sample(obj)
@@ -75,7 +79,9 @@ setMethod("get_taxadf", "data.frame",
     if(!is.null(sampleda) && !inherits(sampleda, "sample_data")){
         sampleda <- sample_data(sampleda)
     }
-    taxda <- fillNAtax(taxda, type=type)
+    if (!"fillNA" %in% names(attributes(taxda))){
+        taxda <- fillNAtax(taxda, type=type)
+    }
     if (inherits(taxlevel, "numeric")){taxlevel <- colnames(taxda)[taxlevel]}
     tmptax <- taxda[, match(taxlevel, colnames(taxda)), drop=FALSE]
     tmptaxda <- taxda[, seq(from=1, to=match(taxlevel, colnames(taxda))), drop=FALSE]
@@ -85,5 +91,6 @@ setMethod("get_taxadf", "data.frame",
                                  featurelist=tmptax), 
                        taxa_are_rows=TRUE)
     taxdf <- phyloseq(taxdf, sampleda, tax_table(as.matrix(tmptaxda)))
+    attr(taxdf@tax_table, "fillNA") <- TRUE
     return(taxdf)
 })

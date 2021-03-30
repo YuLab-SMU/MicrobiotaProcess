@@ -12,7 +12,9 @@
 #' head(taxda)
 #' treedat <- convert_to_treedata(taxda)
 convert_to_treedata <- function(data, type="species", ...){
-    data <- fillNAtax(data, type=type)
+    if (!"fillNA" %in% names(attributes(data))){
+        data <- fillNAtax(data, type=type)
+    }
     data <- data.frame(root=rep("r__root", nrow(data)), data)
     datalist <- list()
     for (i in seq_len(ncol(data)-1)){

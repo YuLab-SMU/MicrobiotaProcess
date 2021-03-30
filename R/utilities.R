@@ -119,6 +119,7 @@ addtaxlevel <- function(taxdf){#, type="species"){
 #' @importFrom tibble column_to_rownames
 #' @keywords internal
 fillNAtax <- function(taxdf, type="species"){
+    taxdf <- remove_unclassfied(taxdf)
     if (type!="species"){
         assign("taxlevelchar", paste0("d", seq_len(ncol(taxdf))), envir = .GlobalEnv)
     }else{
@@ -137,8 +138,27 @@ fillNAtax <- function(taxdf, type="species"){
     }
     taxdf <- filltaxname(taxdf)
     taxdf <- repduplicatedtaxcheck(taxdf) #%>% column_to_rownames(var="rowname")
+    attr(taxdf, "fillNA") <- TRUE 
     return(taxdf)
 }
+
+#' @keywords internal
+remove_unclassfied <- function(taxdf){
+    taxdf[grepl.data.frame("Unclassified|uncultured|Ambiguous|Unknown|unknown", taxdf)] <- NA
+    return(taxdf)
+}
+
+grepl.data.frame <- function(pattern, x, ...){
+    y <- if (length(x)) {
+             do.call("cbind", lapply(x, "grepl", pattern=pattern, ...))
+         }else{
+             matrix(FALSE, length(row.names(x)), 0)
+         }
+    if (.row_names_info(x) > 0L)
+        rownames(y) <- row.names(x)
+    y
+}
+
 
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
