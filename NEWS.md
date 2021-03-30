@@ -1,3 +1,8 @@
+# MicrobiotaProcess 1.3.8.900
+
++ remove unclassified, ambiguous taxonomy names. (2021-03-30, Tue)
++ <https://github.com/YuLab-SMU/MicrobiotaProcess/issues/23>
+
 # MicrobiotaProcess 1.3.8 
 
 + rename files of code. (2021-03-23, Tue)
