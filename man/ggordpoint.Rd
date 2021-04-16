@@ -47,9 +47,9 @@ ggordpoint(obj, ...)
 
 \item{mapping}{set of aesthetic mapping of ggplot2, default is NULL
 when your want to set it by yourself, only alpha can be setted, and
-the first element of factorNames has been setted to map fill, and
-the second element of factorNames has been setted to map starshape,
-you can use \code{\link[ggstar]{scale_starshape_manual}} set the shapes.}
+the first element of factorNames has been setted to map 'fill', and
+the second element of factorNames has been setted to map 'starshape',
+you can add 'scale_starshape_manual' of 'ggstar' to set the shapes.}
 
 \item{sampleda}{data.frame, nrow sample * ncol factors, default is NULL.}
 

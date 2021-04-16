@@ -3,9 +3,9 @@
 #' @param pc integer vector, the component index. 
 #' @param mapping set of aesthetic mapping of ggplot2, default is NULL
 #' when your want to set it by yourself, only alpha can be setted, and
-#' the first element of factorNames has been setted to map fill, and
-#' the second element of factorNames has been setted to map starshape,
-#' you can use \code{\link[ggstar]{scale_starshape_manual}} set the shapes.
+#' the first element of factorNames has been setted to map 'fill', and
+#' the second element of factorNames has been setted to map 'starshape',
+#' you can add 'scale_starshape_manual' of 'ggstar' to set the shapes.
 #' @param sampleda data.frame, nrow sample * ncol factors, default is NULL. 
 #' @param factorNames vector, the names of factors contained sampleda.
 #' @param factorLevels list, the levels of the factors, default is NULL,
