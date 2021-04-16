@@ -1,5 +1,6 @@
-# MicrobiotaProcess 1.3.8.900
+# MicrobiotaProcess 1.3.9
 
+- more layouts for `ggdiffclade`. (2021-04-16, Fri)
 + remove unclassified, ambiguous taxonomy names. (2021-03-30, Tue)
 + <https://github.com/YuLab-SMU/MicrobiotaProcess/issues/23>
 
