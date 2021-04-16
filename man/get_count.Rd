@@ -5,9 +5,9 @@
 \alias{get_ratio}
 \title{calculate the count or relative abundance of replicate element with a speficify column}
 \usage{
-get_count(data, featurelist)
+get_count(data, featurelist, ...)
 
-get_ratio(data, featurelist)
+get_ratio(data, featurelist, ...)
 }
 \arguments{
 \item{data}{dataframe; a dataframe contained one character column and others is numeric,
@@ -15,6 +15,8 @@ if featurelist is NULL. Or a numeirc dataframe, if featurelist is non't NULL, al
 should be numeric.}
 
 \item{featurelist}{dataframe; a dataframe contained one chatacter column, default is NULL.}
+
+\item{...}{additional parameters.}
 }
 \value{
 mean of data.frame by featurelist

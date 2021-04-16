@@ -7,6 +7,7 @@
 #' if featurelist is NULL. Or a numeirc dataframe, if featurelist is non't NULL, all columns 
 #' should be numeric.
 #' @param featurelist dataframe; a dataframe contained one chatacter column, default is NULL.
+#' @param ... additional parameters.
 #' @return mean of data.frame by featurelist
 #' @export 
 #' @author Shuangbin Xu
@@ -28,17 +29,18 @@
 #' phycount <- get_count(otuda, taxdf[,2,drop=FALSE])
 #' phyratios <- get_ratio(otuda, taxdf[,2,drop=FALSE])
 get_count <- function(data,
-                      featurelist){ 
+                      featurelist, ...){ 
     if (missing(featurelist) || is.null(featurelist)){
         data <- data
+        nums <- !unlist(lapply(data, is.numeric))
+        group <- names(data[,nums,drop=FALSE])
     }else{
         data <- merge(data, featurelist, by=0)
         rownames(data) <- as.vector(data$Row.names)
         data$Row.names <- NULL
+        group <- colnames(featurelist)
     }
-    nums <- !unlist(lapply(data, is.numeric))
-    group <- names(data[,nums,drop=FALSE])
-    data <- data.frame(plyr::ddply(data, group, plyr::numcolwise(sum)), 
+    data <- data.frame(plyr::ddply(data, group, plyr::numcolwise(sum), ...), 
     	     check.names=FALSE, stringsAsFactors=FALSE)   
     rownames(data) <- as.vector(data[[group]])
     data[[group]] <- NULL
@@ -55,8 +57,8 @@ get_count <- function(data,
 
 #' @rdname get_count
 #' @export
-get_ratio <- function(data, featurelist){
-    data <- get_count(data=data, featurelist=featurelist)
+get_ratio <- function(data, featurelist, ...){
+    data <- get_count(data=data, featurelist=featurelist, ...)
     data <- data.frame(prop.table(as.matrix(data),2), check.names=FALSE)
     return(data)
 }
