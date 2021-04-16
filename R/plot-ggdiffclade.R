@@ -12,8 +12,8 @@
 #' @param removeUnknown logical, whether do not show unknown taxonomy, 
 #' default is TRUE.
 #' @param layout character, the layout of ggtree, but only "rectangular",
-#' "radial", "slanted", "inward_circular" and "circular" in here, 
-#' default is circular.
+#' "roundrect", "ellipse", "radial", "slanted", "inward_circular" and 
+#' "circular" in here, default is "radial".
 #' @param linewd numeric, the size of segment of ggtree, default is 0.6.
 #' @param skpointsize numeric, the point size of skeleton of tree, 
 #' default is 0.8 .
@@ -69,7 +69,7 @@ ggdiffclade <- function(obj,...){
 #' @importFrom magrittr %<>%
 #' @importFrom stats as.formula
 #' @export
-ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", linewd=0.6, 
+ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="radial", linewd=0.6, 
     skpointsize=0.8, alpha=0.4, taxlevel=6, cladetext=2, factorLevels=NULL, setColors=TRUE,
     xlim=12, reduce=FALSE, type="species", ...){
     params <- list(...)
@@ -78,7 +78,7 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", l
         linewd <- params$size
     }
     treedata <- convert_to_treedata(obj, type=type)
-    layout %<>% match.arg(c("rectangular", "circular", "slanted", "radial", "inward_circular"))
+    layout %<>% match.arg(c("rectangular", "roundrect", "ellipse", "circular", "slanted", "radial", "inward_circular"))
     if (!is.null(factorLevels)){nodedf <- setfactorlevels(nodedf, factorLevels)}
     p <- treeskeleton(treedata, layout=layout, size=linewd, pointsize=skpointsize, xlim=xlim)
     nodedf <- get_node(treedata=p$data, nodedf=nodedf)
@@ -89,7 +89,7 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", l
     }
     cladecoord <- get_cladedf(p, nodedf$node)
     cladecoord <- merge(cladecoord, nodedf, by.x="node", by.y="node")
-    if (layout %in% c("rectangular","slanted")){
+    if (layout %in% c("rectangular","slanted", "roundrect", "ellipse")){
         #taxlevel <- 7
         labelannotcoord <- get_labeldf(p, nodedf$node, angle=90)
     }else{
@@ -99,19 +99,20 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="circular", l
     labelcoord <- labelannotcoord$labeldf
     annotcoord <- labelannotcoord$annotdf
     if ("pvalue" %in% colnames(nodedf)){
-    	nodedf[["-log10(pvalue)"]] <- -log10(nodedf$pvalue)
-    	pointmapping <- aes_(x=~x,y=~y,fill=as.formula(paste("~",factorName)), size=~-log10(pvalue))
+        nodedf[["-log10(pvalue)"]] <- -log10(nodedf$pvalue)
+        pointmapping <- aes_(x=~x,y=~y,fill=as.formula(paste("~",factorName)), size=~-log10(pvalue))
     }else{
-    	pointmapping <- aes_(x=~x,y=~y, fill=as.formula(paste("~",factorName)))
+        pointmapping <- aes_(x=~x,y=~y, fill=as.formula(paste("~",factorName)))
     }
-    p <- p + geom_rect(data=cladecoord,aes_(fill=as.formula(paste("~",factorName)), 
-    		                            xmin=~xmin, ymin=~ymin, xmax=~xmax, ymax=~ymax),
+    p <- p + geom_rect(data=cladecoord,
+                       aes_(fill=as.formula(paste("~",factorName)), 
+                       xmin=~xmin, ymin=~ymin, xmax=~xmax, ymax=~ymax),
                        alpha=alpha,
     	               show.legend=FALSE) +
-    	geom_text(data=labelcoord, aes_(x=~x,y=~y, label=~label, angle=~angle), size=cladetext) +
-    	geom_point(data=cladecoord, pointmapping, shape=21)+
-    	geom_point(data=annotcoord, aes_(x=0,y=0, color=~label), size=0, stroke=0) +
-    	scale_size_continuous(range = c(1, 3))
+        geom_text(data=labelcoord, aes_(x=~x,y=~y, label=~label, angle=~angle), size=cladetext) +
+        geom_point(data=cladecoord, pointmapping, shape=21)+
+        geom_point(data=annotcoord, aes_(x=0,y=0, color=~label), size=0, stroke=0) +
+        scale_size_continuous(range = c(1, 3))
     if (setColors){
         message("The color has been set automatically, you can reset it manually by adding scale_fill_manual(values=yourcolors)")
         tmpn <- length(unique(as.vector(nodedf[[match(factorName,colnames(nodedf))]])))

@@ -12,7 +12,7 @@ ggdiffclade(obj, ...)
   obj,
   nodedf,
   factorName,
-  layout = "circular",
+  layout = "radial",
   linewd = 0.6,
   skpointsize = 0.8,
   alpha = 0.4,
@@ -41,8 +41,8 @@ information and(or pvalue).}
 \item{factorName}{character, the names of factor in nodedf.}
 
 \item{layout}{character, the layout of ggtree, but only "rectangular",
-"radial", "slanted", "inward_circular" and "circular" in here, 
-default is circular.}
+"roundrect", "ellipse", "radial", "slanted", "inward_circular" and 
+"circular" in here, default is "radial".}
 
 \item{linewd}{numeric, the size of segment of ggtree, default is 0.6.}
 
