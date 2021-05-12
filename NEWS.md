@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.3.11
+
++ fill `ggclust` bug to map `color` and `shape`. (2021-05-12, Wed)
+
 # MicrobiotaProcess 1.3.9
 
 - more layouts for `ggdiffclade`. (2021-04-16, Fri)
