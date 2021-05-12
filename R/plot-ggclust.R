@@ -83,7 +83,7 @@ set_factormap <- function(namelist){
         tmpfactormap <- aes_string(color=namelist[1])
     }else{
         tmpfactormap <- aes_string(color=namelist[1],
-                                   starshape=namelist[2])
+                                   shape=namelist[2])
     }
     return(tmpfactormap)
 }
