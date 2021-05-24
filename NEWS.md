@@ -1,3 +1,12 @@
+# MicrobiotaProcess 1.5.0.990
+
++ add `ellipse_linewd` and `ellipse_lty` in `ggordpoint` to control 
+  the width and line type of ellipse line. (2021-05-24, Mon)
+
+# MicrobiotaProcess 1.4.0
+
++ new version released. (2021-05-20, Thu)
+
 # MicrobiotaProcess 1.3.11
 
 + fill `ggclust` bug to map `color` and `shape`. (2021-05-12, Wed)
