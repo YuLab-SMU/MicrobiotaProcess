@@ -19,6 +19,8 @@
 #' @param labelfactor character, the factor want to be show in label, default is NULL.
 #' @param ellipse_pro numeric, confidence value for the ellipse, default is 0.9.
 #' @param ellipse_alpha numeric, the alpha of ellipse, default is 0.2.
+#' @param ellipse_linewd numeric, the width of ellipse line, default is 0.5.
+#' @param ellipse_lty integer, the type of ellipse line, default is 3
 #' @param biplot logical, whether plot the species, default is FALSE.
 #' @param topn integer or vector, the number species have top important contribution, default is 5.
 #' @param settheme logical, whether set the theme for the plot, default is TRUE.
@@ -54,8 +56,8 @@ ggordpoint <- function(obj, ...){
 #' @export
 ggordpoint.default <-  function(obj, pc=c(1,2), mapping=NULL, sampleda=NULL, factorNames=NULL, factorLevels=NULL,
     poinsize=2, linesize=0.3, arrowsize=1.5, arrowlinecolour="grey", ellipse=FALSE, showsample=FALSE, ellipse_pro=0.9, 
-    ellipse_alpha=0.2, biplot=FALSE, topn=5, settheme=TRUE, speciesannot=FALSE, fontsize=2.5, labelfactor=NULL, stroke=0.1,
-    fontface="bold.italic", fontfamily="sans", textlinesize=0.02, ...){
+    ellipse_alpha=0.2, ellipse_linewd=0.5, ellipse_lty=3, biplot=FALSE, topn=5, settheme=TRUE, speciesannot=FALSE, 
+    fontsize=2.5, labelfactor=NULL, stroke=0.1, fontface="bold.italic", fontfamily="sans", textlinesize=0.02, ...){
     plotcoordclass <- get_coord(obj, pc)
     plotcoord <- plotcoordclass@coord
     xlab_text <- plotcoordclass@xlab	
@@ -86,7 +88,12 @@ ggordpoint.default <-  function(obj, pc=c(1,2), mapping=NULL, sampleda=NULL, fac
         shapes <- c(13, 15, 12, 6, 1, 2, 9, 29, 27, 5, 14, 22, 11, 23)[seq_len(length(unique(as.vector(plotcoord[[rlang::as_name(mapping$starshape)]]))))]
         p <- p + scale_starshape_manual(values=shapes)
     }
-    if (ellipse){p <- p + geom_ord_ellipse(data=plotcoord,mapping=ellipsemapping,ellipse_pro=ellipse_pro, alpha=ellipse_alpha, fill=NA, show.legend=FALSE, lty=3)}
+    if (ellipse){
+        p <- p + 
+            geom_ord_ellipse(data=plotcoord, 
+                             mapping=ellipsemapping, ellipse_pro=ellipse_pro, size=ellipse_linewd, 
+                             alpha=ellipse_alpha, fill=NA, show.legend=FALSE, lty=ellipse_lty)
+    }
     if (showsample){
         labelmapping <- modifyList(defaultmapping, aes_string(label="Row.names"))
         if (!is.null(labelfactor)){

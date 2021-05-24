@@ -42,7 +42,6 @@ Imports:
   patchwork,
   ggstar
 Suggests:
-  DT,
   rmarkdown,
   prettydoc,
   treeio,

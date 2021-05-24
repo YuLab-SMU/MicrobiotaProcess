@@ -23,6 +23,8 @@ ggordpoint(obj, ...)
   showsample = FALSE,
   ellipse_pro = 0.9,
   ellipse_alpha = 0.2,
+  ellipse_linewd = 0.5,
+  ellipse_lty = 3,
   biplot = FALSE,
   topn = 5,
   settheme = TRUE,
@@ -73,6 +75,10 @@ if you want to order the levels of factor, you can set this.}
 \item{ellipse_pro}{numeric, confidence value for the ellipse, default is 0.9.}
 
 \item{ellipse_alpha}{numeric, the alpha of ellipse, default is 0.2.}
+
+\item{ellipse_linewd}{numeric, the width of ellipse line, default is 0.5.}
+
+\item{ellipse_lty}{integer, the type of ellipse line, default is 3}
 
 \item{biplot}{logical, whether plot the species, default is FALSE.}
 
