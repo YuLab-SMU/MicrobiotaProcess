@@ -67,14 +67,14 @@ get_cladelabelposition <- function(data,
     if (missing(angle)) 
     	return(d)
     if (angle == "auto") {
-    	angletmp <- mean(range(sp.df$angle))
-    	if(angletmp >180){
-    		d$angle <- angletmp + 90
-    	}else{
-    		d$angle <- angletmp + 270
+        angletmp <- mean(range(sp.df$angle))
+        if(angletmp >180){
+            d$angle <- angletmp + 90
+        }else{
+            d$angle <- angletmp + 270
     	}
     }else{
-    	d$angle <- angle
+        d$angle <- angle
     }
     mx <- d$x
     mx <- mx * adjustRatio

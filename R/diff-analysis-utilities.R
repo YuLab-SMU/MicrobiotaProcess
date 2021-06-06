@@ -234,7 +234,11 @@ get_gfc_wilc <- function(datasample, classlevelsnum, fun1='generalizedFC',
                        vars, classname, minnum, fun2='wilcox.test', wilc,...){
     resgfoldC <- multi_compare(fun=fun1, data=datasample,
                                feature=vars, factorNames=classname)
-    resgfoldC <- lapply(resgfoldC, function(x)x$gfc)
+    resgfoldC <- switch(fun1,
+                        generalizedFC=lapply(resgfoldC, function(x)x$gfc),
+                        compare_mean = lapply(resgfoldC, function(x)x$diffmean),
+                        compare_median = lapply(resgfoldC, function(x)x$diffmedian)
+                        )
     resgfoldC <- do.call("rbind", resgfoldC)
     rownames(resgfoldC) <- vars
     if (classlevelsnum>= minnum &&  wilc){
@@ -254,16 +258,16 @@ get_gfc_wilc <- function(datasample, classlevelsnum, fun1='generalizedFC',
 #' @keywords internal
 get_compareres <- function(reslist, pfold){
     if (ncol(reslist)<3){
-    	reslist <- data.frame(f=rownames(reslist),gfc=reslist[,1], stringsAsFactors =FALSE)
-    	reslist$gfc <- reslist$gfc >0
-    	reslist <- data.frame(table(reslist), stringsAsFactors =FALSE)
+        reslist <- data.frame(f=rownames(reslist),gfc=reslist[,1], stringsAsFactors =FALSE)
+        reslist$gfc <- reslist$gfc >0
+        reslist <- data.frame(table(reslist), stringsAsFactors =FALSE)
     }else{
-    	reslist <- data.frame(reslist, stringsAsFactors =FALSE)
-    	colnames(reslist) <- c("f", "gfc", "pvalue")
-    	reslist <- reslist[reslist$pvalue <= pfold &!is.na(reslist$pvalue),,drop=FALSE]
-    	reslist$pvalue <- NULL
-    	reslist$gfc <- reslist$gfc > 0 
-    	reslist <- data.frame(table(reslist),stringsAsFactors =FALSE)
+        reslist <- data.frame(reslist, stringsAsFactors =FALSE)
+        colnames(reslist) <- c("f", "gfc", "pvalue")
+        reslist <- reslist[reslist$pvalue <= pfold &!is.na(reslist$pvalue),,drop=FALSE]
+        reslist$pvalue <- NULL
+        reslist$gfc <- reslist$gfc > 0 
+        reslist <- data.frame(table(reslist),stringsAsFactors =FALSE)
     }
     return(reslist)
 }
@@ -276,7 +280,7 @@ get_consistentfeatures <- function(diffsubclassfeature,
     for (i in classlevels){
         tmpindex <- grep(i, names(diffsubclassfeature))
         tmpkeepfeature <- diffsubclassfeature[tmpindex]
-        checkflag <- grepl(paste0(i, "-vs-"), names(tmpkeepfeature))
+        checkflag <- grepl(paste0("^",i, "-vs-"), names(tmpkeepfeature))
         falseindex <- which(!checkflag) 
         if (length(falseindex)>0){
             for (j in falseindex){

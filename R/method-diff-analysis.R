@@ -102,7 +102,7 @@ diff_analysis.data.frame <- function(obj, sampleda, classgroup, subclass=NULL, t
     kwres$fdr <- p.adjust(kwres$pvalue, method=padjust)
     if (!filtermod=="pvalue"){varsfirst <- as.vector(kwres[kwres$fdr<=firstalpha& !is.na(kwres$fdr),,drop=FALSE]$f)
     }else{varsfirst <- as.vector(kwres[kwres$pvalue<=firstalpha&!is.na(kwres$pvalue),,drop=FALSE]$f)}
-    if (!length(varsfirst)>0){stop("There are not significantly discriminative features before internal wilcoxon!")}
+    if (!length(varsfirst)>0){stop(paste0("There are not significantly discriminative features before internal", secondcomfun," !"))}
     classlevels <- get_classlevels(sampleda, classgroup)
     compareclass <- get_compareclass(classlevels)
     if (!is.null(subclass) && strictmod){
@@ -114,7 +114,7 @@ diff_analysis.data.frame <- function(obj, sampleda, classgroup, subclass=NULL, t
         secondvars <- diffclass(datasample=datameta, features=varsfirst, comclass=compareclass, classgroup=classgroup, fcfun=fcfun,
                                 secondcomfun=secondcomfun,classmin=clmin,clwilc=clwilc,pfold=secondalpha, ...)
     }
-    if (!length(secondvars)>0){stop("There are not significantly discriminative features after internal wilcoxon!")}
+    if (!length(secondvars)>0){stop(paste0("There are not significantly discriminative features after internal", secondcomfun," !"))}
     leaveclasslevels <- unlist(lapply(names(secondvars), function(x){unlist(strsplit(x,"-vs-"))}))
     secondvars <- get_consistentfeatures(diffsubclassfeature=secondvars, classgroup=classgroup,classlevels=leaveclasslevels)
     secondvarsvectors <- get_secondvarlist(secondvars=secondvars)
@@ -126,9 +126,11 @@ diff_analysis.data.frame <- function(obj, sampleda, classgroup, subclass=NULL, t
     dameta <- remove_constant(dameta)
     if (mlfun=="lda"){mlres <- LDAeffectsize(dameta, compareclass, classgroup, bootnums=bootnums, LDA=ldascore, ci=ci)}
     if (mlfun=="rf"){mlres <- rfimportance(dameta, classgroup, bootnums=bootnums, effsize=ldascore, ci=ci)}
-    params <- list("mlfun"=mlfun,"firstcomfun"=firstcomfun,"secondcomfun"=secondcomfun,
-                   "firstalpha"=firstalpha, "filtermod"=filtermod, "classgroup"=classgroup,
-                   "normalization"=normalization, "type"=type, "standard_method"=standard_method)
+    params <- list(mlfun=mlfun, firstcomfun=firstcomfun, secondcomfun=secondcomfun,
+                   firstalpha=firstalpha, filtermod=filtermod, classgroup=classgroup,
+                   normalization=normalization, type=type, standard_method=standard_method,
+                   subclass=subclass, strictmod=strictmod, fcfun=fcfun, clmin=clmin, clwilc=clwilc,
+                   subclmin=subclmin, subclwilc=subclwilc)
     res <- new("diffAnalysisClass", originalD=obj, sampleda=sampleda, taxda=taxda, kwres=kwres,
                secondvars=secondvars, mlres=mlres, someparams=params)
     return(res)

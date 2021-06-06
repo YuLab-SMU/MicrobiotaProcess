@@ -132,21 +132,21 @@ ggdifftaxbar.featureMeanMedian <- function(obj, featurename, classgroup, subclas
     	geom_bar(stat="identity") +
     	geom_errorbar(data=dastatistic, aes_(x=~sample, ymax=~value, ymin=~value, linetype=~statistic), 
 	              size=0.5, width=1, inherit.aes=FALSE)+
-    	scale_linetype_manual(values=c("solid", "dotted"))+
+    	scale_linetype_manual(values=c("solid", "dotted"), 
+                              guide = guide_legend(keywidth = 0.7, keyheight = 0.5, order=2))+
     	facet_grid(as.formula(paste0("~",classgroup)), space="free_x", scales="free_x") + 
     	labs(title=featurename) + xlab(NULL)+ ylab(ylabel)+
     	scale_y_continuous(expand=c(0,0), limits=c(0,max(data$RelativeAbundance)*1.05))
-    p <- p + theme_bw() + guides(fill= guide_legend(keywidth = 0.5, keyheight = 0.5, order=1),
-    			   linetype=guide_legend(keywidth = 0.7, keyheight = 0.5, order=2))+
+    p <- p + theme_bw() + 
     	 theme(plot.title = element_text(face="bold",lineheight=25,hjust=0.5), legend.box.spacing=unit(0.02,"cm"),
     	       panel.grid=element_blank(), legend.text = element_text(size=6.5),  legend.title=element_text(size=7),
     	       legend.background=element_rect(fill=NA), axis.text.x=element_blank(), axis.ticks.x=element_blank(),
     	       panel.spacing = unit(0.2, "mm"), strip.background = element_rect(colour=NA,fill="grey"))
     if (is.null(coloslist)){
         tmpn <- length(unique(as.vector(data[[match(subclass,colnames(data))]])))
-        p <- p + scale_fill_manual(values=get_cols(tmpn))
+        p <- p + scale_fill_manual(values=get_cols(tmpn), guide = guide_legend(keywidth = 0.5, keyheight = 0.5, order=1))
     }else{
-        p <- p + scale_fill_manual(values=coloslist)
+        p <- p + scale_fill_manual(values=coloslist, guide = guide_legend(keywidth = 0.5, keyheight = 0.5, order=1))
     }
     return(p)
 }

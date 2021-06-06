@@ -112,13 +112,20 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, layout="radial", lin
         geom_text(data=labelcoord, aes_(x=~x,y=~y, label=~label, angle=~angle), size=cladetext) +
         geom_point(data=cladecoord, pointmapping, shape=21)+
         geom_point(data=annotcoord, aes_(x=0,y=0, color=~label), size=0, stroke=0) +
-        scale_size_continuous(range = c(1, 3))
-    if (setColors){
-        message("The color has been set automatically, you can reset it manually by adding scale_fill_manual(values=yourcolors)")
-        tmpn <- length(unique(as.vector(nodedf[[match(factorName,colnames(nodedf))]])))
-        p <- p + scale_fill_manual(values=get_cols(tmpn))
-    }
-    p <- p + theme_diffclade() + guides_diffclade() 
+        scale_size_continuous(range = c(1, 3), guide=guide_legend(keywidth = 0.5, keyheight = 0.5, order=2))
+    message("The color has been set automatically, you can reset it manually by adding scale_fill_manual(values=yourcolors)")
+    p <- p + 
+         scale_color_manual(
+             values=rep("black", nrow(annotcoord)), 
+             guide =guide_legend(keywidth = 0.1, ncol=1, keyheight = 0.6, order = 3)
+         )
+    tmpn <- length(unique(as.vector(nodedf[[match(factorName,colnames(nodedf))]])))
+    p <- p + 
+         scale_fill_manual(
+             values=get_cols(tmpn), 
+             guide = guide_legend(keywidth = 0.5, keyheight = 0.5, order=1)
+           )
+    p <- p + theme_diffclade() #+ guides_diffclade() 
     return(p)
 }
 
@@ -198,13 +205,13 @@ treeskeleton <- function(treedata, layout, size, pointsize=1, xlim=12){
     return(p)
 }
 
-#' @importFrom ggplot2 guides guide_legend
-#' @keywords internal
-guides_diffclade <- function(...){
-    guides(fill= guide_legend(keywidth = 0.5, keyheight = 0.5, order=1),
-    	   size=guide_legend(keywidth = 0.5, keyheight = 0.5, order=2),
-    	   color = guide_legend(keywidth = 0.1, ncol=1, keyheight = 0.6, order = 3),...)
-}
+## #' @importFrom ggplot2 guides guide_legend
+## #' @keywords internal
+## guides_diffclade <- function(...){
+##     guides(fill= guide_legend(keywidth = 0.5, keyheight = 0.5, order=1),
+##     	   size=guide_legend(keywidth = 0.5, keyheight = 0.5, order=2),
+##     	   color = guide_legend(keywidth = 0.1, ncol=1, keyheight = 0.6, order = 3),...)
+## }
 
 #' @importFrom ggplot2 theme unit element_text element_rect margin
 #' @keywords internal
