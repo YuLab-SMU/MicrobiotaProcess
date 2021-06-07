@@ -1,5 +1,4 @@
 #' @method as.data.frame diffAnalysisClass
-#' @rdname as.data.frame
 #' @export
 as.data.frame.diffAnalysisClass <- function(x,...){
     #efres <- tidyEffectSize(x)
@@ -11,7 +10,6 @@ as.data.frame.diffAnalysisClass <- function(x,...){
 }
 
 #' @method as.data.frame alphasample
-#' @rdname as.data.frame
 #' @export
 as.data.frame.alphasample <- function(x, ...){
     dat <- x@alpha
