@@ -305,3 +305,44 @@ get_secondvarlist <- function(secondvars){
     return(vars)
 }
 
+## #' @keywords internal
+## tidyEffectSize <- function(obj){
+##     f <- LDAmean <- MDAmean <- NULL
+##     secondvars <- get_second_true_var(obj)
+##     classname <- extract_args(obj, "classgroup")
+##     efres <- merge(obj@mlres, secondvars, by.x="f", by.y="f") %>%
+##              select (-c("gfc", "Freq"))
+##     if ("LDAmean" %in% colnames(efres)){
+##         efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)), LDAmean)]))
+##     }else{
+##         efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)),
+##                                                          MDAmean)]))
+##     }
+##     return(efres)
+## }
+## 
+
+#' @keywords internal
+get_second_true_var <- function(obj){
+     secondvars <- do.call("rbind",c(obj@secondvars,make.row.names=FALSE))
+     secondvars <- secondvars %>% dplyr::filter(eval(parse(text="gfc"))%in%"TRUE")
+     return(secondvars)
+}
+
+merge_total_res <- function(kwres, secondvars, mlres, params){
+    f <- LDAmean <- MDAmean <- NULL
+    secondvars <- do.call("rbind",c(secondvars,make.row.names=FALSE))
+    secondvars <- secondvars %>% dplyr::filter(eval(parse(text="gfc"))%in%"TRUE")
+    classname <- params$classgroup
+    efres <- merge(mlres, secondvars, by.x="f", by.y="f") %>%  
+             select (-c("gfc", "Freq"))
+    if ("LDAmean" %in% colnames(efres)){
+        efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)), LDAmean)]))
+    }else{
+        efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)),
+                                                         MDAmean)]))
+    }
+    res <- merge(efres, kwres, by.x="f", by.y="f")
+    res <- res[order(res$pvalue),]
+    return(res)
+}

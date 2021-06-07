@@ -16,6 +16,9 @@ diffAnalysisClass class
 
 \item{\code{taxda}}{the data.frame contained taxonomy.}
 
+\item{\code{result}}{data.frame contained the results of 
+first, second test and LDA or rf}
+
 \item{\code{kwres}}{the results of first test, contained
 feature names, pvalue and fdr.}
 

@@ -49,7 +49,7 @@ setMethod("show",
       cat(paste0("after second test (",secondfun,") number of significantly discriminative feature:", 
       		   nrow(secondvars)),
           fill=TRUE)
-      mlres <- as.data.frame(object) 
+      mlres <- object@result 
       uncertain <- length(grep("__un_", mlres$f))
       mlmethod <- extract_args(object, "mlfun")
       cat(paste0("after ",mlmethod,", Number of discriminative features: ", 

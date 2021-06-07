@@ -112,7 +112,8 @@ ggeffectsize.data.frame <- function(obj,
 #' @rdname ggeffectsize
 #' @export
 ggeffectsize.diffAnalysisClass <- function(obj, removeUnknown=TRUE, setFacet=TRUE,...){
-    efres <- tidyEffectSize(obj)
+    #efres <- tidyEffectSize(obj)
+    efres <- obj@result
     classname <- extract_args(obj, "classgroup")
     params <- list(...)
     if (!is.null(params$removeUnkown) && inherits(params$removeUnkown, "logical")){

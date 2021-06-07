@@ -110,6 +110,8 @@ setClassUnion("callOrNull", c("call", "function", "NULL"))
 #' @slot originalD original feature data.frame.
 #' @slot sampleda associated sample information.
 #' @slot taxda the data.frame contained taxonomy.
+#' @slot result data.frame contained the results of 
+#' first, second test and LDA or rf 
 #' @slot kwres the results of first test, contained
 #' feature names, pvalue and fdr.
 #' @slot secondvars the results of second test, contained
@@ -126,6 +128,7 @@ setClass("diffAnalysisClass",
     representation=representation(originalD="dataframeOrNull",
     sampleda="dataframeOrNull",
     taxda="dataframeOrNull",
+    result="dataframeOrNull",
     kwres="dataframeOrNull",
     secondvars="listOrNull",
     mlres="dataframeOrNull",

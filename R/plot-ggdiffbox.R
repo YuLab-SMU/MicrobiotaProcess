@@ -60,7 +60,7 @@ setMethod("ggdiffbox", "diffAnalysisClass", function(obj, geom="boxplot",
     }
     sampleda <- obj@sampleda
     tmpgroup <- unique(as.vector(sampleda[[classname]]))
-    nodedfres <- tidyEffectSize(obj) 
+    nodedfres <- obj@result
     nodedfres <- set_newlevels(data=nodedfres, newlevels=tmpgroup, factorNames=classname)
     if (is.null(featurelist)){
         featurelist <- unique(as.vector(nodedfres$f))

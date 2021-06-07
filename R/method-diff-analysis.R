@@ -131,7 +131,8 @@ diff_analysis.data.frame <- function(obj, sampleda, classgroup, subclass=NULL, t
                    normalization=normalization, type=type, standard_method=standard_method,
                    subclass=subclass, strictmod=strictmod, fcfun=fcfun, clmin=clmin, clwilc=clwilc,
                    subclmin=subclmin, subclwilc=subclwilc)
-    res <- new("diffAnalysisClass", originalD=obj, sampleda=sampleda, taxda=taxda, kwres=kwres,
+    result <- merge_total_res(kwres=kwres, secondvars=secondvars, mlres=mlres, params=params)
+    res <- new("diffAnalysisClass", originalD=obj, sampleda=sampleda, taxda=taxda, result=result, kwres=kwres,
                secondvars=secondvars, mlres=mlres, someparams=params)
     return(res)
 }
@@ -277,49 +278,49 @@ transformdf <- function(data, method, ...){
 ###' head(restab)
 ##base::as.data.frame
 
-#' @method as.data.frame diffAnalysisClass
-#' @rdname as.data.frame
-#' @export
-as.data.frame.diffAnalysisClass <- function(x,...){
-    efres <- tidyEffectSize(x)
-    kwres <- x@kwres
-    difftb <- merge(efres, kwres, by.x="f", by.y="f")
-    difftb <- difftb[order(difftb$pvalue),]
-    return(difftb)
-}
-
-#' @method as.data.frame alphasample
-#' @rdname as.data.frame
-#' @export
-as.data.frame.alphasample <- function(x, ...){
-    dat <- x@alpha
-    if (!is.null(x@sampleda)){
-        dat <- merge(dat, x@sampleda, by=0)
-        rownames(dat) <- as.vector(dat$Row.names)
-        dat$Row.names <- NULL
-    }
-    return(dat)
-}
-
-#' @keywords internal
-tidyEffectSize <- function(obj){
-    f <- LDAmean <- MDAmean <- NULL
-    secondvars <- get_second_true_var(obj)
-    classname <- extract_args(obj, "classgroup")
-    efres <- merge(obj@mlres, secondvars, by.x="f", by.y="f") %>%
-             select (-c("gfc", "Freq"))
-    if ("LDAmean" %in% colnames(efres)){
-        efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)), LDAmean)]))
-    }else{
-        efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)),
-                                                         MDAmean)]))
-    }
-    return(efres)
-}
-
-#' @keywords internal
-get_second_true_var <- function(obj){
-    secondvars <- do.call("rbind",c(obj@secondvars,make.row.names=FALSE))
-    secondvars <- secondvars %>% dplyr::filter(eval(parse(text="gfc"))%in%"TRUE")
-    return(secondvars)
-}
+## #' @method as.data.frame diffAnalysisClass
+## #' @rdname as.data.frame
+## #' @export
+## as.data.frame.diffAnalysisClass <- function(x,...){
+##     efres <- tidyEffectSize(x)
+##     kwres <- x@kwres
+##     difftb <- merge(efres, kwres, by.x="f", by.y="f")
+##     difftb <- difftb[order(difftb$pvalue),]
+##     return(difftb)
+## }
+## 
+## #' @method as.data.frame alphasample
+## #' @rdname as.data.frame
+## #' @export
+## as.data.frame.alphasample <- function(x, ...){
+##     dat <- x@alpha
+##     if (!is.null(x@sampleda)){
+##         dat <- merge(dat, x@sampleda, by=0)
+##         rownames(dat) <- as.vector(dat$Row.names)
+##         dat$Row.names <- NULL
+##     }
+##     return(dat)
+## }
+## 
+## #' @keywords internal
+## tidyEffectSize <- function(obj){
+##     f <- LDAmean <- MDAmean <- NULL
+##     secondvars <- get_second_true_var(obj)
+##     classname <- extract_args(obj, "classgroup")
+##     efres <- merge(obj@mlres, secondvars, by.x="f", by.y="f") %>%
+##              select (-c("gfc", "Freq"))
+##     if ("LDAmean" %in% colnames(efres)){
+##         efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)), LDAmean)]))
+##     }else{
+##         efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)),
+##                                                          MDAmean)]))
+##     }
+##     return(efres)
+## }
+## 
+## #' @keywords internal
+## get_second_true_var <- function(obj){
+##     secondvars <- do.call("rbind",c(obj@secondvars,make.row.names=FALSE))
+##     secondvars <- secondvars %>% dplyr::filter(eval(parse(text="gfc"))%in%"TRUE")
+##     return(secondvars)
+## }
