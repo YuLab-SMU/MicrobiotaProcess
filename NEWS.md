@@ -1,7 +1,10 @@
-# MicrobiotaProcess 1.5.0.990
+# MicrobiotaProcess 1.5.0.991
 
 + add `ellipse_linewd` and `ellipse_lty` in `ggordpoint` to control 
   the width and line type of ellipse line. (2021-05-24, Mon)
++ fixed the regular expression match for the internal function 
+  to print the results of `diff_analysis`. (2021-06-06, Sun)
++ add `filter` function to filter the result of `diff_analysis`. (2021-06-07, Mon)
 
 # MicrobiotaProcess 1.4.0
 
