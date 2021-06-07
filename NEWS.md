@@ -5,6 +5,13 @@
 + fixed the regular expression match for the internal function 
   to print the results of `diff_analysis`. (2021-06-06, Sun)
 + add `filter` function to filter the result of `diff_analysis`. (2021-06-07, Mon)
++ more accessor function for result of `diff_analysis`. (2021-06-07, Mon)
+  - `head`
+  - `tail`
+  - `[`
+  - `[[]]`
+  - `$`
+  - `dim`
 
 # MicrobiotaProcess 1.4.0
 
