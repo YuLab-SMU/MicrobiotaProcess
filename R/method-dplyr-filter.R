@@ -6,3 +6,12 @@ filter.diffAnalysisClass <- function(.data, ..., .preserve = FALSE) {
     .data@result %<>% filter(!!!dots, .preserve = .preserve)
     return(.data)
 }
+
+##' @method filter alphasample
+##' @export
+filter.alphasample <- function(.data, ..., .preserve = FALSE){
+    dots <- quos(...)
+    .data <- as.data.frame(.data)
+    .data %<>% filter(!!!dots, .preserve = .preserve)
+    return(.data)
+}

@@ -44,3 +44,9 @@ tail.diffAnalysisClass <- function(x, n=6L, ...) {
 head.diffAnalysisClass <- function(x, n=6L, ...){
     head(as.data.frame(x), n=n, ...)
 }
+
+#' @method head alphasample
+#' @export
+head.alphasample <- function(x, n=6L, ...){
+    head(as.data.frame(x), n=n, ...)
+}
