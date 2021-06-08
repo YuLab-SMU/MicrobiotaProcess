@@ -1,4 +1,4 @@
-# MicrobiotaProcess 1.5.0.991
+# MicrobiotaProcess 1.5.0.993
 
 + add `ellipse_linewd` and `ellipse_lty` in `ggordpoint` to control 
   the width and line type of ellipse line. (2021-05-24, Mon)
@@ -12,6 +12,7 @@
   - `[[]]`
   - `$`
   - `dim`
++ add `get_NRI_NTI` to calculate the `NRI` and `NTI`. (2021-06-08, Tue)
 
 # MicrobiotaProcess 1.4.0
 
