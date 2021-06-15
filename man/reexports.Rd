@@ -5,6 +5,14 @@
 \alias{reexports}
 \alias{as.treedata}
 \alias{filter}
+\alias{select}
+\alias{mutate}
+\alias{group_by}
+\alias{rename}
+\alias{distinct}
+\alias{arrange}
+\alias{as_tibble}
+\alias{\%>\%}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -12,7 +20,11 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{dplyr}{\code{\link[dplyr]{filter}}}
+  \item{dplyr}{\code{\link[dplyr]{arrange}}, \code{\link[dplyr]{distinct}}, \code{\link[dplyr]{filter}}, \code{\link[dplyr]{group_by}}, \code{\link[dplyr]{mutate}}, \code{\link[dplyr]{rename}}, \code{\link[dplyr]{select}}}
+
+  \item{magrittr}{\code{\link[magrittr:pipe]{\%>\%}}}
+
+  \item{tibble}{\code{\link[tibble]{as_tibble}}}
 
   \item{tidytree}{\code{\link[tidytree]{as.treedata}}}
 }}

@@ -20,3 +20,26 @@ as.data.frame.alphasample <- function(x, ...){
     }
     return(dat)
 }
+
+#' @method as.data.frame phyloseq
+#' @export
+as.data.frame.phyloseq <- function(x, ...){
+    x <- as_tibble(x) 
+    return (x)
+}
+
+## #' @method as.data.frame otu_table
+## #' @export
+## as.data.frame.otu_table <- function(x, ...){
+##     x <- data.frame(x, ..., check.names=FALSE)
+##     return (x)
+## }
+## 
+## #' @method as.data.frame sample_data
+## #' @export
+## as.data.frame.sample_data <- as.data.frame.otu_table
+## 
+## #' @method as.data.frame taxonomyTable
+## #' @export
+## as.data.frame.taxonomyTable <- as.data.frame.otu_table
+## 
