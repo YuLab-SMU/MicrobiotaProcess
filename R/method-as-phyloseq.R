@@ -22,10 +22,10 @@ as.phyloseq.tbl_ps <- function(x, ...){
     taxavar <- attr(x, "taxavar")
     tree <- attr(x, "tree")
     refseq <- attr(x, "refseq")
-    otuda <- x[,colnames(x) %in% c("Sample", "OTU", "Abundance")]
-    otuda <- otuda %>% 
+    otuda <- x %>% 
+             select(c("Sample", "OTU", "Abundance")) %>%
              distinct() %>%
-             pivot_wider(names_from=.data$OTU, values_from=.data$Abundance) %>% 
+             pivot_wider(names_from="OTU", values_from="Abundance") %>% 
              column_to_rownames(var="Sample")
     if (!is.null(samplevar)){
         sampleda <- x[, colnames(x) %in% samplevar] %>%
@@ -47,10 +47,10 @@ as.phyloseq.tbl_ps <- function(x, ...){
     }
     
     if (!is.null(tree)){
-        tree <- keep.tip(tree, .data$OTU)
+        tree <- keep.tip(tree, colnames(otuda))
     }
     if (!is.null(refseq)){
-        refseq <- refseq[.data$OTU]
+        refseq <- refseq[colnames(otuda)]
     }
     res <- phyloseq(otu_table(otuda, taxa_are_rows=FALSE), sampleda, taxada, tree, refseq)
     return (res)

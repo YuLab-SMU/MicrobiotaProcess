@@ -60,7 +60,6 @@ ggrarecurve.data.frame <- function(obj, sampleda, factorLevels, chunks=400, ...)
 #' @method ggrarecurve rarecurve
 #' @importFrom ggplot2 ggplot geom_ribbon aes_string geom_smooth facet_wrap scale_y_continuous
 #' @importFrom rlang .data
-#' @importFrom Rmisc summarySE
 #' @rdname ggrarecurve
 #' @export
 ggrarecurve.rarecurve <- function(obj,

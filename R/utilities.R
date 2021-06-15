@@ -218,3 +218,41 @@ extract_args <- function(obj, arg){
 
 #' @importFrom utils globalVariables
 utils::globalVariables('taxlevelchar')
+
+
+#' @importFrom plyr ddply
+#' @importFrom stats sd 
+# Adapted from Rmisc
+summarySE <- function (data = NULL, measurevar, groupvars = NULL, na.rm = FALSE,
+                       conf.interval = 0.95, .drop = TRUE){
+    length2 <- function(x, na.rm = FALSE) {
+        if (na.rm)
+            sum(!is.na(x))
+        else length(x)
+    }
+    datac <- ddply(data, 
+                   groupvars, 
+                   .drop = .drop, 
+                   .fun = function(xx, col, na.rm) {
+          c(N = length2(xx[, col], na.rm = na.rm), mean = mean(xx[, col], na.rm = na.rm), 
+            sd = sd(xx[, col], na.rm = na.rm))
+          }, measurevar, na.rm)
+    datac <- rename(datac, c(mean = measurevar))
+    datac$se <- datac$sd/sqrt(datac$N)
+    ciMult <- qt(conf.interval/2 + 0.5, datac$N - 1)
+    datac$ci <- datac$se * ciMult
+    return(datac)
+}
+
+#' @importFrom stats qt
+# reference to Rmisc
+CI <- function (x, ci = 0.95, na.rm=FALSE){
+    a <- mean(x, na.rm = na.rm)
+    s <- sd(x, na.rm = na.rm)
+    if (na.rm){
+        x <- x[!is.na(x)]
+    }
+    n <- length(x)
+    error <- qt(ci + (1 - ci)/2, df = n - 1) * s/sqrt(n)
+    return(c(upper = a + error, mean = a, lower = a - error))
+}

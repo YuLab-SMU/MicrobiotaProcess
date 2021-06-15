@@ -110,7 +110,6 @@ remove_constant <- function(dflist){
 }
 
 #' @importFrom tibble rownames_to_column
-#' @importFrom Rmisc CI
 cal_ci <- function(x, classgroup, ci=0.95, method){
     if (method=="rf"){
         x <- do.call("cbind", x)

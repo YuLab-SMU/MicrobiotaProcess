@@ -38,9 +38,9 @@ Imports:
   utils,
   coin,
   ggsignif,
-  Rmisc,
   patchwork,
-  ggstar
+  ggstar,
+  tidyselect
 Suggests:
   rmarkdown,
   prettydoc,

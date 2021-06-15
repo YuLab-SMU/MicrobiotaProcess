@@ -19,8 +19,7 @@ filter.alphasample <- function(.data, ..., .preserve = FALSE){
 ##' @export
 filter.phyloseq <- function(.data, ..., .preserve = FALSE){
     .data <- internal_filter(x=.data, ..., .preserve = .preserve)
-    ps <- as.phyloseq(.data)
-    return (ps)
+    return (.data)
 }
 
 #' @method filter tbl_ps
@@ -64,8 +63,7 @@ select.phyloseq <- function(.data, ...){
     if(any(!c("Sample", "OTU", "Abundance") %in% colnames(.data))){
         stop("The Sample,OTU,Abundance columns should not be removed !")
     }
-    ps <- as.phyloseq(.data)
-    return (ps)
+    return (.data)
 }
 
 ##' @method select tbl_ps
@@ -89,12 +87,28 @@ internal_select <- function(x, dots, ...){
 ##' @importFrom dplyr group_by
 ##' @method group_by phyloseq
 ##' @export
-group_by.phyloseq <- function (.data, ..., .add = FALSE, .drop = group_by_drop_default(.data)){
+group_by.phyloseq <- function(.data, ..., .add = FALSE, .drop = group_by_drop_default(.data)){
     message("A tibble is returned for independent data analysis.")
-    x <- .data %>% as_tibble()
-    .data <- x %>% dplyr::group_by(..., .add=.add, .drop=.drop)
-    .data <- add_attr.tbl_ps(x1=.data, x2=x)
-    return(.data)
+    .data %<>% as_tibble()
+    res <- group_by(.data=.data, ..., .add = .add, .drop = .drop)
+    res <- add_attr.tbl_ps(x1=res, x2=.data)
+    return(res)
+}
+
+##' @method group_by tbl_ps
+##' @export
+group_by.tbl_ps <- function(.data, ..., .add = FALSE, .drop = group_by_drop_default(.data)){
+    res <- NextMethod()
+    res <- add_attr.tbl_ps(x1=res, x2=.data)
+    return(res)
+}
+
+##' @method mutate phyloseq
+##' @export
+mutate.phyloseq <- function(.data, ...){
+    .data %<>% as_tibble()
+    res <- mutate(.data=.data, ...)
+    return (res)
 }
 
 ##' @method mutate tbl_ps
@@ -105,11 +119,27 @@ mutate.tbl_ps <- function(.data, ...){
     return(res)
 }
 
+##' @method distinct phyloseq
+##' @export
+distinct.phyloseq <- function(.data, ..., .keep_all = FALSE){
+    .data %<>%  as_tibble()
+    res <- distinct(.data=.data, ..., .keep_all = .keep_all)
+    return(res)
+}
+
 ##' @method distinct tbl_ps
 ##' @export
 distinct.tbl_ps <- function(.data, ..., .keep_all = FALSE){
-    res <- distinct(.data=.data, ..., .keep_all = .keep_all)
+    res <- NextMethod()
     res <- add_attr.tbl_ps(x1 = res, x2 = .data)
+    return (res)
+}
+
+##' @method rename phyloseq
+##' @export
+rename.phyloseq <- function(.data, ...){
+    .data %<>% as_tibble()
+    res <- rename(.data=.data, ...)
     return (res)
 }
 
@@ -122,6 +152,14 @@ rename.tbl_ps <- function(.data, ...){
     .data <- check_attr.tbl_ps(x=.data, recol=cols)
     res <- NextMethod()
     res <- add_attr.tbl_ps(x1=res, x2=.data)
+    return (res)
+}
+
+##' @method arrange phyloseq
+##' @export
+arrange.phyloseq <- function(.data, ..., by_group = FALSE){
+    .data %<>% as_tibble()
+    res <- arrange(.data = .data, ..., by_group = by_group)
     return (res)
 }
 
@@ -138,8 +176,16 @@ add_attr.tbl_ps <- function(x1, x2){
     attr(x1, "taxavar") <- attr(x2, "taxavar")
     attr(x1, "tree") <- attr(x2, "tree")
     attr(x1, "refseq") <- attr(x2, "refseq")
-    class(x1) <- c("tbl_ps", class(x1))
+    class(x1) <- add_class(new="tbl_ps", old=class(x1))
     return(x1)   
+}
+
+add_class <- function(new, old){
+    if (!new %in% old){
+        return(c(new, old))
+    }else{
+        return (old)
+    }
 }
 
 check_attr.tbl_ps <- function(x, recol, type="rename"){
