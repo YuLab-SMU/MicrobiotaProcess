@@ -11,6 +11,8 @@
 \alias{rename}
 \alias{distinct}
 \alias{arrange}
+\alias{nest}
+\alias{unnest}
 \alias{as_tibble}
 \alias{\%>\%}
 \title{Objects exported from other packages}
@@ -25,6 +27,8 @@ below to see their documentation.
   \item{magrittr}{\code{\link[magrittr:pipe]{\%>\%}}}
 
   \item{tibble}{\code{\link[tibble]{as_tibble}}}
+
+  \item{tidyr}{\code{\link[tidyr]{nest}}, \code{\link[tidyr:nest]{unnest}}}
 
   \item{tidytree}{\code{\link[tidytree]{as.treedata}}}
 }}

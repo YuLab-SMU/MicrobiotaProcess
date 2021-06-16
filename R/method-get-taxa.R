@@ -36,7 +36,7 @@ setMethod("get_taxadf", "phyloseq", function(obj, taxlevel=2, type="species",...
     if (is.null(obj@tax_table)){
     	stop("The tax table is empty!")
     }else{
-        taxdf <- tax_table(obj)
+        taxdf <- obj@tax_table
         
         if (!"fillNA" %in% names(attributes(taxdf))){
             taxdf <- fillNAtax(taxdf, type)

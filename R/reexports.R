@@ -30,6 +30,14 @@ dplyr::distinct
 #' @export
 dplyr::arrange
 
+#' @importFrom tidyr nest
+#' @export
+tidyr::nest
+
+#' @importFrom tidyr unnest
+#' @export
+tidyr::unnest
+
 #' @importFrom tibble as_tibble
 #' @export
 tibble::as_tibble

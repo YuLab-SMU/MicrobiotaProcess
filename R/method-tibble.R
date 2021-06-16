@@ -2,13 +2,12 @@
 #' @importFrom tibble rownames_to_column 
 #' @importFrom reshape melt
 #' @importFrom dplyr full_join
+#' @importFrom tidyr pivot_longer
 #' @export
 as_tibble.phyloseq <- function(x, ...){
     otuda <- checkotu(x) %>% 
              rownames_to_column(var="Sample") %>%
-             melt(id="Sample", variable_name="OTU") %>%
-             rename(Abundance="value") %>%
-             as_tibble()
+             pivot_longer(!.data$Sample, names_to = "OTU", values_to = "Abundance") 
     sampleda <- get_sample(x) %>% rownames_to_column(var="Sample.idy")
     if (!is.null(sampleda)){
         otuda <- otuda %>% full_join(sampleda, by=c("Sample"="Sample.idy"))
@@ -17,7 +16,7 @@ as_tibble.phyloseq <- function(x, ...){
     }else{
         samplevar <- NULL
     }
-    taxada <- as.data.frame(tax_table(x)) %>% rownames_to_column(var="OTU")
+    taxada <- as.data.frame(x@tax_table) %>% rownames_to_column(var="OTU")
     if (!is.null(taxada)){
         taxavar <- colnames(taxada)
         otuda <- otuda %>% full_join(taxada, by=c("OTU"="OTU"))
@@ -31,4 +30,3 @@ as_tibble.phyloseq <- function(x, ...){
     class(otuda) <- c("tbl_ps", class(otuda))
     return(otuda)
 }
-

@@ -29,11 +29,12 @@ setfactorlevels <- function(data, factorlist){
 
 #' @keywords internal
 get_otudata <- function(obj){
+    otudata <- obj@otu_table
+    otudata <- data.frame(otudata, check.names=FALSE)
     if(taxa_are_rows(obj)){
-    	otudata <- data.frame(t(otu_table(obj)), check.names=FALSE)
-    }else{
-    	otudata <- data.frame(otu_table(obj), check.names=FALSE)
+        otudata <- data.frame(t(otudata), check.names=FALSE)
     }
+    return (otudata)
 }
 
 #' @keywords internal
@@ -56,13 +57,12 @@ checksample <- function(obj){
     }
 }
 
-#' @importFrom phyloseq sample_data
 #' @keywords internal.
 get_sample <- function(obj){
     if (is.null(obj@sam_data)){
     	sampleda <- NULL
     }else{
-    	sampleda <- data.frame(sample_data(obj), check.names=FALSE)
+    	sampleda <- data.frame(obj@sam_data, check.names=FALSE)
     }
     return(sampleda)
 }
@@ -176,7 +176,6 @@ duplicatedtaxcheck <- function(taxdf){
     	}
     	taxdf <- do.call("rbind",c(tmp, make.row.names=FALSE)) 
     }
-    taxdf #%>% column_to_rownames(var="rowname")
     return(taxdf)
 }
 
