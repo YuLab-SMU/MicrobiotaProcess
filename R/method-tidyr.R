@@ -5,6 +5,9 @@ unnest.tbl_ps_nest <- function(data, cols, ..., keep_empty = FALSE, ptype = NULL
     names_sep = NULL, names_repair = "check_unique"){
     x <- data
     class(x) <- "data.frame"
+    if (missing(cols)||missing(...)){
+        cols <- colnames(data)[unlist(lapply(data, function(i)rlang::is_list(i)))]
+    }
     res <- unnest(x, {{cols}}, keep_empty=keep_empty, 
                   ptype=ptype, names_sep=names_sep, names_repair=names_repair)
     res <- add_attr.tbl_ps(x1=res, x2=data)

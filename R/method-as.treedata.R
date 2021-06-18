@@ -69,22 +69,37 @@ as.treedata.taxonomyTable <- function(tree, ...){
 
 #' @method as.treedata tbl_ps
 #' @export
-as.treedata.tbl_ps <- function(tree, use_taxatree=TRUE, ...){
+as.treedata.tbl_ps <- function(tree, use_taxatree=TRUE, tiplevel="OTU", ...){
     tr <- attr(tree, "tree")
     taxavar <- attr(tree, "taxavar")
     if (!is.null(tr) && !use_taxatree){
         treeda <- tr %>% as_tibble()
         extrada <- tree %>% nest()
+        tiplevel <- "OTU"
     }else{
         if (use_taxatree && !is.null(taxavar)){
             if (!is.null(taxavar)){
-                taxavar <- taxavar[taxavar!="OTU"]
-                taxavar2 <- c(taxavar, "OTU")
-                treeda <- tree %>% select(taxavar2) %>% distinct() %>% data.frame() 
-                treeda <- convert_to_treedata(data=treeda) %>% as_tibble()
-                isTip <- !treeda$node %in% treeda$parent
-                treeda$label[isTip] <- restore_name(treeda$label[isTip])
+                if (tiplevel != "OTU"){tiplevel <- taxavar[length(taxavar)]}
+                taxavar <- taxavar[taxavar!=tiplevel]
+                taxavar2 <- c(taxavar, tiplevel)
+                if (tiplevel != "OTU"){
+                    taxada <- tree %>% select(taxavar2) %>% distinct() %>% 
+                               column_to_rownames(var="OTU") 
+                    treeda1 <- taxada %>% data.frame() %>% fillNAtax()
+                    taxavar <- taxavar[taxavar != "OTU"]
+                }else{
+                    treeda1 <- tree %>% select(taxavar2) %>% distinct() %>% 
+                               data.frame() %>% fillNAtax()
+                }
+                treeda <- convert_to_treedata(data=treeda1) %>% as_tibble()
                 extrada <- tree %>% select(-taxavar) %>% nest()
+                if (tiplevel == "OTU"){
+                    isTip <- !treeda$node %in% treeda$parent
+                    treeda$label[isTip] <- restore_name(treeda$label[isTip])
+                }else{
+                    extrada[[tiplevel]] <- as.vector(treeda1[match(extrada$OTU, rownames(treeda1)),tiplevel])
+                    extrada <- extrada %>% select(-c("OTU")) %>% nest() 
+                }
             }else{
                 stop("The tax table is empty in the object!")
             }
@@ -92,7 +107,7 @@ as.treedata.tbl_ps <- function(tree, use_taxatree=TRUE, ...){
             stop("The tree slot is empty, you can use the taxa tree via set use_taxatree=TRUE")
         }
     }
-    treeda %<>% full_join(extrada, by=c("label"="OTU")) %>% as.treedata()
+    treeda %<>% full_join(extrada, by=c("label"=tiplevel)) %>% as.treedata()
     return(treeda)
 }
 
