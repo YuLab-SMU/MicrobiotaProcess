@@ -1,4 +1,4 @@
-# MicrobiotaProcess 1.5.1.990
+# MicrobiotaProcess 1.5.1.991
 
 + tidy framework for `phyloseq` object. (2021-06-16, Wed)
   - `as_tibble` to convert `phyloseq` to `tbl_ps`.
@@ -13,6 +13,8 @@
   - `unnest` to convert the `tbl_ps_nest` to `tbl_ps`.
   - `as.treedata` to convert `tbl_ps` to `treedata`, then we can explore 
     the data with `treedata`.
+    - add `tiplevel` argument to control whether use `OTU` as tip label,
+      default is `OTU`. (2021-06-18, Fri)
   
 # MicrobiotaProcess 1.5.1
 
