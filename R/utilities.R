@@ -138,7 +138,7 @@ fillNAtax <- function(taxdf, type="species"){
     }
     taxdf <- filltaxname(taxdf)
     taxdf <- repduplicatedtaxcheck(taxdf) #%>% column_to_rownames(var="rowname")
-    attr(taxdf, "fillNA") <- TRUE 
+    attr(taxdf, "fillNAtax") <- TRUE 
     return(taxdf)
 }
 

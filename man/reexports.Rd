@@ -8,6 +8,7 @@
 \alias{select}
 \alias{mutate}
 \alias{group_by}
+\alias{ungroup}
 \alias{rename}
 \alias{distinct}
 \alias{arrange}
@@ -22,7 +23,7 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{dplyr}{\code{\link[dplyr]{arrange}}, \code{\link[dplyr]{distinct}}, \code{\link[dplyr]{filter}}, \code{\link[dplyr]{group_by}}, \code{\link[dplyr]{mutate}}, \code{\link[dplyr]{rename}}, \code{\link[dplyr]{select}}}
+  \item{dplyr}{\code{\link[dplyr]{arrange}}, \code{\link[dplyr]{distinct}}, \code{\link[dplyr]{filter}}, \code{\link[dplyr]{group_by}}, \code{\link[dplyr]{mutate}}, \code{\link[dplyr]{rename}}, \code{\link[dplyr]{select}}, \code{\link[dplyr:group_by]{ungroup}}}
 
   \item{magrittr}{\code{\link[magrittr:pipe]{\%>\%}}}
 

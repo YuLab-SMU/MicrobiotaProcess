@@ -18,6 +18,10 @@ dplyr::mutate
 #' @export
 dplyr::group_by
 
+#' @importFrom dplyr ungroup
+#' @export
+dplyr::ungroup
+
 #' @importFrom dplyr rename
 #' @export
 dplyr::rename

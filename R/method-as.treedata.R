@@ -12,7 +12,7 @@
 #' head(taxda)
 #' treedat <- convert_to_treedata(taxda)
 convert_to_treedata <- function(data, type="species", ...){
-    if (!"fillNA" %in% names(attributes(data))){
+    if (!"fillNAtax" %in% names(attributes(data))){
         data <- fillNAtax(data, type=type)
     }
     data <- data.frame(root=rep("r__root", nrow(data)), data)
@@ -68,6 +68,7 @@ as.treedata.taxonomyTable <- function(tree, ...){
 
 
 #' @method as.treedata tbl_ps
+#' @importFrom dplyr left_join
 #' @export
 as.treedata.tbl_ps <- function(tree, use_taxatree=TRUE, tiplevel="OTU", ...){
     tr <- attr(tree, "tree")
@@ -78,28 +79,22 @@ as.treedata.tbl_ps <- function(tree, use_taxatree=TRUE, tiplevel="OTU", ...){
         tiplevel <- "OTU"
     }else{
         if (use_taxatree && !is.null(taxavar)){
+            taxavar <- c(taxavar[taxavar!="OTU"], "OTU")
             if (!is.null(taxavar)){
-                if (tiplevel != "OTU"){tiplevel <- taxavar[length(taxavar)]}
-                taxavar <- taxavar[taxavar!=tiplevel]
-                taxavar2 <- c(taxavar, tiplevel)
-                if (tiplevel != "OTU"){
-                    taxada <- tree %>% select(taxavar2) %>% distinct() %>% 
-                               column_to_rownames(var="OTU") 
-                    treeda1 <- taxada %>% data.frame() %>% fillNAtax()
-                    taxavar <- taxavar[taxavar != "OTU"]
-                }else{
-                    treeda1 <- tree %>% select(taxavar2) %>% distinct() %>% 
-                               data.frame() %>% fillNAtax()
+                indx <- which(taxavar==tiplevel)
+                n <- length(taxavar)
+                flag <- indx < n
+                if (flag){
+                    taxavar <- taxavar[!taxavar %in% taxavar[indx+1:n]]
                 }
-                treeda <- convert_to_treedata(data=treeda1) %>% as_tibble()
-                extrada <- tree %>% select(-taxavar) %>% nest()
-                if (tiplevel == "OTU"){
-                    isTip <- !treeda$node %in% treeda$parent
-                    treeda$label[isTip] <- restore_name(treeda$label[isTip])
-                }else{
-                    extrada[[tiplevel]] <- as.vector(treeda1[match(extrada$OTU, rownames(treeda1)),tiplevel])
-                    extrada <- extrada %>% select(-c("OTU")) %>% nest() 
-                }
+                treeda1 <- tree %>% select(taxavar) %>% distinct()
+                treeda <- convert_to_treedata(data=treeda1) %>% as_tibble() %>% select(-"nodeClass")
+                extrada <- tree %>% as_tibble() %>% pivot_longer(cols=taxavar, names_to="nodeClass", values_to=tiplevel) 
+                othervars <- colnames(tree)[!colnames(tree) %in% taxavar]
+                params <- lapply(othervars, function(i)i)
+                names(params) <- othervars
+                params[[".data"]] <- extrada %>% as_tibble()
+                extrada <- do.call("nest", params)
             }else{
                 stop("The tax table is empty in the object!")
             }
@@ -107,24 +102,22 @@ as.treedata.tbl_ps <- function(tree, use_taxatree=TRUE, tiplevel="OTU", ...){
             stop("The tree slot is empty, you can use the taxa tree via set use_taxatree=TRUE")
         }
     }
-    treeda %<>% full_join(extrada, by=c("label"=tiplevel)) %>% as.treedata()
+    treeda %<>% left_join(extrada, by=c("label"=tiplevel)) %>% as.treedata()
     return(treeda)
 }
 
-restore_name <- function(x){
-    x <- strsplit(x, "__")
-    x <- lapply(x, function(x){
-          if (length(x)==1){
-              res <- x
-          }
-          if (length(x)==2){
-              res <- x[2]
-          }
-          if (length(x)>2){
-              res <- paste(x[-1], collapse="__")
-          }
-          return (res)
-     }
-    ) %>% unlist()
+#' @method as.treedata grouped_df_ps
+#' @export
+as.treedata.grouped_df_ps <- function(tree, use_taxatree=TRUE, tiplevel="OTU", ...){
+    tree <- tree %>% ungroup()
+    mutatevar <- attr(tree, "mutatevar")
+    tree <- tree %>% select(-mutatevar)
+    treeda <- as.treedata(tree=tree, use_taxatree=use_taxatree, tiplevel=tiplevel, ...)
+    return(treeda)
+}
+
+drop_class <- function(x, class){
+    old <- class(x) 
+    class(x) <- old[!old %in% class]
     return (x)
 }

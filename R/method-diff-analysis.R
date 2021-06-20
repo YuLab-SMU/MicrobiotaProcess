@@ -83,7 +83,7 @@ diff_analysis.data.frame <- function(obj, sampleda, classgroup, subclass=NULL, t
         classgroup <- params$class
     }
     if (!is.null(taxda)){
-        if (!"fillNA" %in% names(attributes(taxda))){
+        if (!"fillNAtax" %in% names(attributes(taxda))){
             taxda <- fillNAtax(taxda, type=type)
         }
         if (alltax){obj <- get_alltaxdf(obj, taxda, method=standard_method)}
@@ -199,7 +199,7 @@ setMethod("get_alltaxadf", "phyloseq",function(obj, method=NULL, type="species",
         stop("The taxaonomy table is empty!")
     }else{
         taxa <- tax_table(obj)
-        if (!"fillNA" %in% names(attributes(taxa))){
+        if (!"fillNAtax" %in% names(attributes(taxa))){
             taxa <- fillNAtax(taxa, type = type)
         }
     }
@@ -214,7 +214,7 @@ setMethod("get_alltaxadf", "data.frame", function(obj, taxda, taxa_are_rows=FALS
     #if (taxa_are_rows){
     #    obj <- data.frame(t(obj), check.names=FALSE)
     #}
-    if (!"fillNA" %in% names(attributes(taxda))){
+    if (!"fillNAtax" %in% names(attributes(taxda))){
         taxda <- fillNAtax(taxda, type=type)
     }
     data <- get_alltaxdf(data=obj, taxda=taxda, taxa_are_rows=taxa_are_rows, method=method, ...)

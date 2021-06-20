@@ -16,17 +16,29 @@ as_tibble.phyloseq <- function(x, ...){
     }else{
         samplevar <- NULL
     }
-    taxada <- as.data.frame(x@tax_table) %>% rownames_to_column(var="OTU")
-    if (!is.null(taxada)){
+    taxada <- as.data.frame(x@tax_table)
+    if (!all(dim(taxada)==0)){
         taxavar <- colnames(taxada)
+        taxada %<>% fillNAtax() %>% rownames_to_column(var="OTU")
         otuda <- otuda %>% full_join(taxada, by=c("OTU"="OTU"))
+        fillNAtax <- TRUE
     }else{
         taxavar <- NULL
+        fillNAtax <- NULL
     }
     attr(otuda, "samplevar") <- samplevar
     attr(otuda, "taxavar") <- taxavar
+    attr(otuda, "fillNAtax") <- fillNAtax
     attr(otuda, "tree") <- x@phy_tree
     attr(otuda, "refseq") <- x@refseq
     class(otuda) <- c("tbl_ps", class(otuda))
     return(otuda)
+}
+
+#' @method as_tibble grouped_df_ps
+#' @export
+as_tibble.grouped_df_ps <- function(x, ...){
+    res <- NextMethod()
+    res <- drop_class(x=res, class=c("grouped_df_ps", "grouped_df"))
+    return(res)
 }

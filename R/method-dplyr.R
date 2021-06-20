@@ -30,6 +30,14 @@ filter.tbl_ps <- function(.data, ..., .preserve = FALSE){
     return(res)
 }
 
+#' @method filter grouped_df_ps
+#' @export
+filter.grouped_df_ps <- function(.data, ..., .preserve=FALSE){
+    res <- NextMethod()
+    res <- add_attr.tbl_ps(x1=res, x2=.data, class="grouped_df_ps")
+    return(res)
+}
+
 internal_filter <- function(x, ..., .preserve){
     dots <- quos(...)
     x <- as.data.frame(x)
@@ -77,6 +85,18 @@ select.tbl_ps <- function(.data, ...){
     return (res)
 }
 
+##' @method select grouped_df_ps
+##' @export
+select.grouped_df_ps <- function(.data, ...){
+    loc <- tidyselect::eval_select(expr(c(...)), .data)
+    loc <- loc[!names(loc) %in% c("Sample", "OTU", "Abundance")]
+    .data <- check_attr.tbl_ps(x=.data, recol=loc, type="select")
+    res <- NextMethod()
+    res <- add_attr.tbl_ps(x1=res, x2=.data, class="grouped_df_ps")
+    return (res)
+
+}
+
 internal_select <- function(x, dots, ...){
     x <- as.data.frame(x)
     x %<>% select(!!!dots, ...)
@@ -100,6 +120,16 @@ group_by.phyloseq <- function(.data, ..., .add = FALSE, .drop = group_by_drop_de
 group_by.tbl_ps <- function(.data, ..., .add = FALSE, .drop = group_by_drop_default(.data)){
     res <- NextMethod()
     res <- add_attr.tbl_ps(x1=res, x2=.data)
+    class(res) <- c("grouped_df_ps", class(res))
+    return(res)
+}
+
+##' @method ungroup grouped_df_ps
+##' @export
+ungroup.grouped_df_ps <- function(x, ...){
+    res <- NextMethod()
+    res <- add_attr.tbl_ps(x1=res, x2=x)
+    res <- drop_class(res, class=c("grouped_df_ps", "grouped_df"))
     return(res)
 }
 
@@ -116,6 +146,16 @@ mutate.phyloseq <- function(.data, ...){
 mutate.tbl_ps <- function(.data, ...){
     res <- NextMethod()
     res <- add_attr.tbl_ps(x1=res, x2=.data)
+    res <- add_mutatevar(res)
+    return(res)
+}
+
+##' @method mutate grouped_df_ps
+##' @export
+mutate.grouped_df_ps <- function(.data, ...){
+    res <- NextMethod()
+    res <- add_attr.tbl_ps(x1=res, x2=.data, class="grouped_df_ps")
+    res <- add_mutatevar(res)
     return(res)
 }
 
@@ -132,6 +172,14 @@ distinct.phyloseq <- function(.data, ..., .keep_all = FALSE){
 distinct.tbl_ps <- function(.data, ..., .keep_all = FALSE){
     res <- NextMethod()
     res <- add_attr.tbl_ps(x1 = res, x2 = .data)
+    return (res)
+}
+
+##' @method distinct grouped_df_ps
+##' @export
+distinct.grouped_df_ps <- function(.data, ..., .keep_all = FALSE){
+    res <- NextMethod()
+    res <- add_attr.tbl_ps(x1 = res, x2 = .data, class="grouped_df_ps")
     return (res)
 }
 
@@ -155,6 +203,16 @@ rename.tbl_ps <- function(.data, ...){
     return (res)
 }
 
+##' @method rename grouped_df_ps
+##' @export
+rename.grouped_df_ps <- function(.data, ...){
+    cols <- tidyselect::eval_select(expr(c(...)), .data)
+    .data <- check_attr.tbl_ps(x=.data, recol=cols)
+    res <- NextMethod()
+    res <- add_attr.tbl_ps(x1=res, x2=.data, class="grouped_df_ps")
+    return (res)
+}
+
 ##' @method arrange phyloseq
 ##' @export
 arrange.phyloseq <- function(.data, ..., by_group = FALSE){
@@ -171,12 +229,23 @@ arrange.tbl_ps <- function(.data, ..., by_group = FALSE){
     return(res)
 }
 
-add_attr.tbl_ps <- function(x1, x2){
+##' @method arrange grouped_df_ps
+##' @export
+arrange.grouped_df_ps <- function(.data, ..., by_group = FALSE){
+    res <- NextMethod()
+    res <- add_attr.tbl_ps(x1 = res, x2 = .data, class = "grouped_df_ps")
+    return (res)
+}
+
+
+add_attr.tbl_ps <- function(x1, x2, class="tbl_ps"){
     attr(x1, "samplevar") <- attr(x2, "samplevar")
+    attr(x1, "mutatevar") <- attr(x2, "mutatevar")
     attr(x1, "taxavar") <- attr(x2, "taxavar")
+    attr(x1, "fillNAtax") <- attr(x2, "fillNAtax")
     attr(x1, "tree") <- attr(x2, "tree")
     attr(x1, "refseq") <- attr(x2, "refseq")
-    class(x1) <- add_class(new="tbl_ps", old=class(x1))
+    class(x1) <- add_class(new=class, old=class(x1))
     return(x1)   
 }
 
@@ -210,5 +279,15 @@ check_attr.tbl_ps <- function(x, recol, type="rename"){
     }
     attr(x, "samplevar") <- samplevar
     attr(x, "taxavar") <- taxavar
+    return(x)
+}
+
+add_mutatevar <- function(x){
+    cl <- colnames(x)
+    samplevar <- attr(x, "samplevar")
+    taxavar <- attr(x, "taxavar")
+    mutatevar <- attr(x, "mutatevar")
+    newvar <- setdiff(cl, c("OTU", "Sample", "Abundance", samplevar, taxavar, mutatevar))
+    attr(x, "mutatevar") <- c(mutatevar, newvar)
     return(x)
 }

@@ -37,7 +37,7 @@ as.phyloseq.tbl_ps <- function(x, ...){
     }
 
     if (!is.null(taxavar)){
-        taxada <- x[,colnames(x) %in% taxavar] %>% 
+        taxada <- x[,colnames(x) %in% c("OTU",taxavar)] %>% 
                   distinct() %>%
                   column_to_rownames(var="OTU") %>% 
                   as.matrix()

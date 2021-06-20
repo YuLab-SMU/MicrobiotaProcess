@@ -24,9 +24,18 @@ nest.tbl_ps <- function(.data, ..., .names_sep = NULL){
     return(x)
 }
 
+#' @method nest grouped_df_ps
+#' @export
+nest.grouped_df_ps <- function(.data, ..., .names_sep = NULL){
+    x <- nest_internal(x=.data, ..., .names_sep = .names_sep)
+    x <- add_attr.tbl_ps(x1=x, x2=.data)
+    class(x) <- c("tbl_ps_nest", class(x))
+    return(x)
+}
+
 #' @importFrom tidyr nest
 nest_internal <- function(x, ..., .names_sep = NULL){
-    class(x) <- class(x)[!class(x) %in% c("tbl_ps_nest", "tbl_ps")]
+    class(x) <- class(x)[!class(x) %in% c("grouped_df_ps", "tbl_ps_nest", "tbl_ps")]
     if (missing(...)){
         clnm <- colnames(x)
         taxavar <- attr(x, "taxavar")

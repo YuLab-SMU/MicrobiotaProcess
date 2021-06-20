@@ -38,7 +38,7 @@ setMethod("get_taxadf", "phyloseq", function(obj, taxlevel=2, type="species",...
     }else{
         taxdf <- obj@tax_table
         
-        if (!"fillNA" %in% names(attributes(taxdf))){
+        if (!"fillNAtax" %in% names(attributes(taxdf))){
             taxdf <- fillNAtax(taxdf, type)
         }
     }
@@ -79,7 +79,7 @@ setMethod("get_taxadf", "data.frame",
     if(!is.null(sampleda) && !inherits(sampleda, "sample_data")){
         sampleda <- sample_data(sampleda)
     }
-    if (!"fillNA" %in% names(attributes(taxda))){
+    if (!"fillNAtax" %in% names(attributes(taxda))){
         taxda <- fillNAtax(taxda, type=type)
     }
     if (inherits(taxlevel, "numeric")){taxlevel <- colnames(taxda)[taxlevel]}
@@ -91,6 +91,6 @@ setMethod("get_taxadf", "data.frame",
                                  featurelist=tmptax), 
                        taxa_are_rows=TRUE)
     taxdf <- phyloseq(taxdf, sampleda, tax_table(as.matrix(tmptaxda)))
-    attr(taxdf@tax_table, "fillNA") <- TRUE
+    attr(taxdf@tax_table, "fillNAtax") <- TRUE
     return(taxdf)
 })
