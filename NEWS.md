@@ -1,20 +1,21 @@
-# MicrobiotaProcess 1.5.1.991
+# MicrobiotaProcess 1.5.1.992
 
-+ tidy framework for `phyloseq` object. (2021-06-16, Wed)
-  - `as_tibble` to convert `phyloseq` to `tbl_ps`.
-  - `filter` to subset a data frame for `tbl_ps`.
-  - `group_by` to do some data operations on groups for `tbl_ps`.
-  - `arrange` to order the rows of a data frame for `tbl_ps`.
-  - `mutate` to adds new variables and preserves existing ones for `tbl_ps`.
-  - `select` to select variables in `tbl_ps`.
-  - `distinct` to select only unique/distinct rows in `tbl_ps`
-  - `rename` to rename the variable names in `tbl_ps`
-  - `nest` to create a list-column of `tbl_ps`, it will convert `tbl_ps` to `tbl_ps_nest`.
-  - `unnest` to convert the `tbl_ps_nest` to `tbl_ps`.
++ tidy framework for `phyloseq` object.
+  - `as_tibble` to convert `phyloseq` to `tbl_ps`. (2021-06-14, Mon)
+  - `filter` to subset a data frame for `tbl_ps`. (2021-06-14, Mon)
+  - `group_by` to do some data operations on groups for `tbl_ps`. (2021-06-15, Tue)
+  - `arrange` to order the rows of a data frame for `tbl_ps`. (2021-06-15, Wed)
+  - `mutate` to adds new variables and preserves existing ones for `tbl_ps`. (2021-06-15, Tue)
+  - `select` to select variables in `tbl_ps`. (2021-06-15, Tue)
+  - `distinct` to select only unique/distinct rows in `tbl_ps`. (2021-06-16, Wed)
+  - `rename` to rename the variable names in `tbl_ps`. (2021-06-16, Wed)
+  - `nest` to create a list-column of `tbl_ps`, it will convert `tbl_ps` to `tbl_ps_nest`. (2021-06-16, Wed)
+  - `unnest` to convert the `tbl_ps_nest` to `tbl_ps`. (2021-06-16, Wed)
   - `as.treedata` to convert `tbl_ps` to `treedata`, then we can explore 
     the data with `treedata`.
     - add `tiplevel` argument to control whether use `OTU` as tip label,
       default is `OTU`. (2021-06-18, Fri)
+  - `left_join` to mutate joins based the left `tbl_ps` structure. (2021-06-21, Mon)
   
 # MicrobiotaProcess 1.5.1
 
