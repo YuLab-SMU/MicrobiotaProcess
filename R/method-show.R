@@ -1,6 +1,6 @@
-#' @title method extensions to show for diffAnalysisClass objects.
+#' @title method extensions to show for diffAnalysisClass or alphasample objects.
 #' @rdname show-methods
-#' @param object object, `diffAnalysisClass` class
+#' @param object object, diffAnalysisClass or alphasample class
 #' @importFrom methods show
 #' @author Shuangbin Xu
 #' @return print info
@@ -99,4 +99,29 @@ check_second_fun <- function(obj){
         }
     }
     return (secondfun)
+}
+
+#' @rdname show-methods
+#' @exportMethod show
+setMethod("show", "alphasample", function(object){
+    print.alphasample(object)
+})
+
+print.alphasample <- function(object){
+    msg <- "'alphasample' S4 object"
+    sampleda <- object@sampleda
+    if (!is.null(sampleda)){
+        smsg <- sampleda
+    }else{
+        smsg <- "The 'alphasample' does not have sampleda slot."
+    }
+    cat (msg, fill=TRUE)
+    cat ("The alpha diversity index :", fill=TRUE)
+    print (head(object@alpha))
+    if (is.character(smsg)){
+        cat (smsg, fill=TRUE)
+    }else{
+        cat ("The sample information is present in 'alphasample':", fill=TRUE)
+        print (head(sampleda))
+    }
 }

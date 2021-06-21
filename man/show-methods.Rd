@@ -2,18 +2,21 @@
 % Please edit documentation in R/method-show.R
 \name{show,diffAnalysisClass-method}
 \alias{show,diffAnalysisClass-method}
-\title{method extensions to show for diffAnalysisClass objects.}
+\alias{show,alphasample-method}
+\title{method extensions to show for diffAnalysisClass or alphasample objects.}
 \usage{
 \S4method{show}{diffAnalysisClass}(object)
+
+\S4method{show}{alphasample}(object)
 }
 \arguments{
-\item{object}{object, `diffAnalysisClass` class}
+\item{object}{object, diffAnalysisClass or alphasample class}
 }
 \value{
 print info
 }
 \description{
-method extensions to show for diffAnalysisClass objects.
+method extensions to show for diffAnalysisClass or alphasample objects.
 }
 \examples{
 # don't run in examples

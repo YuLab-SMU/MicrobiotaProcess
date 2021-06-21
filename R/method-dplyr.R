@@ -146,7 +146,7 @@ mutate.phyloseq <- function(.data, ...){
 mutate.tbl_ps <- function(.data, ...){
     res <- NextMethod()
     res <- add_attr.tbl_ps(x1=res, x2=.data)
-    res <- add_mutatevar(res)
+    res <- add_var(res, type="mutate")
     return(res)
 }
 
@@ -155,7 +155,7 @@ mutate.tbl_ps <- function(.data, ...){
 mutate.grouped_df_ps <- function(.data, ...){
     res <- NextMethod()
     res <- add_attr.tbl_ps(x1=res, x2=.data, class="grouped_df_ps")
-    res <- add_mutatevar(res)
+    res <- add_var(res, type="mutate")
     return(res)
 }
 
@@ -237,6 +237,14 @@ arrange.grouped_df_ps <- function(.data, ..., by_group = FALSE){
     return (res)
 }
 
+##' @method left_join tbl_ps
+##' @export
+left_join.tbl_ps <- function(x, y, by=NULL, copy=FALSE, suffix = c(".x", ".y")){
+    res <- NextMethod()
+    res <- add_attr.tbl_ps(x1 = res, x2 = x) 
+    res <- add_var(res, type="join")
+    return(res)
+}
 
 add_attr.tbl_ps <- function(x1, x2, class="tbl_ps"){
     attr(x1, "samplevar") <- attr(x2, "samplevar")
@@ -282,12 +290,16 @@ check_attr.tbl_ps <- function(x, recol, type="rename"){
     return(x)
 }
 
-add_mutatevar <- function(x){
+add_var <- function(x, type){
     cl <- colnames(x)
     samplevar <- attr(x, "samplevar")
     taxavar <- attr(x, "taxavar")
     mutatevar <- attr(x, "mutatevar")
     newvar <- setdiff(cl, c("OTU", "Sample", "Abundance", samplevar, taxavar, mutatevar))
-    attr(x, "mutatevar") <- c(mutatevar, newvar)
+    if (type == "mutate"){
+        attr(x, "mutatevar") <- c(mutatevar, newvar)
+    }else{
+        attr(x, "samplevar") <- c(samplevar, newvar)
+    }
     return(x)
 }
