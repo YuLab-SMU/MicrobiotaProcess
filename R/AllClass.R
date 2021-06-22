@@ -5,6 +5,13 @@
 #' @keywords internal
 setOldClass("prcomp")
 
+#' @title tbl_ps class
+#' @name tbl_ps-class
+#' @rdname tbl_ps-class
+#' @keywords internal
+#' @noRd
+setOldClass("tbl_ps")
+
 #' @title pcoa class
 #' @seealso \code{\link[ape]{pcoa}}
 #' @name pcoa-class
@@ -77,24 +84,6 @@ setClass("ordplotClass",
 # #' @importClassesFrom phyloseq phylo
 # #' @keywords internal 
 # #' setClassUnion("phyloOrNULL", c("phylo", "NULL"))
-
-
-#' @title clustplotClass class
-#' @docType class
-#' @slot hclustphylo phylo object (convert hclust to phylo).
-#' @slot sampleda assocaited sample information.
-#' @slot distmethod character the method of dist.
-#' @name clustplotClass-class
-#' @rdname clustplotClass-class
-#' @importClassesFrom phyloseq phylo
-#' @exportClass clustplotClass
-setClass("clustplotClass",
-    representation=representation(hclustphylo="phylo",
-    sampleda="dataframeOrNull",
-    distmethod="characterOrNull"),
-    prototype=prototype(
-    sampleda=NULL,
-    distmethod=NULL))
 
 #' @keywords internal
 setClassUnion("listOrNull", c("list", "NULL"))

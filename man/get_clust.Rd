@@ -54,20 +54,20 @@ is in column, it should set FALSE.}
 ecologists, see also \code{\link[vegan]{decostand}}}
 }
 \value{
-clustplotClass object.
+treedata object.
 }
 \description{
 Hierarchical cluster analysis for the samples
 }
 \examples{
-#don't run in examples
-#library(phyloseq)
-#data(GlobalPatterns)
-#subGlobal <- subset_samples(GlobalPatterns, 
-#         SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
-# don't run in examples
-#hcsample <- get_clust(subGlobal, distmethod="jaccard",
-#                  method="hellinger", hclustmethod="average")
+\dontrun{
+library(phyloseq)
+data(GlobalPatterns)
+subGlobal <- subset_samples(GlobalPatterns, 
+         SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
+hcsample <- get_clust(subGlobal, distmethod="jaccard",
+                  method="hellinger", hclustmethod="average")
+}
 }
 \author{
 Shuangbin Xu

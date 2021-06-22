@@ -2,12 +2,12 @@
 % Please edit documentation in R/plot-ggclust.R
 \name{ggclust}
 \alias{ggclust}
-\alias{ggclust.clustplotClass}
+\alias{ggclust.treedata}
 \title{plot the result of hierarchical cluster analysis for the samples}
 \usage{
 ggclust(obj, ...)
 
-\method{ggclust}{clustplotClass}(
+\method{ggclust}{treedata}(
   obj,
   layout = "rectangular",
   factorNames = NULL,
@@ -15,12 +15,11 @@ ggclust(obj, ...)
   pointsize = 2,
   fontsize = 2.6,
   hjust = -0.1,
-  settheme = TRUE,
   ...
 )
 }
 \arguments{
-\item{obj}{R object, clustplotClass.}
+\item{obj}{R object, treedata object.}
 
 \item{..., }{additional params, see also \code{\link[ggtree]{geom_tippoint}}}
 
@@ -35,8 +34,6 @@ ggclust(obj, ...)
 \item{fontsize}{numeric, the size of text of tiplabel, default is 2.6.}
 
 \item{hjust}{numeric, default is -0.1}
-
-\item{settheme}{logical, default is TRUE.}
 }
 \value{
 the figures of hierarchical cluster.
@@ -45,20 +42,21 @@ the figures of hierarchical cluster.
 plot the result of hierarchical cluster analysis for the samples
 }
 \examples{
-#don't run in examples
-#library(phyloseq)
-#library(ggtree)
-#library(ggplot2)
-#data(GlobalPatterns)
-#subGlobal <- subset_samples(GlobalPatterns,
-#         SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
-#hcsample <- get_clust(subGlobal, distmethod="jaccard",
-#                  method="hellinger", hclustmethod="average")
-#hc_p <- ggclust(hcsample, layout = "rectangular",
-#                pointsize=1, fontsize=0,
-#                factorNames=c("SampleType")) +
-#        theme_tree2(legend.position="right",
-#                    plot.title = element_text(face="bold", lineheight=25,hjust=0.5))
+\dontrun{
+library(phyloseq)
+library(ggtree)
+library(ggplot2)
+data(GlobalPatterns)
+subGlobal <- subset_samples(GlobalPatterns,
+         SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
+hcsample <- get_clust(subGlobal, distmethod="jaccard",
+                  method="hellinger", hclustmethod="average")
+hc_p <- ggclust(hcsample, layout = "rectangular",
+                pointsize=1, fontsize=0,
+                factorNames=c("SampleType")) +
+        theme_tree2(legend.position="right",
+                    plot.title = element_text(face="bold", lineheight=25,hjust=0.5))
+}
 }
 \author{
 Shuangbin Xu

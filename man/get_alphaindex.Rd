@@ -12,6 +12,8 @@
 \alias{get_alphaindex,numeric}
 \alias{get_alphaindex,phyloseq-method}
 \alias{get_alphaindex,phyloseq}
+\alias{get_alphaindex,tbl_ps-method}
+\alias{get_alphaindex,tbl_ps}
 \title{alpha index}
 \usage{
 get_alphaindex(obj, ...)
@@ -25,6 +27,8 @@ get_alphaindex(obj, ...)
 \S4method{get_alphaindex}{numeric}(obj, ...)
 
 \S4method{get_alphaindex}{phyloseq}(obj, ...)
+
+\S4method{get_alphaindex}{tbl_ps}(obj, ...)
 }
 \arguments{
 \item{obj}{object, data.frame of (nrow sample * ncol taxonomy(feature)) 

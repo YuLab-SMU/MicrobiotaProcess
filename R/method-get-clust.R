@@ -13,18 +13,18 @@
 #' default is average.
 #' @param tree phylo, the phylo class, see also \code{\link[ape]{as.phylo}}.
 #' @param ..., additional parameters.
-#' @return clustplotClass object.
+#' @return treedata object.
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' #don't run in examples
-#' #library(phyloseq)
-#' #data(GlobalPatterns)
-#' #subGlobal <- subset_samples(GlobalPatterns, 
-#' #         SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
-#' # don't run in examples
-#' #hcsample <- get_clust(subGlobal, distmethod="jaccard",
-#' #                  method="hellinger", hclustmethod="average")
+#' \dontrun{
+#' library(phyloseq)
+#' data(GlobalPatterns)
+#' subGlobal <- subset_samples(GlobalPatterns, 
+#'          SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#' hcsample <- get_clust(subGlobal, distmethod="jaccard",
+#'                   method="hellinger", hclustmethod="average")
+#' }
 get_clust <- function(obj,...){
     UseMethod("get_clust")
 }
@@ -40,7 +40,8 @@ get_clust.dist <- function(obj,
                            hclustmethod="average",
                            ...){
     if (missing(distmethod) && is.null(attr(obj, "distmethod"))){
-    	stop("the method of distance should be provided!")
+        #stop("the method of distance should be provided!")
+        distmethod <- NULL
     }
     if (!is.null(attr(obj, "distmethod"))){
     	distmethod <- attr(obj, "distmethod")
@@ -52,10 +53,13 @@ get_clust.dist <- function(obj,
                         method=hclustmethod, 
                         ...)
     phyloobj <- as.phylo(hclustobj)
-    clustplot <- new("clustplotClass",
-                     hclustphylo=phyloobj,
-                     sampleda=sampleda,
-                     distmethod=distmethod)
+    if (!is.null(sampleda)){
+        sampleda %<>% rownames_to_column(var="label")
+        clustplot <- phyloobj %>% full_join(sampleda, by="label") 
+    }else{
+        clustplot <- phyloobj %>% as.treedata
+    }
+    attr(clustplot, "distmethod") <- distmethod
     return(clustplot)
 }
 

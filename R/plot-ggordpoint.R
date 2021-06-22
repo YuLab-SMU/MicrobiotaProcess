@@ -35,15 +35,16 @@
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' #don't run in examples
-#' #library(phyloseq)
-#' #data(GlobalPatterns)
-#' #subGlobal <- subset_samples(GlobalPatterns,
-#' #         SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
-#' #pcares <- get_pca(subGlobal, method="hellinger")
-#' #pcaplot <- ggordpoint(pcares, biplot=TRUE,
-#' #                    speciesannot=TRUE,
-#' #                     factorNames=c("SampleType"), ellipse=TRUE)
+#' \dontrun{
+#' library(phyloseq)
+#' data(GlobalPatterns)
+#' subGlobal <- subset_samples(GlobalPatterns,
+#'          SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#' pcares <- get_pca(subGlobal, method="hellinger")
+#' pcaplot <- ggordpoint(pcares, biplot=TRUE,
+#'                     speciesannot=TRUE,
+#'                      factorNames=c("SampleType"), ellipse=TRUE)
+#' }
 ggordpoint <- function(obj, ...){
 	UseMethod("ggordpoint")
 }
@@ -222,12 +223,14 @@ get_ellipsemap <- function(namelist){
 #' contribution and coordinate of features.
 #' @export
 #' @examples
+#' \dontrun{
 #' library(phyloseq)
 #' data(GlobalPatterns)
 #' subGlobal <- subset_samples(GlobalPatterns,
 #'          SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
-#' #pcares <- get_pca(subGlobal, method="hellinger") 
-#' #varres <- get_varct(pcares)
+#' pcares <- get_pca(subGlobal, method="hellinger") 
+#' varres <- get_varct(pcares)
+#' }
 get_varct <- function(obj,...){
     UseMethod("get_varct")
 }
