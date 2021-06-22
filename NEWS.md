@@ -1,4 +1,4 @@
-# MicrobiotaProcess 1.5.1.992
+# MicrobiotaProcess 1.5.1.993
 
 + tidy framework for `phyloseq` object.
   - `as_tibble` to convert `phyloseq` to `tbl_ps`. (2021-06-14, Mon)
@@ -16,6 +16,7 @@
     - add `tiplevel` argument to control whether use `OTU` as tip label,
       default is `OTU`. (2021-06-18, Fri)
   - `left_join` to mutate joins based the left `tbl_ps` structure. (2021-06-21, Mon)
++ changed `clustplotClass` to `treedata`. (2021-06-22, Tue)
   
 # MicrobiotaProcess 1.5.1
 
