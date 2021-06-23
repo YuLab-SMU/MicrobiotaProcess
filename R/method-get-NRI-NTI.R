@@ -24,7 +24,7 @@ setMethod("get_NRI_NTI", "matrix", function(obj, mindepth, sampleda, tree, abund
     if (missing(mindepth) || is.null(mindepth)){
            mindepth <- min(rowSums(obj))
     }
-    obj <- rrarefy(obj, mindepth)
+    obj <- vegan::rrarefy(obj, mindepth)
     treedist <- cal_treedist(tree=tree)
     resnri <- picante::ses.mpd(samp=obj, dis=treedist, abundance.weighted=abundance.weighted, ...)
     resnti <- picante::ses.mntd(samp=obj, dis=treedist, abundance.weighted=abundance.weighted, ...)

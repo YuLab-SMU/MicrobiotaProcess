@@ -32,7 +32,7 @@ setGeneric("get_alphaindex", function(obj, ...){standardGeneric("get_alphaindex"
 
 #' @aliases get_alphaindex,matrix
 #' @rdname get_alphaindex
-#' @importFrom vegan rrarefy estimateR diversity specnumber
+#' @importFrom vegan estimateR diversity specnumber
 #' @export
 setMethod("get_alphaindex", "matrix", function(obj, mindepth, sampleda,...){
     if (!identical(all.equal(obj, round(obj)),TRUE)){
@@ -41,7 +41,7 @@ setMethod("get_alphaindex", "matrix", function(obj, mindepth, sampleda,...){
     if (missing(mindepth) || is.null(mindepth)){
            mindepth <- min(rowSums(obj))
     }
-    obj <- rrarefy(obj, mindepth)
+    obj <- vegan::rrarefy(obj, mindepth)
     Chao <- estimateR(obj)
     Shannon <- diversity(obj)
     Simpson <- diversity(obj, index="simpson")
