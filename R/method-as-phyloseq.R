@@ -55,3 +55,11 @@ as.phyloseq.tbl_ps <- function(x, ...){
     res <- phyloseq(otu_table(otuda, taxa_are_rows=FALSE), sampleda, taxada, tree, refseq)
     return (res)
 }
+
+#' @method as.phyloseq grouped_df_ps
+#' @export
+as.phyloseq.grouped_df_ps <- function(x, ...){
+    x %<>% ungroup()
+    res <- as.phyloseq(x=x,...)
+    return(res)
+}

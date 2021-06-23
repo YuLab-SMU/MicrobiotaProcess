@@ -55,7 +55,8 @@ Suggests:
   randomForest,
   biomformat,
   scales,
-  yaml
+  yaml,
+  withr
 License: GPL (>= 3.0)
 URL: https://github.com/YuLab-SMU/MicrobiotaProcess/
 BugReports: https://github.com/YuLab-SMU/MicrobiotaProcess/issues

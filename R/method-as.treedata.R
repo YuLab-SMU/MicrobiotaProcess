@@ -110,8 +110,8 @@ as.treedata.tbl_ps <- function(tree, use_taxatree=TRUE, tiplevel="OTU", ...){
 #' @export
 as.treedata.grouped_df_ps <- function(tree, use_taxatree=TRUE, tiplevel="OTU", ...){
     tree <- tree %>% ungroup()
-    mutatevar <- attr(tree, "mutatevar")
-    tree <- tree %>% select(-mutatevar)
+    #mutatevar <- attr(tree, "mutatevar")
+    #tree <- tree %>% select(-mutatevar)
     treeda <- as.treedata(tree=tree, use_taxatree=use_taxatree, tiplevel=tiplevel, ...)
     return(treeda)
 }
