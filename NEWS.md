@@ -1,8 +1,8 @@
-# MicrobiotaProcess 1.5.1.993
+# MicrobiotaProcess 1.5.1.994
 
 + tidy framework for `phyloseq` object.
   - `as_tibble` to convert `phyloseq` to `tbl_ps`. (2021-06-14, Mon)
-  - `filter` to subset a data frame for `tbl_ps`. (2021-06-14, Mon)
+  - `filter` to subset a data frame from `tbl_ps`. (2021-06-14, Mon)
   - `group_by` to do some data operations on groups for `tbl_ps`. (2021-06-15, Tue)
   - `arrange` to order the rows of a data frame for `tbl_ps`. (2021-06-15, Wed)
   - `mutate` to adds new variables and preserves existing ones for `tbl_ps`. (2021-06-15, Tue)
@@ -17,6 +17,10 @@
       default is `OTU`. (2021-06-18, Fri)
   - `left_join` to mutate joins based the left `tbl_ps` structure. (2021-06-21, Mon)
 + changed `clustplotClass` to `treedata`. (2021-06-22, Tue)
++ add `rrarefy` method to rarefy species richness. (2021-06-23, Mon)
+  - it supports `phyloseq`, `tbl_ps` object via wrapping `vegan::rrarefy`.
++ update `as.phyloseq` and `as.treedata` for `grouped_df_ps` object. (2021-06-23, Mon)
+  - This feature is useful to explore the microbiome data in taxa tree. 
   
 # MicrobiotaProcess 1.5.1
 
