@@ -81,3 +81,13 @@ setMethod("rrarefy", signature(obj="tbl_ps"), function(obj, raresize, trimOTUs=T
     res %<>% as_tibble()
     return (res)
 })
+
+##' @rdname rrarefy-methods
+##' @aliases rrarefy,grouped_df_ps
+##' @exportMethod rrarefy
+setMethod("rrarefy", signature(obj="grouped_df_ps"), function(obj, raresize, trimOTUs=TRUE, seed=123){
+    obj %<>% ungroup
+    res <- rrarefy(obj=obj, raresize=raresize, trimOTUs=trimOTUs, seed=seed)
+    res %<>% as_tibble()
+    return (res)
+})

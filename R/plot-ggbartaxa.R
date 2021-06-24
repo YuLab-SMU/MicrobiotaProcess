@@ -49,10 +49,10 @@ ggbartax.phyloseq <- function(obj, ...){
     	otudata <- get_otudata(obj)
     }
     if (!is.null(obj@sam_data)){
-    	sampleda <- data.frame(sample_data(obj), check.names=FALSE)
-    	p <- ggbartax.data.frame(obj=otudata, sampleda=sampleda, ...)
+    	sampleda <- data.frame(obj@sam_data, check.names=FALSE)
+    	p <- ggbartax(obj=otudata, sampleda=sampleda, ...)
     }else{
-    	p <- ggbartax.data.frame(obj=otudata,...)
+    	p <- ggbartax(obj=otudata,...)
     }
     return(p)	
 }
