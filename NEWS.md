@@ -18,7 +18,7 @@
   - `left_join` to mutate joins based the left `tbl_ps` structure. (2021-06-21, Mon)
 + changed `clustplotClass` to `treedata`. (2021-06-22, Tue)
 + add `rrarefy` method to rarefy species richness. (2021-06-23, Mon)
-  - it supports `phyloseq`, `tbl_ps` object via wrapping `vegan::rrarefy`.
+  - it supports `phyloseq`, `tbl_ps`, `grouped_df_ps` object via wrapping `vegan::rrarefy`.
 + update `as.phyloseq` and `as.treedata` for `grouped_df_ps` object. (2021-06-23, Mon)
   - This feature is useful to explore the microbiome data in taxa tree. 
   
