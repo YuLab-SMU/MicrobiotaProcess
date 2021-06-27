@@ -1,7 +1,7 @@
 ##' @docType methods
-##' @name rrarefy 
-##' @rdname rrarefy-methods
-##' @title rrarefy method
+##' @name mp_rrarefy 
+##' @rdname mp_rrarefy-methods
+##' @title mp_rrarefy method
 ##' @param obj phyloseq or tbl_ps object
 ##' @param raresize integer Subsample size for rarefying community.
 ##' @param trimOTUs logical Whether to remove the otus that are no 
@@ -10,17 +10,17 @@
 ##' default is 123.
 ##' @return update object
 ##' @export
-setGeneric("rrarefy", function(obj, raresize, trimOTUs=TRUE, seed=123){standardGeneric("rrarefy")}) 
+setGeneric("mp_rrarefy", function(obj, raresize, trimOTUs=TRUE, seed=123){standardGeneric("mp_rrarefy")}) 
 
-##' @rdname rrarefy-methods
-##' @aliases rrarefy,matrix
-##' @exportMethod rrarefy
+##' @rdname mp_rrarefy-methods
+##' @aliases mp_rrarefy,matrix
+##' @exportMethod mp_rrarefy
 ##' @source 
-##' rrarefy for matrix object is a wrapper method of vegan::rrarefy from the vegan 
+##' mp_rrarefy for matrix object is a wrapper method of vegan::rrarefy from the vegan 
 ##' package. 
 ##' @seealso
 ##' \link[vegan]{rrarefy}
-setMethod("rrarefy", signature(obj="matrix"), function(obj, raresize, trimOTUs=TRUE, seed=123){
+setMethod("mp_rrarefy", signature(obj="matrix"), function(obj, raresize, trimOTUs=TRUE, seed=123){
     if (missing(raresize)||is.null(raresize)){
         raresize <- min(rowSums(obj))
     }
@@ -40,22 +40,22 @@ setMethod("rrarefy", signature(obj="matrix"), function(obj, raresize, trimOTUs=T
 })
 
 
-##' @rdname rrarefy-methods
-##' @aliases rrarefy,data.frame
-##' @exportMethod rrarefy
-setMethod("rrarefy", signature(obj="data.frame"), function(obj, raresize, trimOTUs=TRUE, seed=123){
+##' @rdname mp_rrarefy-methods
+##' @aliases mp_rrarefy,data.frame
+##' @exportMethod mp_rrarefy
+setMethod("mp_rrarefy", signature(obj="data.frame"), function(obj, raresize, trimOTUs=TRUE, seed=123){
     obj <- as.matrix(obj)
-    res <- rrarefy(obj=obj, raresize=raresize, trimOTUs=trimOTUs, seed=seed)
+    res <- mp_rrarefy(obj=obj, raresize=raresize, trimOTUs=trimOTUs, seed=seed)
     res <- data.frame(res) 
     return(res)
 })
 
-##' @rdname rrarefy-methods
-##' @aliases rrarefy,phyloseq
-##' @exportMethod rrarefy
-setMethod("rrarefy", signature(obj="phyloseq"), function(obj, raresize, trimOTUs=TRUE, seed=123){
+##' @rdname mp_rrarefy-methods
+##' @aliases mp_rrarefy,phyloseq
+##' @exportMethod mp_rrarefy
+setMethod("mp_rrarefy", signature(obj="phyloseq"), function(obj, raresize, trimOTUs=TRUE, seed=123){
     otuda <- get_otudata(obj)
-    res <- rrarefy(obj=otuda, raresize=raresize, trimOTUs=trimOTUs, seed=seed)
+    res <- mp_rrarefy(obj=otuda, raresize=raresize, trimOTUs=trimOTUs, seed=seed)
     obj@otu_table <- otu_table(res, taxa_are_rows=FALSE)
     if (!is.null(obj@sam_data)){
         obj@sam_data <- obj@sam_data[rownames(obj@sam_data) %in% rownames(res),,drop=FALSE]
@@ -72,22 +72,22 @@ setMethod("rrarefy", signature(obj="phyloseq"), function(obj, raresize, trimOTUs
     return (obj)
 })
 
-##' @rdname rrarefy-methods
-##' @aliases rrarefy,tbl_ps
-##' @exportMethod rrarefy
-setMethod("rrarefy", signature(obj="tbl_ps"), function(obj, raresize, trimOTUs=TRUE, seed=123){
+##' @rdname mp_rrarefy-methods
+##' @aliases mp_rrarefy,tbl_ps
+##' @exportMethod mp_rrarefy
+setMethod("mp_rrarefy", signature(obj="tbl_ps"), function(obj, raresize, trimOTUs=TRUE, seed=123){
     obj <- obj %>% as.phyloseq()
-    res <- rrarefy(obj=obj, raresize=raresize, trimOTUs=trimOTUs, seed=seed)
+    res <- mp_rrarefy(obj=obj, raresize=raresize, trimOTUs=trimOTUs, seed=seed)
     res %<>% as_tibble()
     return (res)
 })
 
-##' @rdname rrarefy-methods
-##' @aliases rrarefy,grouped_df_ps
-##' @exportMethod rrarefy
-setMethod("rrarefy", signature(obj="grouped_df_ps"), function(obj, raresize, trimOTUs=TRUE, seed=123){
+##' @rdname mp_rrarefy-methods
+##' @aliases mp_rrarefy,grouped_df_ps
+##' @exportMethod mp_rrarefy
+setMethod("mp_rrarefy", signature(obj="grouped_df_ps"), function(obj, raresize, trimOTUs=TRUE, seed=123){
     obj %<>% ungroup
-    res <- rrarefy(obj=obj, raresize=raresize, trimOTUs=trimOTUs, seed=seed)
+    res <- mp_rrarefy(obj=obj, raresize=raresize, trimOTUs=trimOTUs, seed=seed)
     res %<>% as_tibble()
     return (res)
 })
