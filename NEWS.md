@@ -1,25 +1,29 @@
-# MicrobiotaProcess 1.5.1.994
+# MicrobiotaProcess 1.5.1.995
+
++ use `MPSE` object. (2021-06-28, Mon)
+ - add `as.MPSE` to convert `phyloseq` or `tbl_mpse` to `MPSE` class.
+ - Formatted output.
 
 + tidy framework for `phyloseq` object.
-  - `as_tibble` to convert `phyloseq` to `tbl_ps`. (2021-06-14, Mon)
-  - `filter` to subset a data frame from `tbl_ps`. (2021-06-14, Mon)
-  - `group_by` to do some data operations on groups for `tbl_ps`. (2021-06-15, Tue)
-  - `arrange` to order the rows of a data frame for `tbl_ps`. (2021-06-15, Wed)
-  - `mutate` to adds new variables and preserves existing ones for `tbl_ps`. (2021-06-15, Tue)
-  - `select` to select variables in `tbl_ps`. (2021-06-15, Tue)
-  - `distinct` to select only unique/distinct rows in `tbl_ps`. (2021-06-16, Wed)
-  - `rename` to rename the variable names in `tbl_ps`. (2021-06-16, Wed)
-  - `nest` to create a list-column of `tbl_ps`, it will convert `tbl_ps` to `tbl_ps_nest`. (2021-06-16, Wed)
-  - `unnest` to convert the `tbl_ps_nest` to `tbl_ps`. (2021-06-16, Wed)
-  - `as.treedata` to convert `tbl_ps` to `treedata`, then we can explore 
+  - `as_tibble` to convert `phyloseq` to `tbl_mpse`. (2021-06-28, Mon)
+  - `filter` to subset a data frame from `tbl_mpse`. (2021-06-28, Mon)
+  - `group_by` to do some data operations on groups for `tbl_mpse`. (2021-06-28, Mon)
+  - `arrange` to order the rows of a data frame for `tbl_mpse`. (2021-06-28, Mon)
+  - `mutate` to adds new variables and preserves existing ones for `tbl_mpse`. (2021-06-28, Mon)
+  - `select` to select variables in `tbl_mpse`. (2021-06-28, Mon)
+  - `distinct` to select only unique/distinct rows in `tbl_mpse`. (2021-06-28, Mon)
+  - `rename` to rename the variable names in `tbl_mpse`. (2021-06-28, Mon)
+  - `nest` to create a list-column of `tbl_mpse`, it will convert `tbl_mpse` to `tbl_mpse_nest`. (2021-06-28, Mon)
+  - `unnest` to convert the `tbl_mpse_nest` to `tbl_mpse`. (2021-06-28, Mon)
+  - `as.treedata` to convert `tbl_mpse` to `treedata`, then we can explore 
     the data with `treedata`.
     - add `tiplevel` argument to control whether use `OTU` as tip label,
-      default is `OTU`. (2021-06-18, Fri)
-  - `left_join` to mutate joins based the left `tbl_ps` structure. (2021-06-21, Mon)
-+ changed `clustplotClass` to `treedata`. (2021-06-22, Tue)
-+ add `rrarefy` method to rarefy species richness. (2021-06-23, Mon)
-  - it supports `phyloseq`, `tbl_ps`, `grouped_df_ps` object via wrapping `vegan::rrarefy`.
-+ update `as.phyloseq` and `as.treedata` for `grouped_df_ps` object. (2021-06-23, Mon)
+      default is `OTU`. (2021-06-28, Mon)
+  - `left_join` to mutate joins based the left `tbl_mpse` structure. (2021-06-28, Mon)
++ changed `clustplotClass` to `treedata`. (2021-06-28, Tue)
++ add `mp_rrarefy` method to rarefy species richness. (2021-06-28, Mon)
+  - it supports `phyloseq`, `tbl_mpse`, `grouped_df_mpse` object via wrapping `vegan::rrarefy`.
++ update `as.phyloseq` and `as.treedata` for `grouped_df_mpse` object. (2021-06-28, Mon)
   - This feature is useful to explore the microbiome data in taxa tree. 
   
 # MicrobiotaProcess 1.5.1
