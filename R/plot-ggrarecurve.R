@@ -59,7 +59,6 @@ ggrarecurve.data.frame <- function(obj, sampleda, factorLevels, chunks=400, ...)
 
 #' @method ggrarecurve rarecurve
 #' @importFrom ggplot2 ggplot geom_ribbon aes_string geom_smooth facet_wrap scale_y_continuous
-#' @importFrom rlang .data
 #' @rdname ggrarecurve
 #' @export
 ggrarecurve.rarecurve <- function(obj,
@@ -119,7 +118,6 @@ ggrarecurve.rarecurve <- function(obj,
 #' @return data.frame for ggrarecurve.
 #' @author Shuangbin Xu
 #' @importFrom dplyr bind_rows
-#' @importFrom reshape melt
 #' @importFrom magrittr %>%
 #' @keywords internal
 #' @noRd
@@ -137,19 +135,25 @@ stat_rare <- function(data,
     	if (!missing(sampleda)){
     		sampleda$sample <- rownames(sampleda)
     		out <- merge(out, sampleda)
-    		out <- melt(out,id.vars=c(colnames(sampleda), "readsNums"),
-    					variable_name="Alpha")
+            out <- out %>% 
+                   tidyr::pivot_longer(!c(colnames(sampleda), "readsNums"),
+                                       names_to = "Alpha"
+                   )
     	}
     	if (missing(sampleda) && length(tmpfactor) > 0){
     		tmpsample <- data[, tmpfactor, drop=FALSE]
     		tmpsample$sample <- rownames(tmpsample)
     		out <- merge(out, tmpsample)
-    		out <- melt(out, id.vars=c("sample", "readsNums", tmpfactor),
-    					variable_name="Alpha")
+            out <- out %>%
+                   tidyr::pivot_longer(!c("sample", "readsNums", tmpfactor),
+                                       names_to = "Alpha"
+                   )
     	}
     	if (missing(sampleda)&&length(tmpfactor) == 0){
-    		out <- melt(out, id.vars=c("sample", "readsNums"),
-    			     variable_name="Alpha")
+            out <- out %>%
+                   tidyr::pivot_longer(!c("sample", "readsNums"),
+                                       names_to = "Alpha"
+                   )
     	}		
     }else{
     	if (!missing(sampleda)){

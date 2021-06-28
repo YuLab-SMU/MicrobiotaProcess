@@ -1,5 +1,5 @@
 #' @title convert to phyloseq object. 
-#' @param x object, tbl_ps object, which the result of 
+#' @param x object, tbl_mpse object, which the result of 
 #' as_tibble for phyloseq objcet.
 #' @param ... additional params
 #' @return phyloseq object.
@@ -12,15 +12,15 @@ as.phyloseq <- function(x, ...){
 #' @export
 as_phyloseq <- as.phyloseq
 
-#' @method as.phyloseq tbl_ps
+#' @method as.phyloseq tbl_mpse
 #' @rdname as.phyloseq
 #' @importFrom tidyr pivot_wider
 #' @importFrom dplyr distinct
 #' @export
-as.phyloseq.tbl_ps <- function(x, ...){
+as.phyloseq.tbl_mpse <- function(x, ...){
     samplevar <- attr(x, "samplevar")
     taxavar <- attr(x, "taxavar")
-    tree <- attr(x, "tree")
+    tree <- attr(x, "otutree")
     refseq <- attr(x, "refseq")
     otuda <- x %>% 
              select(c("Sample", "OTU", "Abundance")) %>%
@@ -56,9 +56,9 @@ as.phyloseq.tbl_ps <- function(x, ...){
     return (res)
 }
 
-#' @method as.phyloseq grouped_df_ps
+#' @method as.phyloseq grouped_df_mpse
 #' @export
-as.phyloseq.grouped_df_ps <- function(x, ...){
+as.phyloseq.grouped_df_mpse <- function(x, ...){
     x %<>% ungroup()
     res <- as.phyloseq(x=x,...)
     return(res)

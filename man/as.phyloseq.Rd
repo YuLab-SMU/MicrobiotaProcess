@@ -3,17 +3,17 @@
 \name{as.phyloseq}
 \alias{as.phyloseq}
 \alias{as_phyloseq}
-\alias{as.phyloseq.tbl_ps}
+\alias{as.phyloseq.tbl_mpse}
 \title{convert to phyloseq object.}
 \usage{
 as.phyloseq(x, ...)
 
 as_phyloseq(x, ...)
 
-\method{as.phyloseq}{tbl_ps}(x, ...)
+\method{as.phyloseq}{tbl_mpse}(x, ...)
 }
 \arguments{
-\item{x}{object, tbl_ps object, which the result of 
+\item{x}{object, tbl_mpse object, which the result of 
 as_tibble for phyloseq objcet.}
 
 \item{...}{additional params}

@@ -162,7 +162,6 @@ ggdiffclade.diffAnalysisClass <- function(obj, removeUnknown=TRUE, ...){
     return(p)
 }
 #' @importFrom dplyr rename
-#' @importFrom rlang .data
 #' @keywords internal
 get_node <- function(treedata, nodedf){
     nodelist <- treedata[match(as.vector(nodedf[,1]),treedata$label),]$node

@@ -123,7 +123,12 @@ get_anova <- function(obj){
 
 #' @keywords internal
 get_classlevels <- function(sampleda, classgroup){
-    levelstmp <- unique(as.vector(sampleda[,match(classgroup, colnames(sampleda))]))
+    #levelstmp <- unique(as.vector(sampleda[,match(classgroup, colnames(sampleda))]))
+    levelstmp <- sampleda %>% 
+                 dplyr::select(classgroup) %>% 
+                 unlist(use.names=FALSE) %>% 
+                 as.vector() %>% 
+                 unique()
     return(levelstmp)
 }
 

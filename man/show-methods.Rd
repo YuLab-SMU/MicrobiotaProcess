@@ -3,11 +3,14 @@
 \name{show,diffAnalysisClass-method}
 \alias{show,diffAnalysisClass-method}
 \alias{show,alphasample-method}
+\alias{show,MPSE-method}
 \title{method extensions to show for diffAnalysisClass or alphasample objects.}
 \usage{
 \S4method{show}{diffAnalysisClass}(object)
 
 \S4method{show}{alphasample}(object)
+
+\S4method{show}{MPSE}(object)
 }
 \arguments{
 \item{object}{object, diffAnalysisClass or alphasample class}

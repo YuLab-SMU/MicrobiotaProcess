@@ -117,7 +117,6 @@ ggbartax.data.frame <- function(obj, mapping=NULL, position = "stack", stat="ide
 #' @return the data.frame for ggbartax
 #' @author Shuangbin Xu
 #' @importFrom magrittr %>%
-#' @importFrom reshape melt
 #' @keywords internal
 #' @noRd
 mappingtaxda <- function(data, topn=30, count=FALSE, sampleda=NULL, 
@@ -140,8 +139,9 @@ mappingtaxda <- function(data, topn=30, count=FALSE, sampleda=NULL,
     }
     featurelevels <- rownames(dat)
     if (plotda){
-    	dat <- melt(as.matrix(dat))
-    	colnames(dat) <- c("feature", "sample", "value")
+    	dat <- dat %>% 
+               tibble::as_tibble(rownames="feature") %>% 
+               tidyr::pivot_longer(!c("feature"), names_to="sample", values_to="value")
     	if (!is.null(sampleda)){
     		sampleda$sample <- rownames(sampleda)
     		dat <- merge(dat, sampleda)

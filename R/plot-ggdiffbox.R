@@ -117,7 +117,8 @@ plotdiffbox <- function(obj, sampleda, factorNames, dodge_width=0.6, box_width=0
     sampleda <- sampleda[, match(factorNames,colnames(sampleda)),drop=FALSE]
     featureda <- merge(obj, sampleda, by=0) %>%
                  column_to_rownames(var="Row.names")
-    featureda <- melt(featureda, id.vars=c(factorNames), variable_name="feature")
+    featureda <- featureda %>% 
+         tidyr::pivot_longer(!factorNames, names_to="feature", values_to="value")
     if (!is.null(featurelist)){
         featureda$feature <- factor(featureda$feature, levels=featurelist)
     }

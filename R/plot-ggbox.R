@@ -66,7 +66,7 @@ setGeneric("ggbox", function(obj, factorNames, ...){standardGeneric("ggbox")})
 #' @rdname ggbox
 #' @importFrom ggplot2 ggplot geom_boxplot geom_violin aes_string facet_wrap 
 #' @importFrom ggsignif geom_signif
-#' @importFrom reshape melt
+#' @importFrom rlang .data
 #' @export
 setMethod("ggbox", "data.frame", 
           function(obj, sampleda, factorNames, indexNames, geom="boxplot",
@@ -83,7 +83,7 @@ setMethod("ggbox", "data.frame",
     obj <- merge(obj, sampleda, by=0)
     rownames(obj) <- obj$Row.names
     obj$Row.names <- NULL
-    obj <- melt(obj, id.vars=c(factorNames), variable_name="feature")
+    obj <- obj %>% tidyr::pivot_longer(!factorNames, names_to="feature", values_to="value")
     if (!is.null(factorLevels)){
         obj <- setfactorlevels(obj, factorLevels)
     }

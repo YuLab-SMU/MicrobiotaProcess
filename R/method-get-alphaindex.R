@@ -103,10 +103,10 @@ setMethod("get_alphaindex", "phyloseq", function(obj, ...){
     return(alpha)
 })
 
-#' @aliases get_alphaindex,tbl_ps
+#' @aliases get_alphaindex,tbl_mpse
 #' @rdname get_alphaindex
 #' @export
-setMethod("get_alphaindex", "tbl_ps", function(obj, ...){
+setMethod("get_alphaindex", "tbl_mpse", function(obj, ...){
     obj <- obj %>% as.phyloseq()
     alpha <- get_alphaindex(obj, ...)
     return(alpha)

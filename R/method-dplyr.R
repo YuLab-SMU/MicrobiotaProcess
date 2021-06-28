@@ -14,27 +14,29 @@ filter.alphasample <- function(.data, ..., .preserve = FALSE){
     return(.data)
 }
 
-##' @method filter phyloseq
+##' @method filter MPSE
 ##' @importFrom ape keep.tip
 ##' @export
-filter.phyloseq <- function(.data, ..., .preserve = FALSE){
-    .data <- internal_filter(x=.data, ..., .preserve = .preserve)
-    return (.data)
+filter.MPSE <- function(.data, ..., .preserve = FALSE){
+    .data %<>% as_tibble()
+    res <- filter(x=.data, ..., .preserve = .preserve)
+    res <- add_attr.tbl_mpse(x1=res, x2=.data)
+    return (res)
 }
 
-#' @method filter tbl_ps
+#' @method filter tbl_mpse
 #' @export
-filter.tbl_ps <- function(.data, ..., .preserve = FALSE){
+filter.tbl_mpse <- function(.data, ..., .preserve = FALSE){
     res <- NextMethod()
-    res <- add_attr.tbl_ps(x1=res, x2=.data)
+    res <- add_attr.tbl_mpse(x1=res, x2=.data)
     return(res)
 }
 
-#' @method filter grouped_df_ps
+#' @method filter grouped_df_mpse
 #' @export
-filter.grouped_df_ps <- function(.data, ..., .preserve=FALSE){
+filter.grouped_df_mpse <- function(.data, ..., .preserve=FALSE){
     res <- NextMethod()
-    res <- add_attr.tbl_ps(x1=res, x2=.data, class="grouped_df_ps")
+    res <- add_attr.tbl_mpse(x1=res, x2=.data, class="grouped_df_mpse")
     return(res)
 }
 
@@ -63,38 +65,38 @@ select.alphasample <- function(.data, ...) {
     return(.data)
 }
 
-##' @method select phyloseq
+##' @method select MPSE 
 ##' @export
-select.phyloseq <- function(.data, ...){
-    dots <- quos(...)
-    .data <- internal_select(x=.data, dots=dots, ...)
-    if(any(!c("Sample", "OTU", "Abundance") %in% colnames(.data))){
-        stop("The Sample,OTU,Abundance columns should not be removed !")
-    }
-    return (.data)
-}
-
-##' @method select tbl_ps
-##' @export
-select.tbl_ps <- function(.data, ...){
+select.MPSE <- function(.data, ...){
+    .data %<>% as_tibble()
     loc <- tidyselect::eval_select(expr(c(...)), .data)
     loc <- loc[!names(loc) %in% c("Sample", "OTU", "Abundance")]
-    .data <- check_attr.tbl_ps(x=.data, recol=loc, type="select")
+    .data <- check_attr.tbl_mpse(x=.data, recol=loc, type="select")
+    res <- select(.data=.data, ...)
+    res <- add_attr.tbl_mpse(x1=res, x2=.data)
+    return(res)
+}
+
+##' @method select tbl_mpse
+##' @export
+select.tbl_mpse <- function(.data, ...){
+    loc <- tidyselect::eval_select(expr(c(...)), .data)
+    loc <- loc[!names(loc) %in% c("Sample", "OTU", "Abundance")]
+    .data <- check_attr.tbl_mpse(x=.data, recol=loc, type="select")
     res <- NextMethod()
-    res <- add_attr.tbl_ps(x1=res, x2=.data)
+    res <- add_attr.tbl_mpse(x1=res, x2=.data)
     return (res)
 }
 
-##' @method select grouped_df_ps
+##' @method select grouped_df_mpse
 ##' @export
-select.grouped_df_ps <- function(.data, ...){
+select.grouped_df_mpse <- function(.data, ...){
     loc <- tidyselect::eval_select(expr(c(...)), .data)
     loc <- loc[!names(loc) %in% c("Sample", "OTU", "Abundance")]
-    .data <- check_attr.tbl_ps(x=.data, recol=loc, type="select")
+    .data <- check_attr.tbl_mpse(x=.data, recol=loc, type="select")
     res <- NextMethod()
-    res <- add_attr.tbl_ps(x1=res, x2=.data, class="grouped_df_ps")
+    res <- add_attr.tbl_mpse(x1=res, x2=.data, class="grouped_df_mpse")
     return (res)
-
 }
 
 internal_select <- function(x, dots, ...){
@@ -105,153 +107,161 @@ internal_select <- function(x, dots, ...){
 
 ##' @importFrom dplyr group_by_drop_default
 ##' @importFrom dplyr group_by
-##' @method group_by phyloseq
+##' @method group_by MPSE
 ##' @export
-group_by.phyloseq <- function(.data, ..., .add = FALSE, .drop = group_by_drop_default(.data)){
-    message("A tibble is returned for independent data analysis.")
+group_by.MPSE <- function(.data, ..., .add = FALSE, .drop = group_by_drop_default(.data)){
     .data %<>% as_tibble()
-    res <- group_by(.data=.data, ..., .add = .add, .drop = .drop)
-    res <- add_attr.tbl_ps(x1=res, x2=.data)
+    res <- group_by(.data=.data, ..., .add = .add, .drop=.drop)
+    res <- add_attr.tbl_mpse(x1=res, x2=.data)
+    class(res) <- c("grouped_df_mpse", class(res))
     return(res)
 }
 
-##' @method group_by tbl_ps
+##' @method group_by tbl_mpse
 ##' @export
-group_by.tbl_ps <- function(.data, ..., .add = FALSE, .drop = group_by_drop_default(.data)){
+group_by.tbl_mpse <- function(.data, ..., .add = FALSE, .drop = group_by_drop_default(.data)){
     res <- NextMethod()
-    res <- add_attr.tbl_ps(x1=res, x2=.data)
-    class(res) <- c("grouped_df_ps", class(res))
+    res <- add_attr.tbl_mpse(x1=res, x2=.data)
+    class(res) <- c("grouped_df_mpse", class(res))
     return(res)
 }
 
-##' @method ungroup grouped_df_ps
+##' @method ungroup grouped_df_mpse
 ##' @export
-ungroup.grouped_df_ps <- function(x, ...){
+ungroup.grouped_df_mpse <- function(x, ...){
     res <- NextMethod()
-    res <- add_attr.tbl_ps(x1=res, x2=x)
-    res <- drop_class(res, class=c("grouped_df_ps", "grouped_df"))
+    res <- add_attr.tbl_mpse(x1=res, x2=x)
+    res <- drop_class(res, class=c("grouped_df_mpse", "grouped_df"))
     return(res)
 }
 
-##' @method mutate phyloseq
+##' @method mutate MPSE
 ##' @export
-mutate.phyloseq <- function(.data, ...){
+mutate.MPSE <- function(.data, ...){
     .data %<>% as_tibble()
     res <- mutate(.data=.data, ...)
+    res <- add_attr.tbl_mpse(x1=res, x2=.data)
+    res <- add_var(res, type="mutate")
     return (res)
 }
 
-##' @method mutate tbl_ps
+##' @method mutate tbl_mpse
 ##' @export
-mutate.tbl_ps <- function(.data, ...){
+mutate.tbl_mpse <- function(.data, ...){
     res <- NextMethod()
-    res <- add_attr.tbl_ps(x1=res, x2=.data)
+    res <- add_attr.tbl_mpse(x1=res, x2=.data)
     res <- add_var(res, type="mutate")
     return(res)
 }
 
-##' @method mutate grouped_df_ps
+##' @method mutate grouped_df_mpse
 ##' @export
-mutate.grouped_df_ps <- function(.data, ...){
+mutate.grouped_df_mpse <- function(.data, ...){
     res <- NextMethod()
-    res <- add_attr.tbl_ps(x1=res, x2=.data, class="grouped_df_ps")
+    res <- add_attr.tbl_mpse(x1=res, x2=.data, class="grouped_df_mpse")
     res <- add_var(res, type="mutate")
     return(res)
 }
 
-##' @method distinct phyloseq
+##' @method distinct MPSE
 ##' @export
-distinct.phyloseq <- function(.data, ..., .keep_all = FALSE){
+distinct.MPSE <- function(.data, ..., .keep_all = FALSE){
     .data %<>%  as_tibble()
     res <- distinct(.data=.data, ..., .keep_all = .keep_all)
+    res <- add_attr.tbl_mpse(x1 = res, x2 = .data)
     return(res)
 }
 
-##' @method distinct tbl_ps
+##' @method distinct tbl_mpse
 ##' @export
-distinct.tbl_ps <- function(.data, ..., .keep_all = FALSE){
+distinct.tbl_mpse <- function(.data, ..., .keep_all = FALSE){
     res <- NextMethod()
-    res <- add_attr.tbl_ps(x1 = res, x2 = .data)
+    res <- add_attr.tbl_mpse(x1 = res, x2 = .data)
     return (res)
 }
 
-##' @method distinct grouped_df_ps
+##' @method distinct grouped_df_mpse
 ##' @export
-distinct.grouped_df_ps <- function(.data, ..., .keep_all = FALSE){
+distinct.grouped_df_mpse <- function(.data, ..., .keep_all = FALSE){
     res <- NextMethod()
-    res <- add_attr.tbl_ps(x1 = res, x2 = .data, class="grouped_df_ps")
+    res <- add_attr.tbl_mpse(x1 = res, x2 = .data, class="grouped_df_mpse")
     return (res)
 }
 
-##' @method rename phyloseq
+##' @method rename MPSE
 ##' @export
-rename.phyloseq <- function(.data, ...){
+rename.MPSE <- function(.data, ...){
     .data %<>% as_tibble()
+    cols <- tidyselect::eval_select(expr(c(...)), .data)
+    .data <- check_attr.tbl_mpse(x=.data, recol=cols)
     res <- rename(.data=.data, ...)
+    res <- add_attr.tbl_mpse(x1=res, x2=.data)
     return (res)
 }
 
-##' @method rename tbl_ps
+##' @method rename tbl_mpse
 ##' @importFrom tidyselect eval_select
 ##' @importFrom rlang expr
 ##' @export
-rename.tbl_ps <- function(.data, ...){
+rename.tbl_mpse <- function(.data, ...){
     cols <- tidyselect::eval_select(expr(c(...)), .data)
-    .data <- check_attr.tbl_ps(x=.data, recol=cols)
+    .data <- check_attr.tbl_mpse(x=.data, recol=cols)
     res <- NextMethod()
-    res <- add_attr.tbl_ps(x1=res, x2=.data)
+    res <- add_attr.tbl_mpse(x1=res, x2=.data)
     return (res)
 }
 
-##' @method rename grouped_df_ps
+##' @method rename grouped_df_mpse
 ##' @export
-rename.grouped_df_ps <- function(.data, ...){
+rename.grouped_df_mpse <- function(.data, ...){
     cols <- tidyselect::eval_select(expr(c(...)), .data)
-    .data <- check_attr.tbl_ps(x=.data, recol=cols)
+    .data <- check_attr.tbl_mpse(x=.data, recol=cols)
     res <- NextMethod()
-    res <- add_attr.tbl_ps(x1=res, x2=.data, class="grouped_df_ps")
+    res <- add_attr.tbl_mpse(x1=res, x2=.data, class="grouped_df_mpse")
     return (res)
 }
 
-##' @method arrange phyloseq
+##' @method arrange MPSE
 ##' @export
-arrange.phyloseq <- function(.data, ..., by_group = FALSE){
+arrange.MPSE <- function(.data, ..., by_group = FALSE){
     .data %<>% as_tibble()
-    res <- arrange(.data = .data, ..., by_group = by_group)
+    res <- arrange(.data=.data, ..., by_group = FALSE)
+    res <- add_attr.tbl_mpse(x1 = res, x2 = .data)
     return (res)
 }
 
-##' @method arrange tbl_ps
+##' @method arrange tbl_mpse
 ##' @export
-arrange.tbl_ps <- function(.data, ..., by_group = FALSE){
+arrange.tbl_mpse <- function(.data, ..., by_group = FALSE){
     res <- NextMethod()
-    res <- add_attr.tbl_ps(x1 = res, x2 = .data)
+    res <- add_attr.tbl_mpse(x1 = res, x2 = .data)
     return(res)
 }
 
-##' @method arrange grouped_df_ps
+##' @method arrange grouped_df_mpse
 ##' @export
-arrange.grouped_df_ps <- function(.data, ..., by_group = FALSE){
+arrange.grouped_df_mpse <- function(.data, ..., by_group = FALSE){
     res <- NextMethod()
-    res <- add_attr.tbl_ps(x1 = res, x2 = .data, class = "grouped_df_ps")
+    res <- add_attr.tbl_mpse(x1 = res, x2 = .data, class = "grouped_df_mpse")
     return (res)
 }
 
-##' @method left_join tbl_ps
+##' @method left_join tbl_mpse
 ##' @export
-left_join.tbl_ps <- function(x, y, by=NULL, copy=FALSE, suffix = c(".x", ".y")){
+left_join.tbl_mpse <- function(x, y, by=NULL, copy=FALSE, suffix = c(".x", ".y")){
     res <- NextMethod()
-    res <- add_attr.tbl_ps(x1 = res, x2 = x) 
+    res <- add_attr.tbl_mpse(x1 = res, x2 = x) 
     res <- add_var(res, type="join")
     return(res)
 }
 
-add_attr.tbl_ps <- function(x1, x2, class="tbl_ps"){
+add_attr.tbl_mpse <- function(x1, x2, class="tbl_mpse"){
     attr(x1, "samplevar") <- attr(x2, "samplevar")
     attr(x1, "mutatevar") <- attr(x2, "mutatevar")
+    attr(x1, "assaysvar") <- attr(x2, "assaysvar")
     attr(x1, "taxavar") <- attr(x2, "taxavar")
     attr(x1, "fillNAtax") <- attr(x2, "fillNAtax")
-    attr(x1, "tree") <- attr(x2, "tree")
+    attr(x1, "otutree") <- attr(x2, "otutree")
     attr(x1, "refseq") <- attr(x2, "refseq")
     class(x1) <- add_class(new=class, old=class(x1))
     return(x1)   
@@ -265,7 +275,7 @@ add_class <- function(new, old){
     }
 }
 
-check_attr.tbl_ps <- function(x, recol, type="rename"){
+check_attr.tbl_mpse <- function(x, recol, type="rename"){
     clnm <- colnames(x)
     renm <- clnm[recol]
     samplevar <- attr(x, "samplevar")
@@ -302,4 +312,8 @@ add_var <- function(x, type){
         attr(x, "samplevar") <- c(samplevar, newvar)
     }
     return(x)
+}
+
+check_abundance_names <- function(x, y){
+    x@assays %>% names()
 }

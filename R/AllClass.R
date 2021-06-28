@@ -5,12 +5,95 @@
 #' @keywords internal
 setOldClass("prcomp")
 
-#' @title tbl_ps class
-#' @name tbl_ps-class
-#' @rdname tbl_ps-class
+#' @title tbl_mpse class
+#' @name tbl_mpse-class
+#' @rdname tbl_mpse-class
 #' @keywords internal
 #' @noRd
-setOldClass("tbl_ps")
+setOldClass("tbl_mpse")
+
+#' @title grouped_df_mpse class
+#' @name grouped_df_mpse-class
+#' @rdname grouped_df_mpse-class
+#' @noRd
+setOldClass("grouped_df_mpse")
+
+#' @importClassesFrom tidytree treedata
+setClassUnion("TREEDATA_OR_NULL", c("treedata", "NULL"))
+
+#' @importClassesFrom Biostrings XStringSet
+setClassUnion("XSTRINGSET_OR_NULL", c("XStringSet", "NULL"))
+
+#' @title MPSE class
+#' @docType class
+#' @slot otutree A treedata object of tidytree package or NULL.
+#' @slot refseq A XStringSet object of Biostrings package or NULL.
+#' @slot ... Other slots from \code{\link[SummarizedExperiment:SummarizedExperiment]{SummarizedExperiment}}
+#' @importClassesFrom SummarizedExperiment SummarizedExperiment
+#' @exportClass MPSE
+setClass("MPSE",
+    contains = "SummarizedExperiment",
+    slots    = c(
+        otutree  = "TREEDATA_OR_NULL",
+        #taxatree = "TREEDATA_OR_NULL",
+        refseq   = "XSTRINGSET_OR_NULL"
+    ),
+    prototype = list(
+        otutree  = NULL,
+        #taxatree = NULL,
+        refseq   = NULL    
+    )
+)
+
+#' @title Construct a MPSE object
+#' @param otutree A treedata object of tidytree package
+
+# #' @param taxatree A treedata object of tidytree package
+
+#' @param refseq A XStingSet object of Biostrings package
+#' @param ... additional parameters, see also the usage 
+#' of \code{\link[SummarizedExperiment]{SummarizedExperiment}}.
+#' @return MPSE object
+#' @export
+MPSE <- function(otutree = NULL, 
+                 #taxatree = NULL, 
+                 refseq = NULL, 
+                 ...){
+    se <- SummarizedExperiment::SummarizedExperiment(...)
+    mpse <- new("MPSE",
+                se,
+                otutree = otutree,
+                #taxatree = taxatree,
+                refseq = refseq
+               )
+}
+
+.valid.MPSE <- function(object){
+    if (!is.null(object@otutree)){
+        ntip <- treeio::Ntip(object@otutree)
+        if (nrow(object)!=ntip){
+            rlang::abort("The number of tip labels of otutree is not equal the numbers of 
+                         otu in assays, Please check the otutree or assays!")
+        }
+        if (!all(object@otutree@phylo$tip.label %in% rownames(object))){
+            rlang::abort("Some otu names are different with the otu names in 
+                   assays, Please check the otutree or assays")
+        }
+    }
+    if (!is.null(object@refseq)){
+       if (length(object@refseq) != nrow(object)){
+           rlang::abort("The number of reference sequences is not equal the numbers 
+                        of otu in assays, Please check the refseq or assays")
+       }
+       if (!all(names(object@refseq) %in% rownames(object))){
+           rlang::abort("Some reference sequence names are different with the otu names 
+                        in assays, Please check the refseq or assays")
+       }
+    }
+    return(NULL)
+}
+
+setValidity("MPSE", .valid.MPSE)
 
 #' @title pcoa class
 #' @seealso \code{\link[ape]{pcoa}}

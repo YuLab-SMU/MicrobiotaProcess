@@ -2,7 +2,7 @@
 ##' @name mp_rrarefy 
 ##' @rdname mp_rrarefy-methods
 ##' @title mp_rrarefy method
-##' @param obj phyloseq or tbl_ps object
+##' @param obj phyloseq or tbl_mpse object
 ##' @param raresize integer Subsample size for rarefying community.
 ##' @param trimOTUs logical Whether to remove the otus that are no 
 ##' longer present in any sample after rarefaction
@@ -73,9 +73,9 @@ setMethod("mp_rrarefy", signature(obj="phyloseq"), function(obj, raresize, trimO
 })
 
 ##' @rdname mp_rrarefy-methods
-##' @aliases mp_rrarefy,tbl_ps
+##' @aliases mp_rrarefy,tbl_mpse
 ##' @exportMethod mp_rrarefy
-setMethod("mp_rrarefy", signature(obj="tbl_ps"), function(obj, raresize, trimOTUs=TRUE, seed=123){
+setMethod("mp_rrarefy", signature(obj="tbl_mpse"), function(obj, raresize, trimOTUs=TRUE, seed=123){
     obj <- obj %>% as.phyloseq()
     res <- mp_rrarefy(obj=obj, raresize=raresize, trimOTUs=trimOTUs, seed=seed)
     res %<>% as_tibble()
@@ -83,9 +83,9 @@ setMethod("mp_rrarefy", signature(obj="tbl_ps"), function(obj, raresize, trimOTU
 })
 
 ##' @rdname mp_rrarefy-methods
-##' @aliases mp_rrarefy,grouped_df_ps
+##' @aliases mp_rrarefy,grouped_df_mpse
 ##' @exportMethod mp_rrarefy
-setMethod("mp_rrarefy", signature(obj="grouped_df_ps"), function(obj, raresize, trimOTUs=TRUE, seed=123){
+setMethod("mp_rrarefy", signature(obj="grouped_df_mpse"), function(obj, raresize, trimOTUs=TRUE, seed=123){
     obj %<>% ungroup
     res <- mp_rrarefy(obj=obj, raresize=raresize, trimOTUs=trimOTUs, seed=seed)
     res %<>% as_tibble()

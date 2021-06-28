@@ -67,11 +67,11 @@ as.treedata.taxonomyTable <- function(tree, ...){
 }
 
 
-#' @method as.treedata tbl_ps
+#' @method as.treedata tbl_mpse
 #' @importFrom dplyr left_join
 #' @export
-as.treedata.tbl_ps <- function(tree, use_taxatree=TRUE, tiplevel="OTU", ...){
-    tr <- attr(tree, "tree")
+as.treedata.tbl_mpse <- function(tree, use_taxatree=TRUE, tiplevel="OTU", ...){
+    tr <- attr(tree, "otutree")
     taxavar <- attr(tree, "taxavar")
     if (!is.null(tr) && !use_taxatree){
         treeda <- tr %>% as_tibble()
@@ -106,9 +106,9 @@ as.treedata.tbl_ps <- function(tree, use_taxatree=TRUE, tiplevel="OTU", ...){
     return(treeda)
 }
 
-#' @method as.treedata grouped_df_ps
+#' @method as.treedata grouped_df_mpse
 #' @export
-as.treedata.grouped_df_ps <- function(tree, use_taxatree=TRUE, tiplevel="OTU", ...){
+as.treedata.grouped_df_mpse <- function(tree, use_taxatree=TRUE, tiplevel="OTU", ...){
     tree <- tree %>% ungroup()
     #mutatevar <- attr(tree, "mutatevar")
     #tree <- tree %>% select(-mutatevar)

@@ -9,10 +9,10 @@
 \alias{mp_rrarefy,data.frame}
 \alias{mp_rrarefy,phyloseq-method}
 \alias{mp_rrarefy,phyloseq}
-\alias{mp_rrarefy,tbl_ps-method}
-\alias{mp_rrarefy,tbl_ps}
-\alias{mp_rrarefy,grouped_df_ps-method}
-\alias{mp_rrarefy,grouped_df_ps}
+\alias{mp_rrarefy,tbl_mpse-method}
+\alias{mp_rrarefy,tbl_mpse}
+\alias{mp_rrarefy,grouped_df_mpse-method}
+\alias{mp_rrarefy,grouped_df_mpse}
 \title{mp_rrarefy method}
 \source{
 mp_rrarefy for matrix object is a wrapper method of vegan::rrarefy from the vegan 
@@ -27,12 +27,12 @@ mp_rrarefy(obj, raresize, trimOTUs = TRUE, seed = 123)
 
 \S4method{mp_rrarefy}{phyloseq}(obj, raresize, trimOTUs = TRUE, seed = 123)
 
-\S4method{mp_rrarefy}{tbl_ps}(obj, raresize, trimOTUs = TRUE, seed = 123)
+\S4method{mp_rrarefy}{tbl_mpse}(obj, raresize, trimOTUs = TRUE, seed = 123)
 
-\S4method{mp_rrarefy}{grouped_df_ps}(obj, raresize, trimOTUs = TRUE, seed = 123)
+\S4method{mp_rrarefy}{grouped_df_mpse}(obj, raresize, trimOTUs = TRUE, seed = 123)
 }
 \arguments{
-\item{obj}{phyloseq or tbl_ps object}
+\item{obj}{phyloseq or tbl_mpse object}
 
 \item{raresize}{integer Subsample size for rarefying community.}
 

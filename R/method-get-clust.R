@@ -55,7 +55,7 @@ get_clust.dist <- function(obj,
     phyloobj <- as.phylo(hclustobj)
     if (!is.null(sampleda)){
         sampleda %<>% rownames_to_column(var="label")
-        clustplot <- phyloobj %>% full_join(sampleda, by="label") 
+        clustplot <- phyloobj %>% treeio::full_join(sampleda, by="label") 
     }else{
         clustplot <- phyloobj %>% as.treedata
     }
