@@ -126,3 +126,114 @@ print.alphasample <- function(object){
         print (head(sampleda))
     }
 }
+
+#' @rdname show-methods
+#' @exportMethod show
+setMethod("show", "MPSE", function(object){
+    if (isTRUE(x = getOption(x = "restore_MPSE_show", default = FALSE))) {
+        cli::cat_line("The otutree (treedata object) of the MPSE object is: ", background_col="white", col = "black")
+        if (!is.null(object@otutree)){
+            show(object@otutree)
+        }else{
+            cat("NULL", fill=TRUE)
+        }
+        cli::cat_line("The taxatree (treedata object) of the MPSE object is: ", background_col="white", col = "black")
+        if (!is.null(object@taxatree)){
+            show(object@taxatree)
+        }else{
+            cat("NULL", fill=TRUE)
+        }
+        cli::cat_line("The reference sequence (XStringSet object) of the MPSE object is: ", background_col="white", col = "black")
+        if (!is.null(object@refseq)){
+            show(object@refseq)
+        }else{
+            cat("NULL", fill=TRUE)
+        }
+        cli::cat_line("The abundance and sample data of the MPSE object are: ", background_col="white", col = "black")
+        f <- getMethod(f="show", signature = "SummarizedExperiment", where = asNamespace(ns = "SummarizedExperiment"))
+        f(object)
+    }else{
+        object %>% print()
+    }
+})
+
+
+#' @title print some objects
+#' @name print
+#' @param x Object to format or print.
+#' @param ... Other arguments passed on to individual methods.
+#' @param n Number of rows to show. If `NULL`, the default, will print all rows
+#'   if less than option `tibble.print_max`. Otherwise, will print
+#'   `tibble.print_min` rows.
+#' @param width Width of text output to generate. This defaults to `NULL`, which
+#'   means use `getOption("tibble.width")` or (if also `NULL`)
+#'   `getOption("width")`; the latter displays only the columns that fit on one
+#'   screen. You can also set `options(tibble.width = Inf)` to override this
+#'   default and always print all columns.
+#' @param n_extra Number of extra columns to print abbreviated information for,
+#'   if the width is too small for the entire tibble. If `NULL`, the default,
+#'   will print information about at most `tibble.max_extra_cols` extra columns.
+#' @return print information
+NULL
+
+#' @rdname print
+#' @method print MPSE
+#' @export
+print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
+    if (nrow(x) > 30){
+        tmpx <- x[1:min(40, nrow(x)), min(1, ncol(x)), drop=FALSE]
+    }else{
+        tmpx <- x[,1:min(20, ncol(x)), drop=FALSE]
+    }
+    formatted_tb <- tmpx %>% 
+                    as_tibble() %>% 
+                    format(..., n = n, width = width, n_extra = n_extra)
+    total_nrows <- dim(x)[1] * dim(x)[2]
+    show_nrows <- ifelse(is.null(n), 10, n)
+    
+    new_head = sprintf(
+      "A MPSE-tibble (tbl_mpse) abstraction: %s",
+       total_nrows %>% format(format="f", big.mark=",", digits=2)
+    )
+    
+    left_nrows <- total_nrows - show_nrows
+    new_tail <- sprintf("%s more rows", 
+       left_nrows %>% format(format="f", big.mark=",", digits=2)
+    )
+    formatted_mpse = 
+      formatted_tb %>%
+      {
+        x = (.);
+        x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
+        x[show_nrows+4] = gsub("([0-9,]+ more rows)", new_tail, x[show_nrows + 4]);
+        x
+      }
+    formatted_mpse %>%
+      append(sprintf(
+        "\033[90m# OTU=%s | Samples=%s | Assays=%s | Taxanomy=%s\033[39m",
+        nrow(x), 
+        ncol(x),
+        SummarizedExperiment::assays(x) %>% names %>% paste(collapse=", "),
+        ifelse(SummarizedExperiment::rowData(x) %>% ncol() ==0, "NULL", 
+               SummarizedExperiment::rowData(x) %>% names %>% paste(collapse=", "))
+      ), after = 1) %>%
+      writeLines()
+    invisible(x)
+}
+
+#' @method print tbl_mpse
+#' @rdname print
+#' @export
+print.tbl_mpse <- function(x, ..., n = NULL, width = NULL, n_extra = NULL){
+    formatted_tb <- x %>% format(..., n = n, width = width, n_extra = n_extra)
+    new_head = "A tbl_mpse abstraction:"
+    formatted_tb_mpse <-
+        formatted_tb %>% 
+        {
+           x = (.);
+           x[1] = gsub("(A tibble:)", new_head, x[1]);
+           x
+        }
+    writeLines(formatted_tb_mpse)
+    invisible(x)
+}
