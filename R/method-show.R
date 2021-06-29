@@ -226,14 +226,39 @@ print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
 #' @export
 print.tbl_mpse <- function(x, ..., n = NULL, width = NULL, n_extra = NULL){
     formatted_tb <- x %>% format(..., n = n, width = width, n_extra = n_extra)
-    new_head = "A tbl_mpse abstraction:"
-    formatted_tb_mpse <-
-        formatted_tb %>% 
-        {
-           x = (.);
-           x[1] = gsub("(A tibble:)", new_head, x[1]);
-           x
-        }
-    writeLines(formatted_tb_mpse)
+    if (valid_names(x, type="tbl_mpse")){
+        new_head = "A tbl_mpse (which can be converted to MPSE via as.MPSE) abstraction:"
+        formatted_tb_mpse <-
+            formatted_tb %>% 
+            {
+               x = (.);
+               x[1] = gsub("(A tibble:)", new_head, x[1]);
+               x
+            }
+        writeLines(formatted_tb_mpse)
+    }else{
+        writeLines(formatted_tb)
+    }
+    invisible(x)
+}
+
+#' @method print grouped_df_mpse
+#' @rdname print
+#' @export
+print.grouped_df_mpse <- function(x, ..., n = NULL, width = NULL, n_extra = NULL){
+    formatted_tb <- x %>% format(..., n = n, width = width, n_extra = n_extra)
+    if (valid_names(x, type="grouped_df_mpse")){
+        new_head = "A grouped_df_mpse (which can be converted to MPSE via as.MPSE) abstraction:"
+        formatted_grouped <- 
+            formatted_tb %>%
+            {
+                x = (.);
+                x[1] = gsub("(A tibble:)", new_head, x[1]);
+                x
+            }
+        writeLines(formatted_grouped)
+    }else{
+        writeLines(formatted_tb)
+    }
     invisible(x)
 }

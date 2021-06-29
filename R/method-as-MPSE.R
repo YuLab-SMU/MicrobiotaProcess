@@ -21,9 +21,9 @@ setMethod("as.MPSE", signature(.data="tbl_mpse"),
         samplevar <- attr(.data, "samplevar")
         taxavar <- attr(.data, "taxavar")
         assaysvar <- attr(.data, "assaysvar")
+        mutatevar <- attr(.data, "mutatevar")
 
         .data %<>% as_tibble()
-
         assaysda <- lapply(assaysvar, function(x) 
             .data %>%
             select(c("Sample", "OTU", x)) %>%
@@ -32,6 +32,17 @@ setMethod("as.MPSE", signature(.data="tbl_mpse"),
             column_to_rownames(var="OTU")
         ) %>% stats::setNames(assaysvar)
 
+        nsample <- ncol(assaysda[[1]])
+        if (!is.null(mutatevar)){
+            indx <- lapply(mutatevar, function(i)
+                        .data %>% 
+                        select(i) %>% 
+                        distinct() %>% 
+                        nrow() == nsample
+                        ) %>% unlist()
+            mutatevar <- mutatevar[indx]
+            samplevar <- c(samplevar, mutatevar)
+        }
         if (!is.null(samplevar)){
             sampleda <- .data %>% 
                         select(samplevar) %>%
@@ -67,7 +78,7 @@ setMethod("as.MPSE", signature(.data="tbl_mpse"),
                       column_to_rownames(var="OTU")
             SummarizedExperiment::rowData(mpse) <- taxada
         }
-
+        methods::validObject(mpse)
         return (mpse)
 })
 
@@ -110,8 +121,16 @@ setMethod("as.MPSE", signature(.data="phyloseq"),
         if (ncol(taxada)!=0){
             SummarizedExperiment::rowData(mpse) <- taxada
         }
-
+        methods::validObject(mpse)
         return(mpse)
 })
 
-
+##' @rdname as.MPSE-methods
+##' @aliases as.MPSE,grouped_df_mpse
+##' @exportMethod as.MPSE
+setMethod("as.MPSE", signature(.data="grouped_df_mpse"), 
+          function(.data, ...){
+    mpse <- .data %>% ungroup() %>% as.MPSE()
+    methods::validObject(mpse)
+    return(mpse)          
+})

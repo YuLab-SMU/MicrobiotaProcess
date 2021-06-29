@@ -47,6 +47,7 @@ as_tibble.phyloseq <- function(x, ...){
 #' @export
 as_tibble.grouped_df_mpse <- function(x, ...){
     res <- NextMethod()
+    res <- add_attr.tbl_mpse(x1=res, x2=x)
     res <- drop_class(x=res, class=c("grouped_df_mpse", "grouped_df"))
     return(res)
 }

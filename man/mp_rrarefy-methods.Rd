@@ -7,8 +7,8 @@
 \alias{mp_rrarefy,matrix}
 \alias{mp_rrarefy,data.frame-method}
 \alias{mp_rrarefy,data.frame}
-\alias{mp_rrarefy,phyloseq-method}
-\alias{mp_rrarefy,phyloseq}
+\alias{mp_rrarefy,MPSE-method}
+\alias{mp_rrarefy,MPSE}
 \alias{mp_rrarefy,tbl_mpse-method}
 \alias{mp_rrarefy,tbl_mpse}
 \alias{mp_rrarefy,grouped_df_mpse-method}
@@ -19,24 +19,24 @@ mp_rrarefy for matrix object is a wrapper method of vegan::rrarefy from the vega
 package.
 }
 \usage{
-mp_rrarefy(obj, raresize, trimOTUs = TRUE, seed = 123)
+mp_rrarefy(obj, raresize, trimOTU = TRUE, seed = 123)
 
-\S4method{mp_rrarefy}{matrix}(obj, raresize, trimOTUs = TRUE, seed = 123)
+\S4method{mp_rrarefy}{matrix}(obj, raresize, trimOTU = TRUE, seed = 123)
 
-\S4method{mp_rrarefy}{data.frame}(obj, raresize, trimOTUs = TRUE, seed = 123)
+\S4method{mp_rrarefy}{data.frame}(obj, raresize, trimOTU = TRUE, seed = 123)
 
-\S4method{mp_rrarefy}{phyloseq}(obj, raresize, trimOTUs = TRUE, seed = 123)
+\S4method{mp_rrarefy}{MPSE}(obj, raresize, trimOTU = TRUE, seed = 123)
 
-\S4method{mp_rrarefy}{tbl_mpse}(obj, raresize, trimOTUs = TRUE, seed = 123)
+\S4method{mp_rrarefy}{tbl_mpse}(obj, raresize, trimOTU = TRUE, seed = 123)
 
-\S4method{mp_rrarefy}{grouped_df_mpse}(obj, raresize, trimOTUs = TRUE, seed = 123)
+\S4method{mp_rrarefy}{grouped_df_mpse}(obj, raresize, trimOTU = TRUE, seed = 123)
 }
 \arguments{
 \item{obj}{phyloseq or tbl_mpse object}
 
 \item{raresize}{integer Subsample size for rarefying community.}
 
-\item{trimOTUs}{logical Whether to remove the otus that are no 
+\item{trimOTU}{logical Whether to remove the otus that are no 
 longer present in any sample after rarefaction}
 
 \item{seed}{a random seed to make the rrarefy reproducible,

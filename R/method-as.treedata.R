@@ -115,9 +115,3 @@ as.treedata.grouped_df_mpse <- function(tree, use_taxatree=TRUE, tiplevel="OTU",
     treeda <- as.treedata(tree=tree, use_taxatree=use_taxatree, tiplevel=tiplevel, ...)
     return(treeda)
 }
-
-drop_class <- function(x, class){
-    old <- class(x) 
-    class(x) <- old[!old %in% class]
-    return (x)
-}
