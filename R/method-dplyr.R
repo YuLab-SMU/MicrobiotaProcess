@@ -19,8 +19,12 @@ filter.alphasample <- function(.data, ..., .preserve = FALSE){
 ##' @export
 filter.MPSE <- function(.data, ..., .preserve = FALSE){
     .data %<>% as_tibble()
-    res <- filter(x=.data, ..., .preserve = .preserve)
+    dots <- quos(...)
+    res <- .data %>% filter(!!!dots, .preserve = .preserve)
     res <- add_attr.tbl_mpse(x1=res, x2=.data)
+	if (valid_names(res)){
+        res <- as.MPSE(res)
+    }
     return (res)
 }
 
@@ -70,10 +74,13 @@ select.alphasample <- function(.data, ...) {
 select.MPSE <- function(.data, ...){
     .data %<>% as_tibble()
     loc <- tidyselect::eval_select(expr(c(...)), .data)
-    loc <- loc[!names(loc) %in% c("Sample", "OTU", "Abundance")]
+    #loc <- loc[!names(loc) %in% c("Sample", "OTU", "Abundance")]
     .data <- check_attr.tbl_mpse(x=.data, recol=loc, type="select")
     res <- select(.data=.data, ...)
     res <- add_attr.tbl_mpse(x1=res, x2=.data)
+    if (valid_names(res)){
+        res %<>% as.MPSE()
+    }
     return(res)
 }
 
@@ -81,7 +88,7 @@ select.MPSE <- function(.data, ...){
 ##' @export
 select.tbl_mpse <- function(.data, ...){
     loc <- tidyselect::eval_select(expr(c(...)), .data)
-    loc <- loc[!names(loc) %in% c("Sample", "OTU", "Abundance")]
+    #loc <- loc[!names(loc) %in% c("Sample", "OTU", "Abundance")]
     .data <- check_attr.tbl_mpse(x=.data, recol=loc, type="select")
     res <- NextMethod()
     res <- add_attr.tbl_mpse(x1=res, x2=.data)
@@ -196,6 +203,9 @@ rename.MPSE <- function(.data, ...){
     .data <- check_attr.tbl_mpse(x=.data, recol=cols)
     res <- rename(.data=.data, ...)
     res <- add_attr.tbl_mpse(x1=res, x2=.data)
+	if (valid_names(res)){
+        res %<>% as.MPSE()
+	}
     return (res)
 }
 
@@ -280,23 +290,36 @@ check_attr.tbl_mpse <- function(x, recol, type="rename"){
     renm <- clnm[recol]
     samplevar <- attr(x, "samplevar")
     taxavar <- attr(x, "taxavar")
+    assaysvar <- attr(x, "assaysvar")
     if (any(renm %in% c("Sample", "OTU", "Abundance")) && type=="rename"){
         stop("The Sample, OTU, and Abundance are not be renamed !")
     }
-    if (any(renm %in% samplevar)){
-        item1 <- intersect(renm, samplevar)
+    item1 <- intersect(samplevar, renm)
+    item2 <- intersect(taxavar, renm)
+	item3 <- intersect(assaysvar, renm)
+    if (any(renm %in% samplevar) && type=="rename"){
         indx <- match(item1, samplevar)
         indy <- match(item1, renm)
         samplevar[indx] <- names(recol[indy])
     }
-    if (any(renm %in% taxavar)){
-        item2 <- intersect(renm, taxavar)
+    if (any(renm %in% taxavar) && type=="rename"){
         indx <- match(item2, taxavar)
         indy <- match(item2, renm)
         taxavar[indx] <- names(recol[indy])
     }
+	if (any(renm %in% assaysvar) && type=="rename"){
+        indx <- match(item3, assaysvar)
+        indy <- match(item3, renm)
+        assaysvar[indx] <- names(recol[indy])
+	}
+    if (type != "rename"){
+        samplevar <- item1
+        taxavar <- item2
+		assaysvar <- item3
+    }
     attr(x, "samplevar") <- samplevar
     attr(x, "taxavar") <- taxavar
+	attr(x, "assaysvar") <- assaysvar
     return(x)
 }
 
@@ -314,6 +337,6 @@ add_var <- function(x, type){
     return(x)
 }
 
-check_abundance_names <- function(x, y){
-    x@assays %>% names()
+valid_names <- function(x){
+   all(c("OTU", "Sample", "Abundance") %in% colnames(x)) 
 }
