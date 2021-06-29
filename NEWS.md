@@ -1,11 +1,14 @@
-# MicrobiotaProcess 1.5.1.995
+# MicrobiotaProcess 1.5.1.996
+
++ update `print` information for `MPSE`, `tbl_mpse` and `grouped_df_mpse`. (2021-06-29, Tue)
++ add `[` to the accessors of `MPSE`. (2021-06-29, Tue)
 
 + use `MPSE` object. (2021-06-28, Mon)
  - add `as.MPSE` to convert `phyloseq` or `tbl_mpse` to `MPSE` class.
  - Formatted output.
 
-+ tidy framework for `phyloseq` object.
-  - `as_tibble` to convert `phyloseq` to `tbl_mpse`. (2021-06-28, Mon)
++ tidy framework for `MPSE` object.
+  - `as_tibble` to convert `MPSE` and `phyloseq` to `tbl_mpse`. (2021-06-28, Mon)
   - `filter` to subset a data frame from `tbl_mpse`. (2021-06-28, Mon)
   - `group_by` to do some data operations on groups for `tbl_mpse`. (2021-06-28, Mon)
   - `arrange` to order the rows of a data frame for `tbl_mpse`. (2021-06-28, Mon)
@@ -21,9 +24,9 @@
       default is `OTU`. (2021-06-28, Mon)
   - `left_join` to mutate joins based the left `tbl_mpse` structure. (2021-06-28, Mon)
 + changed `clustplotClass` to `treedata`. (2021-06-28, Tue)
-+ add `mp_rrarefy` method to rarefy species richness. (2021-06-28, Mon)
-  - it supports `phyloseq`, `tbl_mpse`, `grouped_df_mpse` object via wrapping `vegan::rrarefy`.
-+ update `as.phyloseq` and `as.treedata` for `grouped_df_mpse` object. (2021-06-28, Mon)
++ add `mp_rrarefy` method to rarefy species richness. (2021-06-29, Tue)
+  - it supports `MPSE`, `tbl_mpse`, `grouped_df_mpse` object via wrapping `vegan::rrarefy`.
++ update `as.MPSE` and `as.treedata` for `grouped_df_mpse` object. (2021-06-29, Tue)
   - This feature is useful to explore the microbiome data in taxa tree. 
   
 # MicrobiotaProcess 1.5.1
