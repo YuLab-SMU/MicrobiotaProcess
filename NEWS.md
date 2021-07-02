@@ -1,4 +1,10 @@
-# MicrobiotaProcess 1.5.1.996
+# MicrobiotaProcess 1.5.1.997
+
++ add `taxatree` slot to `MPSE`. (2021-06-30, Wed)
++ add `mp_cal_alpha` function for `MPSE` or `mpse` object. (2021-07-01, Thu)
++ add `rownames<-` to support renaming the names of feature. (2021-07-01, Thu)
++ add `mp_import_qiime2` and `mp_import_dada2` to 
+   parse the output of `dada2` or `qiime2` and return `MPSE` object. (2021-07-02, Fri)
 
 + update `print` information for `MPSE`, `tbl_mpse` and `grouped_df_mpse`. (2021-06-29, Tue)
 + add `[` to the accessors of `MPSE`. (2021-06-29, Tue)
