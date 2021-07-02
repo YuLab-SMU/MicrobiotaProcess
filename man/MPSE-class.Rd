@@ -12,6 +12,8 @@ MPSE class
 \describe{
 \item{\code{otutree}}{A treedata object of tidytree package or NULL.}
 
+\item{\code{taxatree}}{A treedata object of tidytree package or NULL.}
+
 \item{\code{refseq}}{A XStringSet object of Biostrings package or NULL.}
 
 \item{\code{...}}{Other slots from \code{\link[SummarizedExperiment:SummarizedExperiment]{SummarizedExperiment}}}

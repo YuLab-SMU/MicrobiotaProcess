@@ -140,7 +140,6 @@ diff_analysis.data.frame <- function(obj, sampleda, classgroup, subclass=NULL, t
 
 #' @method diff_analysis phyloseq
 #' @rdname diff_analysis
-#' @importFrom phyloseq tax_table
 #' @export
 diff_analysis.phyloseq <- function(obj, ...){
     otuda <- checkotu(obj)
@@ -191,14 +190,13 @@ setGeneric("get_alltaxadf", function(obj, ...){standardGeneric("get_alltaxadf")}
 
 #' @aliases get_alltaxadf,phyloseq
 #' @rdname get_alltaxadf
-#' @importFrom phyloseq tax_table
 #' @export
 setMethod("get_alltaxadf", "phyloseq",function(obj, method=NULL, type="species", ...){
     otuda <- checkotu(obj)
     if (is.null(obj@tax_table)){
         stop("The taxaonomy table is empty!")
     }else{
-        taxa <- tax_table(obj)
+        taxa <- phyloseq::tax_table(obj)
         if (!"fillNAtax" %in% names(attributes(taxa))){
             taxa <- fillNAtax(taxa, type = type)
         }

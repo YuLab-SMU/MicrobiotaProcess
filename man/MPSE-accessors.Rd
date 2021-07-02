@@ -3,9 +3,13 @@
 \name{MPSE-accessors}
 \alias{MPSE-accessors}
 \alias{[,MPSE,ANY,ANY,ANY-method}
+\alias{rownames<-,MPSE-method}
+\alias{rownames<-,MPSE}
 \title{MPSE accessors}
 \usage{
 \S4method{[}{MPSE,ANY,ANY,ANY}(x, i, j, ..., drop = TRUE)
+
+\S4method{rownames}{MPSE}(x) <- value
 }
 \arguments{
 \item{x}{MPSE object}
@@ -19,6 +23,9 @@ to the 'names' of the object (or for matrices/arrays, the 'dimnames')}
 \item{drop}{logical If 'TRUE' the result is coerced to the lowest 
 possible dimension (see the examples).  This only works for extracting 
 elements, not for the replacement.}
+
+\item{value}{character vector, Either ‘NULL’ or a character vector equal 
+of length equal to the appropriate dimension.}
 }
 \description{
 MPSE accessors

@@ -11,11 +11,11 @@ read_qza(qzafile, parallel = FALSE)
 `BIOMV210DirFmt`, `TSVTaxonomyDirectoryFormat`, `NewickDirectoryFormat`
 and `DNASequencesDirectoryFormat`.}
 
-\item{parallel}{logical, whether parsing the taxonomy by multi-parallel, 
+\item{parallel}{logical, whether parsing the taxonomy by multi-parallel,
 efault is FALSE.}
 }
 \value{
-list contained one or multiple object of feature table, 
+list contained one or multiple object of feature table,
 taxonomy table, tree and represent sequences.
 }
 \description{

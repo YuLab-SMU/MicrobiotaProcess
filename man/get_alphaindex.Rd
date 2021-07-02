@@ -12,13 +12,11 @@
 \alias{get_alphaindex,numeric}
 \alias{get_alphaindex,phyloseq-method}
 \alias{get_alphaindex,phyloseq}
-\alias{get_alphaindex,tbl_mpse-method}
-\alias{get_alphaindex,tbl_mpse}
 \title{alpha index}
 \usage{
 get_alphaindex(obj, ...)
 
-\S4method{get_alphaindex}{matrix}(obj, mindepth, sampleda, ...)
+\S4method{get_alphaindex}{matrix}(obj, mindepth, sampleda, force = FALSE, ...)
 
 \S4method{get_alphaindex}{data.frame}(obj, ...)
 
@@ -27,8 +25,6 @@ get_alphaindex(obj, ...)
 \S4method{get_alphaindex}{numeric}(obj, ...)
 
 \S4method{get_alphaindex}{phyloseq}(obj, ...)
-
-\S4method{get_alphaindex}{tbl_mpse}(obj, ...)
 }
 \arguments{
 \item{obj}{object, data.frame of (nrow sample * ncol taxonomy(feature)) 
@@ -39,6 +35,10 @@ or phyloseq.}
 \item{mindepth}{numeric, Subsample size for rarefying community.}
 
 \item{sampleda}{data.frame,sample information, row sample * column factors.}
+
+\item{force}{logical whether calculate the alpha index even the count of otu is
+not rarefied, default is FALSE. If it is TRUE, meaning the rarefaction is not be
+performed automatically.}
 }
 \value{
 data.frame contained alpha Index.

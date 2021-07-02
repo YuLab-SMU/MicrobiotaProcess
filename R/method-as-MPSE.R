@@ -19,7 +19,9 @@ setMethod("as.MPSE", signature(.data="tbl_mpse"),
         otutree <- attr(.data, "otutree")
         refseq <- attr(.data, "refseq")
         samplevar <- attr(.data, "samplevar")
-        taxavar <- attr(.data, "taxavar")
+        #taxavar <- attr(.data, "taxavar")
+        otumetavar <- attr(.data, "otumetavar")
+        taxatree <- attr(.data, "taxatree")
         assaysvar <- attr(.data, "assaysvar")
         mutatevar <- attr(.data, "mutatevar")
 
@@ -57,7 +59,17 @@ setMethod("as.MPSE", signature(.data="tbl_mpse"),
 
         if (!is.null(otutree)){
             rmtip <- setdiff(otutree@phylo$tip.label, rownames(assaysda[[1]]))
-            otutree <- treeio::drop.tip(otutree, tip=rmtip)
+            if (length(rmtip)>0){
+                otutree <- treeio::drop.tip(otutree, tip=rmtip)
+            }
+        }
+        if (!is.null(taxatree)){
+            rmtip <- setdiff(taxatree@phylo$tip.label, rownames(assaysda[[1]]))
+            if (length(rmtip)>0){
+                taxatree <- treeio::drop.tip(taxatree, 
+                                             tip=rmtip, 
+                                             collapse.singles=FALSE) 
+            }
         }
 
         if (!is.null(refseq)){
@@ -69,14 +81,15 @@ setMethod("as.MPSE", signature(.data="tbl_mpse"),
                     colData = sampleda,
                     otutree = otutree,
                     refseq  = refseq,
+                    taxatree = taxatree
                 )
 
-        if (!is.null(taxavar)){
-            taxada <- .data %>%
-                      select(c("OTU",taxavar)) %>%
+        if (!is.null(otumetavar)){
+            otumeta <- .data %>%
+                      select(c("OTU", otumetavar)) %>%
                       distinct() %>%
                       column_to_rownames(var="OTU")
-            SummarizedExperiment::rowData(mpse) <- taxada
+            SummarizedExperiment::rowData(mpse) <- otumeta
         }
         methods::validObject(mpse)
         return (mpse)
@@ -93,13 +106,11 @@ setMethod("as.MPSE", signature(.data="phyloseq"),
         sampleda <- get_sample(.data) 
         taxada <- as.data.frame(.data@tax_table)
         otutree <- NULL
-        #taxatree <- NULL
+        taxatree <- NULL
 
         if (ncol(taxada)!=0){
             taxada %<>% fillNAtax()
-            taxada$OTU <- rownames(taxada)
-            taxatree <- convert_to_treedata(data=taxada)
-            taxada$OTU <- NULL
+            taxatree <- convert_to_treedata2(x=taxada)
         }
 
         if (!is.null(.data@phy_tree)){
@@ -114,13 +125,13 @@ setMethod("as.MPSE", signature(.data="phyloseq"),
                    colData  = sampleda,
                    assays   = list(Abundance=otuda),
                    otutree  = otutree,
-                   #taxatree = taxatree,
+                   taxatree = taxatree,
                    refseq   = .data@refseq
                 )
 
-        if (ncol(taxada)!=0){
-            SummarizedExperiment::rowData(mpse) <- taxada
-        }
+        #if (ncol(taxada)!=0){
+        #    SummarizedExperiment::rowData(mpse) <- taxada
+        #}
         methods::validObject(mpse)
         return(mpse)
 })

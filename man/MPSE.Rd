@@ -4,10 +4,12 @@
 \alias{MPSE}
 \title{Construct a MPSE object}
 \usage{
-MPSE(otutree = NULL, refseq = NULL, ...)
+MPSE(otutree = NULL, taxatree = NULL, refseq = NULL, ...)
 }
 \arguments{
 \item{otutree}{A treedata object of tidytree package}
+
+\item{taxatree}{A treedata object of tidytree package}
 
 \item{refseq}{A XStingSet object of Biostrings package}
 

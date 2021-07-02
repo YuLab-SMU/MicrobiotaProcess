@@ -32,7 +32,8 @@ setMethod("mp_rrarefy", signature(obj="matrix"), function(obj, raresize, trimOTU
     if (trimOTU){
         removeOTU <- colSums(res)==0
         if (sum(removeOTU) > 0){
-            message(sum(removeOTU), " OTUs were removed because they are no longer present in any sample after rarefaction!")
+            message(sum(removeOTU), " OTUs were removed because they are no longer present in any sample after ",
+                    "rarefaction, if you want to keep them you can set 'trimOTU = FALSE' !")
         }
         res <- res[, !removeOTU]
     }
@@ -83,11 +84,12 @@ setMethod("mp_rrarefy", signature(obj="MPSE"), function(obj, raresize, trimOTU=T
         return(obj)
     }
     rare <- mp_rrarefy(obj=t(allassays[["Abundance"]]), raresize=raresize, trimOTU=FALSE, seed=123) %>% t()
-    SummarizedExperiment::assays(obj)@listData <- c(allassays, list(RareAbundance=rare))    
+    SummarizedExperiment::assays(obj)@listData <- c(allassays, list(RareAbundance=rare))
     if (trimOTU){
         removeOTU <- rowSums(rare)==0
         if (sum(removeOTU) > 0){
-            message(sum(removeOTU), " OTUs were removed because they are no longer present in any sample after rarefaction!")
+            message(sum(removeOTU), " OTUs were removed because they are no longer present in any sample after ",
+                    "rarefaction, if you want to keep them you can set 'trimOTU = FALSE' !")
             obj <- obj[!rownames(obj) %in% rownames(rare[removeOTU,]), ]
         }
     }
@@ -99,6 +101,8 @@ setMethod("mp_rrarefy", signature(obj="MPSE"), function(obj, raresize, trimOTU=T
 ##' @exportMethod mp_rrarefy
 setMethod("mp_rrarefy", signature(obj="tbl_mpse"), function(obj, raresize, trimOTU=TRUE, seed=123){
     assaysvar <- attr(obj, "assaysvar")
+    otutree <- attr(obj, "otutree")
+    taxatree <- attr(obj, "taxatree")
     if ("RareAbundance" %in% assaysvar){
         message("The RareAbundance was in the MPSE object, please check whether it has been rarefied !")
         return(obj)
@@ -112,9 +116,9 @@ setMethod("mp_rrarefy", signature(obj="tbl_mpse"), function(obj, raresize, trimO
             t() %>% 
             tibble::as_tibble(rownames="OTU") %>% 
             tidyr::pivot_longer(!"OTU", names_to="Sample", values_to="RareAbundance")
-    othernms <- colnames(obj)[!colnames(obj) %in% c("OTU", "Sample", "Abundance")]
+    othernms <- colnames(obj)[!colnames(obj) %in% c("OTU", "Sample", assaysvar)]
     res <- obj %>% left_join(rare, by=c("OTU", "Sample")) %>% 
-           select(c("OTU", "Sample", "Abundance", "RareAbundance", othernms))
+           select(c("OTU", "Sample", assaysvar, "RareAbundance", othernms))
     if (trimOTU){
         removeOTU <- res %>% 
                      dplyr::group_by(.data$OTU) %>% 
@@ -123,7 +127,8 @@ setMethod("mp_rrarefy", signature(obj="tbl_mpse"), function(obj, raresize, trimO
                      select("OTU") %>%
                      unlist(use.names=FALSE)
         if (length(removeOTU) > 0){
-            message(length(removeOTU), " OTUs were removed because they are no longer present in any sample after rarefaction!")
+            message(length(removeOTU), " OTUs were removed because they are no longer present in any sample after ",
+                    "rarefaction, if you want to keep them you can set 'trimOTU = FALSE' !")
             res %<>% dplyr::filter(!.data$OTU %in% removeOTU)
         }
     }

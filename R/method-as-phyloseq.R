@@ -19,7 +19,7 @@ as_phyloseq <- as.phyloseq
 #' @export
 as.phyloseq.tbl_mpse <- function(x, ...){
     samplevar <- attr(x, "samplevar")
-    taxavar <- attr(x, "taxavar")
+    taxatree <- attr(x, "taxatree")
     tree <- attr(x, "otutree")
     refseq <- attr(x, "refseq")
     otuda <- x %>% 
@@ -31,17 +31,18 @@ as.phyloseq.tbl_mpse <- function(x, ...){
         sampleda <- x[, colnames(x) %in% samplevar] %>%
                     distinct() %>% 
                     column_to_rownames(var="Sample")
-        sampleda <- sample_data(sampleda)
+        sampleda <- phyloseq::sample_data(sampleda)
     }else{
         sampleda <- NULL
     }
 
-    if (!is.null(taxavar)){
-        taxada <- x[,colnames(x) %in% c("OTU",taxavar)] %>% 
-                  distinct() %>%
-                  column_to_rownames(var="OTU") %>% 
-                  as.matrix()
-        taxada <- tax_table(taxada)
+    if (!is.null(taxatree)){
+        #taxada <- x[,colnames(x) %in% c("OTU",taxavar)] %>% 
+        #          distinct() %>%
+        #          column_to_rownames(var="OTU") %>% 
+        #          as.matrix()
+        taxada <- taxatree_to_tb(taxatree)
+        taxada <- phyloseq::tax_table(taxada)
     }else{
         taxada <- NULL
     }
@@ -52,7 +53,7 @@ as.phyloseq.tbl_mpse <- function(x, ...){
     if (!is.null(refseq)){
         refseq <- refseq[colnames(otuda)]
     }
-    res <- phyloseq(otu_table(otuda, taxa_are_rows=FALSE), sampleda, taxada, tree, refseq)
+    res <- phyloseq::phyloseq(phyloseq::otu_table(otuda, taxa_are_rows=FALSE), sampleda, taxada, tree, refseq)
     return (res)
 }
 

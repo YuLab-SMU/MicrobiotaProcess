@@ -39,7 +39,6 @@ ggbartax <- function(obj,...){
 ggbartaxa <- ggbartax
 
 #' @method ggbartax phyloseq
-#' @importFrom phyloseq otu_table taxa_are_rows
 #' @rdname ggbartax
 #' @export
 ggbartax.phyloseq <- function(obj, ...){

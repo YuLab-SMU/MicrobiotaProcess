@@ -30,7 +30,6 @@ setGeneric("get_taxadf", function(obj, ...)standardGeneric("get_taxadf"))
 
 #' @aliases get_taxadf,phyloseq
 #' @rdname get_taxadf
-#' @importFrom phyloseq otu_table tax_table taxa_are_rows rank_names
 #' @export
 setMethod("get_taxadf", "phyloseq", function(obj, taxlevel=2, type="species",...){
     if (is.null(obj@tax_table)){
@@ -44,15 +43,15 @@ setMethod("get_taxadf", "phyloseq", function(obj, taxlevel=2, type="species",...
     }
     otuda <- checkotu(obj)
     sampleda <- get_sample(obj)
-    if (inherits(taxlevel, 'numeric')){taxlevel <- rank_names(obj)[taxlevel]}
+    taxanames <- colnames(obj@tax_table)
+    if (inherits(taxlevel, 'numeric')){taxlevel <- taxanames[taxlevel]}
     if (inherits(taxlevel, 'character')){
-    	if (!taxlevel %in% rank_names(obj)){
+    	if (!taxlevel %in% taxanames){
     		stop("the taxlevel should be among the values of rank_names(phyloseq)")
     	}else{
-    		taxlevel <- rank_names(obj)[match(taxlevel,rank_names(obj))]
+    		taxlevel <- taxanames[match(taxlevel, taxanames)]
     	}
     }
-    #taxlevel <- rank_names(obj)[taxlevel]
     taxdf <- get_taxadf(obj=otuda, 
                         taxda=taxdf, 
                         taxlevel=taxlevel,
@@ -65,7 +64,6 @@ setMethod("get_taxadf", "phyloseq", function(obj, taxlevel=2, type="species",...
 
 #' @aliases get_taxadf,data.frame
 #' @rdname get_taxadf
-#' @importFrom phyloseq phyloseq otu_table tax_table
 #' @export 
 setMethod("get_taxadf", "data.frame", 
           function(obj, taxda, 
@@ -77,7 +75,7 @@ setMethod("get_taxadf", "data.frame",
         obj <- data.frame(t(obj), check.names=FALSE)
     }
     if(!is.null(sampleda) && !inherits(sampleda, "sample_data")){
-        sampleda <- sample_data(sampleda)
+        sampleda <- phyloseq::sample_data(sampleda)
     }
     if (!"fillNAtax" %in% names(attributes(taxda))){
         taxda <- fillNAtax(taxda, type=type)
@@ -87,10 +85,10 @@ setMethod("get_taxadf", "data.frame",
     tmptaxda <- taxda[, seq(from=1, to=match(taxlevel, colnames(taxda))), drop=FALSE]
     tmptaxda <- tmptaxda[!duplicated(tmptaxda),,drop=FALSE]
     rownames(tmptaxda) <- as.vector(tmptaxda[, match(taxlevel, colnames(tmptaxda))])
-    taxdf <- otu_table(get_count(data=obj, 
+    taxdf <- phyloseq::otu_table(get_count(data=obj, 
                                  featurelist=tmptax), 
                        taxa_are_rows=TRUE)
-    taxdf <- phyloseq(taxdf, sampleda, tax_table(as.matrix(tmptaxda)))
+    taxdf <- phyloseq::phyloseq(taxdf, sampleda, phyloseq::tax_table(as.matrix(tmptaxda)))
     attr(taxdf@tax_table, "fillNAtax") <- TRUE
     return(taxdf)
 })

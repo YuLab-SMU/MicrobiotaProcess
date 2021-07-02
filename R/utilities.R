@@ -31,7 +31,7 @@ setfactorlevels <- function(data, factorlist){
 get_otudata <- function(obj){
     otudata <- obj@otu_table
     otudata <- data.frame(otudata, check.names=FALSE)
-    if(taxa_are_rows(obj)){
+    if(obj@otu_table@taxa_are_rows){
         otudata <- data.frame(t(otudata), check.names=FALSE)
     }
     return (otudata)
@@ -119,7 +119,8 @@ addtaxlevel <- function(taxdf){#, type="species"){
 #' @importFrom tibble column_to_rownames
 #' @keywords internal
 fillNAtax <- function(taxdf, type="species"){
-    taxdf <- remove_unclassfied(taxdf)
+    #taxdf <- remove_unclassfied(taxdf)
+    taxdf <- remove_na_taxonomy_rank(taxdf)
     if (type!="species"){
         assign("taxlevelchar", paste0("d", seq_len(ncol(taxdf))), envir = .GlobalEnv)
     }else{

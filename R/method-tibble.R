@@ -6,26 +6,29 @@
 as_tibble.phyloseq <- function(x, ...){
     otuda <- checkotu(x) %>% 
              tibble::as_tibble(rownames="Sample") %>%
-             pivot_longer(!.data$Sample, names_to = "OTU", values_to = "Abundance") 
+             pivot_longer(!"Sample", names_to = "OTU", values_to = "Abundance") 
     sampleda <- get_sample(x) %>%
                 avoid_conflict_names() %>%
                 rownames_to_column(var="Sample")
-    if (nrow(sampleda)!=0){
+    if (ncol(sampleda)!=0){
         otuda <- otuda %>% left_join(sampleda, by="Sample")
         samplevar <- colnames(sampleda)
     }else{
         samplevar <- NULL
     }
+    print(samplevar)
     taxada <- as.data.frame(x@tax_table)
     if (!all(dim(taxada)==0)){
         taxavar <- colnames(taxada)
-        taxada %<>% fillNAtax() %>%
-                    avoid_conflict_names() %>% 
+        taxada %<>% fillNAtax() 
+        taxatree <- convert_to_treedata2(taxada)
+        taxada <- avoid_conflict_names() %>% 
                     tibble::as_tibble(rownames="OTU")
         otuda <- otuda %>% left_join(taxada, by="OTU")
         fillNAtax <- TRUE
     }else{
         taxavar <- NULL
+        taxatree <- NULL
         fillNAtax <- NULL
     }
     if (!is.null(x@phy_tree)){
@@ -38,6 +41,7 @@ as_tibble.phyloseq <- function(x, ...){
     attr(otuda, "assaysvar") <- "Abundance"
     attr(otuda, "fillNAtax") <- fillNAtax
     attr(otuda, "otutree") <- otutree
+    attr(otuda, "taxatree") <- taxatree
     attr(otuda, "refseq") <- x@refseq
     class(otuda) <- c("tbl_mpse", class(otuda))
     return(otuda)
@@ -72,14 +76,24 @@ as_tibble.MPSE <- function(x, ...){
     }else{
         samplevar <- NULL
     }
-    taxada <-
+    otumeta <-
         SummarizedExperiment::rowData(x) %>%
         avoid_conflict_names() 
-    if (ncol(taxada)!=0){
-        taxavar <- colnames(taxada)
+    if (ncol(otumeta)!=0){
+        otumetavar <- colnames(otumeta)
+        otumeta %<>% tibble::as_tibble(rownames="OTU")
+        otuda <- otuda %>% left_join(otumeta, by="OTU")
+    }else{
+        otumetavar <- NULL
+    }
+    
+    if (!is.null(x@taxatree)){
+        taxada <- taxatree_to_tb(x@taxatree) 
+        uniqnm <- setdiff(colnames(taxada), colnames(otuda))
+        taxada %<>% dplyr::select(uniqnm)
+        taxavar <- colnames(taxada)  
         taxada %<>% tibble::as_tibble(rownames="OTU")
         otuda <- otuda %>% left_join(taxada, by="OTU")
-        fillNAtax <- TRUE
     }else{
         taxavar <- NULL
         fillNAtax <- TRUE
@@ -89,13 +103,15 @@ as_tibble.MPSE <- function(x, ...){
         otuda <- otuda %>% dplyr::select(!!.subset)
         samplevar <- samplevar[samplevar %in% colnames(otuda)]
         taxavar <- taxavar[taxavar %in% colnames(otuda)]
+        otumetavar <- otumetavar[otumetavar %in% names(otuda)]
     }
     attr(otuda, "samplevar") <- samplevar
     attr(otuda, "taxavar") <- taxavar
+    attr(otuda, "otumetavar") <- otumetavar
     attr(otuda, "assaysvar") <- names(x@assays)
     attr(otuda, "fillNAtax") <- fillNAtax
     attr(otuda, "otutree") <- x@otutree
-    #attr(otuda, "taxatree") <- x@taxatree
+    attr(otuda, "taxatree") <- x@taxatree
     attr(otuda, "refseq") <- x@refseq
     class(otuda) <- c("tbl_mpse", class(otuda))
     return(otuda)
@@ -105,6 +121,7 @@ avoid_conflict_names <- function(.data){
     cls <- colnames(.data)
     cls <- gsub("^OTU$", "OTU.x", cls)
     cls <- gsub("^Sample$", "Sample.x", cls)
+    cls <- gsub("^Abundance$", "Abundance.x", cls)
     stats::setNames(.data, cls)
     return(.data)
 }
@@ -119,7 +136,7 @@ extract_count_data <- function(SE_object){
               allda, 
               clnm, 
               SIMPLIFY=FALSE) %>%
-          Reduce(left_join, .) %>%
+          purrr::reduce(left_join, by=c("OTU", "Sample"), suffix = c("", ".y")) %>%
           suppressMessages()
     return (da)
 }

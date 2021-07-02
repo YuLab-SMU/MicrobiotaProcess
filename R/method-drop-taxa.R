@@ -46,7 +46,6 @@ setMethod("drop_taxa", "data.frame",
 
 #' @aliases drop_taxa,phyloseq
 #' @rdname drop_taxa
-#' @importFrom phyloseq otu_table
 #' @importFrom ape drop.tip
 #' @export
 setMethod("drop_taxa", "phyloseq", function(obj, ...){
@@ -71,7 +70,7 @@ setMethod("drop_taxa", "phyloseq", function(obj, ...){
         tmptax <- tmptax[match(keeptax,rownames(tmptax)),,drop=FALSE]
         obj@tax_table <- tmptax
     }
-    obj@otu_table <- otu_table(otuda,taxa_are_rows=FALSE)
+    obj@otu_table <- phyloseq::otu_table(otuda,taxa_are_rows=FALSE)
     return(obj)
 })
 

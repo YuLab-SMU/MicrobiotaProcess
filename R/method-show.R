@@ -131,25 +131,25 @@ print.alphasample <- function(object){
 #' @exportMethod show
 setMethod("show", "MPSE", function(object){
     if (isTRUE(x = getOption(x = "restore_MPSE_show", default = FALSE))) {
-        cli::cat_line("The otutree (treedata object) of the MPSE object is: ", background_col="white", col = "black")
+        writeLines(formatted_out("The otutree (treedata object) of the MPSE object is: "))
         if (!is.null(object@otutree)){
             show(object@otutree)
         }else{
-            cat("NULL", fill=TRUE)
+            writeLines("NULL")
         }
-        cli::cat_line("The taxatree (treedata object) of the MPSE object is: ", background_col="white", col = "black")
+        writeLines(formatted_out("The taxatree (treedata object) of the MPSE object is: "))
         if (!is.null(object@taxatree)){
             show(object@taxatree)
         }else{
-            cat("NULL", fill=TRUE)
+            writeLines(formatted_out("NULL"))
         }
-        cli::cat_line("The reference sequence (XStringSet object) of the MPSE object is: ", background_col="white", col = "black")
+        writeLines(formatted_out("The reference sequence (XStringSet object) of the MPSE object is: "))
         if (!is.null(object@refseq)){
             show(object@refseq)
         }else{
-            cat("NULL", fill=TRUE)
+            writeLines("NULL")
         }
-        cli::cat_line("The abundance and sample data of the MPSE object are: ", background_col="white", col = "black")
+        writeLines(formatted_out("The abundance and sample data of the MPSE object are: "))
         f <- getMethod(f="show", signature = "SummarizedExperiment", where = asNamespace(ns = "SummarizedExperiment"))
         f(object)
     }else{
@@ -214,8 +214,13 @@ print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
         nrow(x), 
         ncol(x),
         SummarizedExperiment::assays(x) %>% names %>% paste(collapse=", "),
-        ifelse(SummarizedExperiment::rowData(x) %>% ncol() ==0, "NULL", 
-               SummarizedExperiment::rowData(x) %>% names %>% paste(collapse=", "))
+        ifelse(is.null(x@taxatree), "NULL", 
+               x@taxatree@data %>% 
+                   select("nodeClass") %>% 
+                   filter(!!!as.symbol("nodeClass") %in% c("OTU", "Root")) %>% 
+                   unlist(use.names=FALSE) %>% 
+                   unique %>% 
+                   paste(collapse=", "))
       ), after = 1) %>%
       writeLines()
     invisible(x)

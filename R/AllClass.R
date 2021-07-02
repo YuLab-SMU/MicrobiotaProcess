@@ -27,6 +27,7 @@ setClassUnion("XSTRINGSET_OR_NULL", c("XStringSet", "NULL"))
 #' @title MPSE class
 #' @docType class
 #' @slot otutree A treedata object of tidytree package or NULL.
+#' @slot taxatree A treedata object of tidytree package or NULL.
 #' @slot refseq A XStringSet object of Biostrings package or NULL.
 #' @slot ... Other slots from \code{\link[SummarizedExperiment:SummarizedExperiment]{SummarizedExperiment}}
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
@@ -35,35 +36,33 @@ setClass("MPSE",
     contains = "SummarizedExperiment",
     slots    = c(
         otutree  = "TREEDATA_OR_NULL",
-        #taxatree = "TREEDATA_OR_NULL",
+        taxatree = "TREEDATA_OR_NULL",
         refseq   = "XSTRINGSET_OR_NULL"
     ),
     prototype = list(
         otutree  = NULL,
-        #taxatree = NULL,
+        taxatree = NULL,
         refseq   = NULL    
     )
 )
 
 #' @title Construct a MPSE object
 #' @param otutree A treedata object of tidytree package
-
-# #' @param taxatree A treedata object of tidytree package
-
+#' @param taxatree A treedata object of tidytree package
 #' @param refseq A XStingSet object of Biostrings package
 #' @param ... additional parameters, see also the usage 
 #' of \code{\link[SummarizedExperiment]{SummarizedExperiment}}.
 #' @return MPSE object
 #' @export
 MPSE <- function(otutree = NULL, 
-                 #taxatree = NULL, 
+                 taxatree = NULL, 
                  refseq = NULL, 
                  ...){
     se <- SummarizedExperiment::SummarizedExperiment(...)
     mpse <- new("MPSE",
                 se,
                 otutree = otutree,
-                #taxatree = taxatree,
+                taxatree = taxatree,
                 refseq = refseq
                )
 }
@@ -72,12 +71,23 @@ MPSE <- function(otutree = NULL,
     if (!is.null(object@otutree)){
         ntip <- treeio::Ntip(object@otutree)
         if (nrow(object)!=ntip){
-            rlang::abort("The number of tip labels of otutree is not equal the numbers of 
+            rlang::abort("The number of tip labels of otutree is not equal the number of 
                          otu in assays, Please check the otutree or assays!")
         }
         if (!all(object@otutree@phylo$tip.label %in% rownames(object))){
-            rlang::abort("Some otu names are different with the otu names in 
+            rlang::abort("Some otu names of otutree are different with the otu names in 
                    assays, Please check the otutree or assays")
+        }
+    }
+    if (!is.null(object@taxatree)){
+        ntip <- treeio::Ntip(object@taxatree)
+        if (nrow(object) != ntip){
+            rlang::abort("The number of tip labels of taxatree is not equal the number of 
+                         otu in assays, Please check the taxatree or assays!")
+        }
+        if (length(intersect(object@taxatree@phylo$tip.label, rownames(object)))!=ntip){
+            rlang::abort("Some otu names of taxatree are different with the otu names in 
+                         assays, Please check the taxatree or assays.")
         }
     }
     if (!is.null(object@refseq)){

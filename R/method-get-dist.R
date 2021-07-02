@@ -22,7 +22,6 @@ get_dist <- function(obj,...){
 #' @method get_dist data.frame
 #' @rdname get_dist
 #' @importFrom vegan decostand
-#' @importFrom phyloseq otu_table 
 #' @export
 get_dist.data.frame <- function(obj, 
     distmethod="euclidean",
@@ -31,8 +30,8 @@ get_dist.data.frame <- function(obj,
     tree=NULL,
     method="hellinger",
     ...){
-    objphyloseq <- new("phyloseq",
-                       otu_table=otu_table(obj, 
+    objphyloseq <- phyloseq::phyloseq(
+                       otu_table=phyloseq::otu_table(obj, 
                        taxa_are_rows=taxa_are_rows),
                        sam_data=phyloseq::sample_data(sampleda),
                        phy_tree=tree)
@@ -44,7 +43,6 @@ get_dist.data.frame <- function(obj,
 }
 
 #' @method get_dist phyloseq
-#' @importFrom phyloseq distance taxa_are_rows phy_tree
 #' @seealso \code{\link[phyloseq]{distance}}
 #' @rdname get_dist
 #' @export
@@ -58,15 +56,15 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
     	}
     }
     if (!is.null(method)){
-    	if (taxa_are_rows(obj@otu_table)){
+    	if (obj@otu_table@taxa_are_rows){
     		tmpotu <- t(obj@otu_table)
     	}else{
     		tmpotu <- data.frame(obj@otu_table)
     	}
-    	obj@otu_table <- otu_table(decostand(tmpotu, method=method), 
+    	obj@otu_table <- phyloseq::otu_table(decostand(tmpotu, method=method), 
                                    taxa_are_rows=FALSE)
     }
-    disres <- distance(obj, method=distmethod, type="sample", ...)
+    disres <- phyloseq::distance(obj, method=distmethod, type="sample", ...)
     attr(disres, "distmethod") <- distmethod
     attr(disres, "originalD") <- data.frame(obj@otu_table, check.names=FALSE)
     return(disres)

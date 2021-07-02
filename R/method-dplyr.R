@@ -362,11 +362,31 @@ left_join.tbl_mpse <- function(x, y, by=NULL, copy=FALSE, suffix = c(".x", ".y")
 add_attr.tbl_mpse <- function(x1, x2, class="tbl_mpse"){
     attr(x1, "samplevar") <- attr(x2, "samplevar")
     attr(x1, "mutatevar") <- attr(x2, "mutatevar")
+    attr(x1, "otumetavar") <- attr(x2, "otumetavar")
     attr(x1, "assaysvar") <- attr(x2, "assaysvar")
     attr(x1, "taxavar") <- attr(x2, "taxavar")
     attr(x1, "fillNAtax") <- attr(x2, "fillNAtax")
-    attr(x1, "otutree") <- attr(x2, "otutree")
-    attr(x1, "refseq") <- attr(x2, "refseq")
+    otutree <- attr(x2, "otutree")
+    taxatree <- attr(x2, "taxatree")
+    refseq <- attr(x2, "refseq")
+    rmotus <- setdiff(unique(x2$OTU), unique(x1$OTU))
+    if (length(rmotus) > 0){
+        if (!is.null(otutree)){
+            otutree <- treeio::drop.tip(otutree, tip=rmotus)
+        }
+        if (!is.null(taxatree)){
+            taxatree <- treeio::drop.tip(taxatree,
+                                         tip=rmotus,
+                                         collapse.singles=FALSE
+                                   )
+        }
+        if (!is.null(refseq)){
+            refseq <- refseq[!names(refseq) %in% rmotus]
+        }
+    }
+    attr(x1, "otutree") <- otutree
+    attr(x1, "taxatree") <- taxatree
+    attr(x1, "refseq") <- refseq
     class(x1) <- add_class(new=class, old=class(x1))
     return(x1)   
 }
@@ -386,12 +406,14 @@ check_attr.tbl_mpse <- function(x, recol, type="rename"){
     samplevar <- attr(x, "samplevar")
     taxavar <- attr(x, "taxavar")
     assaysvar <- attr(x, "assaysvar")
+    otumetavar <- attr(x, "otumetavar")
     if (any(renm %in% c("Sample", "OTU", "Abundance")) && type=="rename"){
         stop("The Sample, OTU, and Abundance are not be renamed !")
     }
     item1 <- intersect(samplevar, renm)
     item2 <- intersect(taxavar, renm)
-	item3 <- intersect(assaysvar, renm)
+    item3 <- intersect(assaysvar, renm)
+    item4 <- intersect(otumetavar, renm)
     if (any(renm %in% samplevar) && type=="rename"){
         indx <- match(item1, samplevar)
         indy <- match(item1, renm)
@@ -407,14 +429,21 @@ check_attr.tbl_mpse <- function(x, recol, type="rename"){
         indy <- match(item3, renm)
         assaysvar[indx] <- names(recol[indy])
 	}
+    if (any(renm %in% otumetavar) && type=="rename"){
+        indx <- match(item4, otumetavar)
+        indy <- match(item4, renm)
+        otumetavar[indx] <- names(recol[indy])
+    }
     if (type != "rename"){
         samplevar <- item1
         taxavar <- item2
-		assaysvar <- item3
+        assaysvar <- item3
+        otumetavar <- item4
     }
     attr(x, "samplevar") <- samplevar
     attr(x, "taxavar") <- taxavar
 	attr(x, "assaysvar") <- assaysvar
+    attr(x, "otumetavar") <- otumetavar
     return(x)
 }
 
@@ -424,7 +453,8 @@ add_var <- function(x, type){
     taxavar <- attr(x, "taxavar")
     mutatevar <- attr(x, "mutatevar")
     assaysvar <- attr(x, "assaysvar")
-    newvar <- setdiff(cl, c("OTU", "Sample", "Abundance", samplevar, taxavar, mutatevar, assaysvar))
+    otumetavar <- attr(x, "otumetavar")
+    newvar <- setdiff(cl, c("OTU", "Sample", "Abundance", samplevar, taxavar, mutatevar, assaysvar, otumetavar))
     if (type == "mutate"){
         attr(x, "mutatevar") <- c(mutatevar, newvar)
     }else{
