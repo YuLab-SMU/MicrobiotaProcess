@@ -58,18 +58,13 @@ setMethod("as.MPSE", signature(.data="tbl_mpse"),
         }
 
         if (!is.null(otutree)){
-            rmtip <- setdiff(otutree@phylo$tip.label, rownames(assaysda[[1]]))
-            if (length(rmtip)>0){
-                otutree <- treeio::drop.tip(otutree, tip=rmtip)
-            }
+            otutree <- .internal_drop.tip(tree=otutree, newnm=rownames(assaysda[[1]]))
         }
         if (!is.null(taxatree)){
-            rmtip <- setdiff(taxatree@phylo$tip.label, rownames(assaysda[[1]]))
-            if (length(rmtip)>0){
-                taxatree <- treeio::drop.tip(taxatree, 
-                                             tip=rmtip, 
-                                             collapse.singles=FALSE) 
-            }
+            taxatree <- .internal_drop.tip(tree=taxatree, 
+                                           newnm=rownames(assaysda[[1]]),
+                                           collapse.singles = FALSE
+                                      )
         }
 
         if (!is.null(refseq)){

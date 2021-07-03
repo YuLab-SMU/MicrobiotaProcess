@@ -217,7 +217,7 @@ print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
         ifelse(is.null(x@taxatree), "NULL", 
                x@taxatree@data %>% 
                    select("nodeClass") %>% 
-                   filter(!!!as.symbol("nodeClass") %in% c("OTU", "Root")) %>% 
+                   filter(! .data[["nodeClass"]] %in% c("OTU", "Root")) %>% 
                    unlist(use.names=FALSE) %>% 
                    unique %>% 
                    paste(collapse=", "))

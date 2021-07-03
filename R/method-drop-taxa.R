@@ -46,7 +46,6 @@ setMethod("drop_taxa", "data.frame",
 
 #' @aliases drop_taxa,phyloseq
 #' @rdname drop_taxa
-#' @importFrom ape drop.tip
 #' @export
 setMethod("drop_taxa", "phyloseq", function(obj, ...){
     otuda <- checkotu(obj)
@@ -55,7 +54,7 @@ setMethod("drop_taxa", "phyloseq", function(obj, ...){
     if (!is.null(obj@phy_tree)){
         tmptree <- obj@phy_tree
         removetip <- setdiff(tmptree$tip.label, keepotu)
-        tmptree <- drop.tip(tmptree, removetip)
+        tmptree <- ape::drop.tip(tmptree, removetip)
         obj@phy_tree <- tmptree
     }
     if (!is.null(obj@refseq)){

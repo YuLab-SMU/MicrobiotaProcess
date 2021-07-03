@@ -16,7 +16,7 @@ mp_import_dada2(seqtab, taxatab = NULL, reftree = NULL, sampleda = NULL, ...)
 \item{taxatab}{matrix, a taxonomic table, the output of \code{\link[dada2]{assignTaxonomy}},
 or the ouput of \code{\link[dada2]{addSpecies}}.}
 
-\item{reftree}{phylo or character, the phylo class of tree, or the tree file.}
+\item{reftree}{phylo, treedata or character, the treedata or phylo class of tree, or the tree file.}
 
 \item{sampleda}{data.frame or character, the data.frame of sample information,
 or the file of sample information, nrow samples X ncol factors.}

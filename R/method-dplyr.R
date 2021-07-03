@@ -27,6 +27,8 @@ filter.MPSE <- function(.data, ..., .preserve = FALSE, .returnMPSE = FALSE){
         xm <- tbl_mpse_return_message(flag)
         if (flag){
            xm <- c(xm, keep_mpse_message)
+        }else{
+           res %<>% tibble::as_tibble()
         }
         writeLines(xm)
     }else{
@@ -94,8 +96,10 @@ select.MPSE <- function(.data, ..., .returnMPSE = FALSE){
         xm <- tbl_mpse_return_message(flag)
         if (flag){
            xm <- c(xm, keep_mpse_message)
+        }else{
+           res %<>% tibble::as_tibble()
         }
-        writeLines(xm)    
+        writeLines(xm)
     }else{
         if (valid_names(res)){
             res %<>% as.MPSE()
@@ -370,19 +374,10 @@ add_attr.tbl_mpse <- function(x1, x2, class="tbl_mpse"){
     taxatree <- attr(x2, "taxatree")
     refseq <- attr(x2, "refseq")
     rmotus <- setdiff(unique(x2$OTU), unique(x1$OTU))
-    if (length(rmotus) > 0){
-        if (!is.null(otutree)){
-            otutree <- treeio::drop.tip(otutree, tip=rmotus)
-        }
-        if (!is.null(taxatree)){
-            taxatree <- treeio::drop.tip(taxatree,
-                                         tip=rmotus,
-                                         collapse.singles=FALSE
-                                   )
-        }
-        if (!is.null(refseq)){
-            refseq <- refseq[!names(refseq) %in% rmotus]
-        }
+    otutree <- .internal_drop.tip(tree=otutree, rmotus=rmotus)
+    taxatree <- .internal_drop.tip(tree=taxatree, rmotus=rmotus, collapse.singles=FALSE)
+    if (!is.null(refseq)){
+        refseq <- refseq[!names(refseq) %in% rmotus]
     }
     attr(x1, "otutree") <- otutree
     attr(x1, "taxatree") <- taxatree

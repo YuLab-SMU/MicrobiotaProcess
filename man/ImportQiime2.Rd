@@ -35,10 +35,11 @@ default is NULL.}
 \item{mapfilename}{character, the file contained sample information,
 the tsv format, default is NULL.}
 
-\item{refseqqza}{character, the file contained refrentent sequences, default is
-NULL.}
+\item{refseqqza}{character, the file contained reference sequences or the XStringSet object,
+default is NULL.}
 
-\item{treeqza}{character, the file contained the tree file, default is NULL.}
+\item{treeqza}{character, the file contained the tree file or treedata object, which is the result 
+by parsing function of treeio, default is NULL.}
 
 \item{parallel}{logical, whether parsing the column of taxonomy multi-parallel, default is FALSE.}
 

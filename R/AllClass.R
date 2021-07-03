@@ -71,33 +71,33 @@ MPSE <- function(otutree = NULL,
     if (!is.null(object@otutree)){
         ntip <- treeio::Ntip(object@otutree)
         if (nrow(object)!=ntip){
-            rlang::abort("The number of tip labels of otutree is not equal the number of 
-                         otu in assays, Please check the otutree or assays!")
+            rlang::abort(c("The number of tip labels of otutree is not equal the number of otu in assays.", 
+                         "Please check the otutree or assays!"))
         }
         if (!all(object@otutree@phylo$tip.label %in% rownames(object))){
-            rlang::abort("Some otu names of otutree are different with the otu names in 
-                   assays, Please check the otutree or assays")
+            rlang::abort(c("Some otu names of otutree are different with the otu names in assays.", 
+                         "Please check the otutree or assays"))
         }
     }
     if (!is.null(object@taxatree)){
         ntip <- treeio::Ntip(object@taxatree)
         if (nrow(object) != ntip){
-            rlang::abort("The number of tip labels of taxatree is not equal the number of 
-                         otu in assays, Please check the taxatree or assays!")
+            rlang::abort(c("The number of tip labels of taxatree is not equal the number of otu in assays.", 
+                           "Please check the taxatree or assays!"))
         }
         if (length(intersect(object@taxatree@phylo$tip.label, rownames(object)))!=ntip){
-            rlang::abort("Some otu names of taxatree are different with the otu names in 
-                         assays, Please check the taxatree or assays.")
+            rlang::abort(c("Some otu names of taxatree are different with the otu names in assays.", 
+                           "Please check the taxatree or assays."))
         }
     }
     if (!is.null(object@refseq)){
-       if (length(object@refseq) != nrow(object)){
-           rlang::abort("The number of reference sequences is not equal the numbers 
-                        of otu in assays, Please check the refseq or assays")
+       if (length(object@refseq) != nrow(object) || length(object@refseq)==0){
+           rlang::abort(c("The number of reference sequences is not equal the numbers of the otu in assays.",
+                        "Please check the refseq or assays"))
        }
        if (!all(names(object@refseq) %in% rownames(object))){
-           rlang::abort("Some reference sequence names are different with the otu names 
-                        in assays, Please check the refseq or assays")
+           rlang::abort(c("Some reference sequence names are different with the otu names in assays.", 
+                        "Please check the refseq or assays"))
        }
     }
     return(NULL)

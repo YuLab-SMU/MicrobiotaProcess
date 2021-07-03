@@ -76,28 +76,19 @@ setMethod("[", signature(x="MPSE"),
     taxatree <- x@taxatree
     nx <- methods::callNextMethod()
     newotus <- rownames(nx)
-
-    if (!is.null(otutree)){
-        rmotus <- setdiff(otutree@phylo$tip.label, newotus)
-        if (length(rmotus) > 0){
-            otutree <- treeio::drop.tip(otutree, tip=rmotus)
-        }
-    }
-
-    if (!is.null(taxatree)){
-        rmotus <- setdiff(taxatree@phylo$tip.label, newotus)
-        if (length(rmotus) > 0){
-            taxatree <- treeio::drop.tip(taxatree, 
-                                         tip=rmotus, 
-                                         collapse.singles=FALSE 
-                                         )
-        }
-    }
+   
+    otutree <- .internal_drop.tip(tree=otutree, newnm=newotus)
+ 
+    taxatree <- .internal_drop.tip(
+                                       tree=taxatree, 
+                                       newnm=newotus, 
+                                       collapse.singles=FALSE
+                                )
 
     if (!is.null(refseq)){
         refseq <- refseq[newotus]
     }
-
+ 
     nx@taxatree <- taxatree
     nx@otutree <- otutree
     nx@refseq <- refseq
@@ -201,4 +192,19 @@ rename_tiplab <- function(treedata, oldname, newname){
     tip.label <- treedata@phylo$tip.label
     treedata@phylo$tip.label <- newname[match(tip.label, oldname)]
     return(treedata)
+}
+
+.internal_drop.tip <- function(tree, newnm=NULL, collapse.singles=TRUE, rmotus=NULL){
+    if (is.null(tree)){
+        return (NULL)
+    }
+    if (is.null(rmotus)){
+        rmotus <- setdiff(tree@phylo$tip.label, newnm)
+    }
+    if (length(rmotus) > 0 && length(rmotus) != treeio::Ntip(tree)){
+        otutree <- treeio::drop.tip(tree, tip=rmotus, collapse.singles=collapse.singles)
+    }else{
+        otutree <- NULL
+    }
+    return (otutree)
 }

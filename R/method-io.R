@@ -9,9 +9,10 @@
 #' default is NULL.
 #' @param mapfilename character, the file contained sample information,
 #' the tsv format, default is NULL.
-#' @param refseqqza character, the file contained refrentent sequences, default is
-#' NULL.
-#' @param treeqza character, the file contained the tree file, default is NULL.
+#' @param refseqqza character, the file contained reference sequences or the XStringSet object,
+#' default is NULL.
+#' @param treeqza character, the file contained the tree file or treedata object, which is the result 
+#' by parsing function of treeio, default is NULL.
 #' @param parallel logical, whether parsing the column of taxonomy multi-parallel, default is FALSE.
 #' @param ..., additional parameters.
 #' @return MPSE-class or phyloseq-class contained the argument class.
@@ -66,7 +67,7 @@ mp_import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
 #' @param seqtab matrix, feature table, the output of \code{\link[dada2]{removeBimeraDenovo}}.
 #' @param taxatab matrix, a taxonomic table, the output of \code{\link[dada2]{assignTaxonomy}},
 #' or the ouput of \code{\link[dada2]{addSpecies}}.
-#' @param reftree phylo or character, the phylo class of tree, or the tree file.
+#' @param reftree phylo, treedata or character, the treedata or phylo class of tree, or the tree file.
 #' @param sampleda data.frame or character, the data.frame of sample information,
 #' or the file of sample information, nrow samples X ncol factors.
 #' @param ..., additional parameters.
@@ -89,11 +90,14 @@ mp_import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
 import_dada2 <- function(seqtab, taxatab=NULL, reftree=NULL, 
                          sampleda=NULL, 
                          ...){
+
     res <- .internal_import_dada2(seqtab=seqtab,
                                   taxatab=taxatab,
                                   reftree=reftree,
                                   sampleda=sampleda)
+
     ps <- .build_ps(res)
+
     return(ps)
 }
 
@@ -104,13 +108,51 @@ mp_import_dada2 <- function(seqtab,
                              reftree=NULL,
                              sampleda=NULL,
                              ...){
+
     res <- .internal_import_dada2(seqtab=seqtab,
                                   taxatab=taxatab,
                                   reftree=reftree,
                                   sampleda=sampleda)
+
     mpse <- .build_mpse(res)
-    #return(mpse)
+
+    return(mpse)
 }
+
+#' @title Import function to load the output of qiime.
+#'
+#' @description
+#' The function was designed to import the output of qiime and convert them to MPSE
+#' class.
+#' @param otufilename character, the file contained otu table, the ouput of qiime.
+#' @param mapfilename character, the file contained sample information,
+#' the tsv format, default is NULL.
+#' @param otutree treedata, phylo or character, the file contained reference sequences, or
+#' treedata object, which is the result by parsing function of treeio, default is NULL.
+#' @param refseq XStringSet or character, the file contained the tree file or XStringSet, default is NULL.
+#' @param ..., additional parameters.
+#' @return MPSE-class.
+#' @export
+#' @author Shuangbin Xu
+mp_import_qiime <- function(otufilename, 
+                            mapfilename = NULL,
+                            otutree = NULL, 
+                            refseq = NULL,
+                            ...){
+
+    res <- .internal_import_qiime(
+                                  otufilename = otufilename,
+                                  mapfilename = mapfilename,
+                                  otutree = otutree,
+                                  refseq = refseq,
+                                  ...
+                                  )
+
+    mpse <- .build_mpse(res)
+
+    return(mpse)
+}
+
 
 #' @title read the qza file, output of qiime2.
 #' @description

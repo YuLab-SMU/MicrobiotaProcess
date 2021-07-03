@@ -25,11 +25,11 @@ as_tibble.phyloseq <- function(x, ...){
         taxada <- avoid_conflict_names() %>% 
                     tibble::as_tibble(rownames="OTU")
         otuda <- otuda %>% left_join(taxada, by="OTU")
-        fillNAtax <- TRUE
+        fillNAtaxflag <- TRUE
     }else{
         taxavar <- NULL
         taxatree <- NULL
-        fillNAtax <- NULL
+        fillNAtaxflag <- NULL
     }
     if (!is.null(x@phy_tree)){
         otutree <- x@phy_tree %>% as.treedata() 
@@ -39,7 +39,7 @@ as_tibble.phyloseq <- function(x, ...){
     attr(otuda, "samplevar") <- samplevar
     attr(otuda, "taxavar") <- taxavar
     attr(otuda, "assaysvar") <- "Abundance"
-    attr(otuda, "fillNAtax") <- fillNAtax
+    attr(otuda, "fillNAtax") <- fillNAtaxflag
     attr(otuda, "otutree") <- otutree
     attr(otuda, "taxatree") <- taxatree
     attr(otuda, "refseq") <- x@refseq
@@ -94,9 +94,10 @@ as_tibble.MPSE <- function(x, ...){
         taxavar <- colnames(taxada)  
         taxada %<>% tibble::as_tibble(rownames="OTU")
         otuda <- otuda %>% left_join(taxada, by="OTU")
+        fillNAtaxflag <- TRUE
     }else{
         taxavar <- NULL
-        fillNAtax <- TRUE
+        fillNAtaxflag <- FALSE 
     }
     
     if (!rlang::quo_is_null(.subset)){
@@ -109,7 +110,7 @@ as_tibble.MPSE <- function(x, ...){
     attr(otuda, "taxavar") <- taxavar
     attr(otuda, "otumetavar") <- otumetavar
     attr(otuda, "assaysvar") <- names(x@assays)
-    attr(otuda, "fillNAtax") <- fillNAtax
+    attr(otuda, "fillNAtax") <- fillNAtaxflag
     attr(otuda, "otutree") <- x@otutree
     attr(otuda, "taxatree") <- x@taxatree
     attr(otuda, "refseq") <- x@refseq

@@ -42,11 +42,57 @@
             reftree <- treeio::read.treeqza(treeqza)
         }
     }
+
     return (list(otutab=otutab, 
                 sampleda=sampleda, 
                 taxatab=taxatab, 
                 refseq=refseq, 
                 otutree=reftree))
+}
+
+.internal_import_qiime <- function(otufilename, mapfilename = NULL, otutree = NULL, refseq = NULL){
+    x <- read_qiime_otu(otufilename)
+
+    if (!is.null(mapfilename)){
+        if (file.exists(mapfilename)){
+            sampleda <- read_qiime_sample(mapfilename)
+        }else if (!inherits(mapfilename, "data.frame")){
+            sampleda <- NULL
+        }else{
+            sampleda <- mapfilename
+        }
+    }else{
+        sampleda <- NULL
+    }
+
+    if (!is.null(otutree)){
+        if (file.exists(otutree)){
+            rlang::warn(c("The reftree is a tree file, it is parsing by read.tree function.",
+                     "It is better to parse it with the function of treeio",
+                     "then the treedata or phylo result all can be supported."))
+            otutree <- ape::read.tree(otutree) %>% treeio::as.treedata()
+        }else if (inherits(otutree, "phylo")){
+            otutree <- otutree %>% treeio::as.treedata()
+        }else if (!inherits(otutree, "treedata")){
+            otutree <- NULL
+        }
+    }
+
+    if (!is.null(refseq)){
+        if (file.exists(refseq)){
+            refseq <- seqmagick::fa_read(refseq)
+        }else if (inherits(refseq, "character")){
+            refseq <- build_tree(refseq)
+        }else if (!inherits(refseq, "XStringSet")){
+            refseq <- NULL
+        }
+    }
+
+    return (list(otutab = x$otuda,
+                 sampleda = sampleda,
+                 taxatab = x$taxada,
+                 refseq = refseq,
+                 otutree = otutree))
 }
 
 #' @keywords internal
@@ -72,10 +118,10 @@
         if (inherits(reftree, "phylo")){
             reftree <- treeio::as.treedata(reftree)
         }else if(file.exists(reftree)){
-            warning("The reftree is a tree file, it is parsing by read.tree function. 
-                     It is better to parse it with the function of treeio, 
-                     then the treedata or phylo result all can be supported.")
-            reftree <- read.tree(reftree) %>% treeio::as.treedata()
+            rlang::warn(c("The reftree is a tree file, it is parsing by read.tree function.",
+                     "It is better to parse it with the function of treeio", 
+                     "then the treedata or phylo result all can be supported."))
+            reftree <- ape::read.tree(reftree) %>% treeio::as.treedata()
         }
     }
     if (!is.null(sampleda) && file.exists(sampleda)){
@@ -138,12 +184,16 @@
         }else{
             rmotus <- NULL
         }
-        if (length(rmotus) > 0){
+        if (length(rmotus) > 0 && length(rmotus) != treeio::Ntip(otutree)){
             otutree <- treeio::drop.tip(otutree, tip=rmotus)
             otuda <- otuda[rownm %in% flagn, , drop = FALSE]
-            if (!is.null(taxatree)){
-                taxatree <- treeio::drop.tip(taxatree, tip=rmotus,collapse.singles=FALSE)
+            if (!is.null(taxatree) && length(rmotus) != treeio::Ntip(taxatree)){
+                taxatree <- treeio::drop.tip(taxatree, tip=rmotus, collapse.singles=FALSE)
+            }else{
+                taxatree <- NULL
             }
+        }else{
+            otutree <- NULL
         }
     }
 
@@ -160,14 +210,19 @@
         refseq <- refseq[flagn]
         if (length(rmotus) > 0){
             otuda <- otuda[rownm %in% flagn, , drop = FALSE]
-            if (!is.null(otutree)){
+            if (!is.null(otutree) && length(rmotus) != treeio::Ntip(otutree)){
                 otutree <- treeio::drop.tip(otutree, tip=rmotus)
+            }else{
+                otutree <- NULL
             }
-            if (!is.null(taxatree)){
+            if (!is.null(taxatree) && length(rmotus) != treeio::Ntip(taxatree)){
                 taxatree <- treeio::drop.tip(taxatree, tip=rmotus, collapse.singles=FALSE)
+            }else{
+                taxatree <- NULL
             }
         }
     }
+
     mpse <- MPSE(
                  assays = list(Abundance=otuda),
                  colData = sampleda,
@@ -195,6 +250,36 @@
       )
     return(ps)
 }
+
+read_qiime_otu <- function(otufilename){
+    skipn <- guess_skipnum(otufilename)
+    xx <- utils::read.table(otufilename, sep="\t", skip=skipn, header=TRUE, 
+                            row.names=1, comment.char="", quote="")
+    indy <- vapply(xx, function(i)is.numeric(i), logical(1)) %>% setNames(NULL)
+    otuda <- xx[, indy, drop=FALSE]
+    if (!all(indy)){
+        taxada <- xx[, !indy, drop=FALSE]
+        taxada <- apply(taxada, 2, function(i)gsub(";\\s+", ";", i)) %>% 
+                  data.frame() %>%
+                  split_str_to_list(sep=";") %>% 
+                  fillNAtax() %>% 
+                  setNames(taxaclass[seq_len(ncol(.))])
+    }else{
+        taxada <- NULL
+    }
+    return(list(otuda=otuda, taxada=taxada))
+}
+
+taxaclass <- c("Kingdom", 
+               "Phylum", 
+               "Class", 
+               "Order", 
+               "Family", 
+               "Genus", 
+               "Speies", 
+               "Rank8", 
+               "Rank9", 
+               "Rank10")
 
 read_qiime_sample <- function(samplefile){
     sep <- guess_sep(samplefile)    
@@ -245,6 +330,12 @@ guess_rownames <- function(string){
         return("Other")
     }
     return("AA")
+}
+
+guess_skipnum <- function(otufilename){
+    x <- readLines(otufilename, n=50)
+    n <- sum(substr(x, 1, 1) == "#") - 1
+    return(n)
 }
 
 guess_sep <- function(samplefile){
