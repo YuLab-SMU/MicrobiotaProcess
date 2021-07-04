@@ -57,15 +57,13 @@ setMethod("as.MPSE", signature(.data="tbl_mpse"),
             sampleda <- S4Vectors::DataFrame(NULL, row.names=samplelist) 
         }
 
-        if (!is.null(otutree)){
-            otutree <- .internal_drop.tip(tree=otutree, newnm=rownames(assaysda[[1]]))
-        }
-        if (!is.null(taxatree)){
-            taxatree <- .internal_drop.tip(tree=taxatree, 
-                                           newnm=rownames(assaysda[[1]]),
-                                           collapse.singles = FALSE
-                                      )
-        }
+        otutree <- .internal_drop.tip(tree=otutree, newnm=rownames(assaysda[[1]]))
+
+        taxatree <- .internal_drop.tip(
+                                       tree=taxatree, 
+                                       newnm=rownames(assaysda[[1]]),
+                                       collapse.singles = FALSE
+                                   )
 
         if (!is.null(refseq)){
             refseq <- refseq[rownames(assaysda[[1]])]

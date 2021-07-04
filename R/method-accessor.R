@@ -204,7 +204,7 @@ rename_tiplab <- function(treedata, oldname, newname){
     if (length(rmotus) > 0 && length(rmotus) != treeio::Ntip(tree)){
         otutree <- treeio::drop.tip(tree, tip=rmotus, collapse.singles=collapse.singles)
     }else{
-        otutree <- NULL
+        otutree <- tree
     }
     return (otutree)
 }

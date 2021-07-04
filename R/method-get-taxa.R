@@ -46,11 +46,11 @@ setMethod("get_taxadf", "phyloseq", function(obj, taxlevel=2, type="species",...
     taxanames <- colnames(obj@tax_table)
     if (inherits(taxlevel, 'numeric')){taxlevel <- taxanames[taxlevel]}
     if (inherits(taxlevel, 'character')){
-    	if (!taxlevel %in% taxanames){
-    		stop("the taxlevel should be among the values of rank_names(phyloseq)")
-    	}else{
-    		taxlevel <- taxanames[match(taxlevel, taxanames)]
-    	}
+        if (!taxlevel %in% taxanames){
+            stop("the taxlevel should be among the values of rank_names(phyloseq)")
+        }else{
+            taxlevel <- taxanames[match(taxlevel, taxanames)]
+        }
     }
     taxdf <- get_taxadf(obj=otuda, 
                         taxda=taxdf, 
