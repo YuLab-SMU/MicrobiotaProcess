@@ -19,20 +19,20 @@ mp_rrarefy for matrix object is a wrapper method of vegan::rrarefy from the vega
 package.
 }
 \usage{
-mp_rrarefy(obj, raresize, trimOTU = TRUE, seed = 123)
+mp_rrarefy(.data, raresize, trimOTU = TRUE, seed = 123)
 
-\S4method{mp_rrarefy}{matrix}(obj, raresize, trimOTU = TRUE, seed = 123)
+\S4method{mp_rrarefy}{matrix}(.data, raresize, trimOTU = TRUE, seed = 123)
 
-\S4method{mp_rrarefy}{data.frame}(obj, raresize, trimOTU = TRUE, seed = 123)
+\S4method{mp_rrarefy}{data.frame}(.data, raresize, trimOTU = TRUE, seed = 123)
 
-\S4method{mp_rrarefy}{MPSE}(obj, raresize, trimOTU = TRUE, seed = 123)
+\S4method{mp_rrarefy}{MPSE}(.data, raresize, trimOTU = TRUE, seed = 123)
 
-\S4method{mp_rrarefy}{tbl_mpse}(obj, raresize, trimOTU = TRUE, seed = 123)
+\S4method{mp_rrarefy}{tbl_mpse}(.data, raresize, trimOTU = TRUE, seed = 123)
 
-\S4method{mp_rrarefy}{grouped_df_mpse}(obj, raresize, trimOTU = TRUE, seed = 123)
+\S4method{mp_rrarefy}{grouped_df_mpse}(.data, raresize, trimOTU = TRUE, seed = 123)
 }
 \arguments{
-\item{obj}{phyloseq or tbl_mpse object}
+\item{.data}{MPSE or tbl_mpse object}
 
 \item{raresize}{integer Subsample size for rarefying community.}
 

@@ -134,14 +134,19 @@ setGeneric("mp_cal_alpha", function(.data, .abundance=NULL,
 setMethod("mp_cal_alpha", signature(.data="MPSE"),
           function(.data, .abundance=NULL, action="add", force=FALSE, ...){
     action %<>% match.arg(c("add", "only", "get"))
-    .abundance <- ifelse(is.null(.abundance), "RareAbundance", .abundance) 
+    
+    .abundance <- rlang::enquo(.abundance)
+    if (rlang::quo_is_null(.abundance)){
+        .abundance <- as.symbol("RareAbundance")
+    }
+
     if (!valid_rare(.data, .abundance=.abundance) && !force){
         writeLines(c("The rarefied abundance of species might not be provided",
                     "rarefaction of all observations is performed automatically."))
-        .data <- mp_rrarefy(obj=.data, ...)
+        .data <- mp_rrarefy(.data=.data, ...)
     }
     
-    alphada <- SummarizedExperiment::assays(.data)@listData[["RareAbundance"]] %>% 
+    alphada <- SummarizedExperiment::assays(.data)@listData[[rlang::as_name(.abundance)]] %>% 
                t() %>% 
                get_alphaindex(force=TRUE)
     if (action=="get"){
@@ -165,18 +170,26 @@ setMethod("mp_cal_alpha", signature(.data="MPSE"),
 
 .internal_mp_cal_alpha <- function(.data, .abundance=NULL, action="add", force=FALSE, ...){
     action %<>% match.arg(c("add", "only", "get"))
-    .abundance <- ifelse(is.null(.abundance), "RareAbundance", .abundance)
+    
+    .abundance <- rlang::enquo(.abundance)
+
+    if (rlang::quo_is_null(.abundance)){
+        .abundance <- as.symbol("RareAbundance")
+    }
+
     if (!valid_rare(.data, .abundance=.abundance) && !force){
         message("The rarefied abundance of species might not be provided. Rarefaction of all observations is performed automatically.")
-        .data <- mp_rrarefy(obj=.data, ...)
+        .data <- mp_rrarefy(.data=.data, ...)
     }
+
     alphada <- .data %>% 
-               select(c("Sample", "OTU", .abundance)) %>%
+               select(c("Sample", "OTU", rlang::as_name(.abundance))) %>%
                tidyr::pivot_wider(id_cols="Sample", 
                                   names_from="OTU", 
-                                  values_from=.abundance) %>%
+                                  values_from=rlang::as_name(.abundance)) %>%
                column_to_rownames(var="Sample") %>%
                get_alphaindex(force=TRUE)
+
     if (action=="get"){
         samplevar <- attr(.data, "samplevar")
         alphada@sampleda <- .data %>% 
@@ -186,7 +199,11 @@ setMethod("mp_cal_alpha", signature(.data="MPSE"),
     }
     da <- alphada@alpha %>% as_tibble(rownames="Sample")
     if (action=="add"){
-        .data %<>% left_join(da, by="Sample")
+        samplevar <- .data %>% attr("samplevar")
+        assaysvar <- .data %>% attr("assaysvar")
+        othernm <- colnames(.data)[!colnames(.data) %in% c("OTU", "Sample", assaysvar, samplevar)]
+        .data %<>% left_join(da, by="Sample") %>%
+                   select(c("OTU", "Sample", assaysvar, samplevar, colnames(da), othernm))
         return(.data)
     }else if (action=="only"){
         return(da)
@@ -211,6 +228,7 @@ valid_rare <- function(.data, ...){
 valid_rare.MPSE <- function(.data, .abundance=NULL){
     assaysvar <- names(.data@assays)
     #.abundance <- ifelse(is.null(.abundance), "RareAbundance", .abundance)
+    .abundance <- rlang::as_name(.abundance)
     if (.abundance %in% assaysvar){
         flag <- SummarizedExperiment::assays(.data)@listData[[.abundance]] %>% colSums %>% var == 0
         return(flag)
@@ -222,6 +240,7 @@ valid_rare.MPSE <- function(.data, .abundance=NULL){
 
 .internal_valid_rare <- function(.data, .abundance=NULL){
     assaysvar <- attr(.data, "assaysvar")
+    .abundance <- rlang::as_name(.abundance)
     #.abundance <- ifelse(is.null(.abundance), "RareAbundance", .abundance)
     if (.abundance %in% assaysvar){
         flag <- .data %>%

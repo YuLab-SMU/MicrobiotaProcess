@@ -2,7 +2,7 @@
 ##' @name mp_rrarefy 
 ##' @rdname mp_rrarefy-methods
 ##' @title mp_rrarefy method
-##' @param obj phyloseq or tbl_mpse object
+##' @param .data MPSE or tbl_mpse object
 ##' @param raresize integer Subsample size for rarefying community.
 ##' @param trimOTU logical Whether to remove the otus that are no 
 ##' longer present in any sample after rarefaction
@@ -10,7 +10,7 @@
 ##' default is 123. 
 ##' @return update object
 ##' @export
-setGeneric("mp_rrarefy", function(obj, raresize, trimOTU=TRUE, seed=123){standardGeneric("mp_rrarefy")}) 
+setGeneric("mp_rrarefy", function(.data, raresize, trimOTU=TRUE, seed=123){standardGeneric("mp_rrarefy")}) 
 
 ##' @rdname mp_rrarefy-methods
 ##' @aliases mp_rrarefy,matrix
@@ -20,15 +20,15 @@ setGeneric("mp_rrarefy", function(obj, raresize, trimOTU=TRUE, seed=123){standar
 ##' package. 
 ##' @seealso
 ##' \link[vegan]{rrarefy}
-setMethod("mp_rrarefy", signature(obj="matrix"), function(obj, raresize, trimOTU=TRUE, seed=123){
+setMethod("mp_rrarefy", signature(.data="matrix"), function(.data, raresize, trimOTU=TRUE, seed=123){
     if (missing(raresize)||is.null(raresize)){
-        raresize <- min(rowSums(obj))
+        raresize <- min(rowSums(.data))
     }
     if (is.na(seed) || is.null(seed)){
         message("To reproduce and it was not be set, the random seed will set to 123 automatically.")
         seed <- 123
     }
-    res <- withr::with_seed(seed, vegan::rrarefy(x=obj, sample=raresize))
+    res <- withr::with_seed(seed, vegan::rrarefy(x=.data, sample=raresize))
     if (trimOTU){
         removeOTU <- colSums(res)==0
         if (sum(removeOTU) > 0){
@@ -44,9 +44,9 @@ setMethod("mp_rrarefy", signature(obj="matrix"), function(obj, raresize, trimOTU
 ##' @rdname mp_rrarefy-methods
 ##' @aliases mp_rrarefy,data.frame
 ##' @exportMethod mp_rrarefy
-setMethod("mp_rrarefy", signature(obj="data.frame"), function(obj, raresize, trimOTU=TRUE, seed=123){
-    obj <- as.matrix(obj)
-    res <- mp_rrarefy(obj=obj, raresize=raresize, trimOTU=trimOTU, seed=seed)
+setMethod("mp_rrarefy", signature(.data="data.frame"), function(.data, raresize, trimOTU=TRUE, seed=123){
+    .data <- as.matrix(.data)
+    res <- mp_rrarefy(.data=.data, raresize=raresize, trimOTU=trimOTU, seed=seed)
     res <- data.frame(res) 
     return(res)
 })
@@ -77,47 +77,47 @@ setMethod("mp_rrarefy", signature(obj="data.frame"), function(obj, raresize, tri
 ##' @rdname mp_rrarefy-methods
 ##' @aliases mp_rrarefy,MPSE
 ##' @exportMethod mp_rrarefy
-setMethod("mp_rrarefy", signature(obj="MPSE"), function(obj, raresize, trimOTU=TRUE, seed=123){
-    allassays <- SummarizedExperiment::assays(obj) %>% as.list()
+setMethod("mp_rrarefy", signature(.data="MPSE"), function(.data, raresize, trimOTU=TRUE, seed=123){
+    allassays <- SummarizedExperiment::assays(.data) %>% as.list()
     if ("RareAbundance" %in% names(allassays)){
         message("The RareAbundance was in the MPSE object, please check whether it has been rarefied !")
-        return(obj)
+        return(.data)
     }
-    rare <- mp_rrarefy(obj=t(allassays[["Abundance"]]), raresize=raresize, trimOTU=FALSE, seed=123) %>% t()
-    SummarizedExperiment::assays(obj)@listData <- c(allassays, list(RareAbundance=rare))
+    rare <- mp_rrarefy(.data=t(allassays[["Abundance"]]), raresize=raresize, trimOTU=FALSE, seed=123) %>% t()
+    SummarizedExperiment::assays(.data)@listData <- c(allassays, list(RareAbundance=rare))
     if (trimOTU){
         removeOTU <- rowSums(rare)==0
         if (sum(removeOTU) > 0){
             message(sum(removeOTU), " OTUs were removed because they are no longer present in any sample after ",
                     "rarefaction, if you want to keep them you can set 'trimOTU = FALSE' !")
-            obj <- obj[!rownames(obj) %in% rownames(rare[removeOTU,]), ]
+            .data <- .data[!rownames(.data) %in% rownames(rare[removeOTU,]), ]
         }
     }
-    return(obj)
+    return(.data)
 })
 
 ##' @rdname mp_rrarefy-methods
 ##' @aliases mp_rrarefy,tbl_mpse
 ##' @exportMethod mp_rrarefy
-setMethod("mp_rrarefy", signature(obj="tbl_mpse"), function(obj, raresize, trimOTU=TRUE, seed=123){
-    assaysvar <- attr(obj, "assaysvar")
-    otutree <- attr(obj, "otutree")
-    taxatree <- attr(obj, "taxatree")
+setMethod("mp_rrarefy", signature(.data="tbl_mpse"), function(.data, raresize, trimOTU=TRUE, seed=123){
+    assaysvar <- attr(.data, "assaysvar")
+    otutree <- attr(.data, "otutree")
+    taxatree <- attr(.data, "taxatree")
     if ("RareAbundance" %in% assaysvar){
         message("The RareAbundance was in the MPSE object, please check whether it has been rarefied !")
-        return(obj)
+        return(.data)
     }
-    tmpotu <- obj %>% 
+    tmpotu <- .data %>% 
               tibble::as_tibble() %>% 
               select(c("OTU", "Sample", "Abundance")) %>%
               tidyr::pivot_wider(names_from="OTU", values_from="Abundance") %>% 
               tibble::column_to_rownames(var="Sample")
-    rare <- mp_rrarefy(obj=tmpotu, raresize=raresize, trimOTU=FALSE, seed=seed) %>%
+    rare <- mp_rrarefy(.data=tmpotu, raresize=raresize, trimOTU=FALSE, seed=seed) %>%
             t() %>% 
             tibble::as_tibble(rownames="OTU") %>% 
             tidyr::pivot_longer(!"OTU", names_to="Sample", values_to="RareAbundance")
-    othernms <- colnames(obj)[!colnames(obj) %in% c("OTU", "Sample", assaysvar)]
-    res <- obj %>% left_join(rare, by=c("OTU", "Sample")) %>% 
+    othernms <- colnames(.data)[!colnames(.data) %in% c("OTU", "Sample", assaysvar)]
+    res <- .data %>% left_join(rare, by=c("OTU", "Sample")) %>% 
            select(c("OTU", "Sample", assaysvar, "RareAbundance", othernms))
     if (trimOTU){
         removeOTU <- res %>% 
@@ -132,7 +132,7 @@ setMethod("mp_rrarefy", signature(obj="tbl_mpse"), function(obj, raresize, trimO
             res %<>% dplyr::filter(!.data$OTU %in% removeOTU)
         }
     }
-    res <- add_attr.tbl_mpse(x1 = res, x2 = obj)
+    res <- add_attr.tbl_mpse(x1 = res, x2 = .data)
     attr(res, "assaysvar") <- c(assaysvar, "RareAbundance")
     return (res)
 })
@@ -140,12 +140,12 @@ setMethod("mp_rrarefy", signature(obj="tbl_mpse"), function(obj, raresize, trimO
 ##' @rdname mp_rrarefy-methods
 ##' @aliases mp_rrarefy,grouped_df_mpse
 ##' @exportMethod mp_rrarefy
-setMethod("mp_rrarefy", signature(obj="grouped_df_mpse"), function(obj, raresize, trimOTU=TRUE, seed=123){
-    tmpgroups <- attr(obj, "groups")
+setMethod("mp_rrarefy", signature(.data="grouped_df_mpse"), function(.data, raresize, trimOTU=TRUE, seed=123){
+    tmpgroups <- attr(.data, "groups")
     groupvars <- names(tmpgroups)[names(tmpgroups) != ".rows"]
     groupvars <- lapply(groupvars, function(i) as.symbol(i))
-    obj %<>% ungroup
-    res <- mp_rrarefy(obj=obj, raresize=raresize, trimOTU=trimOTU, seed=seed)
+    .data %<>% ungroup
+    res <- mp_rrarefy(.data=.data, raresize=raresize, trimOTU=trimOTU, seed=seed)
     res <- do.call(group_by, c(list(res), groupvars))
     return (res)
 })
