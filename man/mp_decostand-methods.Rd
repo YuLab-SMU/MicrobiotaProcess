@@ -33,7 +33,11 @@ mp_decostand(.data, .abundance = NULL, method = "hellinger", logbase = 2, ...)
 
 \item{method}{character the name of standardization method, it can one of 
 'total', 'max', 'frequency', 'normalize', 'range', 'rank', 'rrank', 'standardize'
-'pa', 'chi.square', 'hellinger' and 'log', see also \code{\link[vegan]{decostand}}.}
+'pa', 'chi.square', 'hellinger' and 'log', see also \code{\link[vegan]{decostand}}}
+
+\item{logbase}{numeric The logarithm base used in 'method=log', default is 2.}
+
+\item{...}{additional parameters, see also \code{\link[vegan]{decostand}}}
 }
 \value{
 update object
@@ -42,5 +46,5 @@ update object
 This Function Provideds Several Standardization Methods for Community Data
 }
 \seealso{
-\link[vegan]{deconstand}
+\link[vegan]{decostand}
 }

@@ -6,7 +6,9 @@
 ##' @param .abundance the names of otu abundance to be applied standardization. 
 ##' @param method character the name of standardization method, it can one of 
 ##' 'total', 'max', 'frequency', 'normalize', 'range', 'rank', 'rrank', 'standardize'
-##' 'pa', 'chi.square', 'hellinger' and 'log', see also \code{\link[vegan]{decostand}}.
+##' 'pa', 'chi.square', 'hellinger' and 'log', see also \code{\link[vegan]{decostand}}
+##' @param logbase numeric The logarithm base used in 'method=log', default is 2.
+##' @param ... additional parameters, see also \code{\link[vegan]{decostand}}
 ##' @return update object
 ##' @export
 setGeneric("mp_decostand", 
@@ -20,7 +22,7 @@ setGeneric("mp_decostand",
 ##' @source
 ##' mp_decostand for data.frame object is a wrapper method of vegan::decostand from the vegan package
 ##' @seealso
-##' \link[vegan]{deconstand}
+##' \link[vegan]{decostand}
 setMethod("mp_decostand", signature(.data="data.frame"), 
           function(.data, method="hellinger", logbase=2, ...){
    x <- vegan::decostand(x=.data, method=method, logbase=logbase, ...)
