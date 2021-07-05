@@ -141,9 +141,11 @@ setMethod("mp_cal_alpha", signature(.data="MPSE"),
     }
 
     if (!valid_rare(.data, .abundance=.abundance) && !force){
-        writeLines(c("The rarefied abundance of species might not be provided",
-                    "rarefaction of all observations is performed automatically."))
+        glue::glue("The rarefied abundance of species might not be provided. Rarefaction of all
+                    observations is performed automatically. If you still want to calculate the
+                    alpha index with the '.abundance', you can set 'force=TRUE'. ")
         .data <- mp_rrarefy(.data=.data, ...)
+        .abundance <- as.symbol("RareAbundance")
     }
     
     alphada <- SummarizedExperiment::assays(.data)@listData[[rlang::as_name(.abundance)]] %>% 
@@ -178,8 +180,11 @@ setMethod("mp_cal_alpha", signature(.data="MPSE"),
     }
 
     if (!valid_rare(.data, .abundance=.abundance) && !force){
-        message("The rarefied abundance of species might not be provided. Rarefaction of all observations is performed automatically.")
+        glue::glue("The rarefied abundance of species might not be provided. Rarefaction of all 
+                    observations is performed automatically. If you still want to calculate the 
+                    alpha index with the '.abundance', you can set 'force=TRUE'. ")
         .data <- mp_rrarefy(.data=.data, ...)
+        .abundance <- as.symbol("RareAbundance")
     }
 
     alphada <- .data %>% 

@@ -79,7 +79,7 @@ as_tibble.MPSE <- function(x, ...){
     otumeta <-
         SummarizedExperiment::rowData(x) %>%
         avoid_conflict_names() 
-    if (ncol(otumeta)!=0){
+    if (ncol(otumeta)>0){
         otumetavar <- colnames(otumeta)
         otumeta %<>% tibble::as_tibble(rownames="OTU")
         otuda <- otuda %>% left_join(otumeta, by="OTU")
@@ -91,6 +91,7 @@ as_tibble.MPSE <- function(x, ...){
         taxada <- taxatree_to_tb(x@taxatree) 
         uniqnm <- setdiff(colnames(taxada), colnames(otuda))
         taxada %<>% dplyr::select(uniqnm)
+        taxada <- taxada[,!vapply(taxada, function(i)rlang::is_list(i), logical(1)),drop=FALSE]
         taxavar <- colnames(taxada)  
         taxada %<>% tibble::as_tibble(rownames="OTU")
         otuda <- otuda %>% left_join(taxada, by="OTU")

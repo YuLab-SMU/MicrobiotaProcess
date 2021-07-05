@@ -92,3 +92,301 @@ setMethod("get_taxadf", "data.frame",
     attr(taxdf@tax_table, "fillNAtax") <- TRUE
     return(taxdf)
 })
+
+
+#' Calculate the (relative) abundance of each taxonomy class for each sample or group.
+#' @rdname mp_cal_abundance-methods
+#' @param .data MPSE or tbl_mpse object
+#' @param .abundance the name of otu abundance to be calculated
+#' @param .group the name of group to be calculated.
+#' @param relative logical whether calculate the relative abundance.
+#' @param action character, "add" joins the new information to the input tbl (default), 
+#' "only" return a non-redundant tibble with the just new information.
+#' @param force logical whether calculate the relative abundance when the abundance 
+#' is not be rarefied, default is FALSE.
+#' @return update object or tibble according the 'action'
+#' @export
+setGeneric("mp_cal_abundance", 
+           function(.data, 
+                    .abundance = NULL, 
+                    .group = NULL, 
+                    relative = TRUE, 
+                    action = "add",
+                    force = FALSE, 
+                    ...){
+    standardGeneric("mp_cal_abundance")
+})
+
+#' @rdname mp_cal_abundance-methods
+#' @aliases mp_cal_abundance,MPSE 
+#' @importFrom dplyr across
+#' @exportMethod mp_cal_abundance
+setMethod("mp_cal_abundance", signature(.data="MPSE"), 
+          function(.data, 
+                   .abundance = NULL, 
+                   .group = NULL, 
+                   relative = TRUE, 
+                   action = "add", 
+                   force = FALSE,
+                   ...){
+
+    action %<>% match.arg(c("add", "get", "only"))
+          
+    .abundance <- rlang::enquo(.abundance)
+    .group <- rlang::enquo(.group)
+
+    if (rlang::quo_is_null(.abundance)){
+        .abundance <- as.symbol("RareAbundance")
+    }    
+
+    if (!valid_rare(.data, .abundance=.abundance) && !force){
+        glue::glue("The rarefied abundance of species might not be provided. Rarefaction of all
+                    observations is performed automatically. If you still want to calculate the
+                    alpha index with the '.abundance', you can set 'force=TRUE'. ")
+        .data <- mp_rrarefy(.data=.data, ...)
+        .abundance <- as.symbol("RareAbundance")
+    }
+    assaysvar <- .data %>% SummarizedExperiment::assayNames()
+    xx <- SummarizedExperiment::assays(.data)@listData
+
+    da <- xx[[rlang::as_name(.abundance)]] %>%
+          tibble::as_tibble(rownames="OTU") %>%
+          tidyr::pivot_longer(!as.symbol("OTU"), names_to="Sample", values_to=rlang::as_name(.abundance))
+
+    sampleda <- .data@colData %>%
+                avoid_conflict_names() %>%
+                tibble::as_tibble(rownames="Sample")
+
+    if (ncol(sampleda)>1){
+        da %<>% left_join(sampleda, by="Sample")
+    }
+
+    otumeta <-
+        SummarizedExperiment::rowData(.data) %>%
+        avoid_conflict_names() %>%
+        tibble::as_tibble(rownames="OTU")
+    
+    if (ncol(otumeta) > 1){
+        da %<>% dplyr::left_join(otumeta, by="OTU")
+    }
+    
+    if (!is.null(.data@taxatree)){
+        taxada <- taxatree_to_tb(.data@taxatree) %>%
+                  tibble::as_tibble(rownames="OTU")
+        taxada <- taxada[ ,!colnames(taxada) %in% 
+                           c(colnames(.data@taxatree@data), 
+                             colnames(.data@taxatree@extraInfo)),
+                           drop=FALSE]
+        da %<>% dplyr::left_join(taxada, by="OTU")
+        taxavar <- colnames(taxada)
+    }else{
+        taxavar <- "OTU"
+    }
+    
+    if (!rlang::quo_is_null(.group)){
+        da1 <- lapply(taxavar, function(x) 
+                               .internal_cal_feature_abun(da=da, 
+                                         .abundance=.abundance, 
+                                         feature=x, 
+                                         byID=.group,
+                                         relative=relative))
+    }else{
+        da1 <- lapply(taxavar, function(x)
+                      .internal_cal_feature_abun(da=da,
+                                         .abundance=.abundance,
+                                         feature=x,
+                                         byID=as.symbol("Sample"),
+                                         relative=relative))
+    }
+
+    if (action %in% c("add", "get")){
+        if (rlang::quo_is_null(.group) && relative){
+            newRelabun <- paste0(c("Rel", rlang::as_name(.abundance), "BySample"), collapse="")
+            otuRelabun <- da1[[1]] %>% 
+                          select(-!!as.symbol(.abundance)) %>%
+                          tidyr::pivot_wider(id_cols="OTU", names_from="Sample", values_from=as.symbol(newRelabun)) %>%
+                          tibble::column_to_rownames(var="OTU")
+            SummarizedExperiment::assays(.data)@listData <- c(xx, list(otuRelabun)) %>% 
+                setNames(c(assaysvar, newRelabun))
+        }
+        
+        da1 %<>% 
+             dplyr::bind_rows() %>% 
+             nest_internal() %>% 
+             rename(label="OTU")
+
+        if (!is.null(.data@taxatree)){
+            .data@taxatree %<>% treeio::full_join(da1, by="label")
+        }
+
+        if (!is.null(.data@otutree)){
+            da1 %<>% dplyr::filter(.data$label %in% .data@otutree@phylo$tip.label)
+            .data@otutree %<>% treeio::full_join(da1, by="label")
+        }
+        
+        if (action=="add"){
+            return(.data)
+        }else{
+            if (is.null(.data@taxatree)){
+                message("The taxatree of the MPSE object is empty!")
+            }
+            return(.data@taxatree)
+        }
+
+    }else if(action=="only"){
+        da1 %<>% 
+            setNames(taxavar) %>%
+            dplyr::bind_rows(.id="TaxaClass") %>% 
+            dplyr::rename(AllTaxa="OTU")
+        
+        if (rlang::quo_is_null(.group) && ncol(sampleda)>1){
+            da1 %<>% dplyr::left_join(sampleda, by="Sample")
+        }
+
+        return(da1)
+    }
+    
+})
+
+.internal_cal_feature_abun <- function(da, .abundance, feature, byID, relative){
+    Totalnm <- paste0("TotalNumsBy", rlang::as_name(byID))
+    if(rlang::as_name(byID)=="Sample"){
+        newabun <- rlang::as_name(.abundance)
+    }else{
+        newabun <- paste0(c(rlang::as_name(.abundance), "By", rlang::as_name(byID)), collapse="")
+    }
+
+    da %<>%
+        dplyr::group_by(!!byID) %>%
+        dplyr::mutate(across(!!.abundance, sum, .names=Totalnm)) %>%
+        dplyr::group_by(across(c(!!as.symbol(feature), !!byID))) %>%
+        dplyr::mutate(across(!!.abundance, sum, .names=newabun))
+
+    if (relative){
+        newRelabun <- paste0(c("Rel", rlang::as_name(.abundance), "By", rlang::as_name(byID)), collapse="")
+        da %<>%
+            dplyr::mutate(across(!!as.symbol(newabun), ~ .x/!!as.symbol(Totalnm) * 100, .names=newRelabun)) %>%
+            select(c(as.symbol(feature), !!byID, as.symbol(newabun), as.symbol(newRelabun))) %>%
+            distinct() %>%
+            ungroup()
+
+    }else{
+        da %<>%
+            select(c(as.symbol(feature), !!byID, as.symbol(newabun))) %>%
+            distinct() %>%
+            ungroup()
+    }
+    colnames(da)[1] <- "OTU"
+    return(da)
+}
+
+.internal_mp_cal_abundance <- function(.data, .abundance=NULL, .group=NULL, relative=TRUE, action="add", force=FALSE, ...){
+
+    action %<>% match.arg(c("add", "get", "only"))
+
+    .abundance <- rlang::enquo(.abundance)
+    .group <- rlang::enquo(.group)
+    
+    if (rlang::quo_is_null(.abundance)){
+        .abundance <- as.symbol("RareAbundance")
+    }
+
+    if (!valid_rare(.data, .abundance=.abundance) && !force){
+        glue::glue("The rarefied abundance of species might not be provided. Rarefaction of all
+                    observations is performed automatically. If you still want to calculate the
+                    alpha index with the '.abundance', you can set 'force=TRUE'. ")
+        .data <- mp_rrarefy(.data=.data, ...)
+        .abundance <- as.symbol("RareAbundance")
+    }
+
+    assaysvar <- .data %>% attr("assaysvar")
+    taxavar <- .data %>% attr("taxavar")
+
+    if (!is.null(taxavar)){
+        taxavar <- c("OTU", taxavar)
+    }else{
+        taxavar <- "OTU"    
+    }
+    
+    if (!rlang::quo_is_null(.group)){
+        da1 <- lapply(taxavar, function(x)
+                               .internal_cal_feature_abun(da=.data,
+                                         .abundance=.abundance,
+                                         feature=x,
+                                         byID=.group,
+                                         relative=relative))
+    }else{
+        da1 <- lapply(taxavar, function(x)
+                      .internal_cal_feature_abun(da=.data,
+                                         .abundance=.abundance,
+                                         feature=x,
+                                         byID=as.symbol("Sample"),
+                                         relative=relative))
+    }
+    
+    if (action %in% c("add", "get")){
+        if (rlang::quo_is_null(.group) && relative){
+            newRelabun <- paste0(c("Rel", rlang::as_name(.abundance), "BySample"), collapse="")
+            dx1 <- da1[[1]] %>% select(c("OTU", "Sample", as.symbol(newRelabun)))
+            othernm <- colnames(.data)[!colnames(.data) %in% c("OTU", "Sample", assaysvar)]
+            attr(.data, "assaysvar") <- c(assaysvar, newRelabun)
+            .data %<>% 
+                  left_join(dx1, by=c("OTU", "Sample")) %>%
+                  select(c("OTU", "Sample", assaysvar, newRelabun, othernm))
+        }
+
+        da1 %<>%
+             dplyr::bind_rows() %>%
+             nest_internal() %>%
+             rename(label="OTU")
+
+        taxatree <- .data %>% attr("taxatree")
+
+        if (!is.null(taxatree)){
+            attr(.data, "taxatree") <- taxatree %>% treeio::full_join(da1, by="label")
+        }
+     
+        otutree <- .data %>% attr("otutree")
+
+        if (!is.null(otutree)){
+            da1 %<>% dplyr::filter(.data$label %in% .data@otutree@phylo$tip.label)
+            attr(.data, "otutree") <- otutree %>% treeio::full_join(da1, by="label")
+        }
+        
+        if (action=="get"){
+            if (is.null(taxatree)){
+                message("The taxatree of the MPSE object is empty")
+            }
+
+            return(attr(.data, "taxatree"))
+
+        }else{
+            return(.data)
+        }
+
+    }else if(action=="only"){
+        da1 %<>%
+            setNames(taxavar) %>%
+            dplyr::bind_rows(.id="TaxaClass") %>%
+            dplyr::rename(AllTaxa="OTU")
+        
+        samplevar <- .data %>% attr("samplevar")
+
+        if (rlang::quo_is_null(.group) && length(samplevar)>1){
+            sampleda <- .data %>% ungroup() %>% select(samplevar)
+            da1 %<>% dplyr::left_join(sampleda, by="Sample")
+        }
+
+        return(da1)
+    }
+}
+
+#' @rdname mp_cal_abundance-methods
+#' @aliases mp_cal_abundance,tbl_mpse
+#' @exportMethod mp_cal_abundance
+setMethod("mp_cal_abundance", signature(.data = "tbl_mpse"), .internal_mp_cal_abundance)
+
+#' @rdname mp_cal_abundance-methods
+#' @aliases mp_cal_abundance,grouped_df_mpse
+#' @exportMethod mp_cal_abundance
+setMethod("mp_cal_abundance", signature(.data = "grouped_df_mpse"), .internal_mp_cal_abundance)
