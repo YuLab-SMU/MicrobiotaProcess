@@ -16,7 +16,7 @@ as_tibble.phyloseq <- function(x, ...){
     }else{
         samplevar <- NULL
     }
-    print(samplevar)
+    
     taxada <- as.data.frame(x@tax_table)
     if (!all(dim(taxada)==0)){
         taxavar <- colnames(taxada)
@@ -91,7 +91,7 @@ as_tibble.MPSE <- function(x, ...){
         taxada <- taxatree_to_tb(x@taxatree) 
         uniqnm <- setdiff(colnames(taxada), colnames(otuda))
         taxada %<>% dplyr::select(uniqnm)
-        taxada <- taxada[,!vapply(taxada, function(i)rlang::is_list(i), logical(1)),drop=FALSE]
+        taxada <- taxada[,!vapply(taxada, rlang::is_list, logical(1)),drop=FALSE]
         taxavar <- colnames(taxada)  
         taxada %<>% tibble::as_tibble(rownames="OTU")
         otuda <- otuda %>% left_join(taxada, by="OTU")

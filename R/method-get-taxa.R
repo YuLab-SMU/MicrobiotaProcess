@@ -239,7 +239,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
             dplyr::bind_rows(.id="TaxaClass") %>% 
             dplyr::rename(AllTaxa="OTU")
         
-        if (rlang::quo_is_null(.group) && ncol(sampleda)>1){
+        if (ncol(sampleda)>1){
             da1 %<>% dplyr::left_join(sampleda, by="Sample")
         }
 
@@ -252,8 +252,10 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     Totalnm <- paste0("TotalNumsBy", rlang::as_name(byID))
     if(rlang::as_name(byID)=="Sample"){
         newabun <- rlang::as_name(.abundance)
+        sampleind <- NULL
     }else{
         newabun <- paste0(c(rlang::as_name(.abundance), "By", rlang::as_name(byID)), collapse="")
+        sampleind <- as.symbol("Sample")
     }
 
     da %<>%
@@ -265,16 +267,27 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     if (relative){
         newRelabun <- paste0(c("Rel", rlang::as_name(.abundance), "By", rlang::as_name(byID)), collapse="")
         da %<>%
-            dplyr::mutate(across(!!as.symbol(newabun), ~ .x/!!as.symbol(Totalnm) * 100, .names=newRelabun)) %>%
-            select(c(as.symbol(feature), !!byID, as.symbol(newabun), as.symbol(newRelabun))) %>%
-            distinct() %>%
-            ungroup()
+            dplyr::mutate(across(!!as.symbol(newabun), ~ .x/!!as.symbol(Totalnm) * 100, .names=newRelabun))
+        if(is.null(sampleind)){
+            da %<>% select(c(as.symbol(feature), !!byID, as.symbol(newabun), as.symbol(newRelabun)))
+        }else{
+            da %<>% select(c(as.symbol(feature), !!sampleind, !!byID, as.symbol(newabun), as.symbol(newRelabun)))
+        }
+        da %<>% 
+            ungroup() %>%
+            distinct() 
 
     }else{
+        if (is.null(sampleind)){
+            da %<>%
+            select(c(as.symbol(feature), !!byID, as.symbol(newabun)))
+        }else{
+            da %<>%
+            select(c(as.symbol(feature), !!sampleind, !!byID, as.symbol(newabun)))
+        }
         da %<>%
-            select(c(as.symbol(feature), !!byID, as.symbol(newabun))) %>%
-            distinct() %>%
-            ungroup()
+            ungroup() %>%
+            distinct()
     }
     colnames(da)[1] <- "OTU"
     return(da)
@@ -372,7 +385,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
         
         samplevar <- .data %>% attr("samplevar")
 
-        if (rlang::quo_is_null(.group) && length(samplevar)>1){
+        if (length(samplevar)>1){
             sampleda <- .data %>% ungroup() %>% select(samplevar)
             da1 %<>% dplyr::left_join(sampleda, by="Sample")
         }
