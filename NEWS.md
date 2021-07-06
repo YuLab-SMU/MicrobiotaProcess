@@ -1,6 +1,8 @@
 # MicrobiotaProcess 1.5.1.997
 
-+ add `mp_decostand` provided several standardization methods for `MPSE`, `tbl_mpse` and `grouped_df_mpse`. (2021-07-4, Sun)
++ add `mp_cal_rarecurve` to calculate the `rarecurve` of each sample with `MPSE` or `tbl_mpse`. (2021-07-06, Tue)
++ add `mp_cal_abundance` to calculate the relative abundance of each taxonomy class with `MPSE` or `tbl_mpse`. (2021-07-05, Mon)
++ add `mp_decostand` provided several standardization methods for `MPSE`, `tbl_mpse` and `grouped_df_mpse`. (2021-07-04, Sun)
 + add `mp_import_qiime` to parse the output of `qiime` old version. (2021-07-03, Sat)
 + add `taxatree` slot to `MPSE`. (2021-06-30, Wed)
 + add `mp_cal_alpha` function for `MPSE` or `mpse` object. (2021-07-01, Thu)
