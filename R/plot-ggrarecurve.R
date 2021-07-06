@@ -173,16 +173,16 @@ stat_rare <- function(data,
 }
 
 #' @keywords internal
-samplealpha <- function(data, chunks=200){
+samplealpha <- function(data, chunks=200, seed=123){
     sdepth <- sum(data)
     step <- trunc(sdepth/chunks)
     n <- seq(0, sdepth, by=step)[-1]
     n <- c(n, sdepth)
     out <- lapply(n, function(x){
-                tmp <- get_alphaindex(data, mindepth=x)
-    		#tmp <- tmp$indexs
-    		tmp$readsNums <- x
-    	    return(tmp)})
+                tmp <- withr::with_seed(seed, get_alphaindex(data, mindepth=x))
+                #tmp <- tmp$indexs
+                tmp$readsNums <- x
+                return(tmp)})
     out <- do.call("rbind", c(out, make.row.names=FALSE))
     out[is.na(out)] <- 0
     return (out)

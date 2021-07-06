@@ -267,3 +267,22 @@ print.grouped_df_mpse <- function(x, ..., n = NULL, width = NULL, n_extra = NULL
     }
     invisible(x)
 }
+
+#' @method print rarecurve
+#' @rdname print
+#' @export
+print.rarecurve <- function(x, ..., n = NULL, width = NULL, n_extra = NULL){
+    formatted_tb <- x$data %>% format(..., n =  n, width = width, n_extra = n_extra)
+    new_head = "A rarecurve (which can be visualized via ggrarecurve) abstraction:"
+
+    format_rare <- 
+        formatted_tb %>%
+        {
+            x = (.);
+            x[1] = gsub("(A tibble:)", new_head, x[1]);
+            x
+        }
+    writeLines(format_rare)
+
+    invisible(x)
+}

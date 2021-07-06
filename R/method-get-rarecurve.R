@@ -48,3 +48,102 @@ setMethod("get_rarecurve", "phyloseq", function(obj, ...){
                          ...)
     return(res)
 })
+
+
+#' Calculating the different alpha diversities index with different depth
+#' @rdname mp_cal_rarecurve-methods
+#' @param .data MPSE or tbl_mpse object
+#' @param .abundance the name of otu abundance to be calculated.
+#' @param chunks numeric the split number of each sample to 
+#' calculate alpha diversity, default is 400. eg. A sample has total 40000 reads,
+#' if chunks is 400, it will be split to 100 sub-samples (100, 200, 300,..., 40000),
+#' then alpha diversity index was calculated based on the sub-samples.
+#' @param seed a random seed to make the result reproducible, default is 123.
+#' @param force logical whether calculate rarecurve forcibly when the
+#' '.abundance' is not be rarefied, default is FALSE
+#' @param ... additional parameters.
+#' @return update rarecurce calss
+#' @export
+
+setGeneric("mp_cal_rarecurve", function(.data, .abundance=NULL, chunks=400, seed=123, force=FALSE, ...)standardGeneric("mp_cal_rarecurve"))
+
+#' @rdname mp_cal_rarecurve-methods
+#' @aliases mp_cal_rarecurve,MPSE
+#' @exportMethod mp_cal_rarecurve
+setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundance=NULL, chunks=400, seed=123, force=FALSE, ...){
+
+    .abundance <- rlang::enquo(.abundance)
+
+    if (rlang::quo_is_null(.abundance)){
+        .abundance <- as.symbol("RareAbundance")
+    }
+
+    if (!valid_rare(.data, .abundance=.abundance) && !force){
+        glue::glue("The rarefied abundance of species might not be provided. Rarefaction of all
+                    observations is performed automatically. If you still want to calculate the
+                    alpha index with the '.abundance', you can set 'force=TRUE'. ")
+        .data <- mp_rrarefy(.data=.data, ...)
+        .abundance <- as.symbol("RareAbundance")
+    }
+
+    da <- SummarizedExperiment::assays(.data)@listData[[rlang::as_name(.abundance)]] %>% as.data.frame(check.names=FALSE)
+    
+    sampleda <- .data@colData %>%
+                avoid_conflict_names() %>%
+                tibble::as_tibble(rownames="Sample")
+
+    dat <- .internal_apply_cal_rarecurve(da=da, sampleda=sampleda, chunks=chunks, seed=seed)
+    return(dat)
+})
+
+
+.internal_mp_cal_rarecurve <- function(.data, .abundance=NULL, chunks=400, seed=123, force=FALSE, ...){
+
+    .abundance <- rlang::enquo(.abundance)
+
+    if (rlang::quo_is_null(.abundance)){
+        .abundance <- as.symbol("RareAbundance")
+    }
+
+    if (!valid_rare(.data, .abundance=.abundance) && !force){
+        glue::glue("The rarefied abundance of species might not be provided. Rarefaction of all
+                    observations is performed automatically. If you still want to calculate the
+                    alpha index with the '.abundance', you can set 'force=TRUE'. ")
+        .data <- mp_rrarefy(.data=.data, ...)
+        .abundance <- as.symbol("RareAbundance")
+    }
+
+    da <- .data %>% 
+           dplyr::ungroup() %>% 
+           select(c("OTU", "Sample", rlang::as_name(.abundance))) %>%
+           tidyr::pivot_wider(id_cols="OTU", names_from="Sample", values_from=rlang::as_name(.abundance)) %>%
+           tibble::column_to_rownames(var="OTU")
+
+    samplevar <- .data %>% attr("samplevar")
+    sampleda <- .data %>% dplyr::ungroup() %>% select(samplevar) %>% distinct()
+
+    dat <- .internal_apply_cal_rarecurve(da=da, sampleda=sampleda, chunks=chunks, seed=seed)
+    return(dat)
+}
+
+.internal_apply_cal_rarecurve <- function(da, sampleda, chunks, seed){
+    dat <- apply(da, 2, samplealpha, chunks=chunks, seed=seed) %>% 
+           dplyr::bind_rows(.id="sample") %>%
+           tidyr::pivot_longer(cols=!c("sample", "readsNums"), names_to="Alpha")
+    if (ncol(sampleda) > 1){
+        dat %<>%
+            left_join(sampleda, by=c("sample"="Sample"))
+    }
+    dat <- structure(list(data=dat), class="rarecurve")
+    return(dat)
+}
+
+#' @rdname mp_cal_rarecurve-methods
+#' @aliases mp_cal_rarecurve,tbl_mpse
+#' @exportMethod mp_cal_rarecurve
+setMethod("mp_cal_rarecurve", signature(.data="tbl_mpse"), .internal_mp_cal_rarecurve)
+
+#' @rdname mp_cal_rarecurve-methods
+#' @aliases mp_cal_rarecurve,grouped_df_mpse
+#' @exportMethod mp_cal_rarecurve
+setMethod("mp_cal_rarecurve", signature(.data="grouped_df_mpse"), .internal_mp_cal_rarecurve)

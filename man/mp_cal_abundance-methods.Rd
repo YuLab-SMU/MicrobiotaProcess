@@ -59,11 +59,16 @@ mp_cal_abundance(
 
 \item{relative}{logical whether calculate the relative abundance.}
 
-\item{action}{character, "add" joins the new information to the input tbl (default), 
-"only" return a non-redundant tibble with the just new information.}
+\item{action}{character, "add" joins the new information to the taxatree and 
+otutree if they exists (default). In addition, All taxonomy class will be added 
+the taxatree, and OTU (tip) information will be added to the otutree."only" return 
+a non-redundant tibble with the just new information. "get" return 'taxatree' slot
+which is a treedata object.}
 
 \item{force}{logical whether calculate the relative abundance when the abundance 
 is not be rarefied, default is FALSE.}
+
+\item{...}{additional parameters.}
 }
 \value{
 update object or tibble according the 'action'

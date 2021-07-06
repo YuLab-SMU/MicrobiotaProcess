@@ -5,6 +5,7 @@
 \alias{print.MPSE}
 \alias{print.tbl_mpse}
 \alias{print.grouped_df_mpse}
+\alias{print.rarecurve}
 \title{print some objects}
 \usage{
 \method{print}{MPSE}(x, ..., n = NULL, width = NULL, n_extra = NULL)
@@ -12,6 +13,8 @@
 \method{print}{tbl_mpse}(x, ..., n = NULL, width = NULL, n_extra = NULL)
 
 \method{print}{grouped_df_mpse}(x, ..., n = NULL, width = NULL, n_extra = NULL)
+
+\method{print}{rarecurve}(x, ..., n = NULL, width = NULL, n_extra = NULL)
 }
 \arguments{
 \item{x}{Object to format or print.}

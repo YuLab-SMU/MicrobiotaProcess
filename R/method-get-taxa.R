@@ -100,10 +100,14 @@ setMethod("get_taxadf", "data.frame",
 #' @param .abundance the name of otu abundance to be calculated
 #' @param .group the name of group to be calculated.
 #' @param relative logical whether calculate the relative abundance.
-#' @param action character, "add" joins the new information to the input tbl (default), 
-#' "only" return a non-redundant tibble with the just new information.
-#' @param force logical whether calculate the relative abundance when the abundance 
+#' @param action character, "add" joins the new information to the taxatree and 
+#' otutree if they exists (default). In addition, All taxonomy class will be added 
+#' the taxatree, and OTU (tip) information will be added to the otutree."only" return 
+#' a non-redundant tibble with the just new information. "get" return 'taxatree' slot
+#' which is a treedata object.
+#' @param force logical whether calculate the relative abundance forcibly when the abundance 
 #' is not be rarefied, default is FALSE.
+#' @param ... additional parameters.
 #' @return update object or tibble according the 'action'
 #' @export
 setGeneric("mp_cal_abundance", 
@@ -356,14 +360,16 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
         taxatree <- .data %>% attr("taxatree")
 
         if (!is.null(taxatree)){
-            attr(.data, "taxatree") <- taxatree %>% treeio::full_join(da1, by="label")
+            dat1 <- da1 %>% select(setdiff(colnames(da1), c(colnames(taxatree@data), colnames(taxatree@extraInfo))))
+            attr(.data, "taxatree") <- taxatree %>% treeio::full_join(dat1, by="label")
         }
      
         otutree <- .data %>% attr("otutree")
 
         if (!is.null(otutree)){
-            da1 %<>% dplyr::filter(.data$label %in% .data@otutree@phylo$tip.label)
-            attr(.data, "otutree") <- otutree %>% treeio::full_join(da1, by="label")
+            dat2 <- da1 %>% dplyr::filter(.data$label %in% .data@otutree@phylo$tip.label) %>%
+                     select(setdiff(colnames(da1), c(colnames(otutree@data), colnames(otutree@extraInfo))))
+            attr(.data, "otutree") <- otutree %>% treeio::full_join(dat2, by="label")
         }
         
         if (action=="get"){
