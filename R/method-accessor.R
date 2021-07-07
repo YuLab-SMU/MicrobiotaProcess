@@ -110,50 +110,56 @@ setMethod("[", signature(x="MPSE"),
 
 #' @title extract the taxonomy tree in MPSE object
 #' @docType methods
-#' @rdname mp_taxatree-methods
+#' @rdname mp_extract_tree-methods
 #' @param x MPSE object
+#' @param type character taxatree or otutree
 #' @param ... additional arguments
 #' @return taxatree treedata object
 #' @export
-setGeneric("mp_taxatree", function(x, ...){standardGeneric("mp_taxatree")})
+setGeneric("mp_extract_tree", function(x, type="taxatree", ...){standardGeneric("mp_extract_tree")})
 
 
-#' @rdname mp_taxatree-methods
-#' @aliases mp_taxatree,MPSE
-#' @exportMethod mp_taxatree
-setMethod("mp_taxatree", signature(x="MPSE"),
-          function(x, ...){
-    if (!is.null(x@taxatree)){
-        return(x@taxatree)
+#' @rdname mp_extract_tree-methods
+#' @aliases mp_extract_tree,MPSE
+#' @exportMethod mp_extract_tree
+setMethod("mp_extract_tree", signature(x="MPSE"), function(x, type="taxatree", ...){
+    type %<>% match.arg(c("taxatree", "otutree"))
+    tree <- slot(x, type)
+    if (!is.null(tree)){
+        return(tree)
     }else{
-        message(taxatree_empty)
+        message(tree_empty(type=type))
     }
 })
 
-#' @rdname mp_taxatree-methods
-#' @aliases mp_taxatree,tbl_mpse
-#' @exportMethod mp_taxatree
-setMethod("mp_taxatree", signature(x="tbl_mpse"),function(x, ...){
-    .internal_taxatree(x=x)
+#' @rdname mp_extract_tree-methods
+#' @aliases mp_extract_tree,tbl_mpse
+#' @exportMethod mp_extract_tree
+setMethod("mp_extract_tree", signature(x="tbl_mpse"),function(x, type="taxatree", ...){
+    .internal_tree(x=x, type=type)
 })
 
-#' @rdname mp_taxatree-methods
-#' @aliases mp_taxatree,grouped_df_mpse
-#' @exportMethod mp_taxatree
-setMethod("mp_taxatree", signature(x="grouped_df_mpse"),function(x, ...){
-    .internal_taxatree(x=x)
+#' @rdname mp_extract_tree-methods
+#' @aliases mp_extract_tree,grouped_df_mpse
+#' @exportMethod mp_extract_tree
+setMethod("mp_extract_tree", signature(x="grouped_df_mpse"),function(x, type="taxatree", ...){
+    .internal_tree(x=x, type=type)
 })
 
-.internal_taxatree <- function(x){
-    taxatree <- attr(x, "taxatree")
-    if (!is.null(taxatree)){
-        return(taxatree)
+.internal_tree <- function(x, type){
+    type %<>% match.arg(c("taxatree", "otutree"))
+    tree <- x %>% attr(type)
+    if (!is.null(tree)){
+        return(tree)
     }else{
-        message(taxatree_empty)
-    } 
+        message(tree_empty(type=type))
+    }
 }
 
-taxatree_empty <- "The taxatree is empty in the MPSE object!"
+tree_empty <- function(type){
+    x <- paste0("The ", type," is empty in the MPSE object!")
+    return(x)
+}
 
 #' @rdname MPSE-accessors
 #' @aliases rownames<-,MPSE

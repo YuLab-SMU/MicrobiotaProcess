@@ -34,6 +34,14 @@ dplyr::distinct
 #' @export
 dplyr::arrange
 
+#' @importFrom dplyr pull
+#' @export
+dplyr::pull
+
+#' @importFrom dplyr slice
+#' @export
+dplyr::slice
+
 #' @importFrom tidyr nest
 #' @export
 tidyr::nest

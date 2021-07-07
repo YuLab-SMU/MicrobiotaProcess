@@ -363,6 +363,28 @@ left_join.tbl_mpse <- function(x, y, by=NULL, copy=FALSE, suffix = c(".x", ".y")
     return(res)
 }
 
+##' @method pull MPSE
+##' @export
+pull.MPSE <- function(.data, var = -1, name = NULL, ...){
+    var <- rlang::enquo(var)
+    name <- rlang::enquo(name)
+    da <- .data %>% 
+          as_tibble() %>%
+          dplyr::pull(var= !!var, name = !!name, ...)
+    return(da)
+}
+
+##' @method slice MPSE
+##' @export
+slice.MPSE <- function(.data, ..., .preserve = FALSE){
+    writeLines(tbl_mpse_return_message(TRUE))
+    dots <- rlang::quos(...)
+    da <- .data %>% 
+          as_tibble() %>%
+          slice(!!!dots, .preserve=.preserve)
+    return(da)
+}
+
 add_attr.tbl_mpse <- function(x1, x2, class="tbl_mpse"){
     attr(x1, "samplevar") <- attr(x2, "samplevar")
     attr(x1, "mutatevar") <- attr(x2, "mutatevar")

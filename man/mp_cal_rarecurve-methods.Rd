@@ -10,13 +10,41 @@
 \alias{mp_cal_rarecurve,grouped_df_mpse}
 \title{Calculating the different alpha diversities index with different depth}
 \usage{
-mp_cal_rarecurve(.data, .abundance = NULL, chunks = 400, seed = 123, ...)
+mp_cal_rarecurve(
+  .data,
+  .abundance = NULL,
+  chunks = 400,
+  seed = 123,
+  force = FALSE,
+  ...
+)
 
-\S4method{mp_cal_rarecurve}{MPSE}(.data, .abundance = NULL, chunks = 400, seed = 123, ...)
+\S4method{mp_cal_rarecurve}{MPSE}(
+  .data,
+  .abundance = NULL,
+  chunks = 400,
+  seed = 123,
+  force = FALSE,
+  ...
+)
 
-\S4method{mp_cal_rarecurve}{tbl_mpse}(.data, .abundance = NULL, chunks = 400, seed = 123, ...)
+\S4method{mp_cal_rarecurve}{tbl_mpse}(
+  .data,
+  .abundance = NULL,
+  chunks = 400,
+  seed = 123,
+  force = FALSE,
+  ...
+)
 
-\S4method{mp_cal_rarecurve}{grouped_df_mpse}(.data, .abundance = NULL, chunks = 400, seed = 123, ...)
+\S4method{mp_cal_rarecurve}{grouped_df_mpse}(
+  .data,
+  .abundance = NULL,
+  chunks = 400,
+  seed = 123,
+  force = FALSE,
+  ...
+)
 }
 \arguments{
 \item{.data}{MPSE or tbl_mpse object}
@@ -29,6 +57,9 @@ if chunks is 400, it will be split to 100 sub-samples (100, 200, 300,..., 40000)
 then alpha diversity index was calculated based on the sub-samples.}
 
 \item{seed}{a random seed to make the result reproducible, default is 123.}
+
+\item{force}{logical whether calculate rarecurve forcibly when the
+'.abundance' is not be rarefied, default is FALSE}
 
 \item{...}{additional parameters.}
 }

@@ -65,7 +65,7 @@ the taxatree, and OTU (tip) information will be added to the otutree."only" retu
 a non-redundant tibble with the just new information. "get" return 'taxatree' slot
 which is a treedata object.}
 
-\item{force}{logical whether calculate the relative abundance when the abundance 
+\item{force}{logical whether calculate the relative abundance forcibly when the abundance 
 is not be rarefied, default is FALSE.}
 
 \item{...}{additional parameters.}
