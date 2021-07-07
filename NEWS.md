@@ -1,5 +1,7 @@
 # MicrobiotaProcess 1.5.1.997
 
++ add `mp_extract_tree` to extract the `otutree` or `taxatree` from `MPSE` or `tbl_mpse` object. (2021-07-07, Wed)
++ add `pull` and `slice` to support the `MPSE` object. (2021-07-06, Tue)
 + add `mp_cal_rarecurve` to calculate the `rarecurve` of each sample with `MPSE` or `tbl_mpse`. (2021-07-06, Tue)
 + add `mp_cal_abundance` to calculate the relative abundance of each taxonomy class with `MPSE` or `tbl_mpse`. (2021-07-05, Mon)
 + add `mp_decostand` provided several standardization methods for `MPSE`, `tbl_mpse` and `grouped_df_mpse`. (2021-07-04, Sun)
