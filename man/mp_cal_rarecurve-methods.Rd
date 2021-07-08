@@ -13,6 +13,7 @@
 mp_cal_rarecurve(
   .data,
   .abundance = NULL,
+  action = "add",
   chunks = 400,
   seed = 123,
   force = FALSE,
@@ -22,6 +23,7 @@ mp_cal_rarecurve(
 \S4method{mp_cal_rarecurve}{MPSE}(
   .data,
   .abundance = NULL,
+  action = "add",
   chunks = 400,
   seed = 123,
   force = FALSE,
@@ -31,6 +33,7 @@ mp_cal_rarecurve(
 \S4method{mp_cal_rarecurve}{tbl_mpse}(
   .data,
   .abundance = NULL,
+  action = "add",
   chunks = 400,
   seed = 123,
   force = FALSE,
@@ -40,6 +43,7 @@ mp_cal_rarecurve(
 \S4method{mp_cal_rarecurve}{grouped_df_mpse}(
   .data,
   .abundance = NULL,
+  action = "add",
   chunks = 400,
   seed = 123,
   force = FALSE,
@@ -50,6 +54,10 @@ mp_cal_rarecurve(
 \item{.data}{MPSE or tbl_mpse object}
 
 \item{.abundance}{the name of otu abundance to be calculated.}
+
+\item{action}{character it has three options, "add" joins the new
+information to the input tbl (default), "only" return a non-redundant tibble 
+with the just new information, ang 'get' return a 'rarecurve' object.}
 
 \item{chunks}{numeric the split number of each sample to 
 calculate alpha diversity, default is 400. eg. A sample has total 40000 reads,

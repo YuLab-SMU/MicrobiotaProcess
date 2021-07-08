@@ -54,6 +54,9 @@ setMethod("get_rarecurve", "phyloseq", function(obj, ...){
 #' @rdname mp_cal_rarecurve-methods
 #' @param .data MPSE or tbl_mpse object
 #' @param .abundance the name of otu abundance to be calculated.
+#' @param action character it has three options, "add" joins the new
+#' information to the input tbl (default), "only" return a non-redundant tibble 
+#' with the just new information, ang 'get' return a 'rarecurve' object.
 #' @param chunks numeric the split number of each sample to 
 #' calculate alpha diversity, default is 400. eg. A sample has total 40000 reads,
 #' if chunks is 400, it will be split to 100 sub-samples (100, 200, 300,..., 40000),
@@ -65,13 +68,20 @@ setMethod("get_rarecurve", "phyloseq", function(obj, ...){
 #' @return update rarecurce calss
 #' @export
 
-setGeneric("mp_cal_rarecurve", function(.data, .abundance=NULL, chunks=400, seed=123, force=FALSE, ...)standardGeneric("mp_cal_rarecurve"))
+setGeneric("mp_cal_rarecurve", function(.data, .abundance=NULL, action="add", chunks=400, seed=123, force=FALSE, ...)standardGeneric("mp_cal_rarecurve"))
 
 #' @rdname mp_cal_rarecurve-methods
 #' @aliases mp_cal_rarecurve,MPSE
 #' @exportMethod mp_cal_rarecurve
-setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundance=NULL, chunks=400, seed=123, force=FALSE, ...){
+setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundance=NULL, action="add", chunks=400, seed=123, force=FALSE, ...){
 
+
+    if ("rarecurve" %in% colnames(.data@colData) && inherits(.data@colData$rarecurve, "list")){
+        message("The rarecurve has been found in the colData of the MPSE object ")
+        return (.data)
+    }
+
+    action %<>% match.arg(c("add", "get", "only"))
     .abundance <- rlang::enquo(.abundance)
 
     if (rlang::quo_is_null(.abundance)){
@@ -93,12 +103,38 @@ setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundanc
                 tibble::as_tibble(rownames="Sample")
 
     dat <- .internal_apply_cal_rarecurve(da=da, sampleda=sampleda, chunks=chunks, seed=seed)
-    return(dat)
+    if (action=="get"){
+        dat <- structure(list(data=dat), class="rarecurve")
+        return(dat)
+    }else if (action=="only"){
+        return(dat)
+    }else if (action=="add"){
+        nestnm <- colnames(dat)[!colnames(dat) %in% "sample"]
+        params <- list(.data=dat, rarecurve=nestnm)
+        dat <- do.call("nest", params) 
+        .data@colData <- .data@colData %>%
+            as_tibble(rownames="Sample") %>%
+            left_join(dat, by=c("Sample"="sample")) %>% 
+            column_to_rownames(var="Sample") %>%
+            S4Vectors::DataFrame()
+        return(.data)
+    }
+    
 })
 
 
-.internal_mp_cal_rarecurve <- function(.data, .abundance=NULL, chunks=400, seed=123, force=FALSE, ...){
+.internal_mp_cal_rarecurve <- function(.data, .abundance=NULL, action="add", chunks=400, seed=123, force=FALSE, ...){
 
+    if ("rarecurve" %in% colnames(.data) &&
+        .data %>%
+        dplyr::pull("rarecurve") %>%
+        class == "list" || 
+        all(c("readsNums", "Alpha") %in% colnames(.data))){
+        message("The rarecurve has been found in the colData of the MPSE object !")
+        return (.data)
+    }
+
+    action %<>% match.arg(c("add", "get", "only"))
     .abundance <- rlang::enquo(.abundance)
 
     if (rlang::quo_is_null(.abundance)){
@@ -123,7 +159,19 @@ setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundanc
     sampleda <- .data %>% dplyr::ungroup() %>% select(samplevar) %>% distinct()
 
     dat <- .internal_apply_cal_rarecurve(da=da, sampleda=sampleda, chunks=chunks, seed=seed)
-    return(dat)
+    if (action=="get"){
+        dat <- structure(list(data=dat), class="rarecurve")
+        return(dat)
+    }else if (action=="only"){
+        return(dat)
+    }else if (action=="add"){
+        nestnm <- colnames(dat)[!colnames(dat) %in% "sample"]
+        params <- list(.data=dat, rarecurve=nestnm)
+        dat <- do.call("nest", params)
+        dat <- .data %>% 
+               dplyr::left_join(dat, by=c("Sample"="sample"))
+        return(dat)
+    }
 }
 
 .internal_apply_cal_rarecurve <- function(da, sampleda, chunks, seed){
@@ -134,7 +182,7 @@ setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundanc
         dat %<>%
             left_join(sampleda, by=c("sample"="Sample"))
     }
-    dat <- structure(list(data=dat), class="rarecurve")
+    #dat <- structure(list(data=dat), class="rarecurve")
     return(dat)
 }
 
