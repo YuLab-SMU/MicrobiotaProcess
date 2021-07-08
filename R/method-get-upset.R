@@ -197,7 +197,7 @@ setMethod("mp_cal_upset", signature(.data="MPSE"), function(.data, .group, .abun
         suppressMessages() %>% 
         dplyr::filter(!!as.symbol("AbundanceBy")>0) %>%
         dplyr::select(- !!as.symbol("AbundanceBy")) %>%
-        group_by(!!as.symbol(OTU)) %>% 
+        group_by(!!as.symbol("OTU")) %>% 
         dplyr::summarize(across(!!.group, list, .names=upsetnm))
     return(dat)
 }
