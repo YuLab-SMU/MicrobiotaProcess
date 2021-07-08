@@ -192,7 +192,7 @@ print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
     show_nrows <- ifelse(is.null(n), 10, n)
     
     new_head = sprintf(
-      "A MPSE-tibble (tbl_mpse) abstraction: %s",
+      "A MPSE-tibble (MPSE object) abstraction: %s",
        total_nrows %>% format(format="f", big.mark=",", digits=2)
     )
     

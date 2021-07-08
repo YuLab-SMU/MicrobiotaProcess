@@ -207,7 +207,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
         if (rlang::quo_is_null(.group) && relative){
             newRelabun <- paste0(c("Rel", rlang::as_name(.abundance), "BySample"), collapse="")
             otuRelabun <- da1[[1]] %>% 
-                          select(-!!as.symbol(.abundance)) %>%
+                          select(-!!.abundance) %>%
                           tidyr::pivot_wider(id_cols="OTU", names_from="Sample", values_from=as.symbol(newRelabun)) %>%
                           tibble::column_to_rownames(var="OTU")
             SummarizedExperiment::assays(.data)@listData <- c(xx, list(otuRelabun)) %>% 
@@ -220,11 +220,15 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
              rename(label="OTU")
 
         if (!is.null(.data@taxatree)){
+            extranm <- setdiff(colnames(da1), c(colnames(.data@taxatree@data), colnames(.data@taxatree@extraInfo)))
+            da1 %<>% dplyr::select(extranm)
             .data@taxatree %<>% treeio::full_join(da1, by="label")
         }
 
         if (!is.null(.data@otutree)){
             da1 %<>% dplyr::filter(.data$label %in% .data@otutree@phylo$tip.label)
+            extranm <- setdiff(colnames(da1), c(colnames(.data@otutree@data), colnames(.data@otutree@extraInfo)))
+            da1 %<>% dplyr::select(extranm)
             .data@otutree %<>% treeio::full_join(da1, by="label")
         }
         

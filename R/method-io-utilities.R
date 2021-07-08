@@ -22,13 +22,19 @@
         }
         taxatab <- as.matrix(taxax)
     }
-    if (!is.null(mapfilename) && file.exists(mapfilename)){
-        sampleda <- read_qiime_sample(mapfilename)
+    if (!is.null(mapfilename)){
+        if (inherits(mapfilename, "character") && file.exists(mapfilename)){
+            sampleda <- read_qiime_sample(mapfilename)
+        }else if (!inherits(mapfilename, "data.frame")){
+            rlang::abort("The mapfilename should be a file or data.frame contained sample information!")
+        }else{
+            sampleda <- mapfilename
+        }
     }
     if (!is.null(refseqqza)){
         if (inherits(refseqqza, "XStringSet")){
             refseq <- refseqqza
-        }else if (file.exists(refseqqza)){
+        }else if (inherits(refseqqza, "character") && file.exists(refseqqza)){
             refseq <- read_qza(refseqqza)
         }
     }
@@ -38,7 +44,7 @@
     if (!is.null(treeqza)){
         if (inherits(treeqza, "treedata")){
             reftree <- treeqza
-        }else if (file.exists(treeqza)){
+        }else if (inherits(treeqza, "character") && file.exists(treeqza)){
             reftree <- treeio::read.treeqza(treeqza)
         }
     }
@@ -117,15 +123,19 @@
     if (!is.null(reftree)){
         if (inherits(reftree, "phylo")){
             reftree <- treeio::as.treedata(reftree)
-        }else if(file.exists(reftree)){
+        }else if(inherits(reftree, "character") && file.exists(reftree)){
             rlang::warn(c("The reftree is a tree file, it is parsing by read.tree function.",
                      "It is better to parse it with the function of treeio", 
                      "then the treedata or phylo result all can be supported."))
             reftree <- ape::read.tree(reftree) %>% treeio::as.treedata()
         }
     }
-    if (!is.null(sampleda) && file.exists(sampleda)){
-        sampleda <- read_qiime_sample(sampleda)
+    if (!is.null(sampleda)){
+        if (inherits(sampleda, "character") && file.exists(sampleda)){
+           sampleda <- read_qiime_sample(sampleda)
+        }else if (!inherits(sampleda, "data.frame")){
+           rlang::abort("The sampleda should be a file or data.frame contained sample information!")
+        }
     }
 
     return (list(otutab=data.frame(t(seqtab),check.names=FALSE),
