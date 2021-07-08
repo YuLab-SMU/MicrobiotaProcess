@@ -1,5 +1,8 @@
-# MicrobiotaProcess 1.5.1.997
+# MicrobiotaProcess 1.5.1.998
 
++ `mp_cal_rarecurve` add `action` argument to control whether the 
+  result will be added to `MPSE` and `tbl_mpse` or return directly. (2021-07-08, Thu) 
++ add `mp_cal_upset` to get the input of `ggupset`. (2021-07-08, Thu)
 + add `mp_extract_tree` to extract the `otutree` or `taxatree` from `MPSE` or `tbl_mpse` object. (2021-07-07, Wed)
 + add `pull` and `slice` to support the `MPSE` object. (2021-07-06, Tue)
 + add `mp_cal_rarecurve` to calculate the `rarecurve` of each sample with `MPSE` or `tbl_mpse`. (2021-07-06, Tue)
