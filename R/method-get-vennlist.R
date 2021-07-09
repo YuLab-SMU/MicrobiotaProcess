@@ -59,3 +59,147 @@ setMethod("get_vennlist", "data.frame", function(obj,
     vennlist <- apply(obj, 1, function(x){names(x[x>0])})
     return(vennlist)
 })
+
+
+#' Calculating the OTU for each sample or group, the result can be visualized by 'ggVennDiagram'
+#' @rdname mp_cal_venn-methods
+#' @param .data MPSE or tbl_mpse object
+#' @param .group the name of group to be calculated.
+#' if it is no provided, the sample will be used.
+#' @param .abundance the name of otu abundance to be calculated.
+#' if it is null, the rarefied abundance will be used.
+#' @param action character, "add" joins the new information to the tibble of tbl_mpse or 
+#' rowData of MPSE. "only" and "get" return a non-redundant tibble with the just new information. 
+#' @param force logical whether calculate the relative abundance forcibly when the abundance
+#' is not be rarefied, default is FALSE.
+#' @param ... additional parameters.
+#' @return update object or tibble according the 'action'
+#' @export
+setGeneric("mp_cal_venn", function(.data, .group, .abundance=NULL, action="add", force=FALSE, ...)standardGeneric("mp_cal_venn"))
+
+#' @rdname mp_cal_venn-methods
+#' @aliases mp_cal_venn,MPSE
+#' @exportMethod mp_cal_venn
+setMethod("mp_cal_venn", signature(.data="MPSE"), function(.data, .group, .abundance=NULL, action="add", force=FALSE, ...){
+    
+    .abundance <- rlang::enquo(.abundance)
+    .group <- rlang::enquo(.group)
+
+    action %<>% match.arg(c("add", "get", "only"))
+
+    if (rlang::quo_is_null(.abundance)){
+        .abundance <- as.symbol("RareAbundance")
+    }
+
+    if (rlang::quo_is_missing(.group)){
+        .group <- as.symbol("Sample")
+    }
+
+    if (!valid_rare(.data, .abundance=.abundance) && !force){
+        glue::glue("The rarefied abundance of species might not be provided. Rarefaction of all
+                    observations is performed automatically. If you still want to calculate the
+                    alpha index with the '.abundance', you can set 'force=TRUE'. ")
+        .data <- mp_rrarefy(.data=.data, ...)
+        .abundance <- as.symbol("RareAbundance")
+    }
+
+    xx <- SummarizedExperiment::assays(.data)@listData
+
+    da <- xx[[rlang::as_name(.abundance)]] %>% 
+          tibble::as_tibble(rownames="OTU") %>%
+          tidyr::pivot_longer(!as.symbol("OTU"), 
+                              names_to="Sample", 
+                              values_to=rlang::as_name(.abundance))
+
+    sampleda <- .data@colData %>%
+                avoid_conflict_names() %>%
+                tibble::as_tibble(rownames="Sample")
+
+    if (ncol(sampleda)>1){
+        da %<>% left_join(sampleda, by="Sample")
+    }
+
+    dat <- da %>% 
+           .internal_cal_venn(.abundance=.abundance, .group=.group)
+
+    if (action == "add"){
+        .data@colData <- 
+             .data@colData %>%
+             avoid_conflict_names() %>%
+             tibble::as_tibble(rownames="Sample") %>%
+             dplyr::left_join(dat, by=rlang::as_name(.group)) %>%
+             tibble::column_to_rownames(var="Sample") %>%
+             S4Vectors::DataFrame()
+
+        return(.data)
+    
+    }else if (action == "only"){
+        return (dat)
+    }else if (action == "get"){
+        return (dat)
+    }
+})
+
+
+.internal_mp_cal_venn <- function(.data, .group, .abundance=NULL, action="add", force=FALSE, ...){
+    .abundance <- rlang::enquo(.abundance)
+    .group <- rlang::enquo(.group)
+
+    action %<>% match.arg(c("add", "get", "only"))
+
+    if (rlang::quo_is_null(.abundance)){
+        .abundance <- as.symbol("RareAbundance")
+    }
+
+    if (rlang::quo_is_missing(.group)){
+        .group <- as.symbol("Sample")
+    }
+
+    if (!valid_rare(.data, .abundance=.abundance) && !force){
+        glue::glue("The rarefied abundance of species might not be provided. Rarefaction of all
+                    observations is performed automatically. If you still want to calculate the
+                    alpha index with the '.abundance', you can set 'force=TRUE'. ")
+        .data <- mp_rrarefy(.data=.data, ...)
+        .abundance <- as.symbol("RareAbundance")
+    }
+
+    dat <- .data %>% 
+          dplyr::ungroup() %>%
+          dplyr::select(!!as.symbol("OTU"), !!.group, !!.abundance) %>%
+          .internal_cal_venn(.abundance=.abundance, .group=.group) 
+    
+    if (action=="add"){
+        .data %<>% 
+            dplyr::left_join(dat, by=rlang::as_name(.group))
+        return(.data)
+    }else if(action == "get"){
+        return (dat)
+    }else if(action == "get"){
+        return (dat)
+    }
+}
+
+
+.internal_cal_venn <- function(.data, .abundance, .group){
+    vennnm <- paste0("vennOf", rlang::as_name(.group))
+
+    dat <- .data %>% 
+        dplyr::group_by(!!as.symbol("OTU"), !!.group) %>%
+        dplyr::summarize(AbundanceBy=sum(!!.abundance)) %>%
+        suppressMessages() %>% 
+        dplyr::filter(!!as.symbol("AbundanceBy")>0) %>%
+        dplyr::select(- !!as.symbol("AbundanceBy")) %>%
+        group_by(!!.group) %>% 
+        dplyr::summarize(across(!!as.symbol("OTU"), list, .names=vennnm))
+    return(dat)
+}
+
+#' @rdname mp_cal_venn-methods
+#' @aliases mp_cal_venn,tbl_mpse
+#' @exportMethod mp_cal_venn
+setMethod("mp_cal_venn", signature(.data = "tbl_mpse"), .internal_mp_cal_venn)
+
+#' @rdname mp_cal_venn-methods
+#' @aliases mp_cal_venn,grouped_df_mpse
+#' @exportMethod mp_cal_venn
+setMethod("mp_cal_venn", signature(.data = "grouped_df_mpse"), .internal_mp_cal_venn)

@@ -146,6 +146,165 @@ setMethod("mp_extract_tree", signature(x="grouped_df_mpse"),function(x, type="ta
     .internal_tree(x=x, type=type)
 })
 
+#' @title extract the taxonomy annotation in MPSE object
+#' @docType methods
+#' @rdname mp_extract_taxonomy-methods
+#' @param x MPSE object
+#' @param ... additional arguments
+#' @return data.frame contained taxonomy annotation.
+#' @export
+setGeneric("mp_extract_taxonomy", function(x, ...)standardGeneric("mp_extract_taxonomy"))
+
+#' @rdname mp_extract_taxonomy-methods
+#' @aliases mp_extract_taxonomy,MPSE
+#' @exportMethod mp_extract_taxonomy
+setMethod("mp_extract_taxonomy", signature(x="MPSE"), function(x, ...){
+    da <- .internal_extract_taxonomy(taxatree=x@taxatree, classnm=class(x)[1])
+    return(da)
+})
+
+#' @rdname mp_extract_taxonomy-methods
+#' @aliases mp_extract_taxonomy,tbl_mpse
+#' @exportMethod mp_extract_taxonomy
+setMethod("mp_extract_taxonomy", signature(x="tbl_mpse"), function(x, ...){
+    taxatree <- x %>% attr("taxatree")
+    classnm <- class(x)[1]
+    da <- .internal_extract_taxonomy(taxatree = taxatree, 
+                                     classnm = classnm)
+    return(da)
+})
+
+#' @rdname mp_extract_taxonomy-methods
+#' @aliases mp_extract_taxonomy,grouped_df_mpse
+#' @exportMethod mp_extract_taxonomy
+setMethod("mp_extract_taxonomy", signature(x="grouped_df_mpse"), function(x, ...){
+    taxatree <- x %>% attr("taxatree")
+    classnm <- class(x)[1]
+    da <- .internal_extract_taxonomy(taxatree = taxatree,
+                                     classnm = classnm)
+    return (da)
+})
+
+#' @title extract the sample information in MPSE object
+#' @docType methods
+#' @rdname mp_extract_sample-methods
+#' @param x MPSE object
+#' @param ... additional arguments
+#' @return tbl_df contained sample information.
+#' @export
+setGeneric("mp_extract_sample", function(x, ...)standardGeneric("mp_extract_sample"))
+
+#' @rdname mp_extract_sample-methods
+#' @aliases mp_extract_sample,MPSE
+#' @exportMethod mp_extract_sample
+setMethod("mp_extract_sample", signature(x="MPSE"), function(x, ...){
+     da <- x@colData %>%
+        avoid_conflict_names() %>%
+        tibble::as_tibble(rownames="Sample")
+     return(da)
+})
+
+.internal_extract_sample <- function(x, ...){
+    samplevar <- x %>% attr("samplevar")
+    da <- x %>%
+        dplyr::ungroup() %>%
+        select(samplevar)
+}
+
+#' @rdname mp_extract_sample-methods
+#' @aliases mp_extract_sample,tbl_mpse
+#' @exportMethod mp_extract_sample
+setMethod("mp_extract_sample", signature(x="tbl_mpse"), .internal_extract_sample)
+
+#' @rdname mp_extract_sample-methods
+#' @aliases mp_extract_sample,grouped_df_mpse
+#' @exportMethod mp_extract_sample
+setMethod("mp_extract_sample", signature(x="grouped_df_mpse"), .internal_extract_sample)
+
+
+#' @title extract the feature (OTU) information in MPSE object
+#' @docType methods
+#' @rdname mp_extract_feature-methods
+#' @param x MPSE object
+#' @param addtaxa logical whether adding the taxonomy information
+#' default is FALSE.
+#' @param ... additional arguments
+#' @return tbl_df contained feature (OTU) information.
+#' @export
+setGeneric("mp_extract_feature", function(x, addtaxa=FALSE, ...)standardGeneric("mp_extract_feature"))
+
+#' @rdname mp_extract_feature-methods
+#' @aliases mp_extract_feature,MPSE
+#' @exportMethod mp_extract_feature
+setMethod("mp_extract_feature", signature(x="MPSE"), function(x, addtaxa=FALSE, ...){
+    da <- SummarizedExperiment::rowData(x) %>%
+          avoid_conflict_names() %>%
+          tibble::as_tibble(rownames="OTU")
+    if (!is.null(x@taxatree)){
+        taxanm <- x@taxatree@data %>%
+                  dplyr::filter(!.data$nodeClass %in% c("OTU", "Root")) %>%
+                  dplyr::pull(.data$nodeClass) %>% unique
+        trda <- x@taxatree %>%
+                taxatree_to_tb() %>%
+                tibble::as_tibble(rownames="OTU")
+        if (!addtaxa){
+            trda %<>% dplyr::select(-taxanm)
+        }
+        da %<>% dplyr::left_join(trda, by="OTU") 
+                
+    }
+    return(da)
+})
+
+.internal_extract_feature <- function(x, addtaxa=FALSE, ...){
+    otumetavar <- x %>% attr("otumetavar")
+    taxatree <- x %>% attr("taxatree")
+    da <- x %>%
+        dplyr::ungroup() %>%
+        select(c("OTU", otumetavar))
+    if (!is.null(taxatree)){
+        taxanm <- taxatree@data %>%
+                  dplyr::filter(!.data$nodeClass %in% c("OTU", "Root")) %>%
+                  dplyr::pull(.data$nodeClass) %>% unique
+        trda <- taxatree %>%
+                taxatree_to_tb() %>%
+                tibble::as_tibble(rownames="OTU")
+        if (!addtaxa){
+            trda %<>% dplyr::select(-taxanm)
+        }
+        da %<>% dplyr::left_join(trda, by="OTU")
+    }
+    return(da)
+}
+
+#' @rdname mp_extract_feature-methods
+#' @aliases mp_extract_feature,tbl_mpse
+#' @exportMethod mp_extract_feature
+setMethod("mp_extract_feature", signature(x="tbl_mpse"), .internal_extract_feature)
+
+#' @rdname mp_extract_feature-methods
+#' @aliases mp_extract_feature,grouped_df_mpse
+#' @exportMethod mp_extract_feature
+setMethod("mp_extract_feature", signature(x="grouped_df_mpse"), .internal_extract_feature)
+
+
+.internal_extract_taxonomy <- function(taxatree, classnm){
+    if (is.null(taxatree)){
+        message(paste0("The taxonomy annotation is empty in the ", classnm," object"))
+        return(NULL)
+    }
+    taxanm <- taxatree@data %>%
+              dplyr::filter(.data$nodeClass != "Root") %>%
+              dplyr::pull(.data$nodeClass) %>% unique
+    taxada <- taxatree_to_tb(taxatree) %>%
+              tibble::as_tibble(rownames="OTU") %>%
+              dplyr::select(taxanm) %>%
+              tibble::column_to_rownames(var="OTU")
+    return(taxada)
+
+}
+
+
 .internal_tree <- function(x, type){
     type %<>% match.arg(c("taxatree", "otutree"))
     tree <- x %>% attr(type)
