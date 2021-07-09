@@ -1,5 +1,8 @@
 # MicrobiotaProcess 1.5.1.998
 
++ add `mp_extract_sample`, `mp_extract_taxonomy`, `mp_extract_feature` to extract the `sample`, `taxonomy` (2021-07-09, Fri)
+  and `feature` (`OTU`) information and return `tbl_df` or `data.frame`
++ add `mp_cal_venn` to build the input for `venn plot` (2021-07-09, Fri)
 + `mp_cal_rarecurve` add `action` argument to control whether the 
   result will be added to `MPSE` and `tbl_mpse` or return directly. (2021-07-08, Thu) 
 + add `mp_cal_upset` to get the input of `ggupset`. (2021-07-08, Thu)
