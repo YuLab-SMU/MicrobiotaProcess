@@ -27,7 +27,6 @@ Imports:
   zoo,
   ggtree,
   tidytree,
-  gtools,
   MASS,
   methods,
   rlang,
@@ -40,7 +39,8 @@ Imports:
   patchwork,
   ggstar,
   tidyselect,
-  SummarizedExperiment
+  SummarizedExperiment,
+  foreach
 Suggests:
   rmarkdown,
   prettydoc,
@@ -60,7 +60,8 @@ Suggests:
   S4Vectors,
   purrr,
   seqmagick,
-  glue
+  glue,
+  corrr
 License: GPL (>= 3.0)
 URL: https://github.com/YuLab-SMU/MicrobiotaProcess/
 BugReports: https://github.com/YuLab-SMU/MicrobiotaProcess/issues

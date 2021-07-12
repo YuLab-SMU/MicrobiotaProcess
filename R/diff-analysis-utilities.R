@@ -141,11 +141,13 @@ get_class2sub <- function(sampleda, classgroup, subclass){
     }
 }
 
-#' @importFrom gtools combinations
 #' @keywords internal
 get_compareclass <- function(classlevels){
-    combinations(n=length(classlevels), r=2, v=classlevels,
-    						  repeats.allowed=FALSE)
+    #combinations(n=length(classlevels), r=2, v=classlevels,
+    # 						  repeats.allowed=FALSE)
+    da <- utils::combn(classlevels, 2, simplify = FALSE)
+    da <- do.call("rbind", da)
+    return(da)
 }
 
 #' @keywords internal
