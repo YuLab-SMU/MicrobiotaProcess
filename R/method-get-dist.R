@@ -78,20 +78,16 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #' @param distmethod character the method to calculate distance.
 #' @param action character, "add" joins the distance data to the object, "only" return
 #' a non-redundant tibble with the distance information. "get" return 'dist' object.
-#' @param na.rm logical whether to drop the rows with an NA when 'dist' object is 
-#' converted to 'tbl_df', default is TRUE.
-#' @param remove.dups logical whether to remove duplicate entries when 'dist' object is
-#' converted to 'tbl_df', default is TRUE.
 #' @param ... additional parameters.
 #' @return update object or tibble according the 'action'
 #' @export
-setGeneric("mp_cal_dist", function(.data, .abundance, distmethod="bray", action="add", na.rm=TRUE, remove.dups=TRUE, ...)standardGeneric("mp_cal_dist"))
+setGeneric("mp_cal_dist", function(.data, .abundance, distmethod="bray", action="add", ...)standardGeneric("mp_cal_dist"))
 
 #' @rdname mp_cal_dist-methods
 #' @aliases mp_cal_dist,MPSE
 #' @importFrom rlang :=
 #' @exportMethod mp_cal_dist
-setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, distmethod="bray", action="add", na.rm=TRUE, remove.dups=FALSE, ...){
+setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, distmethod="bray", action="add", ...){
     
     action %<>% match.arg(c("add", "get", "only"))
 
@@ -156,8 +152,8 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, di
     dat <- da %>% 
         as.matrix %>% 
         corrr::as_cordf() %>% 
-        corrr::stretch(na.rm=na.rm, remove.dups=remove.dups) %>%
-        dplyr::rename(!!distmethod:="r", distsampley="y") #%>% 
+        corrr::stretch(na.rm=FALSE, remove.dups=FALSE) %>%
+        dplyr::rename(!!distmethod:="r", !!distsampley:="y") #%>% 
         #tidyr::nest(!!distmethod:=c("y", distmethod))
 
 
@@ -165,7 +161,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, di
         return(dat)   
 
     }else if (action=="add"){
-        dat %<>% tidyr::nest(!!distmethod:=c(distsampley, distmethod))
+        dat %<>% tidyr::nest(!!distmethod:=c(!!as.symbol(distsampley), !!as.symbol(distmethod)))
         .data@colData <- .data@colData %>%
             as_tibble(rownames="Sample") %>%
             left_join(dat, by=c("Sample"="x")) %>%
@@ -177,7 +173,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, di
 })
 
 
-.internal_cal_dist <- function(.data, .abundance, distmethod="bray", action="add", na.rm=TRUE, remove.dups=TRUE, ...){
+.internal_cal_dist <- function(.data, .abundance, distmethod="bray", action="add", ...){
     action %<>% match.arg(c("add", "get", "only"))
 
     .abundance <- rlang::enquo(.abundance)
@@ -241,15 +237,15 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, di
     dat <- da %>%
         as.matrix %>%
         corrr::as_cordf() %>%
-        corrr::stretch(na.rm=na.rm, remove.dups=remove.dups) %>%
-        dplyr::rename(!!distmethod:="r", distsampley="y") #%>%
+        corrr::stretch(na.rm=FALSE, remove.dups=FALSE) %>%
+        dplyr::rename(!!distmethod:="r", !!distsampley:="y") #%>%
         #tidyr::nest(!!distmethod:=c("y", distmethod))
 
 
     if (action=="only"){
         return(dat)
     }else if (action=="add"){
-        dat %<>% tidyr::nest(!!distmethod:=c(distsampley, distmethod))
+        dat %<>% tidyr::nest(!!distmethod:=c(!!as.symbol(distsampley), !!as.symbol(distmethod)))
         .data %<>% 
             dplyr::left_join(dat, by=c("Sample"="x"))
         return(.data)

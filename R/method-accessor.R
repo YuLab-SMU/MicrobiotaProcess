@@ -304,6 +304,57 @@ setMethod("mp_extract_feature", signature(x="grouped_df_mpse"), .internal_extrac
 
 }
 
+#' @title extract the dist object from MPSE or tbl_mpse object
+#' @docType methods
+#' @rdname mp_extract_dist-methods
+#' @param x MPSE object or tbl_mpse object
+#' @param distmethod character the method of calculated distance.
+#' @return dist object.
+#' @export
+setGeneric("mp_extract_dist", function(x, distmethod)standardGeneric("mp_extract_dist"))
+
+#' @rdname mp_extract_dist-methods
+#' @aliases mp_extract_dist,MPSE
+#' @exportMethod mp_extract_dist
+setMethod("mp_extract_dist", signature(x="MPSE"), function(x, distmethod){
+    data <- x@colData %>% avoid_conflict_names() %>% as_tibble(rownames="Sample")
+    res <- .internal_extract_dist(data=data, distmethod=distmethod)
+    return(res)
+})
+
+#' @rdname mp_extract_dist-methods
+#' @aliases mp_extract_dist,tbl_mpse
+#' @exportMethod mp_extract_dist
+setMethod("mp_extract_dist", signature(x="tbl_mpse"), function(x, distmethod){
+    res <- .internal_extract_dist(data=x, distmethod=distmethod)
+    return(res)
+})
+
+#' @rdname mp_extract_dist-methods
+#' @aliases mp_extract_dist,grouped_df_mpse
+#' @exportMethod mp_extract_dist
+setMethod("mp_extract_dist", signature(x="grouped_df_mpse"), function(x, distmethod){
+    data <- x %>% ungroup()
+    res <- .internal_extract_dist(data=data, distmethod=distmethod)
+    return(res)
+})
+
+.internal_extract_dist <- function(data, distmethod){
+    if (!distmethod %in% colnames(data)){
+        rlang::abort(paste0("There is not ", distmethod, 
+                            " distance in the object, please check whether the mp_cal_dist has been performed!"))
+    }
+    distobj <- data %>%
+            select(c("Sample", distmethod)) %>%
+            distinct() %>%
+            tidyr::unnest() %>%
+            suppressWarnings() %>%
+            rename(x="Sample", y=paste0(distmethod,"Sampley"), r=distmethod) %>%
+            corrr::retract() %>%
+            tibble::column_to_rownames(var=colnames(.)[1])
+    distobj <- distobj[colnames(distobj), ] %>% stats::as.dist()
+    return(distobj)
+}
 
 .internal_tree <- function(x, type){
     type %<>% match.arg(c("taxatree", "otutree"))

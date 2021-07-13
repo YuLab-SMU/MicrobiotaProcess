@@ -105,3 +105,84 @@ get_clust.phyloseq <- function(obj,
                                hclustmethod=hclustmethod)
     return(phyloobj)
 }
+
+#' Hierarchical cluster analysis for the samples with MPSE or tbl_mpse object
+#' @rdname mp_cal_clust-methods
+#' @param .data the MPSE or tbl_mpse object
+#' @param .abundance the name of abundance to be calculated.
+#' @param distmethod the method of distance.
+#' @param hclustmethod the method of hierarchical cluster
+#' @param ... additional parameters
+#' @return treedata object contained hierarchical cluster analysis of sample
+#' @export
+setGeneric("mp_cal_clust", function(.data, .abundance, distmethod="bray", hclustmethod="average", ...)standardGeneric("mp_cal_clust"))
+
+
+#' @rdname mp_cal_clust-methods
+#' @aliases mp_cal_clust,MPSE
+#' @exportMethod mp_cal_clust
+setMethod("mp_cal_clust", signature(.data="MPSE"), function(.data, .abundance, distmethod="bray", hclustmethod="average", ...){
+    
+    .abundance <- rlang::enquo(.abundance)
+     
+    if(! distmethod %in% colnames(.data@colData)){
+        if (rlang::quo_is_missing(.abundance)){
+            rlang::abort("The distance is not in the object, the .abundance is required.")
+        }else{
+            distobj <- .data %>% mp_cal_dist(.abundance=.abundance, distmethod=distmethod, action="get", ...)
+        }
+    }else{
+        distobj <- .data %>% mp_extract_dist(distmethod=distmethod)
+    }
+    
+    res <- distobj %>% 
+           hclust(method=hclustmethod) %>%
+           ape::as.phylo() %>%
+           treeio::full_join(
+            y = .data@colData %>%
+                avoid_conflict_names(spename="label") %>%
+                as_tibble(rownames="label"),
+           by="label"
+           )
+
+    return(res)
+})
+
+
+.internal_cal_clust <-  function(.data, .abundance, distmethod="bray", hclustmethod="average", ...){
+    
+    .abundance <- rlang::enquo(.abundance)
+    if (!distmethod %in% colnames(.data)){
+        if (rlang::quo_is_missing(.abundance)){
+            rlang::abort("The distance is not in the object, the .abundance is required.")
+        }else{
+            distobj <- .data %>% mp_cal_dist(.abundance=.abundance, distmethod=distmethod, action="get", ...)
+        }
+    }else{
+        distobj <- .data %>% mp_extract_dist(distmethod=distmethod)
+    }
+
+    res <- distobj %>%
+           hclust(method=hclustmethod) %>%
+           ape::as.phylo() %>%
+           treeio::full_join(
+               y = .data %>% 
+                    ungroup() %>% 
+                    select(.data %>% attr("samplevar")) %>%
+                    distinct() %>%
+                    avoid_conflict_names(spename="label") %>%
+                    rename(label="Sample"),
+               by="label"
+           )
+    return(res)
+}
+
+#' @rdname mp_cal_clust-methods
+#' @aliases mp_cal_clust,tbl_mpse
+#' @exportMethod mp_cal_clust
+setMethod("mp_cal_clust", signature(.data="tbl_mpse"), .internal_cal_clust)
+
+#' @rdname mp_cal_clust-methods
+#' @aliases mp_cal_clust,grouped_df_mpse
+#' @exportMethod mp_cal_clust
+setMethod("mp_cal_clust", signature(.data="grouped_df_mpse"), .internal_cal_clust)

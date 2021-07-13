@@ -185,6 +185,11 @@ print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
     }else{
         tmpx <- x[,1:min(20, ncol(x)), drop=FALSE]
     }
+    
+    if (!is.null(n)){
+        tmpx <- x[seq_len(n), 1:min(20, ncol(x)), drop=FALSE]
+    }
+
     formatted_tb <- tmpx %>% 
                     as_tibble() %>% 
                     format(..., n = n, width = width, n_extra = n_extra)

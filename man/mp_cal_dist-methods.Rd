@@ -10,45 +10,13 @@
 \alias{mp_cal_dist,grouped_df_mpse}
 \title{Calculate the distances between the samples with specified abundance.}
 \usage{
-mp_cal_dist(
-  .data,
-  .abundance,
-  distmethod = "bray",
-  action = "add",
-  na.rm = TRUE,
-  remove.dups = TRUE,
-  ...
-)
+mp_cal_dist(.data, .abundance, distmethod = "bray", action = "add", ...)
 
-\S4method{mp_cal_dist}{MPSE}(
-  .data,
-  .abundance,
-  distmethod = "bray",
-  action = "add",
-  na.rm = TRUE,
-  remove.dups = FALSE,
-  ...
-)
+\S4method{mp_cal_dist}{MPSE}(.data, .abundance, distmethod = "bray", action = "add", ...)
 
-\S4method{mp_cal_dist}{tbl_mpse}(
-  .data,
-  .abundance,
-  distmethod = "bray",
-  action = "add",
-  na.rm = TRUE,
-  remove.dups = TRUE,
-  ...
-)
+\S4method{mp_cal_dist}{tbl_mpse}(.data, .abundance, distmethod = "bray", action = "add", ...)
 
-\S4method{mp_cal_dist}{grouped_df_mpse}(
-  .data,
-  .abundance,
-  distmethod = "bray",
-  action = "add",
-  na.rm = TRUE,
-  remove.dups = TRUE,
-  ...
-)
+\S4method{mp_cal_dist}{grouped_df_mpse}(.data, .abundance, distmethod = "bray", action = "add", ...)
 }
 \arguments{
 \item{.data}{MPSE or tbl_mpse object}
@@ -59,12 +27,6 @@ mp_cal_dist(
 
 \item{action}{character, "add" joins the distance data to the object, "only" return
 a non-redundant tibble with the distance information. "get" return 'dist' object.}
-
-\item{na.rm}{logical whether to drop the rows with an NA when 'dist' object is 
-converted to 'tbl_df', default is TRUE.}
-
-\item{remove.dups}{logical whether to remove duplicate entries when 'dist' object is
-converted to 'tbl_df', default is TRUE.}
 
 \item{...}{additional parameters.}
 }

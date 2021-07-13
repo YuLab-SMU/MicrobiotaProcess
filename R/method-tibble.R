@@ -119,11 +119,14 @@ as_tibble.MPSE <- function(x, ...){
     return(otuda)
 }
 
-avoid_conflict_names <- function(.data){
+avoid_conflict_names <- function(.data, spename=NULL){
     cls <- colnames(.data)
     cls <- gsub("^OTU$", "OTU.x", cls)
     cls <- gsub("^Sample$", "Sample.x", cls)
     cls <- gsub("^Abundance$", "Abundance.x", cls)
+    if(!is.null(spename)){
+        cls <- gsub(paste0("^", spename, "$"), paste0(spename, ".x"), cls)
+    }
     stats::setNames(.data, cls)
     return(.data)
 }

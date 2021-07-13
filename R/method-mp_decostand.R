@@ -55,10 +55,11 @@ setMethod("mp_decostand", signature(.data="MPSE"),function(.data, .abundance=NUL
     
     xx <- SummarizedExperiment::assays(.data)@listData
 
-    da <- xx[[rlang::as_name(.abundance)]] %>% 
+    da <- xx[[rlang::as_name(.abundance)]] %>%
+          t() %>%
           as.data.frame(check.names=FALSE)
 
-    newda <- da %>% mp_decostand(method=method, logbase=logbase, ...)
+    newda <- da %>% mp_decostand(method=method, logbase=logbase, ...) %>% t()
 
     if (method=="log"){
        newnm <- paste0(method, logbase)
