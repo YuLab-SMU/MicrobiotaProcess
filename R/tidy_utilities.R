@@ -24,3 +24,19 @@ drop_class <- function(x, class){
     class(x) <- old[!old %in% class]
     return (x)
 }
+
+add_internals_attr <- function(data, object, name){
+    if(!"internals_attr" %in% (data %>% attributes() %>% names())){
+        data %<>% add_attr(list(), name="internals_attr")
+    }
+    internals <- data %>% attr("internals_attr")
+    internals[[name]] <- object
+    data %<>% add_attr(internals, "internals_attr")
+    return(data)
+}
+
+
+add_attr <- function(x, attribute, name){
+    attr(x, name) <- attribute
+    return(x)
+}

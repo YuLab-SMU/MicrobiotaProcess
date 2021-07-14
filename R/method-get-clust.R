@@ -127,13 +127,13 @@ setMethod("mp_cal_clust", signature(.data="MPSE"), function(.data, .abundance, d
      
     if(! distmethod %in% colnames(.data@colData)){
         if (rlang::quo_is_missing(.abundance)){
-            rlang::abort("The distance is not in the object, the .abundance is required.")
+            rlang::abort("The .abundance must be required, when the distmethod is not present in the object.")
         }else{
-            distobj <- .data %>% mp_cal_dist(.abundance=.abundance, distmethod=distmethod, action="get", ...)
+            .data %<>% mp_cal_dist(.abundance=!!.abundance, distmethod=distmethod, action="add", ...)
         }
-    }else{
-        distobj <- .data %>% mp_extract_dist(distmethod=distmethod)
     }
+    
+    distobj <- .data %>% mp_extract_dist(distmethod=distmethod)
     
     res <- distobj %>% 
            hclust(method=hclustmethod) %>%
@@ -154,13 +154,13 @@ setMethod("mp_cal_clust", signature(.data="MPSE"), function(.data, .abundance, d
     .abundance <- rlang::enquo(.abundance)
     if (!distmethod %in% colnames(.data)){
         if (rlang::quo_is_missing(.abundance)){
-            rlang::abort("The distance is not in the object, the .abundance is required.")
+            rlang::abort("The .abundance must be required, when the distmethod is not present in the object.")
         }else{
-            distobj <- .data %>% mp_cal_dist(.abundance=.abundance, distmethod=distmethod, action="get", ...)
+            .data %<>% mp_cal_dist(.abundance=!!.abundance, distmethod=distmethod, action="add", ...)
         }
-    }else{
-        distobj <- .data %>% mp_extract_dist(distmethod=distmethod)
     }
+    
+    distobj <- .data %>% mp_extract_dist(distmethod=distmethod)
 
     res <- distobj %>%
            hclust(method=hclustmethod) %>%

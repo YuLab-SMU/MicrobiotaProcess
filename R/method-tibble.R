@@ -115,6 +115,7 @@ as_tibble.MPSE <- function(x, ...){
     attr(otuda, "otutree") <- x@otutree
     attr(otuda, "taxatree") <- x@taxatree
     attr(otuda, "refseq") <- x@refseq
+    attr(otuda, "internals_attr") <- x %>% attr("internals_attr")
     class(otuda) <- c("tbl_mpse", class(otuda))
     return(otuda)
 }

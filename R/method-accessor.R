@@ -108,6 +108,89 @@ setMethod("[", signature(x="MPSE"),
     return (res)
 }
 
+#' extract the abundance matrix from MPSE object or tbl_mpse object
+#' @rdname mp_extract_abundance-methods
+#' @param x MPSE or tbl_mpse object
+#' @param .abundance the name of abundance to be extracted.
+#' @param byRow logical if it is set TRUE, 'otu X sample' shape will return,
+#' else 'sample X otu' will return.
+#' @return otu abundance a data.frame object
+#' @param ... additional parameters.
+#' @export
+setGeneric("mp_extract_abundance", function(x, .abundance, byRow=TRUE, ...)standardGeneric("mp_extract_abundance"))
+
+#' @rdname mp_extract_abundance-methods
+#' @aliases mp_extract_abundance,MPSE
+#' @exportMethod mp_extract_abundance
+setMethod("mp_extract_abundance", signature(x="MPSE"), function(x, .abundance, byRow=TRUE, ...){
+
+    .abundance <- rlang::enquo(.abundance)
+    if (rlang::quo_is_missing(.abundance)){
+        rlang::abort("The abundance name is required !")
+    }
+
+    assaysvar <- SummarizedExperiment::assayNames(x)
+    if (!rlang::as_name(.abundance) %in% assaysvar){
+        rlang::abort("The abundance is not in the object!")
+    }
+
+    xx <- SummarizedExperiment::assays(x)@listData
+    dat <- xx[[rlang::as_name(.abundance)]]
+
+    if (byRow){
+        dat %<>% as.data.frame(check.names=FALSE)
+    }else{
+        dat %<>% t() %>% as.data.frame(check.names=FALSE)
+    }
+    return(dat)
+})
+
+.internal_extract_abundance <- function(x, .abundance, byRow=TRUE, ...){
+    
+    .abundance <- rlang::enquo(.abundance)
+
+    if (rlang::quo_is_missing(.abundance)){
+        rlang::abort("The abundance name is required !")
+    }
+
+    assaysvar <- x %>% attr("assaysvar")
+
+    if (!rlang::as_name(.abundance) %in% assaysvar){
+        rlang::abort("The abundance is not in the object!")
+    }
+
+    dat <- x %>% 
+        ungroup() %>%
+        select(c("OTU", "Sample", rlang::as_name(.abundance))) 
+
+    if (byRow){
+        dat %<>%
+            tidyr::pivot_wider(id_cols="OTU", 
+                               names_from="Sample", 
+                               values_from=rlang::as_name(.abundance)) %>%
+            tibble::column_to_rownames(var="OTU")
+    }else{
+        dat %<>%
+            tidyr::pivot_wider(id_cols="Sample",
+                               names_from="OTU",
+                               values_from=rlang::as_name(.abundance)) %>%
+            tibble::column_to_rownames(var="Sample")   
+    }
+    
+    return(dat)
+}
+
+#' @rdname mp_extract_abundance-methods
+#' @aliases mp_extract_abundance,tbl_mpse
+#' @exportMethod mp_extract_abundance
+setMethod("mp_extract_abundance", signature(x="tbl_mpse"), .internal_extract_abundance)
+
+#' @rdname mp_extract_abundance-methods
+#' @aliases mp_extract_abundance,grouped_df_mpse
+#' @exportMethod mp_extract_abundance
+setMethod("mp_extract_abundance", signature(x="grouped_df_mpse"), .internal_extract_abundance)
+
+
 #' @title extract the taxonomy tree in MPSE object
 #' @docType methods
 #' @rdname mp_extract_tree-methods
@@ -208,7 +291,9 @@ setMethod("mp_extract_sample", signature(x="MPSE"), function(x, ...){
     samplevar <- x %>% attr("samplevar")
     da <- x %>%
         dplyr::ungroup() %>%
-        select(samplevar)
+        select(samplevar) %>%
+        distinct()
+    return(da)
 }
 
 #' @rdname mp_extract_sample-methods
@@ -261,7 +346,8 @@ setMethod("mp_extract_feature", signature(x="MPSE"), function(x, addtaxa=FALSE, 
     taxatree <- x %>% attr("taxatree")
     da <- x %>%
         dplyr::ungroup() %>%
-        select(c("OTU", otumetavar))
+        select(c("OTU", otumetavar)) %>%
+        distinct()
     if (!is.null(taxatree)){
         taxanm <- taxatree@data %>%
                   dplyr::filter(!.data$nodeClass %in% c("OTU", "Root")) %>%

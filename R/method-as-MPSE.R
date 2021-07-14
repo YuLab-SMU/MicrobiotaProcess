@@ -25,6 +25,8 @@ setMethod("as.MPSE", signature(.data="tbl_mpse"),
         assaysvar <- attr(.data, "assaysvar")
         mutatevar <- attr(.data, "mutatevar")
 
+        internals_attr <- attr(.data, "internals_attr")
+
         .data %<>% as_tibble()
         assaysda <- lapply(assaysvar, function(x) 
             .data %>%
@@ -83,6 +85,9 @@ setMethod("as.MPSE", signature(.data="tbl_mpse"),
                       distinct() %>%
                       column_to_rownames(var="OTU")
             SummarizedExperiment::rowData(mpse) <- otumeta
+        }
+        if (!is.null(internals_attr)){
+            mpse %<>% add_attr(attribute=internals_attr, name="internals_attr")
         }
         methods::validObject(mpse)
         return (mpse)

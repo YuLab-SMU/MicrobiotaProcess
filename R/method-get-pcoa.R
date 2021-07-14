@@ -149,3 +149,128 @@ get_varct.pcoa <- function(obj,...){
         return(res)
     }
 }
+
+#' Principal Coordinate Analysis with MPSE or tbl_mpse object
+#' @rdname mp_cal_pcoa-methods
+#' @param .data MPSE or tbl_mpse object
+#' @param .abundance the name of abundance to be calculated.
+#' @param distmethod character the method to calculate distance.
+#' @param .dim integer The number of dimensions to be returned, default is 3.
+#' @param action character "add" joins the pca result to the object, "only" return
+#' a non-redundant tibble with the pca result. "get" return 'pcasample' object can
+#' be visualized with 'ggordpoint'.
+#' @param ... additional parameters see also 'mp_cal_dist'.
+#' @return update object or tbl according to the action.
+#' @export
+setGeneric("mp_cal_pcoa", function(.data, .abundance, distmethod="bray", .dim=3, action="add", ...)standardGeneric("mp_cal_pcoa"))
+
+#' @rdname mp_cal_pcoa-methods
+#' @aliases mp_cal_pcoa,MPSE
+#' @exportMethod mp_cal_pcoa
+setMethod("mp_cal_pcoa", signature(.data="MPSE"), function(.data, .abundance, distmethod="bray", .dim=3, action="add", ...){
+    
+    action %<>% match.arg(c("add", "only", "get"))
+
+    .abundance <- rlang::enquo(.abundance)
+    
+    if(! distmethod %in% colnames(.data@colData)){
+        if (rlang::quo_is_missing(.abundance)){
+            rlang::abort("The .abundance must be required, when the distmethod is not present in the object.")
+        }else{
+            .data %<>% mp_cal_dist(.abundance=!!.abundance, distmethod=distmethod, action="add", ...)
+        }
+    }
+    
+    distobj <- .data %>% mp_extract_dist(distmethod=distmethod)
+    
+    pcoa <- ape::pcoa(distobj)
+
+    if (action=="get"){
+        sampleda <- .data %>%
+                    mp_extract_sample() %>%
+                    tibble::column_to_rownames(var="Sample")
+        res <- new("pcasample", pca=pcoa, sampleda=sampleda)
+        return(res)         
+    }
+
+    da <- .data %>%
+          mp_extract_sample() %>%
+          dplyr::left_join(
+                 pcoa$vectors[, seq_len(.dim)] %>%
+                 as_tibble(rownames="Sample") %>%
+                 setNames(c("Sample", paste0("PCoA", seq_len(.dim)))),
+                 by="Sample"
+          )
+
+    if (action=="only"){
+        da %<>%
+             add_internals_attr(object=pcoa, name="PCoA")
+        return(da)
+    }else if (action=="add"){
+        .data@colData <- da %>%
+                         tibble::column_to_rownames(var="Sample") %>%
+                         S4Vectors::DataFrame()
+        .data %<>% add_internals_attr(object=pcoa, name="PCoA")
+        return(.data)
+    }
+})
+
+
+.internal_cal_pcoa <- function(.data, .abundance, distmethod="bray", .dim=3, action="add", ...){
+
+    action %<>% match.arg(c("add", "only", "get"))
+
+    .abundance <- rlang::enquo(.abundance)
+
+    if(! distmethod %in% colnames(.data)){
+        if (rlang::quo_is_missing(.abundance)){
+            rlang::abort("The .abundance must be required, when the distmethod is not present in the object.")
+        }else{
+            .data %<>% mp_cal_dist(.abundance=!!.abundance, distmethod=distmethod, action="add", ...)
+        }
+    }
+
+    distobj <- .data %>% mp_extract_dist(distmethod=distmethod)
+
+    pcoa <- ape::pcoa(distobj)
+
+    if (action=="get"){
+        sampleda <- .data %>%
+                    mp_extract_sample() %>%
+                    tibble::column_to_rownames(var="Sample")
+        res <- new("pcasample", pca=pcoa, sampleda=sampleda)
+        return(res)
+    }else if (action=="only"){
+        da <- .data %>%
+              mp_extract_sample() %>%
+              dplyr::left_join(
+                  pcoa$vectors[,seq_len(.dim)] %>%
+                  as_tibble(rownames="Sample") %>%
+                  setNames(c("Sample", paste0("PCoA", seq_len(.dim)))),
+                 by="Sample"
+              ) %>%
+              add_internals_attr(object=pcoa, name="PCoA")
+        return(da)
+    }else if (action=="add"){
+        .data %<>%
+            dplyr::left_join(
+                pcoa$vectors[,seq_len(.dim)] %>%
+                as_tibble(rownames="Sample") %>%
+                setNames(c("Sample", paste0("PCoA", seq_len(.dim)))),
+                by="Sample"
+            ) %>%
+            add_internals_attr(object=pcoa, name="PCoA")
+
+        return(.data)
+    }
+}
+
+#' @rdname mp_cal_pcoa-methods
+#' @aliases mp_cal_pcoa,tbl_mpse
+#' @exportMethod mp_cal_pcoa
+setMethod("mp_cal_pcoa", signature(.data="tbl_mpse"), .internal_cal_pcoa)
+
+#' @rdname mp_cal_pcoa-methods
+#' @aliases mp_cal_pcoa,grouped_df_mpse
+#' @exportMethod mp_cal_pcoa
+setMethod("mp_cal_pcoa", signature(.data="grouped_df_mpse"), .internal_cal_pcoa)

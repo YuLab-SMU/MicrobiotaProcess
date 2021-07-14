@@ -51,3 +51,105 @@ get_pca.phyloseq <- function(obj, method="hellinger", ...){
     pca <- get_pca.data.frame(otuda, sampleda=sampleda, method=method, ...)
     return(pca)
 }
+
+#' Principal Components Analysis with MPSE or tbl_mpse object
+#' @rdname mp_cal_pca-methods
+#' @param .data MPSE or tbl_mpse object
+#' @param .abundance the name of abundance to be calculated.
+#' @param .dim integer The number of dimensions to be returned, default is 3.
+#' @param action character "add" joins the pca result to the object, "only" return
+#' a non-redundant tibble with the pca result. "get" return 'pcasample' object can
+#' be visualized with 'ggordpoint'. 
+#' @param ... additional parameters see also 'prcomp'
+#' @return update object or tbl according to the action.
+#' @export
+setGeneric("mp_cal_pca", function(.data, .abundance, .dim=3, action="add", ...)standardGeneric("mp_cal_pca"))
+
+#' @rdname mp_cal_pca-methods
+#' @aliases mp_cal_pca,MPSE
+#' @exportMethod mp_cal_pca
+setMethod("mp_cal_pca", signature(.data="MPSE"), function(.data, .abundance, .dim=3, action="add", ...){
+
+    action %<>% match.arg(c("add", "only", "get"))
+    
+    .abundance <- rlang::enquo(.abundance)
+
+    x <- .data %>% mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+
+    pca <- prcomp(x, ...)
+    
+
+    if (action=="get"){
+        sampleda <- mp_extract_sample(.data) %>% 
+                    tibble::column_to_rownames(var="Sample")
+        res <- new("pcasample", pca=pca, sampleda=sampleda)
+        return(res)
+    }
+    da <- .data %>%  
+          mp_extract_sample() %>%
+          dplyr::left_join(
+                 pca$x[, seq_len(.dim)] %>% 
+                 as_tibble(rownames="Sample"),
+                 by="Sample"
+          ) 
+    if (action=="only"){
+        da %<>%
+             add_internals_attr(object=pca, name="PCA") 
+        return(da)
+    }else if (action=="add"){
+        .data@colData <- da %>% 
+                         tibble::column_to_rownames(var="Sample") %>% 
+                         S4Vectors::DataFrame() 
+        .data %<>% add_internals_attr(object=pca, name="PCA")
+        return(.data)    
+    }
+})
+
+.internal_cal_pca <- function(.data, .abundance, .dim=3, action="add", ...){
+    
+    action %<>% match.arg(c("add", "only", "get"))
+
+    .abundance <- rlang::enquo(.abundance)
+
+    x <- .data %>% mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+    
+    pca <- prcomp(x, ...)
+
+    if (action=="get"){
+        sampleda <- .data %>% 
+                    mp_extract_sample() %>%
+                    tibble::column_to_rownames(var="Sample")
+        res <- new("pcasample", pca=pca, sampleda=sampleda)
+        return(res)
+    }else if (action=="only"){
+        da <- .data %>%
+              mp_extract_sample() %>%
+              dplyr::left_join(
+                  pca$x[,seq_len(.dim)] %>%
+                  as_tibble(rownames="Sample"),
+                 by="Sample"
+              ) %>%
+              add_internals_attr(object=pca, name="PCA")
+        return(da)
+    }else if (action=="add"){
+        .data %<>% 
+            dplyr::left_join(
+                pca$x[,seq_len(.dim)] %>%
+                as_tibble(rownames="Sample"),
+                by="Sample"
+            ) %>%
+            add_internals_attr(object=pca, name="PCA")
+
+        return(.data)
+    }
+}
+
+#' @rdname mp_cal_pca-methods
+#' @aliases mp_cal_pca,tbl_mpse
+#' @exportMethod mp_cal_pca
+setMethod("mp_cal_pca", signature(.data="tbl_mpse"), .internal_cal_pca)
+
+#' @rdname mp_cal_pca-methods
+#' @aliases mp_cal_pca,grouped_df_mpse
+#' @exportMethod mp_cal_pca
+setMethod("mp_cal_pca", signature(.data="grouped_df_mpse"), .internal_cal_pca)
