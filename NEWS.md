@@ -1,5 +1,6 @@
 # MicrobiotaProcess 1.5.1.998
 
++ add `mp_cal_dca`, `mp_cal_nmds` and `mp_extract_internal_attr`. (2021-07-15, Thu)
 + add `mp_cal_pca`, `mp_cal_pcoa` and `mp_extract_abundance`. (2021-07-14, Wed)
 + add `mp_cal_clust` to perform the hierarchical cluster analysis of samples and `mp_extract_dist` to 
   extract the `dist` object from `MPSE` object or `tbl_mpse` object. (2021-07-13, Thu)
