@@ -19,17 +19,17 @@ mp_rrarefy for matrix object is a wrapper method of vegan::rrarefy from the vega
 package.
 }
 \usage{
-mp_rrarefy(.data, raresize, trimOTU = TRUE, seed = 123)
+mp_rrarefy(.data, raresize, trimOTU = FALSE, seed = 123)
 
-\S4method{mp_rrarefy}{matrix}(.data, raresize, trimOTU = TRUE, seed = 123)
+\S4method{mp_rrarefy}{matrix}(.data, raresize, trimOTU = FALSE, seed = 123)
 
-\S4method{mp_rrarefy}{data.frame}(.data, raresize, trimOTU = TRUE, seed = 123)
+\S4method{mp_rrarefy}{data.frame}(.data, raresize, trimOTU = FALSE, seed = 123)
 
-\S4method{mp_rrarefy}{MPSE}(.data, raresize, trimOTU = TRUE, seed = 123)
+\S4method{mp_rrarefy}{MPSE}(.data, raresize, trimOTU = FALSE, seed = 123)
 
-\S4method{mp_rrarefy}{tbl_mpse}(.data, raresize, trimOTU = TRUE, seed = 123)
+\S4method{mp_rrarefy}{tbl_mpse}(.data, raresize, trimOTU = FALSE, seed = 123)
 
-\S4method{mp_rrarefy}{grouped_df_mpse}(.data, raresize, trimOTU = TRUE, seed = 123)
+\S4method{mp_rrarefy}{grouped_df_mpse}(.data, raresize, trimOTU = FALSE, seed = 123)
 }
 \arguments{
 \item{.data}{MPSE or tbl_mpse object}

@@ -392,7 +392,7 @@ add_attr.tbl_mpse <- function(x1, x2, class="tbl_mpse"){
     attr(x1, "assaysvar") <- attr(x2, "assaysvar")
     attr(x1, "taxavar") <- attr(x2, "taxavar")
     attr(x1, "fillNAtax") <- attr(x2, "fillNAtax")
-    attr(x1, "internals_attr") <- attr(x2, "internals_attr")
+    attr(x1, "internal_attr") <- attr(x2, "internal_attr")
     otutree <- attr(x2, "otutree")
     taxatree <- attr(x2, "taxatree")
     refseq <- attr(x2, "refseq")

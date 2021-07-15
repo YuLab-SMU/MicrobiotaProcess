@@ -10,7 +10,7 @@
 ##' default is 123. 
 ##' @return update object
 ##' @export
-setGeneric("mp_rrarefy", function(.data, raresize, trimOTU=TRUE, seed=123){standardGeneric("mp_rrarefy")}) 
+setGeneric("mp_rrarefy", function(.data, raresize, trimOTU=FALSE, seed=123){standardGeneric("mp_rrarefy")}) 
 
 ##' @rdname mp_rrarefy-methods
 ##' @aliases mp_rrarefy,matrix
@@ -20,7 +20,7 @@ setGeneric("mp_rrarefy", function(.data, raresize, trimOTU=TRUE, seed=123){stand
 ##' package. 
 ##' @seealso
 ##' \link[vegan]{rrarefy}
-setMethod("mp_rrarefy", signature(.data="matrix"), function(.data, raresize, trimOTU=TRUE, seed=123){
+setMethod("mp_rrarefy", signature(.data="matrix"), function(.data, raresize, trimOTU=FALSE, seed=123){
     if (missing(raresize)||is.null(raresize)){
         raresize <- min(rowSums(.data))
     }
@@ -44,7 +44,7 @@ setMethod("mp_rrarefy", signature(.data="matrix"), function(.data, raresize, tri
 ##' @rdname mp_rrarefy-methods
 ##' @aliases mp_rrarefy,data.frame
 ##' @exportMethod mp_rrarefy
-setMethod("mp_rrarefy", signature(.data="data.frame"), function(.data, raresize, trimOTU=TRUE, seed=123){
+setMethod("mp_rrarefy", signature(.data="data.frame"), function(.data, raresize, trimOTU=FALSE, seed=123){
     .data <- as.matrix(.data)
     res <- mp_rrarefy(.data=.data, raresize=raresize, trimOTU=trimOTU, seed=seed)
     res <- data.frame(res) 
@@ -77,7 +77,7 @@ setMethod("mp_rrarefy", signature(.data="data.frame"), function(.data, raresize,
 ##' @rdname mp_rrarefy-methods
 ##' @aliases mp_rrarefy,MPSE
 ##' @exportMethod mp_rrarefy
-setMethod("mp_rrarefy", signature(.data="MPSE"), function(.data, raresize, trimOTU=TRUE, seed=123){
+setMethod("mp_rrarefy", signature(.data="MPSE"), function(.data, raresize, trimOTU=FALSE, seed=123){
     allassays <- SummarizedExperiment::assays(.data) %>% as.list()
     if ("RareAbundance" %in% names(allassays)){
         message("The RareAbundance was in the MPSE object, please check whether it has been rarefied !")
@@ -99,7 +99,7 @@ setMethod("mp_rrarefy", signature(.data="MPSE"), function(.data, raresize, trimO
 ##' @rdname mp_rrarefy-methods
 ##' @aliases mp_rrarefy,tbl_mpse
 ##' @exportMethod mp_rrarefy
-setMethod("mp_rrarefy", signature(.data="tbl_mpse"), function(.data, raresize, trimOTU=TRUE, seed=123){
+setMethod("mp_rrarefy", signature(.data="tbl_mpse"), function(.data, raresize, trimOTU=FALSE, seed=123){
     assaysvar <- attr(.data, "assaysvar")
     otutree <- attr(.data, "otutree")
     taxatree <- attr(.data, "taxatree")
@@ -140,7 +140,7 @@ setMethod("mp_rrarefy", signature(.data="tbl_mpse"), function(.data, raresize, t
 ##' @rdname mp_rrarefy-methods
 ##' @aliases mp_rrarefy,grouped_df_mpse
 ##' @exportMethod mp_rrarefy
-setMethod("mp_rrarefy", signature(.data="grouped_df_mpse"), function(.data, raresize, trimOTU=TRUE, seed=123){
+setMethod("mp_rrarefy", signature(.data="grouped_df_mpse"), function(.data, raresize, trimOTU=FALSE, seed=123){
     tmpgroups <- attr(.data, "groups")
     groupvars <- names(tmpgroups)[names(tmpgroups) != ".rows"]
     groupvars <- lapply(groupvars, function(i) as.symbol(i))

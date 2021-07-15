@@ -25,13 +25,13 @@ drop_class <- function(x, class){
     return (x)
 }
 
-add_internals_attr <- function(data, object, name){
-    if(!"internals_attr" %in% (data %>% attributes() %>% names())){
-        data %<>% add_attr(list(), name="internals_attr")
+add_internal_attr <- function(data, object, name){
+    if(!"internal_attr" %in% (data %>% attributes() %>% names())){
+        data %<>% add_attr(list(), name="internal_attr")
     }
-    internals <- data %>% attr("internals_attr")
+    internals <- data %>% attr("internal_attr")
     internals[[name]] <- object
-    data %<>% add_attr(internals, "internals_attr")
+    data %<>% add_attr(internals, "internal_attr")
     return(data)
 }
 

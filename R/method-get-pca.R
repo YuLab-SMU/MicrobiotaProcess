@@ -94,13 +94,13 @@ setMethod("mp_cal_pca", signature(.data="MPSE"), function(.data, .abundance, .di
           ) 
     if (action=="only"){
         da %<>%
-             add_internals_attr(object=pca, name="PCA") 
+             add_internal_attr(object=pca, name="PCA") 
         return(da)
     }else if (action=="add"){
         .data@colData <- da %>% 
                          tibble::column_to_rownames(var="Sample") %>% 
                          S4Vectors::DataFrame() 
-        .data %<>% add_internals_attr(object=pca, name="PCA")
+        .data %<>% add_internal_attr(object=pca, name="PCA")
         return(.data)    
     }
 })
@@ -129,7 +129,7 @@ setMethod("mp_cal_pca", signature(.data="MPSE"), function(.data, .abundance, .di
                   as_tibble(rownames="Sample"),
                  by="Sample"
               ) %>%
-              add_internals_attr(object=pca, name="PCA")
+              add_internal_attr(object=pca, name="PCA")
         return(da)
     }else if (action=="add"){
         .data %<>% 
@@ -138,7 +138,7 @@ setMethod("mp_cal_pca", signature(.data="MPSE"), function(.data, .abundance, .di
                 as_tibble(rownames="Sample"),
                 by="Sample"
             ) %>%
-            add_internals_attr(object=pca, name="PCA")
+            add_internal_attr(object=pca, name="PCA")
 
         return(.data)
     }
@@ -153,3 +153,124 @@ setMethod("mp_cal_pca", signature(.data="tbl_mpse"), .internal_cal_pca)
 #' @aliases mp_cal_pca,grouped_df_mpse
 #' @exportMethod mp_cal_pca
 setMethod("mp_cal_pca", signature(.data="grouped_df_mpse"), .internal_cal_pca)
+
+
+#' Detrended Correspondence Analysis with MPSE or tbl_mpse object
+#' @rdname mp_cal_dca-methods
+#' @param .data MPSE or tbl_mpse object
+#' @param .abundance the name of abundance to be calculated.
+#' @param .dim integer The number of dimensions to be returned, default is 3.
+#' @param action character "add" joins the 'decorana' result to the object, "only" return
+#' a non-redundant tibble with the 'decorana' result. "get" return 'decorana' object can
+#' be processed with related vegan function.
+#' @param origin logical Use true origin even in detrended correspondence analysis.
+#' default is TRUE.
+#' @param ... additional parameters see also 'vegan::decorana'
+#' @return update object or tbl according to the action.
+#' @export
+setGeneric("mp_cal_dca", function(.data, .abundance, .dim=3, action="add", origin=TRUE, ...)standardGeneric("mp_cal_dca"))
+
+#' @rdname mp_cal_dca-methods
+#' @aliases mp_cal_dca,MPSE
+#' @exportMethod mp_cal_dca
+setMethod("mp_cal_dca", signature(.data="MPSE"), function(.data, .abundance, .dim=3, action="add", origin=TRUE, ...){
+
+    action %<>% match.arg(c("add", "only", "get"))
+
+    .abundance <- rlang::enquo(.abundance)
+
+    x <- .data %>% mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+
+    dca <- vegan::decorana(x, ...)
+
+    if (action=="get"){
+        #sampleda <- mp_extract_sample(.data) %>%
+        #            tibble::column_to_rownames(var="Sample")
+        return(dca)
+    }
+    
+    dat <- switch(as.character(origin),
+                  "TRUE" = dca$rproj %>%
+                           sweep(2, dca$origin,"-"),
+                  "FALSE"= dca$rproj
+                     ) %>%
+           as_tibble(rownames="Sample") %>%
+           select(seq_len(.dim+1))
+
+    da <- .data %>%
+          mp_extract_sample() %>%
+          dplyr::left_join(
+                 dat,
+                 by="Sample"
+          )
+
+    if (action=="only"){
+        da %<>%
+             add_internal_attr(object=dca, name="DCA")
+        return(da)
+    }else if (action=="add"){
+        .data@colData <- da %>%
+                         tibble::column_to_rownames(var="Sample") %>%
+                         S4Vectors::DataFrame()
+        .data %<>% add_internal_attr(object=dca, name="DCA")
+        return(.data)
+    }            
+            
+})
+
+.internal_cal_dca <- function(.data, .abundance, .dim=3, action="add", origin=TRUE, ...){
+
+    action %<>% match.arg(c("add", "only", "get"))
+
+    .abundance <- rlang::enquo(.abundance)
+
+    x <- .data %>% mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+
+    dca <- vegan::decorana(x, ...)
+
+    if (action=="get"){
+        #sampleda <- .data %>%
+        #            mp_extract_sample() %>%
+        #            tibble::column_to_rownames(var="Sample")
+        #res <- new("pcasample", pca=pca, sampleda=sampleda)
+        return(dca)
+    }
+
+    dat <- switch(as.character(origin),
+                  "TRUE" = dca$rproj %>%
+                           sweep(2, dca$origin,"-"),
+                  "FALSE"= dca$rproj
+                     ) %>%
+              as_tibble(rownames="Sample") %>%
+              select(seq_len(.dim+1))
+
+    if (action=="only"){
+        da <- .data %>%
+              mp_extract_sample() %>%
+              dplyr::left_join(
+                  dat,
+                  by="Sample"
+              ) %>%
+              add_internal_attr(object=dca, name="DCA")
+        return(da)
+    }else if (action=="add"){
+        .data %<>%
+            dplyr::left_join(
+                dat,
+                by="Sample"
+            ) %>%
+            add_internal_attr(object=dca, name="DCA")
+
+        return(.data)
+    }
+}
+
+#' @rdname mp_cal_dca-methods
+#' @aliases mp_cal_dca,tbl_mpse
+#' @exportMethod mp_cal_dca
+setMethod("mp_cal_dca", signature(.data="tbl_mpse"), .internal_cal_dca)
+
+#' @rdname mp_cal_dca-methods
+#' @aliases mp_cal_dca,grouped_df_mpse
+#' @exportMethod mp_cal_dca
+setMethod("mp_cal_dca", signature(.data="grouped_df_mpse"), .internal_cal_dca)

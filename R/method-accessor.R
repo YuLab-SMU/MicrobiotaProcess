@@ -425,6 +425,37 @@ setMethod("mp_extract_dist", signature(x="grouped_df_mpse"), function(x, distmet
     return(res)
 })
 
+
+#' Extracting the PCA, PCoA, etc results from MPSE or tbl_mpse object
+#' @rdname mp_extract_internal_attr-methods
+#' @param x MPSE or tbl_mpse object
+#' @param name character 'PCA' or 'PCoA'
+#' @param ... additional parameters
+#' @return prcomp or pcoa etc object
+#' @export
+setGeneric("mp_extract_internal_attr", function(x, name, ...)standardGeneric("mp_extract_internal_attr"))
+
+.internal_extract_internal_attr <- function(x, name, ...){
+    dat <- x %>% attr("internal_attr")
+    message(paste0("The object contained internal attribute: ",paste0(names(dat), collapse=" ")))
+    return(dat[[name]])
+}
+
+#' @rdname mp_extract_internal_attr-methods
+#' @aliases mp_extract_internal_attr,MPSE
+#' @exportMethod mp_extract_internal_attr
+setMethod("mp_extract_internal_attr", signature(x="MPSE"), .internal_extract_internal_attr)
+
+#' @rdname mp_extract_internal_attr-methods
+#' @aliases mp_extract_internal_attr,tbl_mpse
+#' @exportMethod mp_extract_internal_attr
+setMethod("mp_extract_internal_attr", signature(x="tbl_mpse"), .internal_extract_internal_attr)
+
+#' @rdname mp_extract_internal_attr-methods
+#' @aliases mp_extract_internal_attr,grouped_df_mpse
+#' @exportMethod mp_extract_internal_attr
+setMethod("mp_extract_internal_attr", signature(x="grouped_df_mpse"), .internal_extract_internal_attr)
+
 .internal_extract_dist <- function(data, distmethod){
     if (!distmethod %in% colnames(data)){
         rlang::abort(paste0("There is not ", distmethod, 
@@ -438,7 +469,9 @@ setMethod("mp_extract_dist", signature(x="grouped_df_mpse"), function(x, distmet
             rename(x="Sample", y=paste0(distmethod,"Sampley"), r=distmethod) %>%
             corrr::retract() %>%
             tibble::column_to_rownames(var=colnames(.)[1])
-    distobj <- distobj[colnames(distobj), ] %>% stats::as.dist()
+    distobj <- distobj[colnames(distobj), ] %>% 
+               stats::as.dist() %>%
+               add_attr(distmethod, "method")
     return(distobj)
 }
 

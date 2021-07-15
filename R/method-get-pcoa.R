@@ -204,13 +204,13 @@ setMethod("mp_cal_pcoa", signature(.data="MPSE"), function(.data, .abundance, di
 
     if (action=="only"){
         da %<>%
-             add_internals_attr(object=pcoa, name="PCoA")
+             add_internal_attr(object=pcoa, name="PCoA")
         return(da)
     }else if (action=="add"){
         .data@colData <- da %>%
                          tibble::column_to_rownames(var="Sample") %>%
                          S4Vectors::DataFrame()
-        .data %<>% add_internals_attr(object=pcoa, name="PCoA")
+        .data %<>% add_internal_attr(object=pcoa, name="PCoA")
         return(.data)
     }
 })
@@ -249,7 +249,7 @@ setMethod("mp_cal_pcoa", signature(.data="MPSE"), function(.data, .abundance, di
                   setNames(c("Sample", paste0("PCoA", seq_len(.dim)))),
                  by="Sample"
               ) %>%
-              add_internals_attr(object=pcoa, name="PCoA")
+              add_internal_attr(object=pcoa, name="PCoA")
         return(da)
     }else if (action=="add"){
         .data %<>%
@@ -259,7 +259,7 @@ setMethod("mp_cal_pcoa", signature(.data="MPSE"), function(.data, .abundance, di
                 setNames(c("Sample", paste0("PCoA", seq_len(.dim)))),
                 by="Sample"
             ) %>%
-            add_internals_attr(object=pcoa, name="PCoA")
+            add_internal_attr(object=pcoa, name="PCoA")
 
         return(.data)
     }
@@ -274,3 +274,127 @@ setMethod("mp_cal_pcoa", signature(.data="tbl_mpse"), .internal_cal_pcoa)
 #' @aliases mp_cal_pcoa,grouped_df_mpse
 #' @exportMethod mp_cal_pcoa
 setMethod("mp_cal_pcoa", signature(.data="grouped_df_mpse"), .internal_cal_pcoa)
+
+#' Nonmetric Multidimensional Scaling Analysis with MPSE or tbl_mpse object
+#' @rdname mp_cal_nmds-methods
+#' @param .data MPSE or tbl_mpse object
+#' @param .abundance the name of abundance to be calculated.
+#' @param distmethod character the method to calculate distance.
+#' @param .dim integer The number of dimensions to be returned, default is 2.
+#' @param action character "add" joins the NMDS result to the object, "only" return
+#' a non-redundant tibble with the NMDS result. "get" return 'metaMDS' object can
+#' be analyzed with related 'vegan' function.
+#' @param seed a random seed to make this analysis reproducible, default is 123.
+#' @param ... additional parameters see also 'mp_cal_dist'.
+#' @return update object or tbl according to the action.
+#' @export
+setGeneric("mp_cal_nmds", function(.data, .abundance, distmethod="bray", .dim=2, action="add", seed=123, ...)standardGeneric("mp_cal_nmds"))
+
+#' @rdname mp_cal_nmds-methods
+#' @aliases mp_cal_nmds,MPSE
+#' @exportMethod mp_cal_nmds
+setMethod("mp_cal_nmds", signature(.data="MPSE"), function(.data, .abundance, distmethod="bray", .dim=2, action="add", seed=123, ...){
+
+    action %<>% match.arg(c("add", "only", "get"))
+
+    .abundance <- rlang::enquo(.abundance)
+
+    if(! distmethod %in% colnames(.data@colData)){
+        if (rlang::quo_is_missing(.abundance)){
+            rlang::abort("The .abundance must be required, when the distmethod is not present in the object.")
+        }else{
+            .data %<>% mp_cal_dist(.abundance=!!.abundance, distmethod=distmethod, action="add", ...)
+        }
+    }
+
+    distobj <- .data %>% mp_extract_dist(distmethod=distmethod)
+
+    nmds <- withr::with_seed(seed, vegan::metaMDS(distobj, distance=distmethod, k=.dim))
+
+    if (action=="get"){
+        #sampleda <- .data %>%
+        #            mp_extract_sample() %>%
+        #            tibble::column_to_rownames(var="Sample")
+        #res <- new("pcasample", pca=pcoa, sampleda=sampleda)
+        return(nmds)
+    }
+
+    da <- .data %>%
+          mp_extract_sample() %>%
+          dplyr::left_join(
+                 nmds$points[, seq_len(.dim)] %>%
+                 as_tibble(rownames="Sample") %>%
+                 setNames(c("Sample", paste0("NMDS", seq_len(.dim)))),
+                 by="Sample"
+          )
+
+    if (action=="only"){
+        da %<>%
+             add_internal_attr(object=nmds, name="NMDS")
+        return(da)
+    }else if (action=="add"){
+        .data@colData <- da %>%
+                         tibble::column_to_rownames(var="Sample") %>%
+                         S4Vectors::DataFrame()
+        .data %<>% add_internal_attr(object=nmds, name="NMDS")
+        return(.data)
+    }
+})
+
+.internal_cal_nmds <- function(.data, .abundance, distmethod="bray", .dim=2, action="add", seed=123, ...){
+
+    action %<>% match.arg(c("add", "only", "get"))
+
+    .abundance <- rlang::enquo(.abundance)
+
+    if(! distmethod %in% colnames(.data)){
+        if (rlang::quo_is_missing(.abundance)){
+            rlang::abort("The .abundance must be required, when the distmethod is not present in the object.")
+        }else{
+            .data %<>% mp_cal_dist(.abundance=!!.abundance, distmethod=distmethod, action="add", ...)
+        }
+    }
+
+    distobj <- .data %>% mp_extract_dist(distmethod=distmethod)
+   
+    nmds <- withr::with_seed(seed, vegan::metaMDS(distobj, distance=distmethod, k=.dim))
+
+    if (action=="get"){
+        #sampleda <- .data %>%
+        #            mp_extract_sample() %>%
+        #            tibble::column_to_rownames(var="Sample")
+        #res <- new("pcasample", pca=pcoa, sampleda=sampleda)
+        return(nmds)
+    }else if (action=="only"){
+        da <- .data %>%
+              mp_extract_sample() %>%
+              dplyr::left_join(
+                  nmds$points[, seq_len(.dim)] %>%
+                  as_tibble(rownames="Sample") %>%
+                  setNames(c("Sample", paste0("NMDS", seq_len(.dim)))),
+                 by="Sample"
+              ) %>%
+              add_internal_attr(object=nmds, name="NMDS")
+        return(da)
+    }else if (action=="add"){
+        .data %<>%
+            dplyr::left_join(
+                nmds$points[,seq_len(.dim)] %>%
+                as_tibble(rownames="Sample") %>%
+                setNames(c("Sample", paste0("NMDS", seq_len(.dim)))),
+                by="Sample"
+            ) %>%
+            add_internal_attr(object=nmds, name="NMDS")
+        return(.data)
+    }
+}
+
+#' @rdname mp_cal_nmds-methods
+#' @aliases mp_cal_nmds,tbl_mpse
+#' @exportMethod mp_cal_nmds
+setMethod("mp_cal_nmds", signature(.data="tbl_mpse"), .internal_cal_nmds)
+
+#' @rdname mp_cal_nmds-methods
+#' @aliases mp_cal_nmds,grouped_df_mpse
+#' @exportMethod mp_cal_nmds
+setMethod("mp_cal_nmds", signature(.data="grouped_df_mpse"), .internal_cal_nmds) 
