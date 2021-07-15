@@ -186,11 +186,11 @@ setMethod("mp_cal_pcoa", signature(.data="MPSE"), function(.data, .abundance, di
     pcoa <- ape::pcoa(distobj)
 
     if (action=="get"){
-        sampleda <- .data %>%
-                    mp_extract_sample() %>%
-                    tibble::column_to_rownames(var="Sample")
-        res <- new("pcasample", pca=pcoa, sampleda=sampleda)
-        return(res)         
+        #sampleda <- .data %>%
+        #            mp_extract_sample() %>%
+        #            tibble::column_to_rownames(var="Sample")
+        #res <- new("pcasample", pca=pcoa, sampleda=sampleda)
+        return(pcoa)         
     }
 
     da <- .data %>%
