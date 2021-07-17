@@ -1,5 +1,5 @@
 #'  Permutational Multivariate Analysis of Variance Using Distance Matrices for MPSE or tbl_mpse object
-#' @rdname mp_cal_adonis-methods
+#' @rdname mp_adonis-methods
 #' @param .data MPSE or tbl_mpse object
 #' @param .abundance the name of abundance to be calculated.
 #' @param .formula Model formula right hand side gives the continuous variables 
@@ -14,7 +14,7 @@
 #' @param ... additional parameters see also 'adonis' of vegan.
 #' @return update object according action argument
 #' @export
-setGeneric("mp_cal_adonis", function(.data, .abundance, .formula, distmethod="bray", action="get", permutations=999, seed=123, ...)standardGeneric("mp_cal_adonis"))
+setGeneric("mp_adonis", function(.data, .abundance, .formula, distmethod="bray", action="get", permutations=999, seed=123, ...)standardGeneric("mp_adonis"))
 
 .internal_cal_adonis <- function(.data, .abundance, .formula, distmethod="bray", action="get", permutations=999, seed=123, ...){
 
@@ -61,11 +61,14 @@ setGeneric("mp_cal_adonis", function(.data, .abundance, .formula, distmethod="br
         res <- withr::with_seed(seed, vegan::adonis(.formula, data=sampleda, permutations=permutations, ...))
     }
 
-    if (action %in% c("get", "only")){
+    if (action == "get"){
         return(res)
+    }else if(action == "only"){
+        da <- mp_fortify(res)
+        return(da)
     }else{
         message("The result of adonis has been saved to the internal attribute !")
-        message("It can be extracted using this-object %>% mp_extract_internal_attr(name='ADONIS')")
+        message("It can be extracted using this-object %>% mp_extract_internal_attr(name='adonis')")
         .data %<>%
             add_internal_attr(object=res, name="ADONIS")
         return(.data)
@@ -73,28 +76,27 @@ setGeneric("mp_cal_adonis", function(.data, .abundance, .formula, distmethod="br
 
 }
 
-#' @rdname mp_cal_adonis-methods
-#' @aliases mp_cal_adonis,MPSE
-#' @exportMethod mp_cal_adonis
-setMethod("mp_cal_adonis", signature(.data="MPSE"), .internal_cal_adonis)
+#' @rdname mp_adonis-methods
+#' @aliases mp_adonis,MPSE
+#' @exportMethod mp_adonis
+setMethod("mp_adonis", signature(.data="MPSE"), .internal_cal_adonis)
 
-#' @rdname mp_cal_adonis-methods
-#' @aliases mp_cal_adonis,tbl_mpse
-#' @exportMethod mp_cal_adonis
-setMethod("mp_cal_adonis", signature(.data="tbl_mpse"), .internal_cal_adonis)
+#' @rdname mp_adonis-methods
+#' @aliases mp_adonis,tbl_mpse
+#' @exportMethod mp_adonis
+setMethod("mp_adonis", signature(.data="tbl_mpse"), .internal_cal_adonis)
 
-#' @rdname mp_cal_adonis-methods
-#' @aliases mp_cal_adonis,grouped_df_mpse
-#' @exportMethod mp_cal_adonis
-setMethod("mp_cal_adonis", signature(.data="grouped_df_mpse"), .internal_cal_adonis)
+#' @rdname mp_adonis-methods
+#' @aliases mp_adonis,grouped_df_mpse
+#' @exportMethod mp_adonis
+setMethod("mp_adonis", signature(.data="grouped_df_mpse"), .internal_cal_adonis)
 
 
 #' Analysis of Similarities (ANOSIM) with MPSE or tbl_mpse object
-#' @rdname mp_cal_anosim-methods
+#' @rdname mp_anosim-methods
 #' @param .data MPSE or tbl_mpse object
 #' @param .abundance the name of abundance to be calculated.
-#' @param .formula Model formula right hand side gives the continuous variables
-#' or factors, and keep left empty, such as ~ group, it is required.
+#' @param .group The name of the column of the sample group information.
 #' @param distmethod character the method to calculate pairwise distances,
 #' default is 'bray'.
 #' @param action character "add" joins the ANOSIM result to internal attribute of 
@@ -105,7 +107,7 @@ setMethod("mp_cal_adonis", signature(.data="grouped_df_mpse"), .internal_cal_ado
 #' @param ... additional parameters see also 'anosim' of vegan.
 #' @return update object according action argument
 #' @export
-setGeneric("mp_cal_anosim", function(.data, .abundance, .group, distmethod="bray", action="add", permutations=999, seed=123, ...)standardGeneric("mp_cal_anosim"))
+setGeneric("mp_anosim", function(.data, .abundance, .group, distmethod="bray", action="add", permutations=999, seed=123, ...)standardGeneric("mp_anosim"))
 
 .internal_cal_anosim <- function(.data, .abundance, .group, distmethod="bray", action="add", permutations=999, seed=123, ...){
 
@@ -145,11 +147,14 @@ setGeneric("mp_cal_anosim", function(.data, .abundance, .group, distmethod="bray
         res <- withr::with_seed(seed, vegan::anosim(x=distobj, grouping=sampleda, permutations=permutations, ...))
     }
 
-    if (action %in% c("get", "only")){
+    if (action == "get"){
         return(res)
+    }else if (action=="only"){
+        da <- mp_fortify(res)
+        return(da)
     }else{
         message("The result of anosim has been saved to the internal attribute !")
-        message("It can be extracted using this-object %>% mp_extract_internal_attr(name='ANOSIM')")
+        message("It can be extracted using this-object %>% mp_extract_internal_attr(name='anosim')")
         .data %<>%
             add_internal_attr(object=res, name="ANOSIM")
         return(.data)
@@ -158,17 +163,17 @@ setGeneric("mp_cal_anosim", function(.data, .abundance, .group, distmethod="bray
 }
 
 
-#' @rdname mp_cal_anosim-methods
-#' @aliases mp_cal_anosim,MPSE
-#' @exportMethod mp_cal_anosim
-setMethod("mp_cal_anosim", signature(.data="MPSE"), .internal_cal_anosim)
+#' @rdname mp_anosim-methods
+#' @aliases mp_anosim,MPSE
+#' @exportMethod mp_anosim
+setMethod("mp_anosim", signature(.data="MPSE"), .internal_cal_anosim)
 
-#' @rdname mp_cal_anosim-methods
-#' @aliases mp_cal_anosim,tbl_mpse
-#' @exportMethod mp_cal_anosim
-setMethod("mp_cal_anosim", signature(.data="tbl_mpse"), .internal_cal_anosim)
+#' @rdname mp_anosim-methods
+#' @aliases mp_anosim,tbl_mpse
+#' @exportMethod mp_anosim
+setMethod("mp_anosim", signature(.data="tbl_mpse"), .internal_cal_anosim)
 
-#' @rdname mp_cal_anosim-methods
-#' @aliases mp_cal_anosim,grouped_df_mpse
-#' @exportMethod mp_cal_anosim
-setMethod("mp_cal_anosim", signature(.data="grouped_df_mpse"), .internal_cal_anosim)
+#' @rdname mp_anosim-methods
+#' @aliases mp_anosim,grouped_df_mpse
+#' @exportMethod mp_anosim
+setMethod("mp_anosim", signature(.data="grouped_df_mpse"), .internal_cal_anosim)

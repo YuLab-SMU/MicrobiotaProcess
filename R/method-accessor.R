@@ -395,33 +395,35 @@ setMethod("mp_extract_feature", signature(x="grouped_df_mpse"), .internal_extrac
 #' @rdname mp_extract_dist-methods
 #' @param x MPSE object or tbl_mpse object
 #' @param distmethod character the method of calculated distance.
+#' @param env logical whether extract the distance of samples calculated 
+#' based on continuous environment factors, default is FALSE.
 #' @return dist object.
 #' @export
-setGeneric("mp_extract_dist", function(x, distmethod)standardGeneric("mp_extract_dist"))
+setGeneric("mp_extract_dist", function(x, distmethod, env=FALSE)standardGeneric("mp_extract_dist"))
 
 #' @rdname mp_extract_dist-methods
 #' @aliases mp_extract_dist,MPSE
 #' @exportMethod mp_extract_dist
-setMethod("mp_extract_dist", signature(x="MPSE"), function(x, distmethod){
+setMethod("mp_extract_dist", signature(x="MPSE"), function(x, distmethod, env=FALSE){
     data <- x@colData %>% avoid_conflict_names() %>% as_tibble(rownames="Sample")
-    res <- .internal_extract_dist(data=data, distmethod=distmethod)
+    res <- .internal_extract_dist(data=data, distmethod=distmethod, env=env)
     return(res)
 })
 
 #' @rdname mp_extract_dist-methods
 #' @aliases mp_extract_dist,tbl_mpse
 #' @exportMethod mp_extract_dist
-setMethod("mp_extract_dist", signature(x="tbl_mpse"), function(x, distmethod){
-    res <- .internal_extract_dist(data=x, distmethod=distmethod)
+setMethod("mp_extract_dist", signature(x="tbl_mpse"), function(x, distmethod, env=FALSE){
+    res <- .internal_extract_dist(data=x, distmethod=distmethod, env=env)
     return(res)
 })
 
 #' @rdname mp_extract_dist-methods
 #' @aliases mp_extract_dist,grouped_df_mpse
 #' @exportMethod mp_extract_dist
-setMethod("mp_extract_dist", signature(x="grouped_df_mpse"), function(x, distmethod){
+setMethod("mp_extract_dist", signature(x="grouped_df_mpse"), function(x, distmethod, env=FALSE){
     data <- x %>% ungroup()
-    res <- .internal_extract_dist(data=data, distmethod=distmethod)
+    res <- .internal_extract_dist(data=data, distmethod=distmethod, env=env)
     return(res)
 })
 
@@ -438,7 +440,8 @@ setGeneric("mp_extract_internal_attr", function(x, name, ...)standardGeneric("mp
 .internal_extract_internal_attr <- function(x, name, ...){
     dat <- x %>% attr("internal_attr")
     message(paste0("The object contained internal attribute: ",paste0(names(dat), collapse=" ")))
-    return(dat[[name]])
+    indx <- grep(name, names(dat), ignore.case=TRUE)
+    return(dat[[indx]])
 }
 
 #' @rdname mp_extract_internal_attr-methods
@@ -456,17 +459,22 @@ setMethod("mp_extract_internal_attr", signature(x="tbl_mpse"), .internal_extract
 #' @exportMethod mp_extract_internal_attr
 setMethod("mp_extract_internal_attr", signature(x="grouped_df_mpse"), .internal_extract_internal_attr)
 
-.internal_extract_dist <- function(data, distmethod){
+.internal_extract_dist <- function(data, distmethod, env){
     if (!distmethod %in% colnames(data)){
         rlang::abort(paste0("There is not ", distmethod, 
                             " distance in the object, please check whether the mp_cal_dist has been performed!"))
     }
+    
+    distname <- switch(as.character(env),
+                       "TRUE" = paste0("Env_", distmethod,"Sampley"),
+                       "FALSE" = paste0(distmethod,"Sampley"))
+
     distobj <- data %>%
             select(c("Sample", distmethod)) %>%
             distinct() %>%
             tidyr::unnest() %>%
             suppressWarnings() %>%
-            rename(x="Sample", y=paste0(distmethod,"Sampley"), r=distmethod) %>%
+            rename(x="Sample", y=distname, r=distmethod) %>%
             corrr::retract() %>%
             tibble::column_to_rownames(var=colnames(.)[1])
     distobj <- distobj[colnames(distobj), ] %>% 

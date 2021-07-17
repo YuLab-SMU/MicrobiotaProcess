@@ -157,9 +157,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
           tibble::as_tibble(rownames="OTU") %>%
           tidyr::pivot_longer(!as.symbol("OTU"), names_to="Sample", values_to=rlang::as_name(.abundance))
 
-    sampleda <- .data@colData %>%
-                avoid_conflict_names() %>%
-                tibble::as_tibble(rownames="Sample")
+    sampleda <- .data %>% mp_extract_sample()
 
     if (ncol(sampleda)>1){
         da %<>% left_join(sampleda, by="Sample")
@@ -203,55 +201,58 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
                                          relative=relative))
     }
 
-    if (action %in% c("add", "get")){
-        if (rlang::quo_is_null(.group) && relative){
-            newRelabun <- paste0(c("Rel", rlang::as_name(.abundance), "BySample"), collapse="")
-            otuRelabun <- da1[[1]] %>% 
-                          select(-!!.abundance) %>%
-                          tidyr::pivot_wider(id_cols="OTU", names_from="Sample", values_from=as.symbol(newRelabun)) %>%
-                          tibble::column_to_rownames(var="OTU")
-            SummarizedExperiment::assays(.data)@listData <- c(xx, list(otuRelabun)) %>% 
-                setNames(c(assaysvar, newRelabun))
-        }
-        
-        da1 %<>% 
-             dplyr::bind_rows() %>% 
-             nest_internal() %>% 
-             rename(label="OTU")
+    if (rlang::quo_is_null(.group) && relative){
+        newRelabun <- paste0(c("Rel", rlang::as_name(.abundance), "BySample"), collapse="")
+        otuRelabun <- da1[[1]] %>% 
+                      select(-!!.abundance) %>%
+                      tidyr::pivot_wider(id_cols="OTU", names_from="Sample", values_from=as.symbol(newRelabun)) %>%
+                      tibble::column_to_rownames(var="OTU")
+        SummarizedExperiment::assays(.data)@listData <- c(xx, list(otuRelabun)) %>% 
+            setNames(c(assaysvar, newRelabun))
+    }
+    
+    da1 %<>% 
+         dplyr::bind_rows() %>% 
+         nest_internal() %>% 
+         rename(label="OTU")
 
-        if (!is.null(.data@taxatree)){
-            extranm <- setdiff(colnames(da1), c(colnames(.data@taxatree@data), colnames(.data@taxatree@extraInfo)))
-            da1 %<>% dplyr::select(extranm)
-            .data@taxatree %<>% treeio::full_join(da1, by="label")
-        }
+    if (!is.null(.data@taxatree)){
+        extranm <- setdiff(colnames(da1), c(colnames(.data@taxatree@data), colnames(.data@taxatree@extraInfo)))
+        da1 %<>% dplyr::select(extranm)
+        .data@taxatree %<>% treeio::full_join(da1, by="label")
+    }
 
-        if (!is.null(.data@otutree)){
-            da1 %<>% dplyr::filter(.data$label %in% .data@otutree@phylo$tip.label)
-            extranm <- setdiff(colnames(da1), c(colnames(.data@otutree@data), colnames(.data@otutree@extraInfo)))
-            da1 %<>% dplyr::select(extranm)
-            .data@otutree %<>% treeio::full_join(da1, by="label")
+    if (!is.null(.data@otutree)){
+        da1 %<>% dplyr::filter(.data$label %in% .data@otutree@phylo$tip.label)
+        extranm <- setdiff(colnames(da1), c(colnames(.data@otutree@data), colnames(.data@otutree@extraInfo)))
+        da1 %<>% dplyr::select(extranm)
+        .data@otutree %<>% treeio::full_join(da1, by="label")
+    }
+    
+    if (action=="add"){
+        return(.data)
+    }else if (action=="get"){
+        if (is.null(.data@taxatree)){
+            message("The taxatree of the MPSE object is empty!")
         }
-        
-        if (action=="add"){
-            return(.data)
-        }else{
-            if (is.null(.data@taxatree)){
-                message("The taxatree of the MPSE object is empty!")
-            }
-            return(.data@taxatree)
-        }
-
-    }else if(action=="only"){
-        da1 %<>% 
-            setNames(taxavar) %>%
-            dplyr::bind_rows(.id="TaxaClass") %>% 
-            dplyr::rename(AllTaxa="OTU")
-        
-        if (ncol(sampleda)>1){
-            da1 %<>% dplyr::left_join(sampleda, by="Sample")
-        }
-
-        return(da1)
+        return(.data@taxatree)
+    }else if (action=="only"){
+       if (is.null(.data@taxatree)){
+           da1 %<>% 
+               setNames(taxavar) %>%
+               dplyr::bind_rows(.id="TaxaClass") %>% 
+               dplyr::rename(AllTaxa="OTU")
+           
+           if (ncol(sampleda)>1){
+               sampleda %<>% dplyr::select(c("Sample", setdiff(colnames(sampleda), colnames(da1))))
+               da1 %<>% dplyr::left_join(sampleda, by="Sample") %>% dplyr::distinct()
+           }
+       }else{
+           da1 <- .data@taxatree %>% 
+                   as_tibble() %>%
+                   dplyr::select(-c("parent", "node", "nodeDepth"))
+       }
+       return(da1)
     }
     
 })
@@ -345,61 +346,66 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
                                          relative=relative))
     }
     
-    if (action %in% c("add", "get")){
-        if (rlang::quo_is_null(.group) && relative){
-            newRelabun <- paste0(c("Rel", rlang::as_name(.abundance), "BySample"), collapse="")
-            dx1 <- da1[[1]] %>% select(c("OTU", "Sample", as.symbol(newRelabun)))
-            othernm <- colnames(.data)[!colnames(.data) %in% c("OTU", "Sample", assaysvar)]
-            attr(.data, "assaysvar") <- c(assaysvar, newRelabun)
-            .data %<>% 
-                  left_join(dx1, by=c("OTU", "Sample")) %>%
-                  select(c("OTU", "Sample", assaysvar, newRelabun, othernm))
+    if (rlang::quo_is_null(.group) && relative){
+        newRelabun <- paste0(c("Rel", rlang::as_name(.abundance), "BySample"), collapse="")
+        dx1 <- da1[[1]] %>% select(c("OTU", "Sample", as.symbol(newRelabun)))
+        othernm <- colnames(.data)[!colnames(.data) %in% c("OTU", "Sample", assaysvar)]
+        attr(.data, "assaysvar") <- c(assaysvar, newRelabun)
+        .data %<>% 
+              left_join(dx1, by=c("OTU", "Sample")) %>%
+              select(c("OTU", "Sample", assaysvar, newRelabun, othernm))
+    }
+
+    da1 %<>%
+         dplyr::bind_rows() %>%
+         nest_internal() %>%
+         rename(label="OTU")
+
+    taxatree <- .data %>% attr("taxatree")
+
+    if (!is.null(taxatree)){
+        dat1 <- da1 %>% select(setdiff(colnames(da1), c(colnames(taxatree@data), colnames(taxatree@extraInfo))))
+        attr(.data, "taxatree") <- taxatree %>% treeio::full_join(dat1, by="label")
+    }
+    
+    otutree <- .data %>% attr("otutree")
+
+    if (!is.null(otutree)){
+        dat2 <- da1 %>% dplyr::filter(.data$label %in% .data@otutree@phylo$tip.label) %>%
+                 select(setdiff(colnames(da1), c(colnames(otutree@data), colnames(otutree@extraInfo))))
+        attr(.data, "otutree") <- otutree %>% treeio::full_join(dat2, by="label")
+    }
+    
+    if (action=="get"){
+        if (is.null(taxatree)){
+            message("The taxatree of the MPSE object is empty")
         }
 
-        da1 %<>%
-             dplyr::bind_rows() %>%
-             nest_internal() %>%
-             rename(label="OTU")
+        return(attr(.data, "taxatree"))
 
-        taxatree <- .data %>% attr("taxatree")
-
-        if (!is.null(taxatree)){
-            dat1 <- da1 %>% select(setdiff(colnames(da1), c(colnames(taxatree@data), colnames(taxatree@extraInfo))))
-            attr(.data, "taxatree") <- taxatree %>% treeio::full_join(dat1, by="label")
-        }
-     
-        otutree <- .data %>% attr("otutree")
-
-        if (!is.null(otutree)){
-            dat2 <- da1 %>% dplyr::filter(.data$label %in% .data@otutree@phylo$tip.label) %>%
-                     select(setdiff(colnames(da1), c(colnames(otutree@data), colnames(otutree@extraInfo))))
-            attr(.data, "otutree") <- otutree %>% treeio::full_join(dat2, by="label")
-        }
-        
-        if (action=="get"){
-            if (is.null(taxatree)){
-                message("The taxatree of the MPSE object is empty")
-            }
-
-            return(attr(.data, "taxatree"))
-
-        }else{
-            return(.data)
-        }
-
+    }else if (action=="add"){
+        return(.data)
     }else if(action=="only"){
-        da1 %<>%
-            setNames(taxavar) %>%
-            dplyr::bind_rows(.id="TaxaClass") %>%
-            dplyr::rename(AllTaxa="OTU")
-        
-        samplevar <- .data %>% attr("samplevar")
+        if (is.null(taxatree)){
+            da1 %<>%
+                setNames(taxavar) %>%
+                dplyr::bind_rows(.id="TaxaClass") %>%
+                dplyr::rename(AllTaxa="OTU")
+            
+            samplevar <- .data %>% attr("samplevar")
 
-        if (length(samplevar)>1){
-            sampleda <- .data %>% ungroup() %>% select(samplevar)
-            da1 %<>% dplyr::left_join(sampleda, by="Sample")
+            if (length(samplevar)>1){
+                sampleda <- .data %>% 
+                            ungroup() %>% 
+                            select(c("Sample", setdiff(samplevar, colnames(da1))))
+                da1 %<>% dplyr::left_join(sampleda, by="Sample")
+            }
+        }else{
+            da1 <- .data %>% 
+                   attr("taxatree") %>% 
+                   as_tibble %>%
+                   dplyr::select(-c("parent", "node", "nodeDepth"))
         }
-
         return(da1)
     }
 }

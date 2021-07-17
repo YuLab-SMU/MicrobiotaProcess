@@ -10,18 +10,49 @@
 \alias{mp_cal_dist,grouped_df_mpse}
 \title{Calculate the distances between the samples with specified abundance.}
 \usage{
-mp_cal_dist(.data, .abundance, distmethod = "bray", action = "add", ...)
+mp_cal_dist(
+  .data,
+  .abundance,
+  .env = NULL,
+  distmethod = "bray",
+  action = "add",
+  ...
+)
 
-\S4method{mp_cal_dist}{MPSE}(.data, .abundance, distmethod = "bray", action = "add", ...)
+\S4method{mp_cal_dist}{MPSE}(
+  .data,
+  .abundance,
+  .env = NULL,
+  distmethod = "bray",
+  action = "add",
+  ...
+)
 
-\S4method{mp_cal_dist}{tbl_mpse}(.data, .abundance, distmethod = "bray", action = "add", ...)
+\S4method{mp_cal_dist}{tbl_mpse}(
+  .data,
+  .abundance,
+  .env = NULL,
+  distmethod = "bray",
+  action = "add",
+  ...
+)
 
-\S4method{mp_cal_dist}{grouped_df_mpse}(.data, .abundance, distmethod = "bray", action = "add", ...)
+\S4method{mp_cal_dist}{grouped_df_mpse}(
+  .data,
+  .abundance,
+  .env = NULL,
+  distmethod = "bray",
+  action = "add",
+  ...
+)
 }
 \arguments{
 \item{.data}{MPSE or tbl_mpse object}
 
 \item{.abundance}{the name of otu abundance to be calculated}
+
+\item{.env}{the column names of continuous environment factors,
+default is NULL.}
 
 \item{distmethod}{character the method to calculate distance.}
 

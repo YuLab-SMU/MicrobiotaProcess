@@ -11,18 +11,21 @@
 \alias{mp_extract_dist,grouped_df_mpse}
 \title{extract the dist object from MPSE or tbl_mpse object}
 \usage{
-mp_extract_dist(x, distmethod)
+mp_extract_dist(x, distmethod, env = FALSE)
 
-\S4method{mp_extract_dist}{MPSE}(x, distmethod)
+\S4method{mp_extract_dist}{MPSE}(x, distmethod, env = FALSE)
 
-\S4method{mp_extract_dist}{tbl_mpse}(x, distmethod)
+\S4method{mp_extract_dist}{tbl_mpse}(x, distmethod, env = FALSE)
 
-\S4method{mp_extract_dist}{grouped_df_mpse}(x, distmethod)
+\S4method{mp_extract_dist}{grouped_df_mpse}(x, distmethod, env = FALSE)
 }
 \arguments{
 \item{x}{MPSE object or tbl_mpse object}
 
 \item{distmethod}{character the method of calculated distance.}
+
+\item{env}{logical whether extract the distance of samples calculated 
+based on continuous environment factors, default is FALSE.}
 }
 \value{
 dist object.

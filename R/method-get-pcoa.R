@@ -299,23 +299,27 @@ setMethod("mp_cal_nmds", signature(.data="MPSE"), function(.data, .abundance, di
 
     .abundance <- rlang::enquo(.abundance)
 
-    if(! distmethod %in% colnames(.data@colData)){
-        if (rlang::quo_is_missing(.abundance)){
-            rlang::abort("The .abundance must be required, when the distmethod is not present in the object.")
-        }else{
-            .data %<>% mp_cal_dist(.abundance=!!.abundance, distmethod=distmethod, action="add", ...)
+    if (distmethod %in% distMethods$vegdist ){
+        x <- .data %>% mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+        
+        nmds <- withr::with_seed(seed, vegan::metaMDS(x, distance=distmethod, k=.dim, ...))
+
+    }else{
+        if(! distmethod %in% colnames(.data@colData)){
+            if (rlang::quo_is_missing(.abundance)){
+                rlang::abort("The .abundance must be required, when the distmethod is not present in the object.")
+            }else{
+                .data %<>% mp_cal_dist(.abundance=!!.abundance, distmethod=distmethod, action="add")
+            }
         }
+
+        distobj <- .data %>%
+                   mp_extract_dist(distmethod=distmethod) 
+
+        nmds <- withr::with_seed(seed, vegan::metaMDS(distobj, distance=distmethod, k=.dim, ...))
     }
 
-    distobj <- .data %>% mp_extract_dist(distmethod=distmethod)
-
-    nmds <- withr::with_seed(seed, vegan::metaMDS(distobj, distance=distmethod, k=.dim))
-
     if (action=="get"){
-        #sampleda <- .data %>%
-        #            mp_extract_sample() %>%
-        #            tibble::column_to_rownames(var="Sample")
-        #res <- new("pcasample", pca=pcoa, sampleda=sampleda)
         return(nmds)
     }
 
@@ -347,23 +351,27 @@ setMethod("mp_cal_nmds", signature(.data="MPSE"), function(.data, .abundance, di
 
     .abundance <- rlang::enquo(.abundance)
 
-    if(! distmethod %in% colnames(.data)){
-        if (rlang::quo_is_missing(.abundance)){
-            rlang::abort("The .abundance must be required, when the distmethod is not present in the object.")
-        }else{
-            .data %<>% mp_cal_dist(.abundance=!!.abundance, distmethod=distmethod, action="add", ...)
+    if (distmethod %in% distMethods$vegdist ){
+        x <- .data %>% mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+
+        nmds <- withr::with_seed(seed, vegan::metaMDS(x, distance=distmethod, k=.dim, ...))
+
+    }else{
+        if(! distmethod %in% colnames(.data)){
+            if (rlang::quo_is_missing(.abundance)){
+                rlang::abort("The .abundance must be required, when the distmethod is not present in the object.")
+            }else{
+                .data %<>% mp_cal_dist(.abundance=!!.abundance, distmethod=distmethod, action="add")
+            }
         }
+
+        distobj <- .data %>%
+                   mp_extract_dist(distmethod=distmethod)
+
+        nmds <- withr::with_seed(seed, vegan::metaMDS(distobj, distance=distmethod, k=.dim, ...))
     }
 
-    distobj <- .data %>% mp_extract_dist(distmethod=distmethod)
-   
-    nmds <- withr::with_seed(seed, vegan::metaMDS(distobj, distance=distmethod, k=.dim))
-
     if (action=="get"){
-        #sampleda <- .data %>%
-        #            mp_extract_sample() %>%
-        #            tibble::column_to_rownames(var="Sample")
-        #res <- new("pcasample", pca=pcoa, sampleda=sampleda)
         return(nmds)
     }else if (action=="only"){
         da <- .data %>%

@@ -75,26 +75,26 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #' @rdname mp_cal_dist-methods
 #' @param .data MPSE or tbl_mpse object
 #' @param .abundance the name of otu abundance to be calculated
+#' @param .env the column names of continuous environment factors,
+#' default is NULL.
 #' @param distmethod character the method to calculate distance.
 #' @param action character, "add" joins the distance data to the object, "only" return
 #' a non-redundant tibble with the distance information. "get" return 'dist' object.
 #' @param ... additional parameters.
 #' @return update object or tibble according the 'action'
 #' @export
-setGeneric("mp_cal_dist", function(.data, .abundance, distmethod="bray", action="add", ...)standardGeneric("mp_cal_dist"))
+setGeneric("mp_cal_dist", function(.data, .abundance, .env=NULL, distmethod="bray", action="add", ...)standardGeneric("mp_cal_dist"))
 
 #' @rdname mp_cal_dist-methods
 #' @aliases mp_cal_dist,MPSE
 #' @importFrom rlang :=
 #' @exportMethod mp_cal_dist
-setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, distmethod="bray", action="add", ...){
+setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .env=NULL, distmethod="bray", action="add", ...){
     
     action %<>% match.arg(c("add", "get", "only"))
 
     .abundance <- rlang::enquo(.abundance)
-    if (rlang::quo_is_missing(.abundance)){
-        rlang::abort("The .abundance should be provided, it should be specified column names of abundance of feature.")
-    }
+    .env <- rlang::enquo(.env)
 
     dotargs <- list(...)
 
@@ -103,7 +103,6 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, di
         distmethod <- gsub("^(u.*)*unifrac$", "unifrac", distmethod, ignore.case = TRUE)
         distmethod <- gsub("^w.*unifrac$", "wunifrac", distmethod, ignore.case = TRUE)        
     }
-
 
     if (is.function(distmethod)){
         distfun <- distmethod
@@ -131,13 +130,27 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, di
         distfun <- vegan::designdist
     }
 
-    xx <- SummarizedExperiment::assays(.data)@listData
+    if (rlang::quo_is_missing(.abundance) && rlang::quo_is_null(.env)){
+        rlang::abort(c("The one of .abundance and .env should be provided", 
+                     "The .abundance should be specified one column name of abundance of feature or",
+                     "The .env should be specified names (>2) of continuous sample environment factor."))
+    }else if(!rlang::quo_is_null(.env)){
+        da <- .data %>% 
+              mp_extract_sample() %>%
+              column_to_rownames(var="Sample") %>%
+              dplyr::select(!!.env)
+        distsampley <- paste0("Env_", distmethod, "Sampley")
+    }else{
 
-    da <- xx[[rlang::as_name(.abundance)]] %>%
-          as.matrix() %>%
-          t() 
+        da <- .data %>% 
+              mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+        distsampley <- paste0(distmethod, "Sampley")
+    }
 
     if (distmethod %in% distMethods$UniFrac){
+        if (!rlang::quo_is_null(.env)){
+            rlang::abort("The distance of sample based on environment factor is not calculated via UniFrac method.")
+        }
         params <- c(list(da), dotargs)
     }else{
         params <- c(list(da, method=distmethod), dotargs)
@@ -148,7 +161,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, di
     if (action=="get"){
         return(da)
     }
-    distsampley <- paste0(distmethod, "Sampley")
+    
     dat <- da %>% 
         as.matrix %>% 
         corrr::as_cordf() %>% 
@@ -173,13 +186,11 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, di
 })
 
 
-.internal_cal_dist <- function(.data, .abundance, distmethod="bray", action="add", ...){
+.internal_cal_dist <- function(.data, .abundance, .env=NULL, distmethod="bray", action="add", ...){
     action %<>% match.arg(c("add", "get", "only"))
 
     .abundance <- rlang::enquo(.abundance)
-    if (rlang::quo_is_missing(.abundance)){
-        rlang::abort("The .abundance should be provided, it should be specified column names of abundance of feature.")
-    }
+    .env <- rlang::enquo(.env)
 
     if (is.character(distmethod)){
         distmethod <- gsub("^(u.*)*unifrac$", "unifrac", distmethod, ignore.case = TRUE)
@@ -215,13 +226,27 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, di
         distfun <- vegan::designdist
     }
 
-    da <- .data %>% 
-    dplyr::ungroup() %>%
-    dplyr::select(c(!!as.symbol("OTU"), !!as.symbol("Sample"), !!.abundance)) %>%
-    tidyr::pivot_wider(id_cols="Sample", names_from="OTU", values_from=!!.abundance) %>%
-    tibble::column_to_rownames(var="Sample") 
+    if (rlang::quo_is_missing(.abundance) && rlang::quo_is_null(.env)){
+        rlang::abort(c("The one of .abundance and .env should be provided",
+                     "The .abundance should be specified one column name of abundance of feature or",
+                     "The .env should be specified names (>2) of continuous sample environment factor."))
+    }else if(!rlang::quo_is_null(.env)){
+        da <- .data %>%
+              mp_extract_sample() %>%
+              column_to_rownames(var="Sample") %>%
+              dplyr::select(!!.env)
+        distsampley <- paste0("Env_", distmethod, "Sampley")
+    }else{
+
+        da <- .data %>%
+              mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+        distsampley <- paste0(distmethod, "Sampley")
+    }    
 
     if (distmethod %in% distMethods$UniFrac){
+        if (!rlang::quo_is_null(.env)){
+            rlang::abort("The distance of sample based on environment factor is not calculated via UniFrac method.")
+        }
         params <- c(list(da), dotargs)
     }else{
         params <- c(list(da, method=distmethod), dotargs)
@@ -233,7 +258,6 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, di
         return(da)
     }
 
-    distsampley <- paste0(distmethod, "Sampley")
     dat <- da %>%
         as.matrix %>%
         corrr::as_cordf() %>%
