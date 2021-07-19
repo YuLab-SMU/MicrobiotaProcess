@@ -1,5 +1,6 @@
 # MicrobiotaProcess 1.5.1.998
 
++ add `mp_mantel` and `mp_mrpp` for `MPSE` or `tbl_mpse` object. (2021-07-19, Mon)
 + add `mp_envfit` and update `mp_cal_dist` to support the distance calculation with continuous environment 
   factors and rename `mp_cal_adonis` to `mp_adonis`, `mp_cal_anosim` to `mp_anosim`. (2021-07-17, Sat)
 + add `mp_cal_rda`, `mp_cal_cca`, `mp_cal_adonis` and `mp_cal_anosim` for `MPSE` or `tbl_mpse` object. (2021-07-16, Fri)
