@@ -123,7 +123,6 @@ setGeneric("mp_extract_abundance", function(x, .abundance, byRow=TRUE, ...)stand
 #' @aliases mp_extract_abundance,MPSE
 #' @exportMethod mp_extract_abundance
 setMethod("mp_extract_abundance", signature(x="MPSE"), function(x, .abundance, byRow=TRUE, ...){
-
     .abundance <- rlang::enquo(.abundance)
     if (rlang::quo_is_missing(.abundance)){
         rlang::abort("The abundance name is required !")
@@ -460,14 +459,15 @@ setMethod("mp_extract_internal_attr", signature(x="tbl_mpse"), .internal_extract
 setMethod("mp_extract_internal_attr", signature(x="grouped_df_mpse"), .internal_extract_internal_attr)
 
 .internal_extract_dist <- function(data, distmethod, env){
+    distmethod <- switch(as.character(env),                                                                                                                                                                                               "TRUE" = paste0("Env_", distmethod),
+                       "FALSE" = distmethod)
+
     if (!distmethod %in% colnames(data)){
         rlang::abort(paste0("There is not ", distmethod, 
                             " distance in the object, please check whether the mp_cal_dist has been performed!"))
     }
     
-    distname <- switch(as.character(env),
-                       "TRUE" = paste0("Env_", distmethod,"Sampley"),
-                       "FALSE" = paste0(distmethod,"Sampley"))
+    distname <- paste0(distmethod, "Sampley")
 
     distobj <- data %>%
             select(c("Sample", distmethod)) %>%
@@ -477,7 +477,8 @@ setMethod("mp_extract_internal_attr", signature(x="grouped_df_mpse"), .internal_
             rename(x="Sample", y=distname, r=distmethod) %>%
             corrr::retract() %>%
             tibble::column_to_rownames(var=colnames(.)[1])
-    distobj <- distobj[colnames(distobj), ] %>% 
+    distobj <- distobj[colnames(distobj), ] %>%
+    #distobj[lower.tri(distobj)] <- t(distobj)[lower.tri(distobj)] 
                stats::as.dist() %>%
                add_attr(distmethod, "method")
     return(distobj)

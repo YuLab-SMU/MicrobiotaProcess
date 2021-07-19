@@ -133,12 +133,25 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
     if (rlang::quo_is_missing(.abundance) && rlang::quo_is_null(.env)){
         rlang::abort(c("The one of .abundance and .env should be provided", 
                      "The .abundance should be specified one column name of abundance of feature or",
-                     "The .env should be specified names (>2) of continuous sample environment factor."))
+                     "The .env should be specified names of continuous sample environment factor."))
     }else if(!rlang::quo_is_null(.env)){
         da <- .data %>% 
               mp_extract_sample() %>%
               column_to_rownames(var="Sample") %>%
               dplyr::select(!!.env)
+        if (ncol(da)==1 && da %>% pull(!!.env) %>% rlang::is_list()){
+            da %<>%
+                as_tibble(rownames="Sample") %>%
+                tidyr::unnest() %>%
+                suppressWarnings() %>% 
+                tidyr::pivot_wider(id_cols="Sample", 
+                                   names_from=vapply(., is.character, logical(1)) %>% 
+                                              select_true_nm(rm="Sample"), 
+                                   values_from=vapply(., is.numeric, logical(1)) %>% 
+                                               select_true_nm()
+                                  ) %>%
+                column_to_rownames(var="Sample")
+        }
         distsampley <- paste0("Env_", distmethod, "Sampley")
     }else{
 
@@ -162,22 +175,26 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
         return(da)
     }
     
+    if (!rlang::quo_is_null(.env)){
+        distmethod <- paste0("Env_", distmethod)
+    }
+
     dat <- da %>% 
         as.matrix %>% 
-        corrr::as_cordf() %>% 
+        corrr::as_cordf(diagonal=0) %>% 
         corrr::stretch(na.rm=FALSE, remove.dups=FALSE) %>%
-        dplyr::rename(!!distmethod:="r", !!distsampley:="y") #%>% 
-        #tidyr::nest(!!distmethod:=c("y", distmethod))
+        dplyr::rename(!!distmethod:="r", !!distsampley:="y") %>% 
+        tidyr::nest(!!distmethod:=c(!!as.symbol(distsampley), !!as.symbol(distmethod)))
 
+    dat <- .data@colData %>% 
+        as_tibble(rownames="Sample") %>%
+        left_join(dat, by=c("Sample"="x")) 
 
     if (action=="only"){
         return(dat)   
 
     }else if (action=="add"){
-        dat %<>% tidyr::nest(!!distmethod:=c(!!as.symbol(distsampley), !!as.symbol(distmethod)))
-        .data@colData <- .data@colData %>%
-            as_tibble(rownames="Sample") %>%
-            left_join(dat, by=c("Sample"="x")) %>%
+        .data@colData <- dat %>%
             column_to_rownames(var="Sample") %>%
             S4Vectors::DataFrame()
         return(.data)
@@ -235,6 +252,19 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
               mp_extract_sample() %>%
               column_to_rownames(var="Sample") %>%
               dplyr::select(!!.env)
+        if (ncol(da)==1 && da %>% pull(!!.env) %>% rlang::is_list()){
+            da %<>%
+                as_tibble(rownames="Sample") %>%
+                tidyr::unnest() %>%
+                suppressWarnings() %>%
+                tidyr::pivot_wider(id_cols="Sample",
+                                   names_from=vapply(., is.character, logical(1)) %>%
+                                              select_true_nm(rm="Sample"),
+                                   values_from=vapply(., is.numeric, logical(1)) %>%
+                                               select_true_nm()
+                                  ) %>%
+                column_to_rownames(var="Sample")
+        }
         distsampley <- paste0("Env_", distmethod, "Sampley")
     }else{
 
@@ -258,18 +288,23 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
         return(da)
     }
 
+    if (!rlang::quo_is_null(.env)){
+        distmethod <- paste0("Env_", distmethod)
+    }    
+
     dat <- da %>%
         as.matrix %>%
-        corrr::as_cordf() %>%
+        corrr::as_cordf(diagonal=0) %>%
         corrr::stretch(na.rm=FALSE, remove.dups=FALSE) %>%
-        dplyr::rename(!!distmethod:="r", !!distsampley:="y") #%>%
-        #tidyr::nest(!!distmethod:=c("y", distmethod))
-
+        dplyr::rename(!!distmethod:="r", !!distsampley:="y") %>%
+        tidyr::nest(!!distmethod:=c(!!as.symbol(distsampley), !!as.symbol(distmethod)))
 
     if (action=="only"){
+        dat <- .data %>% 
+               mp_extract_sample() %>%
+               dplyr::left_join(dat, by=c("Sample"="x")) 
         return(dat)
     }else if (action=="add"){
-        dat %<>% tidyr::nest(!!distmethod:=c(!!as.symbol(distsampley), !!as.symbol(distmethod)))
         .data %<>% 
             dplyr::left_join(dat, by=c("Sample"="x"))
         return(.data)
@@ -434,4 +469,10 @@ distMethods <- list(
     designdist = "ANY"
 )
 
-
+select_true_nm <- function(x, rm=NULL){
+    dat <- x[x] %>% names()
+    if (!is.null(rm)){
+       dat <- dat[!dat %in% rm]
+    }
+    return(dat)
+}
