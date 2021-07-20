@@ -78,6 +78,13 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #' @param .env the column names of continuous environment factors,
 #' default is NULL.
 #' @param distmethod character the method to calculate distance.
+#' option is "manhattan", "euclidean", "canberra", "bray", "kulczynski", 
+#' "jaccard", "gower", "altGower", "morisita", "horn", "mountford", "raup",
+#' "binomial", "chao", "cao" (implemented in vegdist of vegan), and
+#' "w", "-1", "c", "wb", "r", "I", "e", "t", "me", "j", "sor", "m", "-2", "co"
+#' "cc", "g", "-3", "l", "19", "hk", "rlb", "sim", "gl", "z" (implemented in 
+#' betadiver of vegan), "maximum", "binary", "minkowski" (implemented in dist 
+#' of stats), "unifrac", "weighted unifrac" (implement in phyloseq),
 #' @param action character, "add" joins the distance data to the object, "only" return
 #' a non-redundant tibble with the distance information. "get" return 'dist' object.
 #' @param ... additional parameters.
