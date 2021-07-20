@@ -3,12 +3,14 @@
 # MicrobiotaProcess: an R package for analysis, visualization and biomarker discovery of microbiome
 
 MicrobiotaProcess is an R package for analysis, visualization and
-biomarker discovery of microbial datasets. It supports calculating alpha
-index and provides functions to visualize rarefaction curves. Moreover,
-it also supports visualizing the abundance of taxonomy of samples. And
-It also provides functions to perform the PCA, PCoA and hierarchical
-cluster analysis. In addition, MicrobiotaProcess also provides a method
-for the biomarker discovery of metagenome or other datasets.
+biomarker discovery of microbial datasets. It introduces a tidy
+microbiome data structure paradigm and analysis grammar. It supports
+calculating alpha index and provides functions to visualize rarefaction
+curves. Moreover, it also supports visualizing the abundance of taxonomy
+of samples. And It also provides functions to perform the PCA, PCoA and
+hierarchical cluster analysis. In addition, MicrobiotaProcess also
+provides a method for the biomarker discovery of metagenome or other
+datasets.
 
 ## :writing\_hand: Authors
 
