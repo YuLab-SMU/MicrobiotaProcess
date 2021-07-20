@@ -1,4 +1,4 @@
-# MicrobiotaProcess 1.5.1.998
+# MicrobiotaProcess 1.5.2
 
 + add `mp_mantel` and `mp_mrpp` for `MPSE` or `tbl_mpse` object. (2021-07-19, Mon)
 + add `mp_envfit` and update `mp_cal_dist` to support the distance calculation with continuous environment 
