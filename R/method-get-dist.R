@@ -193,9 +193,9 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
         dplyr::rename(!!distmethod:="r", !!distsampley:="y") %>% 
         tidyr::nest(!!distmethod:=c(!!as.symbol(distsampley), !!as.symbol(distmethod)))
 
-    dat <- .data@colData %>% 
-        as_tibble(rownames="Sample") %>%
-        left_join(dat, by=c("Sample"="x")) 
+    dat <- .data %>% 
+           mp_extract_sample() %>%
+           left_join(dat, by=c("Sample"="x")) 
 
     if (action=="only"){
         return(dat)   
@@ -203,7 +203,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
     }else if (action=="add"){
         .data@colData <- dat %>%
             column_to_rownames(var="Sample") %>%
-            S4Vectors::DataFrame()
+            S4Vectors::DataFrame(check.names=FALSE)
         return(.data)
     }
           

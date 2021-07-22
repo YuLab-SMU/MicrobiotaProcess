@@ -152,16 +152,16 @@ setMethod("mp_cal_alpha", signature(.data="MPSE"),
                t() %>% 
                get_alphaindex(force=TRUE)
     if (action=="get"){
-        alphada@sampleda <- .data@colData %>% as.data.frame()
+        alphada@sampleda <- .data@colData %>% data.frame(check.names=FALSE)
         return(alphada)
     }
     da <- alphada@alpha %>% as_tibble(rownames="Sample")
-    da <- .data@colData %>%
-          as_tibble(rownames="Sample") %>%
+    da <- .data %>%
+          mp_extract_sample() %>%
           left_join(da, by="Sample") %>% 
           column_to_rownames(var="Sample")
     if (action=="add"){
-        .data@colData <- S4Vectors::DataFrame(da)
+        .data@colData <- da %>% S4Vectors::DataFrame(check.names=FALSE)
         return(.data)
     }else if (action=="only"){
         return(da)

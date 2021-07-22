@@ -66,15 +66,14 @@ as_tibble.MPSE <- function(x, ...){
 .as_tibble_MPSE <- function(x, .subset = NULL){
     .subset = rlang::enquo(.subset)
     otuda <- extract_count_data(x)
-    sampleda <- 
-        SummarizedExperiment::colData(x) %>%
-        avoid_conflict_names() %>%
-        tibble::as_tibble(rownames="Sample")
-    if (nrow(sampleda)!=0){
+    sampleda <- x %>%
+                mp_extract_sample()
+
+    if (ncol(sampleda)>1){
         otuda <- otuda %>% left_join(sampleda, by="Sample")
         samplevar <- colnames(sampleda)
     }else{
-        samplevar <- NULL
+        samplevar <- "Sample"
     }
     otumeta <-
         SummarizedExperiment::rowData(x) %>%

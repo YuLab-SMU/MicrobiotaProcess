@@ -72,7 +72,7 @@ setMethod("mp_cal_cca", signature(.data="MPSE"),function(.data, .abundance, .for
     }else if (action == "add"){
         .data@colData <- da %>% 
                          tibble::column_to_rownames(var="Sample") %>%
-                         S4Vectors::DataFrame()
+                         S4Vectors::DataFrame(check.names=FALSE)
         .data %<>% add_internal_attr(object=ccares,
                                      name = switch(method, cca="CCA", rda="RDA"))
         return(.data)

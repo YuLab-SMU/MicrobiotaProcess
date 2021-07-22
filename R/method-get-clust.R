@@ -140,6 +140,7 @@ setMethod("mp_cal_clust", signature(.data="MPSE"), function(.data, .abundance, d
            ape::as.phylo() %>%
            treeio::full_join(
             y = .data@colData %>%
+                data.frame(check.names=FALSE) %>%
                 avoid_conflict_names(spename="label") %>%
                 as_tibble(rownames="label"),
            by="label"

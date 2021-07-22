@@ -281,8 +281,9 @@ setGeneric("mp_extract_sample", function(x, ...)standardGeneric("mp_extract_samp
 #' @exportMethod mp_extract_sample
 setMethod("mp_extract_sample", signature(x="MPSE"), function(x, ...){
      da <- x@colData %>%
-        avoid_conflict_names() %>%
-        tibble::as_tibble(rownames="Sample")
+           data.frame(check.names=FALSE) %>%
+           avoid_conflict_names() %>%
+           tibble::as_tibble(rownames="Sample")
      return(da)
 })
 
@@ -404,7 +405,10 @@ setGeneric("mp_extract_dist", function(x, distmethod, env=FALSE)standardGeneric(
 #' @aliases mp_extract_dist,MPSE
 #' @exportMethod mp_extract_dist
 setMethod("mp_extract_dist", signature(x="MPSE"), function(x, distmethod, env=FALSE){
-    data <- x@colData %>% avoid_conflict_names() %>% as_tibble(rownames="Sample")
+    data <- x@colData %>%
+            data.frame(check.names=FALSE) %>%
+            avoid_conflict_names() %>% 
+            as_tibble(rownames="Sample")
     res <- .internal_extract_dist(data=data, distmethod=distmethod, env=env)
     return(res)
 })

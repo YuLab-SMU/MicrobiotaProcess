@@ -98,9 +98,8 @@ setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundanc
 
     da <- SummarizedExperiment::assays(.data)@listData[[rlang::as_name(.abundance)]] %>% as.data.frame(check.names=FALSE)
     
-    sampleda <- .data@colData %>%
-                avoid_conflict_names() %>%
-                tibble::as_tibble(rownames="Sample")
+    sampleda <- .data %>%
+                mp_extract_sample()
 
     dat <- .internal_apply_cal_rarecurve(da=da, sampleda=sampleda, chunks=chunks, seed=seed)
     if (action=="get"){
@@ -116,7 +115,7 @@ setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundanc
             as_tibble(rownames="Sample") %>%
             left_join(dat, by=c("Sample"="sample")) %>% 
             column_to_rownames(var="Sample") %>%
-            S4Vectors::DataFrame()
+            S4Vectors::DataFrame(check.names=FALSE)
         return(.data)
     }
     

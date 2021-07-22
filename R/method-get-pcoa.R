@@ -192,24 +192,24 @@ setMethod("mp_cal_pcoa", signature(.data="MPSE"), function(.data, .abundance, di
         #res <- new("pcasample", pca=pcoa, sampleda=sampleda)
         return(pcoa)         
     }
+    dat <- pcoa %>% tidydr(display=c("sites", "features"))
 
     da <- .data %>%
           mp_extract_sample() %>%
           dplyr::left_join(
-                 pcoa$vectors[, seq_len(.dim)] %>%
-                 as_tibble(rownames="Sample") %>%
-                 setNames(c("Sample", paste0("PCoA", seq_len(.dim)))),
-                 by="Sample"
+                 dat[, seq_len(.dim+1)],
+                 by=c("Sample"="sites")
           )
 
     if (action=="only"){
         da %<>%
+             add_attr(dat %>% attr("features_tb"), name="features_tb") %>%
              add_internal_attr(object=pcoa, name="PCoA")
         return(da)
     }else if (action=="add"){
         .data@colData <- da %>%
                          tibble::column_to_rownames(var="Sample") %>%
-                         S4Vectors::DataFrame()
+                         S4Vectors::DataFrame(check.names=FALSE)
         .data %<>% add_internal_attr(object=pcoa, name="PCoA")
         return(.data)
     }
@@ -339,7 +339,7 @@ setMethod("mp_cal_nmds", signature(.data="MPSE"), function(.data, .abundance, di
     }else if (action=="add"){
         .data@colData <- da %>%
                          tibble::column_to_rownames(var="Sample") %>%
-                         S4Vectors::DataFrame()
+                         S4Vectors::DataFrame(check.names=FALSE)
         .data %<>% add_internal_attr(object=nmds, name="NMDS")
         return(.data)
     }

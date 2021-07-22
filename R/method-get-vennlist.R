@@ -111,9 +111,8 @@ setMethod("mp_cal_venn", signature(.data="MPSE"), function(.data, .group, .abund
                               names_to="Sample", 
                               values_to=rlang::as_name(.abundance))
 
-    sampleda <- .data@colData %>%
-                avoid_conflict_names() %>%
-                tibble::as_tibble(rownames="Sample")
+    sampleda <- .data %>%
+                mp_extract_sample()
 
     if (ncol(sampleda)>1){
         da %<>% left_join(sampleda, by="Sample")
@@ -124,12 +123,10 @@ setMethod("mp_cal_venn", signature(.data="MPSE"), function(.data, .group, .abund
 
     if (action == "add"){
         .data@colData <- 
-             .data@colData %>%
-             avoid_conflict_names() %>%
-             tibble::as_tibble(rownames="Sample") %>%
+             sampleda %>%
              dplyr::left_join(dat, by=rlang::as_name(.group)) %>%
              tibble::column_to_rownames(var="Sample") %>%
-             S4Vectors::DataFrame()
+             S4Vectors::DataFrame(check.names=FALSE)
 
         return(.data)
     

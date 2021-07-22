@@ -120,9 +120,8 @@ setMethod("mp_cal_upset", signature(.data="MPSE"), function(.data, .group, .abun
                               names_to="Sample", 
                               values_to=rlang::as_name(.abundance))
 
-    sampleda <- .data@colData %>%
-                avoid_conflict_names() %>%
-                tibble::as_tibble(rownames="Sample")
+    sampleda <- .data %>%
+                mp_extract_sample() 
 
     if (ncol(sampleda)>1){
         da %<>% left_join(sampleda, by="Sample")
@@ -192,6 +191,7 @@ setMethod("mp_cal_upset", signature(.data="MPSE"), function(.data, .group, .abun
     upsetnm <- paste0("ggupsetOf", rlang::as_name(.group))
 
     dat <- .data %>% 
+        dplyr::mutate(across(!!.group, as.vector)) %>%
         dplyr::group_by(!!as.symbol("OTU"), !!.group) %>%
         dplyr::summarize(AbundanceBy=sum(!!.abundance)) %>%
         suppressMessages() %>% 
