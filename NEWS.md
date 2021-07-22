@@ -1,3 +1,9 @@
+# MicrobiotaProcess 1.5.2.990
+
++ add `tidydr` to convert the result of `reduce dimension` to `tbl_df`
+  - such `pca`, `pcoa`, `nmds`, `rda`, `cca`. (2021-07-22, Thu)
++ optimize the `print` for `MPSE`. (2021-07-22, Thu)
+
 # MicrobiotaProcess 1.5.2
 
 + add `mp_mantel` and `mp_mrpp` for `MPSE` or `tbl_mpse` object. (2021-07-19, Mon)
