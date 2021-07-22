@@ -180,28 +180,26 @@ NULL
 #' @method print MPSE
 #' @export
 print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
-    if (nrow(x) > 30){
-        tmpx <- x[1:min(40, nrow(x)), min(1, ncol(x)), drop=FALSE]
-    }else{
-        tmpx <- x[,1:min(20, ncol(x)), drop=FALSE]
+    if (is.null(n)){
+        n <- 10
     }
-    
-    if (!is.null(n)){
-        tmpx <- x[seq_len(n), 1:min(20, ncol(x)), drop=FALSE]
+    if (n < nrow(x)){
+        tmpx <- x[seq_len(n), seq_len(min(2, ncol(x))), drop=FALSE]
+    }else{
+        tmpx <- x[, seq_len(round(n/nrow(x))+2), drop=FALSE]
     }
 
     formatted_tb <- tmpx %>% 
                     as_tibble() %>% 
                     format(..., n = n, width = width, n_extra = n_extra)
-    total_nrows <- dim(x)[1] * dim(x)[2]
-    show_nrows <- ifelse(is.null(n), 10, n)
+    total_nrows <- nrow(x) * ncol(x)
     
     new_head = sprintf(
       "A MPSE-tibble (MPSE object) abstraction: %s",
        total_nrows %>% format(format="f", big.mark=",", digits=2)
     )
     
-    left_nrows <- total_nrows - show_nrows
+    left_nrows <- total_nrows - n
     new_tail <- sprintf("%s more rows", 
        left_nrows %>% format(format="f", big.mark=",", digits=2)
     )
@@ -210,7 +208,7 @@ print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
       {
         x = (.);
         x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
-        x[show_nrows+4] = gsub("([0-9,]+ more rows)", new_tail, x[show_nrows + 4]);
+        x[n+4] = gsub("([0-9,]+ more rows)", new_tail, x[n + 4]);
         x
       }
     formatted_mpse %>%
