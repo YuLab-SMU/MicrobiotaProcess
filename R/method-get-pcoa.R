@@ -323,17 +323,20 @@ setMethod("mp_cal_nmds", signature(.data="MPSE"), function(.data, .abundance, di
         return(nmds)
     }
 
+    dat <- nmds %>% 
+           tidydr(display=c("sites", "features"), 
+                  choices=seq_len(.dim))
+
     da <- .data %>%
           mp_extract_sample() %>%
           dplyr::left_join(
-                 nmds$points[, seq_len(.dim)] %>%
-                 as_tibble(rownames="Sample") %>%
-                 setNames(c("Sample", paste0("NMDS", seq_len(.dim)))),
-                 by="Sample"
+                 dat,
+                 by=c("Sample"="sites")
           )
 
     if (action=="only"){
         da %<>%
+             add_attr(dat %>% attr("features_tb"), name="features_tb") %>%
              add_internal_attr(object=nmds, name="NMDS")
         return(da)
     }else if (action=="add"){
@@ -341,7 +344,7 @@ setMethod("mp_cal_nmds", signature(.data="MPSE"), function(.data, .abundance, di
                          tibble::column_to_rownames(var="Sample") %>%
                          S4Vectors::DataFrame(check.names=FALSE)
         .data %<>% add_internal_attr(object=nmds, name="NMDS")
-        return(.data)
+        return (.data)
     }
 })
 
@@ -371,27 +374,28 @@ setMethod("mp_cal_nmds", signature(.data="MPSE"), function(.data, .abundance, di
         nmds <- withr::with_seed(seed, vegan::metaMDS(distobj, distance=distmethod, k=.dim, ...))
     }
 
+    dat <- nmds %>%
+           tidydr(display=c("sites", "features"), choices=seq_len(.dim))
+
     if (action=="get"){
         return(nmds)
     }else if (action=="only"){
         da <- .data %>%
               mp_extract_sample() %>%
               dplyr::left_join(
-                  nmds$points[, seq_len(.dim)] %>%
-                  as_tibble(rownames="Sample") %>%
-                  setNames(c("Sample", paste0("NMDS", seq_len(.dim)))),
-                 by="Sample"
+                  dat,
+                  by=c("Sample"="sites")
               ) %>%
+              add_attr(dat %>% attr("features_tb"), name="features_tb") %>%
               add_internal_attr(object=nmds, name="NMDS")
         return(da)
     }else if (action=="add"){
         .data %<>%
             dplyr::left_join(
-                nmds$points[,seq_len(.dim)] %>%
-                as_tibble(rownames="Sample") %>%
-                setNames(c("Sample", paste0("NMDS", seq_len(.dim)))),
-                by="Sample"
+                dat,
+                by=c("Sample"="sites")
             ) %>%
+            add_attr(dat %>% attr("features_tb"), name="features_tb") %>%
             add_internal_attr(object=nmds, name="NMDS")
         return(.data)
     }

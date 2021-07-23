@@ -4,6 +4,10 @@
 \alias{mp_envfit}
 \alias{mp_envfit,MPSE-method}
 \alias{mp_envfit,MPSE}
+\alias{mp_envfit,tbl_mpse-method}
+\alias{mp_envfit,tbl_mpse}
+\alias{mp_envfit,grouped_df_mpse-method}
+\alias{mp_envfit,grouped_df_mpse}
 \title{Fits an Environmental Vector or Factor onto an Ordination With MPSE or tbl_mpse Object}
 \usage{
 mp_envfit(
@@ -18,6 +22,28 @@ mp_envfit(
 )
 
 \S4method{mp_envfit}{MPSE}(
+  .data,
+  .ord,
+  .env,
+  .dim = 3,
+  action = "add",
+  permutations = 999,
+  seed = 123,
+  ...
+)
+
+\S4method{mp_envfit}{tbl_mpse}(
+  .data,
+  .ord,
+  .env,
+  .dim = 3,
+  action = "add",
+  permutations = 999,
+  seed = 123,
+  ...
+)
+
+\S4method{mp_envfit}{grouped_df_mpse}(
   .data,
   .ord,
   .env,

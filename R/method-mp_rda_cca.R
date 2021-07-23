@@ -57,15 +57,17 @@ setMethod("mp_cal_cca", signature(.data="MPSE"),function(.data, .abundance, .for
         return(ccares)
     }
 
-    dat <- vegan::scores(ccares, choices=seq_len(.dim))$sites %>%
-           as_tibble(rownames="Sample")
+    dat <- ccares %>% tidydr()
 
     da <- .data %>% 
           mp_extract_sample() %>%
-          dplyr::left_join(dat, by="Sample")
+          dplyr::left_join(dat[, seq_len(.dim+1)], 
+                           by=c("Sample"="sites")
+                           )
 
     if (action == "only"){
         da %<>%
+            add_total_attr(oldda=dat) %>%
             add_internal_attr(object=ccares,
                               name = switch(method, cca="CCA", rda="RDA"))
         return(da)
@@ -103,8 +105,7 @@ setMethod("mp_cal_cca", signature(.data="MPSE"),function(.data, .abundance, .for
         ccares <- cca_rda_method(x, ...)
     }
 
-    dat <- vegan::scores(ccares, choices=seq_len(.dim))$sites %>%
-           as_tibble(rownames="Sample")    
+    dat <- ccares %>% tidydr()
 
     if (action=="get"){
         return(ccares)
@@ -114,24 +115,40 @@ setMethod("mp_cal_cca", signature(.data="MPSE"),function(.data, .abundance, .for
         da <- .data %>%
               mp_extract_sample() %>%
               dplyr::left_join(
-                  dat,
-                  by="Sample"
+                  dat[,seq_len(.dim+1)],
+                  by=c("Sample"="sites")
               ) %>%
+              add_total_attr(oldda=dat) %>%
               add_internal_attr(object=ccares, 
                                 name=switch(method, cca="CCA", rda="RDA"))
         return(da)
     }else if (action=="add"){
         .data %<>%
             dplyr::left_join(
-                 dat,
-                 by="Sample"
+                 dat[,seq_len(.dim+1)],
+                 by=c("Sample"="sites")
             ) %>%
+            add_total_attr(oldda=dat) %>%
             add_internal_attr(object=ccares, 
                               name=switch(method, cca="CCA", rda="RDA"))
 
         return(.data)
     }
 }
+
+add_total_attr <- function(newda, oldda){
+    nm <- oldda %>% attributes() %>% names()
+    nm <- nm[!nm %in% c("names", "row.names", "class")]
+    
+    if (length(nm)>0){
+        for (i in nm){
+            newda %<>%
+                add_attr(oldda %>% attr(i), name=i)
+        }
+    }
+    return(newda)
+}
+
 
 #' @rdname mp_cal_cca-methods
 #' @aliases mp_cal_cca,tbl_mpse

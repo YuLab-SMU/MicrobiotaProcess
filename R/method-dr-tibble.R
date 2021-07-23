@@ -94,3 +94,72 @@ tidydr.decorana <- function(x, display="sites", digits=2, ...){
     }
     return(da)
 }
+
+#' @method tidydr metaMDS
+#' @rdname tidydr
+#' @noRd
+tidydr.metaMDS <- function(x, display="sites", ...){
+    da <- x %>% 
+          vegan::scores(display="sites",...) %>%
+          as.data.frame() %>%
+          tibble::as_tibble(rownames="sites") 
+
+    if ("features" %in% display){
+        dat <- tryCatch(
+                   vegan::scores(x, display="species", ...),
+                   error=function(i){NULL}
+               ) %>%
+               tibble::as_tibble(rownames="features")
+        da %<>% 
+            add_attr(dat, name="features_tb")
+    }
+    return(da)
+}
+
+#' @method tidydr cca
+#' @rdname tidydr
+#' @noRd
+tidydr.cca <- function(x, display=c("sp", "wa", "lc", "bp", "cn"), digits=2, ...){
+    vars <- x %>% 
+            vegan::eigenvals() %>% 
+            summary %>% 
+            data.frame %>% 
+            dplyr::slice(2) %>% 
+            as.numeric() * 100
+    vars %<>% 
+        round(digits=digits) %>% 
+        paste0("(%)")
+
+    if (length(display)<=1){
+        display <- "sp"
+    }
+    dalist <- x %>% 
+              vegan::scores(display, choices=seq_len(length(vars)), ...)
+
+    da <- dalist$sites %>%
+          as.data.frame() %>%
+          setNames(
+                   dalist$sites %>%
+                   colnames() %>%
+                   paste(vars)
+                  ) %>%
+          tibble::as_tibble(rownames="sites")
+
+    dalist <- dalist[-match("sites", names(dalist))]
+    dalist <- dalist[vapply(dalist, function(i)!all(is.na(i)), logical(1))]
+    if (length(dalist)>0){
+        leftnm <- names(dalist)
+        for (i in leftnm){
+            da %<>%
+                add_attr(dalist[[i]] %>% 
+                         tibble::as_tibble(rownames=i),
+                         name=i)
+        }
+    }
+    return(da)
+}
+
+#' @method tidydr rda
+#' @rdname tidydr
+#' @noRd
+tidydr.rda <- tidydr.cca

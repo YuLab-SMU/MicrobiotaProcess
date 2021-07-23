@@ -14,25 +14,6 @@
 #' @export
 setGeneric("mp_envfit", function(.data, .ord, .env, .dim=3, action="add", permutations=999, seed=123, ...)standardGeneric("mp_envfit"))
 
-# #' @rdname mp_envfit-methods
-# #' @aliases mp_envfit,MPSE
-# #' @exportMethod mp_envfit
-# setMethod("mp_envfit", signature(.data="MPSE"), function(.data, .ord, .env, .dim=3, action="get", permutations=999, seed=123, ...){
-#     action %<>% match.arg(c("get", "add", "only"))
-#     res <- .internal_cal_envfit(.data=.data,
-#                                 .ord = !!rlang::enquo(.ord),
-#                                 .env = !!rlang::enquo(.env),
-#                                 .dim = .dim,
-#                                 permutations = permutations,
-#                                 seed = seed)
-# 
-#     if (action=="get"){
-#         return(res)
-#     }
-# })
-
-
-              
 .internal_cal_envfit <- function(.data, .ord, .env, .dim, action="add", permutations=999, seed=123, ...){
 
     .ord <- rlang::enquo(.ord) %>%
@@ -67,7 +48,9 @@ setGeneric("mp_envfit", function(.data, .ord, .env, .dim=3, action="add", permut
     if (action=="get"){
         return(res)
     }else if (action=="only"){
-        da <- mp_fortify(res)
+        da <- .data %>% 
+              mp_extract_sample() %>%
+              add_attr(res %>% mp_fortify(), name=paste0(.ord, "_ENVFIT_tb"))
         return(da)
     }else if (action=="add"){
         attrnames <- paste0(.ord, "_ENVFIT")
@@ -83,3 +66,13 @@ setGeneric("mp_envfit", function(.data, .ord, .env, .dim=3, action="add", permut
 #' @aliases mp_envfit,MPSE
 #' @exportMethod mp_envfit
 setMethod("mp_envfit", signature(.data="MPSE"), .internal_cal_envfit)
+
+#' @rdname mp_envfit-methods
+#' @aliases mp_envfit,tbl_mpse
+#' @exportMethod mp_envfit
+setMethod("mp_envfit", signature(.data="tbl_mpse"), .internal_cal_envfit)
+
+#' @rdname mp_envfit-methods
+#' @aliases mp_envfit,grouped_df_mpse
+#' @exportMethod mp_envfit
+setMethod("mp_envfit", signature(.data="grouped_df_mpse"), .internal_cal_envfit)
