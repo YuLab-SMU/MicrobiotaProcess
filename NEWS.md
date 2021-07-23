@@ -1,5 +1,6 @@
 # MicrobiotaProcess 1.5.2.990
 
++ update the function to parsing the result of `rda`, `cca`, `envfit`. (2021-07-23, Fri)
 + add `tidydr` to convert the result of `reduce dimension` to `tbl_df`
   - such `pca`, `pcoa`, `nmds`, `rda`, `cca`. (2021-07-22, Thu)
 + optimize the `print` for `MPSE`. (2021-07-22, Thu)
