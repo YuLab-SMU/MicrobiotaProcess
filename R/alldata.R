@@ -44,3 +44,14 @@ NA
 #' @examples
 #' data(test_otu_data)
 NA
+
+#' @title (Data) An example data
+#'
+#'
+#' @description This is a MPSE object example data.
+#'
+#' @name mouse.time.mpse
+#' @aliases mouse.time.mpse
+#' @docType data
+#' @keywords data
+NA

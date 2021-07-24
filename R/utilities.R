@@ -237,7 +237,7 @@ summarySE <- function (data = NULL, measurevar, groupvars = NULL, na.rm = FALSE,
           c(N = length2(xx[, col], na.rm = na.rm), mean = mean(xx[, col], na.rm = na.rm), 
             sd = sd(xx[, col], na.rm = na.rm))
           }, measurevar, na.rm)
-    datac <- rename(datac, c(mean = measurevar))
+    datac %<>% dplyr::rename(!!measurevar:="mean")
     datac$se <- datac$sd/sqrt(datac$N)
     ciMult <- qt(conf.interval/2 + 0.5, datac$N - 1)
     datac$ci <- datac$se * ciMult

@@ -17,6 +17,7 @@
 #' @export
 #' @author Shuangbin Xu
 #' @examples
+#' \dontrun{
 #' otudafile <- system.file("extdata", "otu_tax_table.txt",
 #'                          package="MicrobiotaProcess")
 #' otuda <- read.table(otudafile, sep="\t", 
@@ -30,6 +31,7 @@
 #' dim(otudat)
 #' data(test_otu_data)
 #' keepps <- drop_taxa(test_otu_data, minocc=0.1, minabu=0)
+#' }
 setGeneric("drop_taxa",function(obj, ...){standardGeneric("drop_taxa")})
 
 #' @aliases drop_taxa,data.frame

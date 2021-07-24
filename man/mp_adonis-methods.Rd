@@ -81,3 +81,18 @@ update object according action argument
 \description{
 Permutational Multivariate Analysis of Variance Using Distance Matrices for MPSE or tbl_mpse object
 }
+\examples{
+data(mouse.time.mpse)
+mouse.time.mpse \%>\%
+  mp_decostand(
+     .abundance=Abundance, 
+     method="hellinger") \%>\%
+  mp_adonis(.abundance=hellinger, 
+            .formula=~time, 
+            distmethod="bray", 
+            permutations=9999, 
+            action="get")
+}
+\author{
+Shuangbin Xu
+}

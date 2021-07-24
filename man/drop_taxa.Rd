@@ -35,6 +35,7 @@ fewer than or equal to a threshold number of occurrences and fewer
 abundance than to a threshold abundance.
 }
 \examples{
+\dontrun{
 otudafile <- system.file("extdata", "otu_tax_table.txt",
                          package="MicrobiotaProcess")
 otuda <- read.table(otudafile, sep="\t", 
@@ -48,6 +49,7 @@ otudat <- drop_taxa(otuda, minocc=0.1, minabu=1)
 dim(otudat)
 data(test_otu_data)
 keepps <- drop_taxa(test_otu_data, minocc=0.1, minabu=0)
+}
 }
 \author{
 Shuangbin Xu

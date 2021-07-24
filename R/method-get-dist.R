@@ -12,9 +12,11 @@
 #' @return distance class contianed distmethod and originalD attr
 #' @export
 #' @examples
+#' \dontrun{
 #' data(test_otu_data)
 #' distclass <- get_dist(test_otu_data)
 #' hcsample <- get_clust(distclass)
+#' }
 get_dist <- function(obj,...){
     UseMethod("get_dist")
 }
@@ -89,7 +91,13 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #' a non-redundant tibble with the distance information. "get" return 'dist' object.
 #' @param ... additional parameters.
 #' @return update object or tibble according the 'action'
+#' @author Shuangbin Xu
 #' @export
+#' @examples
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %>%
+#' mp_decostand(.abundance=Abundance) %>% 
+#' mp_cal_dist(.abundance=hellinger)
 setGeneric("mp_cal_dist", function(.data, .abundance, .env=NULL, distmethod="bray", action="add", ...)standardGeneric("mp_cal_dist"))
 
 #' @rdname mp_cal_dist-methods

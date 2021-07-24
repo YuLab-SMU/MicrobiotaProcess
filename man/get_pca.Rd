@@ -30,13 +30,14 @@ pcasample class, contained prcomp class and sample information.
 Performs a principal components analysis
 }
 \examples{
-# don't run in examples
-#library(phyloseq)
-#data(GlobalPatterns)
-#subGlobal <- subset_samples(GlobalPatterns, 
-#         SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
-#pcares <- get_pca(subGlobal, method="hellinger")
-#pcaplot <- ggordpoint(pcares, biplot=TRUE, 
-#                      speciesannot=TRUE,
-#                      factorNames=c("SampleType"), ellipse=TRUE)
+\dontrun{
+library(phyloseq)
+data(GlobalPatterns)
+subGlobal <- subset_samples(GlobalPatterns, 
+         SampleType \%in\% c("Feces", "Mock", "Ocean", "Skin"))
+pcares <- get_pca(subGlobal, method="hellinger")
+pcaplot <- ggordpoint(pcares, biplot=TRUE, 
+                      speciesannot=TRUE,
+                      factorNames=c("SampleType"), ellipse=TRUE)
+}
 }

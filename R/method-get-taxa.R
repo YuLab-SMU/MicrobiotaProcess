@@ -19,6 +19,7 @@
 #' @export
 #' @rdname get_taxadf
 #' @examples
+#' \dontrun{
 #' library(ggplot2)
 #' data(test_otu_data)
 #' phytax <- get_taxadf(test_otu_data, taxlevel=2)
@@ -26,6 +27,7 @@
 #' head(phyloseq::otu_table(phytax))
 #' phybar <- ggbartax(phytax) + 
 #'          xlab(NULL) + ylab("relative abundance (%)")
+#' }
 setGeneric("get_taxadf", function(obj, ...)standardGeneric("get_taxadf"))
 
 #' @aliases get_taxadf,phyloseq

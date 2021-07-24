@@ -14,6 +14,7 @@
 #' @importFrom plyr ddply 
 #' @importFrom plyr numcolwise
 #' @examples
+#' \dontrun{
 #' otudafile <- system.file("extdata", "otu_tax_table.txt", 
 #'                       package="MicrobiotaProcess")
 #' samplefile <- system.file("extdata", 
@@ -28,6 +29,7 @@
 #' otuda <- otuda[sapply(otuda, is.numeric)]
 #' phycount <- get_count(otuda, taxdf[,2,drop=FALSE])
 #' phyratios <- get_ratio(otuda, taxdf[,2,drop=FALSE])
+#' }
 get_count <- function(data,
                       featurelist, ...){ 
     if (missing(featurelist) || is.null(featurelist)){

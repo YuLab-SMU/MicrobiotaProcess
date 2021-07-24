@@ -69,3 +69,20 @@ update object or tibble according the 'action'
 \description{
 Calculating the OTU for each sample or group, the result can be visualized by 'ggVennDiagram'
 }
+\examples{
+data(mouse.time.mpse)
+mouse.time.mpse \%>\%
+mp_rrarefy() \%>\%
+mp_cal_venn(.abundance=RareAbundance, .group=time, action="add") -> mpse
+mpse
+library(ggplot2)
+mpse \%>\% 
+  mp_extract_sample() \%>\% 
+  select(time, vennOftime) \%>\%
+  distinct() \%>\%
+  pull(var=vennOftime, name=time) \%>\%
+  ggVennDiagram::ggVennDiagram()
+}
+\author{
+Shuangbin Xu
+}

@@ -10,6 +10,10 @@
 ##' default is 123. 
 ##' @return update object
 ##' @export
+##' @author Shuangbin Xu
+##' @examples
+##' data(mouse.time.mpse)
+##' mouse.time.mpse %>% mp_rrarefy()
 setGeneric("mp_rrarefy", function(.data, raresize, trimOTU=FALSE, seed=123){standardGeneric("mp_rrarefy")}) 
 
 ##' @rdname mp_rrarefy-methods

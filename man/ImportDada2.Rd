@@ -39,9 +39,9 @@ seqtab <- readRDS(seqtabfile)
 taxa <- readRDS(taxafile)
 sampleda <- system.file("extdata", "mouse.time.dada2.txt", 
                         package="MicrobiotaProcess")
-ps <- import_dada2(seqtab=seqtab, taxatab=taxa,
+mpse <- mp_import_dada2(seqtab=seqtab, taxatab=taxa,
                    sampleda=sampleda)
-ps
+mpse
 }
 \author{
 Shuangbin Xu

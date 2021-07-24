@@ -11,6 +11,7 @@
 #' @rdname get_upset
 #' @export
 #' @examples
+#' \dontrun{
 #' data(test_otu_data)
 #' upsetda <- get_upset(test_otu_data, factorNames="group")
 #' otudafile <- system.file("extdata", "otu_tax_table.txt",
@@ -29,9 +30,10 @@
 #' upsetda2 <- get_upset(obj=otuda, sampleda=sampleda, 
 #'                      factorNames="group")
 #' #Then you can use `upset` of `UpSetR` to visualize the results.
-#' #library(UpSetR)
-#' #upset(upsetda, sets=c("B","D","M","N"), sets.bar.color = "#56B4E9",
-#' #      order.by = "freq", empty.intersections = "on")
+#' library(UpSetR)
+#' upset(upsetda, sets=c("B","D","M","N"), sets.bar.color = "#56B4E9",
+#'       order.by = "freq", empty.intersections = "on")
+#' }
 setGeneric("get_upset", function(obj, ...)standardGeneric("get_upset"))
 
 #' @aliases get_upset,data.frame
@@ -84,6 +86,19 @@ setMethod("get_upset", "phyloseq", function(obj,...){
 #' @param ... additional parameters.
 #' @return update object or tibble according the 'action'
 #' @export
+#' @author Shuangbin Xu
+#' @examples
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %>%
+#' mp_rrarefy() %>%
+#' mp_cal_upset(.abundance=RareAbundance, .group=time, action="only") -> tbl
+#' tbl
+#' library(ggplot2)
+#' tbl %>%
+#'   ggplot(aes(x=ggupsetOftime)) +
+#'   geom_bar() +
+#'   ggupset::scale_x_upset() +
+#'   ggupset::theme_combmatrix(combmatrix.label.extra_spacing=30)
 setGeneric("mp_cal_upset", function(.data, .group, .abundance=NULL, action="add", force=FALSE, ...)standardGeneric("mp_cal_upset"))
 
 #' @rdname mp_cal_upset-methods

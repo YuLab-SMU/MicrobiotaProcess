@@ -45,6 +45,14 @@ update object
 \description{
 This Function Provideds Several Standardization Methods for Community Data
 }
+\examples{
+data(mouse.time.mpse)
+mouse.time.mpse \%>\% 
+mp_decostand(.abundance=Abundance, method="hellinger")
+}
 \seealso{
 \link[vegan]{decostand}
+}
+\author{
+Shuangbin Xu
 }

@@ -45,9 +45,11 @@ distance class contianed distmethod and originalD attr
 calculate distance
 }
 \examples{
+\dontrun{
 data(test_otu_data)
 distclass <- get_dist(test_otu_data)
 hcsample <- get_clust(distclass)
+}
 }
 \seealso{
 \code{\link[phyloseq]{distance}}

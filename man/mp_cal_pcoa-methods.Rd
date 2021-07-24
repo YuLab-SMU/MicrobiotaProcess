@@ -67,3 +67,23 @@ update object or tbl according to the action.
 \description{
 Principal Coordinate Analysis with MPSE or tbl_mpse object
 }
+\examples{
+data(mouse.time.mpse)
+mouse.time.mpse \%>\% 
+  mp_decostand(.abundance=Abundance) \%>\% 
+  mp_cal_pcoa(.abundance=hellinger, distmethod="bray", .dim=2, action="only") -> tbl
+tbl
+x <- names(tbl)[grepl("PCo1 ", names(tbl))] \%>\% as.symbol()
+y <- names(tbl)[grepl("PCo2 ", names(tbl))] \%>\% as.symbol()
+library(ggplot2)
+tbl \%>\% 
+ ggplot(aes(x=!!x, y=!!y, color=time)) + 
+ geom_point() +
+ geom_vline(xintercept=0, color="grey20", linetype=2) + 
+ geom_hline(yintercept=0, color="grey20", linetype=2) +
+ theme_bw() +
+ theme(panel.grid=element_blank())
+}
+\author{
+Shuangbin Xu
+}

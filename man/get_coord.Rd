@@ -24,9 +24,11 @@ ordplotClass object.
 get ordination coordinates.
 }
 \examples{
+\dontrun{
 require(graphics)
 data(USArrests)
 pcares <- prcomp(USArrests, scale = TRUE)
 coordtab <- get_coord(pcares,pc=c(1, 2))
 coordtab2 <- get_coord(pcares, pc=c(2, 3))
+}
 }

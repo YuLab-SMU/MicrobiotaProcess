@@ -22,6 +22,7 @@
 #' @author Shuangbin Xu
 #' @export
 #' @examples
+#' \dontrun{
 #' data(test_otu_data)
 #' library(ggplot2)
 #' prare <- ggrarecurve(test_otu_data,
@@ -31,6 +32,7 @@
 #'          ) +
 #'          theme(legend.spacing.y=unit(0.02,"cm"),
 #'                legend.text=element_text(size=6))
+#' }
 ggrarecurve <- function(obj, ...){
     UseMethod("ggrarecurve")
 }

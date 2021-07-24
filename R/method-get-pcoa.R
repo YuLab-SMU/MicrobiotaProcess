@@ -18,17 +18,19 @@
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' library(phyloseq)
-#' data(GlobalPatterns)
-#' subGlobal <- subset_samples(GlobalPatterns, 
-#'               SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
-#' #pcoares <- get_pcoa(subGlobal, 
-#' #                   distmethod="euclidean",
-#' #                   method="hellinger")
-#' # pcoaplot <- ggordpoint(pcoares, biplot=FALSE,
-#' #                        speciesannot=FALSE,
-#' #                        factorNames=c("SampleType"), 
-#' #                        ellipse=FALSE)
+#' \dontrun{
+#'     library(phyloseq)
+#'     data(GlobalPatterns)
+#'     subGlobal <- subset_samples(GlobalPatterns, 
+#'                   SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#'     pcoares <- get_pcoa(subGlobal, 
+#'                        distmethod="euclidean",
+#'                        method="hellinger")
+#'     pcoaplot <- ggordpoint(pcoares, biplot=FALSE,
+#'                             speciesannot=FALSE,
+#'                             factorNames=c("SampleType"), 
+#'                             ellipse=FALSE)
+#' }
 get_pcoa <- function(obj, ...){
     UseMethod("get_pcoa")
 }
@@ -162,6 +164,23 @@ get_varct.pcoa <- function(obj,...){
 #' @param ... additional parameters see also 'mp_cal_dist'.
 #' @return update object or tbl according to the action.
 #' @export
+#' @author Shuangbin Xu
+#' @examples
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %>% 
+#'   mp_decostand(.abundance=Abundance) %>% 
+#'   mp_cal_pcoa(.abundance=hellinger, distmethod="bray", .dim=2, action="only") -> tbl
+#' tbl
+#' x <- names(tbl)[grepl("PCo1 ", names(tbl))] %>% as.symbol()
+#' y <- names(tbl)[grepl("PCo2 ", names(tbl))] %>% as.symbol()
+#' library(ggplot2)
+#' tbl %>% 
+#'  ggplot(aes(x=!!x, y=!!y, color=time)) + 
+#'  geom_point() +
+#'  geom_vline(xintercept=0, color="grey20", linetype=2) + 
+#'  geom_hline(yintercept=0, color="grey20", linetype=2) +
+#'  theme_bw() +
+#'  theme(panel.grid=element_blank())
 setGeneric("mp_cal_pcoa", function(.data, .abundance, distmethod="bray", .dim=3, action="add", ...)standardGeneric("mp_cal_pcoa"))
 
 #' @rdname mp_cal_pcoa-methods
@@ -287,7 +306,24 @@ setMethod("mp_cal_pcoa", signature(.data="grouped_df_mpse"), .internal_cal_pcoa)
 #' @param seed a random seed to make this analysis reproducible, default is 123.
 #' @param ... additional parameters see also 'mp_cal_dist'.
 #' @return update object or tbl according to the action.
+#' @author Shuangbin Xu
 #' @export
+#' @examples
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %>%
+#'   mp_decostand(.abundance=Abundance) %>%
+#'   mp_cal_nmds(.abundance=hellinger, distmethod="bray", .dim=2, action="only") -> tbl
+#' tbl
+#' x <- names(tbl)[grepl("NMDS1", names(tbl))] %>% as.symbol()
+#' y <- names(tbl)[grepl("NMDS2", names(tbl))] %>% as.symbol()
+#' library(ggplot2)
+#' tbl %>%
+#'  ggplot(aes(x=!!x, y=!!y, color=time)) +
+#'  geom_point() +
+#'  geom_vline(xintercept=0, color="grey20", linetype=2) +
+#'  geom_hline(yintercept=0, color="grey20", linetype=2) +
+#'  theme_bw() +
+#'  theme(panel.grid=element_blank())
 setGeneric("mp_cal_nmds", function(.data, .abundance, distmethod="bray", .dim=2, action="add", seed=123, ...)standardGeneric("mp_cal_nmds"))
 
 #' @rdname mp_cal_nmds-methods

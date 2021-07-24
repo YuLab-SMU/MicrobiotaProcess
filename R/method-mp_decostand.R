@@ -10,7 +10,12 @@
 ##' @param logbase numeric The logarithm base used in 'method=log', default is 2.
 ##' @param ... additional parameters, see also \code{\link[vegan]{decostand}}
 ##' @return update object
+##' @author Shuangbin Xu
 ##' @export
+##' @examples
+##' data(mouse.time.mpse)
+##' mouse.time.mpse %>% 
+##' mp_decostand(.abundance=Abundance, method="hellinger")
 setGeneric("mp_decostand", 
            function(.data, .abundance=NULL, method="hellinger", logbase=2, ...){
                standardGeneric("mp_decostand")}
@@ -55,9 +60,8 @@ setMethod("mp_decostand", signature(.data="MPSE"),function(.data, .abundance=NUL
     
     xx <- SummarizedExperiment::assays(.data)@listData
 
-    da <- xx[[rlang::as_name(.abundance)]] %>%
-          t() %>%
-          as.data.frame(check.names=FALSE)
+    da <- .data %>%
+          mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
 
     newda <- da %>% mp_decostand(method=method, logbase=logbase, ...) %>% t()
 
@@ -95,14 +99,10 @@ setMethod("mp_decostand", signature(.data="MPSE"),function(.data, .abundance=NUL
     othernms <- colnames(.data)[!colnames(.data) %in% c("OTU", "Sample", assaysvar)]
 
     newda <- .data %>% 
-        select(c("OTU", "Sample", rlang::as_name(.abundance))) %>%
-        tidyr::pivot_wider(id_cols="Sample", 
-                           values_from=rlang::as_name(.abundance), 
-                           names_from="OTU") %>%
-        tibble::column_to_rownames(var="Sample") %>% 
-        mp_decostand(method=method, logbase=logbase, ...) %>%
-        tibble::as_tibble(rownames="Sample") %>% 
-        tidyr::pivot_longer(!as.symbol("Sample"), values_to=newnm, names_to="OTU")
+             mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE) %>%
+             mp_decostand(method=method, logbase=logbase, ...) %>%
+             tibble::as_tibble(rownames="Sample") %>% 
+             tidyr::pivot_longer(!as.symbol("Sample"), values_to=newnm, names_to="OTU")
 
     res <- .data %>% 
             dplyr::left_join(newda, by=c("OTU", "Sample")) %>%

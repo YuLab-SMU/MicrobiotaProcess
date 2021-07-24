@@ -45,3 +45,13 @@ update object or other (refer to action)
 \description{
 calculate the alpha index with MPSE or tbl_mpse
 }
+\examples{
+data(mouse.time.mpse)
+mpse <- mouse.time.mpse \%>\% 
+        mp_rrarefy() \%>\%
+        mp_cal_alpha(.abundance=RareAbundance)
+mpse
+}
+\author{
+Shuangbin Xu
+}

@@ -8,15 +8,16 @@
 #' @return pcasample class, contained prcomp class and sample information.
 #' @export
 #' @examples
-#' # don't run in examples
-#' #library(phyloseq)
-#' #data(GlobalPatterns)
-#' #subGlobal <- subset_samples(GlobalPatterns, 
-#' #         SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
-#' #pcares <- get_pca(subGlobal, method="hellinger")
-#' #pcaplot <- ggordpoint(pcares, biplot=TRUE, 
-#' #                      speciesannot=TRUE,
-#' #                      factorNames=c("SampleType"), ellipse=TRUE)
+#' \dontrun{
+#' library(phyloseq)
+#' data(GlobalPatterns)
+#' subGlobal <- subset_samples(GlobalPatterns, 
+#'          SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#' pcares <- get_pca(subGlobal, method="hellinger")
+#' pcaplot <- ggordpoint(pcares, biplot=TRUE, 
+#'                       speciesannot=TRUE,
+#'                       factorNames=c("SampleType"), ellipse=TRUE)
+#' }
 get_pca <- function(obj,...){
     UseMethod("get_pca")
 }
@@ -63,6 +64,22 @@ get_pca.phyloseq <- function(obj, method="hellinger", ...){
 #' @param ... additional parameters see also 'prcomp'
 #' @return update object or tbl according to the action.
 #' @export
+#' @author Shuangbin Xu
+#' @examples
+#' data(mouse.time.mpse)
+#' library(ggplot2)
+#' mpse <- mouse.time.mpse %>% 
+#'           mp_decostand(.abundance=Abundance) %>% 
+#'           mp_cal_pca(.abundance=hellinger)
+#' # action = "only" to extract the non-redundant tibble to visualize
+#' tbl <- mouse.time.mpse %>%
+#'           mp_decostand(.abundance=Abundance) %>%
+#'           mp_cal_pca(.abundance=hellinger, action="only")
+#' tbl
+#' x <- names(tbl)[grepl("PC1 ", names(tbl))] %>% as.symbol()
+#' y <- names(tbl)[grepl("PC2 ", names(tbl))] %>% as.symbol()
+#' ggplot(tbl) + 
+#'  geom_point(aes(x=!!x, y=!!y, color=time))
 setGeneric("mp_cal_pca", function(.data, .abundance, .dim=3, action="add", ...)standardGeneric("mp_cal_pca"))
 
 #' @rdname mp_cal_pca-methods

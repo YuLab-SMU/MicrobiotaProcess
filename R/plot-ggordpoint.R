@@ -164,11 +164,13 @@ ggordpoint.pcasample <- function(obj,...){
 #' @return ordplotClass object.
 #' @export
 #' @examples
+#' \dontrun{
 #' require(graphics)
 #' data(USArrests)
 #' pcares <- prcomp(USArrests, scale = TRUE)
 #' coordtab <- get_coord(pcares,pc=c(1, 2))
 #' coordtab2 <- get_coord(pcares, pc=c(2, 3))
+#' }
 get_coord <- function(obj, pc){
     UseMethod("get_coord")
 }

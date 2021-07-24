@@ -74,3 +74,12 @@ update object or tibble according the 'action'
 \description{
 Calculate the distances between the samples with specified abundance.
 }
+\examples{
+data(mouse.time.mpse)
+mouse.time.mpse \%>\%
+mp_decostand(.abundance=Abundance) \%>\% 
+mp_cal_dist(.abundance=hellinger)
+}
+\author{
+Shuangbin Xu
+}

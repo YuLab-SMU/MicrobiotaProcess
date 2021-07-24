@@ -6,9 +6,12 @@
 ##' @param ... additional parameters.
 ##' @return MPSE object
 ##' @export
+##' @author Shuangbin Xu
+##' @examples
+##' data(test_otu_data)
+##' test_otu_data %>% as.MPSE -> mpse
+##' mpse
 setGeneric("as.MPSE", function(.data, ...){standardGeneric("as.MPSE")})
-
-
 
 ##' @rdname as.MPSE-methods
 ##' @aliases as.MPSE,tbl_mpse

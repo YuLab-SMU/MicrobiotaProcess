@@ -165,8 +165,8 @@
             rlang::warn(c("The number of samples in otu table is not equal the number of samples in sample data.", 
                      "The same samples will be extract automatically !"))
         
-            sampleda <- sampleda[rnm %in% flagn, , drop = FALSE]
-            otuda <- otuda[, colnm %in% flagn, drop=FALSE]
+            sampleda <- sampleda[match(flagn, rnm), , drop = FALSE]
+            otuda <- otuda[, match(flagn, colnm), drop=FALSE]
         }
     }
 
@@ -177,8 +177,8 @@
             rlang::warn(c("The number of features in otu table is not equal the number of features in taxonomy annotation.",
                           "The same features will be extract automatically !"))
         
-            taxatab <- taxatab[rnm %in% flagn, , drop = FALSE]
-            otuda <- otuda[rownm %in% flagn, , drop = FALSE]
+            taxatab <- taxatab[match(flagn, rnm), , drop = FALSE]
+            otuda <- otuda[match(flagn, rownm), , drop = FALSE]
         }
         taxatree <- convert_to_treedata2(x=data.frame(taxatab))
     }else{
@@ -196,7 +196,7 @@
         }
         if (length(rmotus) > 0 && length(rmotus) != treeio::Ntip(otutree)){
             otutree <- treeio::drop.tip(otutree, tip=rmotus)
-            otuda <- otuda[rownm %in% flagn, , drop = FALSE]
+            otuda <- otuda[match(flagn, rownm), , drop = FALSE]
             if (!is.null(taxatree) && length(rmotus) != treeio::Ntip(taxatree)){
                 taxatree <- treeio::drop.tip(taxatree, tip=rmotus, collapse.singles=FALSE)
             }else{
@@ -219,7 +219,7 @@
         }
         refseq <- refseq[flagn]
         if (length(rmotus) > 0){
-            otuda <- otuda[rownm %in% flagn, , drop = FALSE]
+            otuda <- otuda[match(flagn, rownm), , drop = FALSE]
             if (!is.null(otutree) && length(rmotus) != treeio::Ntip(otutree)){
                 otutree <- treeio::drop.tip(otutree, tip=rmotus)
             }else{
@@ -232,7 +232,6 @@
             }
         }
     }
-
     mpse <- MPSE(
                  assays = list(Abundance=otuda),
                  colData = sampleda,

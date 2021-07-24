@@ -42,3 +42,16 @@ update object according action argument
 \description{
 [Partial] [Constrained] Correspondence Analysis with MPSE or tbl_mpse object
 }
+\examples{
+library(vegan)
+data(varespec, varechem)
+mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
+mpse
+mpse \%>\% 
+    mp_cal_cca(.abundance=Abundance, 
+               .formula=~Al + P*(K + Baresoil), 
+               action="add")
+}
+\author{
+Shuangbin Xu
+}

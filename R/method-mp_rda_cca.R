@@ -13,6 +13,16 @@
 #' @param ... additional parameters see also 'cca' of vegan.
 #' @return update object according action argument
 #' @export
+#' @author Shuangbin Xu
+#' @examples
+#' library(vegan)
+#' data(varespec, varechem)
+#' mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
+#' mpse
+#' mpse %>% 
+#'     mp_cal_cca(.abundance=Abundance, 
+#'                .formula=~Al + P*(K + Baresoil), 
+#'                action="add")
 setGeneric("mp_cal_cca", function(.data, .abundance, .formula=NULL, .dim=3, action="add", ...)standardGeneric("mp_cal_cca"))
 
 #' @rdname mp_cal_cca-methods
@@ -194,6 +204,17 @@ setMethod("mp_cal_cca", signature(.data="grouped_df_mpse"), function(.data, .abu
 #' @param ... additional parameters see also 'rda' of vegan.
 #' @return update object according action argument
 #' @export
+#' @author Shuangbin Xu
+#' @examples
+#' library(vegan)
+#' data(varespec, varechem)
+#' mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
+#' mpse
+#' mpse %>% 
+#'   mp_cal_rda(.abundance=Abundance, 
+#'              .formula=~Al + P*(K + Baresoil),
+#'              .dim = 3,
+#'              action="only")
 setGeneric("mp_cal_rda", function(.data, .abundance, .formula=NULL, .dim=3, action="add", ...)standardGeneric("mp_cal_rda"))
 
 #' @rdname mp_cal_rda-methods

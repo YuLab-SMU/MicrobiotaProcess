@@ -42,3 +42,17 @@ update object according action argument
 \description{
 [Partial] [Constrained] Redundancy Analysis with MPSE or tbl_mpse object
 }
+\examples{
+library(vegan)
+data(varespec, varechem)
+mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
+mpse
+mpse \%>\% 
+  mp_cal_rda(.abundance=Abundance, 
+             .formula=~Al + P*(K + Baresoil),
+             .dim = 3,
+             action="only")
+}
+\author{
+Shuangbin Xu
+}

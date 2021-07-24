@@ -48,6 +48,7 @@ calculate the alpha index (Obseve,Chao1,Shannon,Simpson) of sample
 with \code{\link[vegan]{diversity}}
 }
 \examples{
+\dontrun{
 otudafile <- system.file("extdata", "otu_tax_table.txt", 
                         package="MicrobiotaProcess")
 otuda <- read.table(otudafile, sep="\t", 
@@ -63,6 +64,7 @@ class(test_otu_data)
 set.seed(1024)
 alphatab2 <- get_alphaindex(test_otu_data)
 head(as.data.frame(alphatab2))
+}
 }
 \author{
 Shuangbin Xu

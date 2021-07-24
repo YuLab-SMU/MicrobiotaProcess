@@ -80,3 +80,25 @@ update object according action argument
 \description{
 Analysis of Similarities (ANOSIM) with MPSE or tbl_mpse object
 }
+\examples{
+data(mouse.time.mpse)
+mouse.time.mpse \%<>\%
+  mp_decostand(.abundance=Abundance)
+# action = "get" will return a anosim object
+mouse.time.mpse \%>\% 
+  mp_anosim(.abundance=hellinger, .group=time, action="get")
+# action = "only" will return a tbl_df that can be as the input of ggplot2.
+library(ggplot2)
+tbl <- mouse.time.mpse \%>\% 
+       mp_anosim(.abundance=hellinger, 
+                 .group=time,
+                 permutations=9999,
+                 action="only")
+tbl
+tbl \%>\%
+ggplot(aes(x=class, y=rank, fill=class)) + 
+geom_boxplot(notch=TRUE, varwidth = TRUE)
+}
+\author{
+Shuangbin Xu
+}

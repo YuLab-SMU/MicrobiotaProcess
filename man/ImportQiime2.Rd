@@ -59,9 +59,9 @@ taxaqzafile <- system.file("extdata", "taxa.qza",
                            package="MicrobiotaProcess")
 mapfile <- system.file("extdata", "metadata_qza.txt",
                        package="MicrobiotaProcess")
-ps <- import_qiime2(otuqza=otuqzafile, taxaqza=taxaqzafile,
-                    mapfilename=mapfile)
-ps
+mpse <- mp_import_qiime2(otuqza=otuqzafile, taxaqza=taxaqzafile,
+                         mapfilename=mapfile)
+mpse
 }
 \author{
 Shuangbin Xu

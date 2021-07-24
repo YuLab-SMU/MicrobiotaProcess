@@ -48,6 +48,13 @@ update object
 \description{
 mp_rrarefy method
 }
+\examples{
+data(mouse.time.mpse)
+mouse.time.mpse \%>\% mp_rrarefy()
+}
 \seealso{
 \link[vegan]{rrarefy}
+}
+\author{
+Shuangbin Xu
 }
