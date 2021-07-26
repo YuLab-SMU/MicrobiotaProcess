@@ -180,19 +180,24 @@ NULL
 #' @method print MPSE
 #' @export
 print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
+    total_nrows <- nrow(x) * ncol(x)
     if (is.null(n)){
         n <- 10
     }
+
+    if (total_nrows <= n){
+        n <- total_nrows
+    }
+
     if (n < nrow(x)){
         tmpx <- x[seq_len(n), seq_len(min(2, ncol(x))), drop=FALSE]
     }else{
-        tmpx <- x[, seq_len(round(n/nrow(x))+2), drop=FALSE]
+        tmpx <- x[, seq_len(min(round(n/nrow(x))+1, ncol(x))), drop=FALSE]
     }
 
     formatted_tb <- tmpx %>% 
                     as_tibble() %>% 
                     format(..., n = n, width = width, n_extra = n_extra)
-    total_nrows <- nrow(x) * ncol(x)
     
     new_head = sprintf(
       "A MPSE-tibble (MPSE object) abstraction: %s",
@@ -200,17 +205,27 @@ print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
     )
     
     left_nrows <- total_nrows - n
-    new_tail <- sprintf("%s more rows", 
-       left_nrows %>% format(format="f", big.mark=",", digits=2)
-    )
-    formatted_mpse = 
-      formatted_tb %>%
-      {
-        x = (.);
-        x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
-        x[n+4] = gsub("([0-9,]+ more rows)", new_tail, x[n + 4]);
-        x
-      }
+    if (left_nrows > 0){
+        new_tail <- sprintf("%s more rows", 
+                            left_nrows %>% format(format="f", big.mark=",", digits=2)
+                      )
+        formatted_mpse = 
+          formatted_tb %>%
+          {
+            x = (.);
+            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
+            x[n+4] = gsub("([0-9,]+ more rows)", new_tail, x[n + 4]);
+            x
+          }
+    }else{
+        formatted_mpse =
+            formatted_tb %>%
+          {
+            x = (.);
+            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
+            x
+          }            
+    }
     formatted_mpse %>%
       append(sprintf(
         "\033[90m# OTU=%s | Samples=%s | Assays=%s | Taxanomy=%s\033[39m",

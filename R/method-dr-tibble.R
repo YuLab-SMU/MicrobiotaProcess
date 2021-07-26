@@ -163,3 +163,38 @@ tidydr.cca <- function(x, display=c("sp", "wa", "lc", "bp", "cn"), digits=2, ...
 #' @rdname tidydr
 #' @noRd
 tidydr.rda <- tidydr.cca
+
+#' Extracting the internal tbl_df attribute of tibble.
+#' @rdname dr_extract
+#' @param name character the name of internal tbl_df attribute.
+#' @param .f a function (if any, default is NULL) that pre-operate the
+#' data
+#' @export
+#' @return tbl_df object
+#' @author Shuangbin Xu
+#' @examples
+#' library(vegan)
+#' data(varespec, varechem)
+#' mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
+#' tbl <- 
+#' mpse %>%
+#'   mp_cal_nmds(.abundance=Abundance) %>%
+#'   mp_envfit(.ord=NMDS, .env=colnames(varechem), action="only") 
+#' tbl 
+#' tbl %>% attributes %>% names
+#' # This function is useful to extract the data to display with ggplot2
+#' # you can also refer to the examples of mp_envfit.
+#' dr_extract(name=NMDS_ENVFIT_tb)(tbl)
+#' # add .f function 
+#' dr_extract(name=NMDS_ENVFIT_tb, 
+#'            .f=td_filter(pvals<=0.05 & label!="Humdepth"))(tbl)
+dr_extract <- function(name, .f=NULL){
+    function(.data){
+        name <- rlang::enquo(name)
+        .data %<>% attr(rlang::as_name(name))
+        if (!is.null(.f)){
+            .data <- .f(.data)
+        }
+        return (.data)
+    }
+}

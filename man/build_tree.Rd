@@ -30,15 +30,17 @@ the phylo class of tree.
 The function can be used to building tree.
 }
 \examples{
-seqtabfile <- system.file("extdata", "seqtab.nochim.rds", 
-                          package="MicrobiotaProcess")
-seqtab <- readRDS(seqtabfile)
-refseq <- colnames(seqtab)
-names(refseq) <- paste0("OTU_",seq_len(length(refseq)))
-# refseq <- Biostrings::DNAStringSet(refseq)
-# tree <- build_tree(refseq)
-# or
-# tree <- build_tree(refseq) 
+\dontrun{
+    seqtabfile <- system.file("extdata", "seqtab.nochim.rds", 
+                              package="MicrobiotaProcess")
+    seqtab <- readRDS(seqtabfile)
+    refseq <- colnames(seqtab)
+    names(refseq) <- paste0("OTU_",seq_len(length(refseq)))
+    refseq <- Biostrings::DNAStringSet(refseq)
+    tree <- build_tree(refseq)
+    or
+    tree <- build_tree(refseq) 
+}
 }
 \author{
 Shuangbin Xu

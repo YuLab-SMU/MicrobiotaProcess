@@ -238,15 +238,17 @@ read.taxa <- function(file, parallel=FALSE){
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' seqtabfile <- system.file("extdata", "seqtab.nochim.rds", 
-#'                           package="MicrobiotaProcess")
-#' seqtab <- readRDS(seqtabfile)
-#' refseq <- colnames(seqtab)
-#' names(refseq) <- paste0("OTU_",seq_len(length(refseq)))
-#' # refseq <- Biostrings::DNAStringSet(refseq)
-#' # tree <- build_tree(refseq)
-#' # or
-#' # tree <- build_tree(refseq) 
+#' \dontrun{
+#'     seqtabfile <- system.file("extdata", "seqtab.nochim.rds", 
+#'                               package="MicrobiotaProcess")
+#'     seqtab <- readRDS(seqtabfile)
+#'     refseq <- colnames(seqtab)
+#'     names(refseq) <- paste0("OTU_",seq_len(length(refseq)))
+#'     refseq <- Biostrings::DNAStringSet(refseq)
+#'     tree <- build_tree(refseq)
+#'     or
+#'     tree <- build_tree(refseq) 
+#' }
 setGeneric("build_tree", function(seqs, ...){standardGeneric("build_tree")})
 
 #' @aliases build_tree,DNAStringSet

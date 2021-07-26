@@ -8,9 +8,11 @@
 #' @importFrom tidytree treedata
 #' @export
 #' @examples
-#' data(hmp_aerobiosis_small)
-#' head(taxda)
-#' treedat <- convert_to_treedata(taxda)
+#' \dontrun{
+#'   data(hmp_aerobiosis_small)
+#'   head(taxda)
+#'   treedat <- convert_to_treedata(taxda)
+#' }
 convert_to_treedata <- function(data, type="species", ...){
     if (!"fillNAtax" %in% names(attributes(data))){
         data <- fillNAtax(data, type=type)

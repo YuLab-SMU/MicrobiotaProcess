@@ -1,4 +1,4 @@
-#' @title NRT (Nearest Relative Index) and NTI (Nearest Taxon Index)
+#' @title NRI (Nearest Relative Index) and NTI (Nearest Taxon Index)
 #' 
 #' @description
 #' calculate NRT and NTI of sample. It is a wrapper method of picante::ses.mpd
@@ -9,7 +9,10 @@
 #' @param sampleda data.frame, sample information, row sample * column factors.
 #' @param tree tree object, it can be phylo object or treedata object.
 #' @param abundance.weighted logical, whether calculate mean nearest taxon distances for each species 
-#' weighted by species abundance, default is TRUE. 
+#' weighted by species abundance, default is TRUE.
+#' @param force logical whether calculate the index even the count of otu is
+#' not rarefied, default is FALSE. If it is TRUE, meaning the rarefaction is not be
+#' performed automatically.
 #' @param ... additional arguments see also "ses.mpd" and "ses.mntd" of "picante".
 #' @return alphasample object contained NRT and NTI.
 #' @rdname get_NRI_NTI-methods
@@ -20,11 +23,13 @@ setGeneric("get_NRI_NTI", function(obj, ...){standardGeneric("get_NRI_NTI")})
 #' @aliases get_NRI_NTI,matrix
 #' @rdname get_NRI_NTI-methods
 #' @export
-setMethod("get_NRI_NTI", "matrix", function(obj, mindepth, sampleda, tree, abundance.weighted=TRUE,...){
+setMethod("get_NRI_NTI", "matrix", function(obj, mindepth, sampleda, tree, abundance.weighted=TRUE, force=FALSE, ...){
     if (missing(mindepth) || is.null(mindepth)){
            mindepth <- min(rowSums(obj))
     }
-    obj <- vegan::rrarefy(obj, mindepth)
+    if (obj %>% rowSums %>% var != 0 && !force){
+        obj <- vegan::rrarefy(obj, mindepth)
+    }
     treedist <- cal_treedist(tree=tree)
     resnri <- picante::ses.mpd(samp=obj, dis=treedist, abundance.weighted=abundance.weighted, ...)
     resnti <- picante::ses.mntd(samp=obj, dis=treedist, abundance.weighted=abundance.weighted, ...)
@@ -78,3 +83,124 @@ cal_treedist <- function(tree){
     }
     return (treedist)
 }
+
+#' Calculating NRI (Nearest Relative Index) and NTI (Nearest Taxon Index) with MPSE or tbl_mpse object
+#' @param .data object, MPSE or tbl_mpse object
+#' @param .abundance The column name of OTU abundance column to be calculate.
+#' @param action character it has three options, "add" joins the new information
+#' to the input tbl (default), "only" return a non-redundant tibble with the just
+#' new information, ang 'get' return a 'alphasample' object.
+#' @param abundance.weighted logical, whether calculate mean nearest taxon distances for each species
+#' weighted by species abundance, default is TRUE.
+#' @param force logical whether calculate the alpha index even the '.abundance' is
+#' not rarefied, default is FALSE.
+#' @param ... additional arguments see also "ses.mpd" and "ses.mntd" of "picante".
+#' @return update object.
+#' @rdname mp_cal_NRI_NTI-methods
+#' @author Shuangbin Xu
+#' @export
+setGeneric("mp_cal_NRI_NTI", function(.data, .abundance, action="add", abundance.weighted=TRUE, force=FALSE, ...)standardGeneric("mp_cal_NRI_NTI"))
+
+#' @rdname mp_cal_NRI_NTI-methods
+#' @aliases mp_cal_NRI_NTI,MPSE
+#' @exportMethod mp_cal_NRI_NTI
+setMethod("mp_cal_NRI_NTI", signature(.data="MPSE"), function(.data, .abundance, action="add", abundance.weighted=TRUE, force=FALSE, ...){
+    action %<>% match.arg(c("add", "only", "get"))
+
+    res <- .internal_cal_NRI_NTI(.data=.data,
+                                 .abundance=!!rlang::enquo(.abundance),
+                                 abundance.weighted=abundance.weighted,
+                                 force=force,
+                                 ...)
+    if (action=="get"){
+        res@sampleda <- .data %>%
+                         mp_extract_sample() %>%
+                         tibble::column_to_rownames(var="Sample")
+        return(res)
+    }
+
+    da <- res@alpha %>% as_tibble(rownames="Sample")
+
+    da <- .data %>%
+          mp_extract_sample() %>%
+          left_join(da, by="Sample") %>%
+          column_to_rownames(var="Sample")
+    if (action=="add"){
+        .data@colData <- da %>% S4Vectors::DataFrame(check.names=FALSE)
+        return(.data)
+    }else if (action=="only"){
+        return(da)
+    }
+
+})
+          
+.internal_cal_NRI_NTI <- function(.data, .abundance, abundance.weighted=TRUE, force=FALSE, ...){
+
+    .abundance <- rlang::enquo(.abundance)
+    if (rlang::quo_is_null(.abundance)){
+        .abundance <- as.symbol("RareAbundance")
+    }
+
+    otutree <- .data %>%
+               mp_extract_tree(type="otutree")
+
+    if (is.null(otutree)){
+        rlang::abort("The otutree is required to calculate the NRI and NTI !")
+    }
+
+    if (!valid_rare(.data, .abundance=.abundance) && !force){
+        glue::glue("The rarefied abundance of species might not be provided. Rarefaction of all
+                    observations is performed automatically. If you still want to calculate the
+                    alpha index with the '.abundance', you can set 'force=TRUE'. ")
+        .data <- mp_rrarefy(.data=.data, ...)
+        .abundance <- as.symbol("RareAbundance")
+    }
+
+    indexda <- .data %>% 
+               mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE) %>%
+               as.matrix() %>%
+               get_NRI_NTI(tree=otutree@phylo, force=TRUE, abundance.weighted=TRUE, ...)
+
+    return(indexda)
+}
+
+.internal_cal_NRI_NTI_ <- function(.data, .abundance, action="add", abundance.weighted=TRUE, force=FALSE, ...){
+    action %<>% match.arg(c("add", "only", "get"))
+    res <- .internal_cal_NRI_NTI(.data=.data,
+                                 .abundance=!!rlang::enquo(.abundance),
+                                 force=force,
+                                 ...)
+    if (action=="get"){
+        res@sampleda <- .data %>%
+                         mp_extract_sample() %>%
+                         tibble::column_to_rownames(var="Sample")
+        return(res)
+    }
+
+    da <- res@alpha %>% as_tibble(rownames="Sample")
+
+    da <- .data %>%
+          mp_extract_sample() %>%
+          left_join(da, by="Sample") %>%
+          column_to_rownames(var="Sample")
+    if (action=="add"){
+        samplevar <- .data %>% attr("samplevar")
+        assaysvar <- .data %>% attr("assaysvar")
+        othernm <- colnames(.data)[!colnames(.data) %in% c("OTU", "Sample", assaysvar, samplevar)]
+        .data %<>% left_join(da, by="Sample") %>%
+                   select(c("OTU", "Sample", assaysvar, samplevar, colnames(da), othernm))
+        return(.data)
+    }else if (action=="only"){
+        return(da)
+    }
+}
+
+#' @rdname mp_cal_NRI_NTI-methods
+#' @aliases mp_cal_NRI_NTI,tbl_mpse
+#' @exportMethod mp_cal_NRI_NTI
+setMethod("mp_cal_NRI_NTI", signature(.data="tbl_mpse"), .internal_cal_NRI_NTI_)
+
+#' @rdname mp_cal_NRI_NTI-methods
+#' @aliases mp_cal_NRI_NTI,grouped_df_mpse
+#' @exportMethod mp_cal_NRI_NTI
+setMethod("mp_cal_NRI_NTI", signature(.data="grouped_df_mpse"), .internal_cal_NRI_NTI_)

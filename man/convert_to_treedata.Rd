@@ -20,9 +20,11 @@ treedata class.
 convert dataframe contained hierarchical relationship or other classes to treedata class
 }
 \examples{
-data(hmp_aerobiosis_small)
-head(taxda)
-treedat <- convert_to_treedata(taxda)
+\dontrun{
+  data(hmp_aerobiosis_small)
+  head(taxda)
+  treedat <- convert_to_treedata(taxda)
+}
 }
 \author{
 Shuangbin Xu

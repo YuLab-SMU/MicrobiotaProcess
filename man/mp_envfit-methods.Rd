@@ -79,3 +79,44 @@ update object according action
 \description{
 Fits an Environmental Vector or Factor onto an Ordination With MPSE or tbl_mpse Object
 }
+\examples{
+library(vegan)
+data(varespec, varechem)
+mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
+envformula <- paste("~", paste(colnames(varechem), collapse="+")) \%>\% as.formula
+tbl <- mpse \%>\% 
+       mp_cal_cca(.abundance=Abundance, .formula=envformula) \%>\%
+       mp_envfit(.ord=CCA, 
+                 .env=colnames(varechem), 
+                 permutations=9999, 
+                 action="only")
+tbl
+library(ggplot2)
+library(ggrepel)
+x <- names(tbl)[grepl("^CCA1 ", names(tbl))] \%>\% as.symbol()
+y <- names(tbl)[grepl("^CCA2 ", names(tbl))] \%>\% as.symbol()
+p <- tbl \%>\%
+     ggplot(aes(x=!!x, y=!!y)) + 
+     geom_point(aes(color=Al, size=Mn)) + 
+     geom_segment(data=dr_extract(
+                            name="CCA_ENVFIT_tb", 
+                            .f=td_filter(pvals<=0.05 & label!="Humdepth")
+                       ), 
+                  aes(x=0, y=0, xend=CCA1, yend=CCA2), 
+                  arrow=arrow(length = unit(0.02, "npc"))
+     ) + 
+     geom_text_repel(data=dr_extract(
+                              name="CCA_ENVFIT_tb", 
+                              .f=td_filter(pvals<=0.05 & label!="Humdepth")
+                          ), 
+                  aes(x=CCA1, y=CCA2, label=label)
+     ) +
+     geom_vline(xintercept=0, color="grey20", linetype=2) +
+     geom_hline(yintercept=0, color="grey20", linetype=2) +
+     theme_bw() +
+     theme(panel.grid=element_blank())
+p
+}
+\author{
+Shuangbin Xu
+}

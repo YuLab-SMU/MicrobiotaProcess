@@ -43,9 +43,11 @@ This function was designed to get the abundance of all level taxonomy,
 the input can be phyloseq object or data.frame.
 }
 \examples{
-data(test_otu_data)
-alltaxatab <- get_alltaxadf(test_otu_data)
-head(alltaxatab[,1:10])
+\dontrun{
+   data(test_otu_data)
+   alltaxatab <- get_alltaxadf(test_otu_data)
+   head(alltaxatab[,1:10])
+}
 }
 \author{
 Shuangbin Xu
