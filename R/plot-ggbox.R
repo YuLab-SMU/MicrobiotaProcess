@@ -29,6 +29,7 @@
 #' @author Shuangbin Xu
 #' @export
 #' @examples
+#' \dontrun{
 #' library(magrittr)
 #' otudafile <- system.file("extdata", "otu_tax_table.txt",
 #'                          package="MicrobiotaProcess")
@@ -53,13 +54,14 @@
 #' head(as.data.frame(alphaobj2))
 #' p2 <- ggbox(alphaobj2, factorNames="group")
 #' # set factor levels.
-#' #p3 <- ggbox(obj=alphaobj2, factorNames="group", 
-#' #            factorLevels=list(group=c("M", "N", "B", "D")))
+#' p3 <- ggbox(obj=alphaobj2, factorNames="group", 
+#'             factorLevels=list(group=c("M", "N", "B", "D")))
 #' # set control group.
-#' #p4 <- ggbox(obj=alphaobj2, factorNames="group", controlgroup="B")
-#' # set comparelist
-#' #p5 <- ggbox(obj=alphaobj2, factorNames="group", 
-#' #            comparelist=list(c("B", "D"), c("B", "M"), c("B", "N")))
+#' p4 <- ggbox(obj=alphaobj2, factorNames="group", controlgroup="B")
+#'  set comparelist
+#' p5 <- ggbox(obj=alphaobj2, factorNames="group", 
+#'             comparelist=list(c("B", "D"), c("B", "M"), c("B", "N")))
+#' }
 setGeneric("ggbox", function(obj, factorNames, ...){standardGeneric("ggbox")})
 
 #' @aliases ggbox,data.frame

@@ -26,9 +26,9 @@
 #'                            package="MicrobiotaProcess")
 #' mapfile <- system.file("extdata", "metadata_qza.txt",
 #'                        package="MicrobiotaProcess")
-#' ps <- import_qiime2(otuqza=otuqzafile, taxaqza=taxaqzafile,
-#'                     mapfilename=mapfile)
-#' ps
+#' mpse <- mp_import_qiime2(otuqza=otuqzafile, taxaqza=taxaqzafile,
+#'                          mapfilename=mapfile)
+#' mpse
 import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL, 
                           refseqqza=NULL, treeqza=NULL,
                           parallel=FALSE, ...){
@@ -84,9 +84,9 @@ mp_import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
 #' taxa <- readRDS(taxafile)
 #' sampleda <- system.file("extdata", "mouse.time.dada2.txt", 
 #'                         package="MicrobiotaProcess")
-#' ps <- import_dada2(seqtab=seqtab, taxatab=taxa,
+#' mpse <- mp_import_dada2(seqtab=seqtab, taxatab=taxa,
 #'                    sampleda=sampleda)
-#' ps
+#' mpse
 import_dada2 <- function(seqtab, taxatab=NULL, reftree=NULL, 
                          sampleda=NULL, 
                          ...){
@@ -238,15 +238,17 @@ read.taxa <- function(file, parallel=FALSE){
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' seqtabfile <- system.file("extdata", "seqtab.nochim.rds", 
-#'                           package="MicrobiotaProcess")
-#' seqtab <- readRDS(seqtabfile)
-#' refseq <- colnames(seqtab)
-#' names(refseq) <- paste0("OTU_",seq_len(length(refseq)))
-#' # refseq <- Biostrings::DNAStringSet(refseq)
-#' # tree <- build_tree(refseq)
-#' # or
-#' # tree <- build_tree(refseq) 
+#' \dontrun{
+#'     seqtabfile <- system.file("extdata", "seqtab.nochim.rds", 
+#'                               package="MicrobiotaProcess")
+#'     seqtab <- readRDS(seqtabfile)
+#'     refseq <- colnames(seqtab)
+#'     names(refseq) <- paste0("OTU_",seq_len(length(refseq)))
+#'     refseq <- Biostrings::DNAStringSet(refseq)
+#'     tree <- build_tree(refseq)
+#'     or
+#'     tree <- build_tree(refseq) 
+#' }
 setGeneric("build_tree", function(seqs, ...){standardGeneric("build_tree")})
 
 #' @aliases build_tree,DNAStringSet

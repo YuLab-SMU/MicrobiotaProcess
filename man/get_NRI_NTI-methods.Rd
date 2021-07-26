@@ -8,11 +8,19 @@
 \alias{get_NRI_NTI,data.frame}
 \alias{get_NRI_NTI,phyloseq-method}
 \alias{get_NRI_NTI,phyloseq}
-\title{NRT (Nearest Relative Index) and NTI (Nearest Taxon Index)}
+\title{NRI (Nearest Relative Index) and NTI (Nearest Taxon Index)}
 \usage{
 get_NRI_NTI(obj, ...)
 
-\S4method{get_NRI_NTI}{matrix}(obj, mindepth, sampleda, tree, abundance.weighted = TRUE, ...)
+\S4method{get_NRI_NTI}{matrix}(
+  obj,
+  mindepth,
+  sampleda,
+  tree,
+  abundance.weighted = TRUE,
+  force = FALSE,
+  ...
+)
 
 \S4method{get_NRI_NTI}{data.frame}(obj, mindepth, sampleda, tree, abundance.weighted = TRUE, ...)
 
@@ -32,6 +40,10 @@ or phyloseq.}
 
 \item{abundance.weighted}{logical, whether calculate mean nearest taxon distances for each species 
 weighted by species abundance, default is TRUE.}
+
+\item{force}{logical whether calculate the index even the count of otu is
+not rarefied, default is FALSE. If it is TRUE, meaning the rarefaction is not be
+performed automatically.}
 }
 \value{
 alphasample object contained NRT and NTI.

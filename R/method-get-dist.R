@@ -12,9 +12,11 @@
 #' @return distance class contianed distmethod and originalD attr
 #' @export
 #' @examples
+#' \dontrun{
 #' data(test_otu_data)
 #' distclass <- get_dist(test_otu_data)
 #' hcsample <- get_clust(distclass)
+#' }
 get_dist <- function(obj,...){
     UseMethod("get_dist")
 }
@@ -89,7 +91,28 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #' a non-redundant tibble with the distance information. "get" return 'dist' object.
 #' @param ... additional parameters.
 #' @return update object or tibble according the 'action'
+#' @author Shuangbin Xu
 #' @export
+#' @examples
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %<>%
+#' mp_decostand(.abundance=Abundance) %>% 
+#' mp_cal_dist(.abundance=hellinger, distmethod="bray")
+#' # Visualization
+#' library(ggplot2)
+#' tbl <- mouse.time.mpse %>% 
+#'        mp_extract_sample 
+#' tbl
+#' tbl %>% 
+#'   select(Sample, time, bray) %>% 
+#'   unnest(cols=c(bray)) %>% 
+#'   mutate(time=paste0(time, "-vs-", time[match(braySampley, Sample)])) %>% 
+#'   dplyr::filter(time!="Late-vs-Early" & bray!=0) %>%
+#'   ggplot(aes(x=time, y=bray)) + 
+#'   geom_boxplot(aes(fill=time)) + 
+#'   geom_jitter(width=0.1) + 
+#'   xlab(NULL) + 
+#'   theme(legend.position="none")
 setGeneric("mp_cal_dist", function(.data, .abundance, .env=NULL, distmethod="bray", action="add", ...)standardGeneric("mp_cal_dist"))
 
 #' @rdname mp_cal_dist-methods
@@ -193,9 +216,9 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
         dplyr::rename(!!distmethod:="r", !!distsampley:="y") %>% 
         tidyr::nest(!!distmethod:=c(!!as.symbol(distsampley), !!as.symbol(distmethod)))
 
-    dat <- .data@colData %>% 
-        as_tibble(rownames="Sample") %>%
-        left_join(dat, by=c("Sample"="x")) 
+    dat <- .data %>% 
+           mp_extract_sample() %>%
+           left_join(dat, by=c("Sample"="x")) 
 
     if (action=="only"){
         return(dat)   
@@ -203,7 +226,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
     }else if (action=="add"){
         .data@colData <- dat %>%
             column_to_rownames(var="Sample") %>%
-            S4Vectors::DataFrame()
+            S4Vectors::DataFrame(check.names=FALSE)
         return(.data)
     }
           

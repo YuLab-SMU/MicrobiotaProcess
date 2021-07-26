@@ -66,6 +66,7 @@ figure of rarefaction curves
 Rarefaction alpha index
 }
 \examples{
+\dontrun{
 data(test_otu_data)
 library(ggplot2)
 prare <- ggrarecurve(test_otu_data,
@@ -75,6 +76,7 @@ prare <- ggrarecurve(test_otu_data,
          ) +
          theme(legend.spacing.y=unit(0.02,"cm"),
                legend.text=element_text(size=6))
+}
 }
 \author{
 Shuangbin Xu

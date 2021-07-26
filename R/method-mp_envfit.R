@@ -12,27 +12,46 @@
 #' @param ... additional parameters see also 'vegan::envfit'
 #' @return update object according action
 #' @export
+#' @author Shuangbin Xu
+#' @examples
+#' library(vegan)
+#' data(varespec, varechem)
+#' mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
+#' envformula <- paste("~", paste(colnames(varechem), collapse="+")) %>% as.formula
+#' tbl <- mpse %>% 
+#'        mp_cal_cca(.abundance=Abundance, .formula=envformula) %>%
+#'        mp_envfit(.ord=CCA, 
+#'                  .env=colnames(varechem), 
+#'                  permutations=9999, 
+#'                  action="only")
+#' tbl
+#' library(ggplot2)
+#' library(ggrepel)
+#' x <- names(tbl)[grepl("^CCA1 ", names(tbl))] %>% as.symbol()
+#' y <- names(tbl)[grepl("^CCA2 ", names(tbl))] %>% as.symbol()
+#' p <- tbl %>%
+#'      ggplot(aes(x=!!x, y=!!y)) + 
+#'      geom_point(aes(color=Al, size=Mn)) + 
+#'      geom_segment(data=dr_extract(
+#'                             name="CCA_ENVFIT_tb", 
+#'                             .f=td_filter(pvals<=0.05 & label!="Humdepth")
+#'                        ), 
+#'                   aes(x=0, y=0, xend=CCA1, yend=CCA2), 
+#'                   arrow=arrow(length = unit(0.02, "npc"))
+#'      ) + 
+#'      geom_text_repel(data=dr_extract(
+#'                               name="CCA_ENVFIT_tb", 
+#'                               .f=td_filter(pvals<=0.05 & label!="Humdepth")
+#'                           ), 
+#'                   aes(x=CCA1, y=CCA2, label=label)
+#'      ) +
+#'      geom_vline(xintercept=0, color="grey20", linetype=2) +
+#'      geom_hline(yintercept=0, color="grey20", linetype=2) +
+#'      theme_bw() +
+#'      theme(panel.grid=element_blank())
+#' p
 setGeneric("mp_envfit", function(.data, .ord, .env, .dim=3, action="add", permutations=999, seed=123, ...)standardGeneric("mp_envfit"))
 
-# #' @rdname mp_envfit-methods
-# #' @aliases mp_envfit,MPSE
-# #' @exportMethod mp_envfit
-# setMethod("mp_envfit", signature(.data="MPSE"), function(.data, .ord, .env, .dim=3, action="get", permutations=999, seed=123, ...){
-#     action %<>% match.arg(c("get", "add", "only"))
-#     res <- .internal_cal_envfit(.data=.data,
-#                                 .ord = !!rlang::enquo(.ord),
-#                                 .env = !!rlang::enquo(.env),
-#                                 .dim = .dim,
-#                                 permutations = permutations,
-#                                 seed = seed)
-# 
-#     if (action=="get"){
-#         return(res)
-#     }
-# })
-
-
-              
 .internal_cal_envfit <- function(.data, .ord, .env, .dim, action="add", permutations=999, seed=123, ...){
 
     .ord <- rlang::enquo(.ord) %>%
@@ -67,7 +86,14 @@ setGeneric("mp_envfit", function(.data, .ord, .env, .dim=3, action="add", permut
     if (action=="get"){
         return(res)
     }else if (action=="only"){
-        da <- mp_fortify(res)
+        da.ord <- .data %>% 
+                 mp_extract_internal_attr(.ord) %>% 
+                 tidydr()
+
+        da <- .data %>% 
+              mp_extract_sample() %>%
+              add_total_attr(da.ord) %>%
+              add_attr(res %>% mp_fortify(), name=paste0(.ord, "_ENVFIT_tb"))
         return(da)
     }else if (action=="add"){
         attrnames <- paste0(.ord, "_ENVFIT")
@@ -83,3 +109,13 @@ setGeneric("mp_envfit", function(.data, .ord, .env, .dim=3, action="add", permut
 #' @aliases mp_envfit,MPSE
 #' @exportMethod mp_envfit
 setMethod("mp_envfit", signature(.data="MPSE"), .internal_cal_envfit)
+
+#' @rdname mp_envfit-methods
+#' @aliases mp_envfit,tbl_mpse
+#' @exportMethod mp_envfit
+setMethod("mp_envfit", signature(.data="tbl_mpse"), .internal_cal_envfit)
+
+#' @rdname mp_envfit-methods
+#' @aliases mp_envfit,grouped_df_mpse
+#' @exportMethod mp_envfit
+setMethod("mp_envfit", signature(.data="grouped_df_mpse"), .internal_cal_envfit)

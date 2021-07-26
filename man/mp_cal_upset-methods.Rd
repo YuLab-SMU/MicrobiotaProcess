@@ -70,3 +70,19 @@ update object or tibble according the 'action'
 \description{
 Calculating the samples or groups for each OTU, the result can be visualized by 'ggupset'
 }
+\examples{
+data(mouse.time.mpse)
+mouse.time.mpse \%>\%
+mp_rrarefy() \%>\%
+mp_cal_upset(.abundance=RareAbundance, .group=time, action="only") -> tbl
+tbl
+library(ggplot2)
+tbl \%>\%
+  ggplot(aes(x=ggupsetOftime)) +
+  geom_bar() +
+  ggupset::scale_x_upset() +
+  ggupset::theme_combmatrix(combmatrix.label.extra_spacing=30)
+}
+\author{
+Shuangbin Xu
+}

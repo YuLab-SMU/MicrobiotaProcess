@@ -37,3 +37,22 @@ update object or tbl according to the action.
 \description{
 Principal Components Analysis with MPSE or tbl_mpse object
 }
+\examples{
+data(mouse.time.mpse)
+library(ggplot2)
+mpse <- mouse.time.mpse \%>\% 
+          mp_decostand(.abundance=Abundance) \%>\% 
+          mp_cal_pca(.abundance=hellinger)
+# action = "only" to extract the non-redundant tibble to visualize
+tbl <- mouse.time.mpse \%>\%
+          mp_decostand(.abundance=Abundance) \%>\%
+          mp_cal_pca(.abundance=hellinger, action="only")
+tbl
+x <- names(tbl)[grepl("PC1 ", names(tbl))] \%>\% as.symbol()
+y <- names(tbl)[grepl("PC2 ", names(tbl))] \%>\% as.symbol()
+ggplot(tbl) + 
+ geom_point(aes(x=!!x, y=!!y, color=time))
+}
+\author{
+Shuangbin Xu
+}

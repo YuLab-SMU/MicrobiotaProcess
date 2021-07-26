@@ -18,6 +18,8 @@
 \alias{unnest}
 \alias{as_tibble}
 \alias{\%>\%}
+\alias{\%<>\%}
+\alias{td_filter}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -27,7 +29,9 @@ below to see their documentation.
 \describe{
   \item{dplyr}{\code{\link[dplyr]{arrange}}, \code{\link[dplyr]{distinct}}, \code{\link[dplyr]{filter}}, \code{\link[dplyr]{group_by}}, \code{\link[dplyr]{mutate}}, \code{\link[dplyr]{pull}}, \code{\link[dplyr]{rename}}, \code{\link[dplyr]{select}}, \code{\link[dplyr]{slice}}, \code{\link[dplyr:group_by]{ungroup}}}
 
-  \item{magrittr}{\code{\link[magrittr:pipe]{\%>\%}}}
+  \item{ggtree}{\code{\link[ggtree]{td_filter}}}
+
+  \item{magrittr}{\code{\link[magrittr:compound]{\%<>\%}}, \code{\link[magrittr:pipe]{\%>\%}}}
 
   \item{tibble}{\code{\link[tibble]{as_tibble}}}
 

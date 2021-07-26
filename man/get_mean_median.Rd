@@ -21,17 +21,18 @@ mean and median of feature by subclass.
 get the mean and median of specific feature.
 }
 \examples{
-data(hmp_aerobiosis_small)
-head(sampleda)
-featureda <- merge(featureda, sampleda, by=0)
-rownames(featureda) <- as.vector(featureda$Row.names)
-featureda$Row.names <- NULL
-feameamed <- get_mean_median(datameta=featureda, 
-                    feature="p__Actinobacteria", 
-                    subclass="body_site")
-#not run in example
-#fplot <- ggdifftaxbar(feameamed, featurename="p__Actinobacteria", 
-#                     classgroup="oxygen_availability", subclass="body_site")
+\dontrun{
+    data(hmp_aerobiosis_small)
+    head(sampleda)
+    featureda <- merge(featureda, sampleda, by=0)
+    rownames(featureda) <- as.vector(featureda$Row.names)
+    featureda$Row.names <- NULL
+    feameamed <- get_mean_median(datameta=featureda, 
+                        feature="p__Actinobacteria", 
+                        subclass="body_site")
+    fplot <- ggdifftaxbar(feameamed, featurename="p__Actinobacteria", 
+                         classgroup="oxygen_availability", subclass="body_site")
+}
 }
 \author{
 Shuangbin Xu

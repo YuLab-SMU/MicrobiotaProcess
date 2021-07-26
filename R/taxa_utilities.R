@@ -13,18 +13,20 @@
 #' @author Shuangbin Xu
 #' @importFrom tidyr separate
 #' @examples
-#' otudafile <- system.file("extdata", "otu_tax_table.txt",
-#'                       package="MicrobiotaProcess")
-#' samplefile <- system.file("extdata",
-#'                  "sample_info.txt", package="MicrobiotaProcess")
-#' otuda <- read.table(otudafile, sep="\t", header=TRUE,
-#'                     row.names=1, check.names=FALSE,
-#'                     skip=1, comment.char="")
-#' sampleda <- read.table(samplefile,
-#'             sep="\t", header=TRUE, row.names=1)
-#' taxdf <- otuda[!sapply(otuda, is.numeric)]
-#' taxdf <- split_str_to_list(taxdf)
-#' head(taxdf)
+#' \dontrun{
+#'     otudafile <- system.file("extdata", "otu_tax_table.txt",
+#'                           package="MicrobiotaProcess")
+#'     samplefile <- system.file("extdata",
+#'                      "sample_info.txt", package="MicrobiotaProcess")
+#'     otuda <- read.table(otudafile, sep="\t", header=TRUE,
+#'                         row.names=1, check.names=FALSE,
+#'                         skip=1, comment.char="")
+#'     sampleda <- read.table(samplefile,
+#'                 sep="\t", header=TRUE, row.names=1)
+#'     taxdf <- otuda[!sapply(otuda, is.numeric)]
+#'     taxdf <- split_str_to_list(taxdf)
+#'     head(taxdf)
+#' }
 split_str_to_list <- function(strdataframe, 
     prefix="tax", 
     sep="; ", 

@@ -25,6 +25,7 @@ mean of data.frame by featurelist
 Caculate the count or relative abundance of replicate element with a speficify columns
 }
 \examples{
+\dontrun{
 otudafile <- system.file("extdata", "otu_tax_table.txt", 
                       package="MicrobiotaProcess")
 samplefile <- system.file("extdata", 
@@ -39,6 +40,7 @@ taxdf <- split_str_to_list(taxdf)
 otuda <- otuda[sapply(otuda, is.numeric)]
 phycount <- get_count(otuda, taxdf[,2,drop=FALSE])
 phyratios <- get_ratio(otuda, taxdf[,2,drop=FALSE])
+}
 }
 \author{
 Shuangbin Xu

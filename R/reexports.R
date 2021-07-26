@@ -57,3 +57,11 @@ tibble::as_tibble
 #' @importFrom magrittr %>%
 #' @export
 magrittr::`%>%`
+
+#' @importFrom magrittr %<>%
+#' @export
+magrittr::`%<>%`
+
+#' @importFrom ggtree td_filter
+#' @export
+ggtree::td_filter

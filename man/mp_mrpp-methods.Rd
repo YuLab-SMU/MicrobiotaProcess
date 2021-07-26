@@ -81,3 +81,16 @@ update object according action argument
 \description{
 Analysis of Multi Response Permutation Procedure (MRPP) with MPSE or tbl_mpse object
 }
+\examples{
+data(mouse.time.mpse)
+mouse.time.mpse \%>\%
+  mp_decostand(.abundance=Abundance) \%>\% 
+  mp_mrpp(.abundance=hellinger, 
+          .group=time, 
+          distmethod="bray", 
+          permutations=999, # for more robust, set it to 9999. 
+          action="get")
+}
+\author{
+Shuangbin
+}

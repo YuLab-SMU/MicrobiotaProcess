@@ -39,13 +39,15 @@ This function is designed to calculate the rare curve result of otu table
 the result can be visualized by `ggrarecurve`.
 }
 \examples{
-data(test_otu_data)
-set.seed(1024)
-res <- get_rarecurve(test_otu_data, chunks=200)
-p <- ggrarecurve(obj=res, 
-                 indexNames=c("Observe","Chao1","ACE"),
-                 shadow=FALSE,
-                 factorNames="Group")
+\dontrun{
+    data(test_otu_data)
+    set.seed(1024)
+    res <- get_rarecurve(test_otu_data, chunks=200)
+    p <- ggrarecurve(obj=res, 
+                     indexNames=c("Observe","Chao1","ACE"),
+                     shadow=FALSE,
+                     factorNames="group")
+}
 }
 \author{
 Shuangbin Xu

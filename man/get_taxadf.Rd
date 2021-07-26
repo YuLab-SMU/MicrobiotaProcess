@@ -52,6 +52,7 @@ phyloseq class contained tax data.frame and sample information.
 get the data of specified taxonomy
 }
 \examples{
+\dontrun{
 library(ggplot2)
 data(test_otu_data)
 phytax <- get_taxadf(test_otu_data, taxlevel=2)
@@ -59,6 +60,7 @@ phytax
 head(phyloseq::otu_table(phytax))
 phybar <- ggbartax(phytax) + 
          xlab(NULL) + ylab("relative abundance (\%)")
+}
 }
 \author{
 Shuangbin Xu

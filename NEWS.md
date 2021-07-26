@@ -1,4 +1,13 @@
-# MicrobiotaProcess 1.5.1.998
+# MicrobiotaProcess 1.5.2.990
+
++ add `dr_extract` for the visualization of the result of ordination. (2021-07-26, Mon)
++ comment out the function for `phyloseq` and add rd of the function for `MPSE` or `tbl_mpse`. (2021-07-24, Sat)
++ update the function to parsing the result of `rda`, `cca`, `envfit`. (2021-07-23, Fri)
++ add `tidydr` to convert the result of `reduce dimension` to `tbl_df`
+  - such `pca`, `pcoa`, `nmds`, `rda`, `cca`. (2021-07-22, Thu)
++ optimize the `print` for `MPSE`. (2021-07-22, Thu)
+
+# MicrobiotaProcess 1.5.2
 
 + add `mp_mantel` and `mp_mrpp` for `MPSE` or `tbl_mpse` object. (2021-07-19, Mon)
 + add `mp_envfit` and update `mp_cal_dist` to support the distance calculation with continuous environment 

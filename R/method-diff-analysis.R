@@ -183,9 +183,11 @@ diff_analysis.phyloseq <- function(obj, ...){
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' data(test_otu_data)
-#' alltaxatab <- get_alltaxadf(test_otu_data)
-#' head(alltaxatab[,1:10])
+#' \dontrun{
+#'    data(test_otu_data)
+#'    alltaxatab <- get_alltaxadf(test_otu_data)
+#'    head(alltaxatab[,1:10])
+#' }
 setGeneric("get_alltaxadf", function(obj, ...){standardGeneric("get_alltaxadf")})
 
 #' @aliases get_alltaxadf,phyloseq

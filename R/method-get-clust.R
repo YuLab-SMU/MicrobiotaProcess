@@ -115,6 +115,18 @@ get_clust.phyloseq <- function(obj,
 #' @param ... additional parameters
 #' @return treedata object contained hierarchical cluster analysis of sample
 #' @export
+#' @author Shuangbin Xu
+#' @examples
+#' library(ggtree)
+#' library(ggplot2)
+#' data(mouse.time.mpse)
+#' res <- mouse.time.mpse %>%
+#'  mp_decostand(.abundance=Abundance) %>% 
+#'  mp_cal_clust(.abundance=hellinger, distmethod="bray")
+#' res
+#' res %>%
+#'  ggtree() + 
+#'  geom_tippoint(aes(color=time))
 setGeneric("mp_cal_clust", function(.data, .abundance, distmethod="bray", hclustmethod="average", ...)standardGeneric("mp_cal_clust"))
 
 
@@ -140,6 +152,7 @@ setMethod("mp_cal_clust", signature(.data="MPSE"), function(.data, .abundance, d
            ape::as.phylo() %>%
            treeio::full_join(
             y = .data@colData %>%
+                data.frame(check.names=FALSE) %>%
                 avoid_conflict_names(spename="label") %>%
                 as_tibble(rownames="label"),
            by="label"

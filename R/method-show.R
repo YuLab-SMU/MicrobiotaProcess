@@ -180,39 +180,52 @@ NULL
 #' @method print MPSE
 #' @export
 print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
-    if (nrow(x) > 30){
-        tmpx <- x[1:min(40, nrow(x)), min(1, ncol(x)), drop=FALSE]
-    }else{
-        tmpx <- x[,1:min(20, ncol(x)), drop=FALSE]
+    total_nrows <- nrow(x) * ncol(x)
+    if (is.null(n)){
+        n <- 10
     }
-    
-    if (!is.null(n)){
-        tmpx <- x[seq_len(n), 1:min(20, ncol(x)), drop=FALSE]
+
+    if (total_nrows <= n){
+        n <- total_nrows
+    }
+
+    if (n < nrow(x)){
+        tmpx <- x[seq_len(n), seq_len(min(2, ncol(x))), drop=FALSE]
+    }else{
+        tmpx <- x[, seq_len(min(round(n/nrow(x))+1, ncol(x))), drop=FALSE]
     }
 
     formatted_tb <- tmpx %>% 
                     as_tibble() %>% 
                     format(..., n = n, width = width, n_extra = n_extra)
-    total_nrows <- dim(x)[1] * dim(x)[2]
-    show_nrows <- ifelse(is.null(n), 10, n)
     
     new_head = sprintf(
       "A MPSE-tibble (MPSE object) abstraction: %s",
        total_nrows %>% format(format="f", big.mark=",", digits=2)
     )
     
-    left_nrows <- total_nrows - show_nrows
-    new_tail <- sprintf("%s more rows", 
-       left_nrows %>% format(format="f", big.mark=",", digits=2)
-    )
-    formatted_mpse = 
-      formatted_tb %>%
-      {
-        x = (.);
-        x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
-        x[show_nrows+4] = gsub("([0-9,]+ more rows)", new_tail, x[show_nrows + 4]);
-        x
-      }
+    left_nrows <- total_nrows - n
+    if (left_nrows > 0){
+        new_tail <- sprintf("%s more rows", 
+                            left_nrows %>% format(format="f", big.mark=",", digits=2)
+                      )
+        formatted_mpse = 
+          formatted_tb %>%
+          {
+            x = (.);
+            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
+            x[n+4] = gsub("([0-9,]+ more rows)", new_tail, x[n + 4]);
+            x
+          }
+    }else{
+        formatted_mpse =
+            formatted_tb %>%
+          {
+            x = (.);
+            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
+            x
+          }            
+    }
     formatted_mpse %>%
       append(sprintf(
         "\033[90m# OTU=%s | Samples=%s | Assays=%s | Taxanomy=%s\033[39m",

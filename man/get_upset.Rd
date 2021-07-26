@@ -34,6 +34,7 @@ a data.frame for the input of `upset` of `UpSetR`.
 generate the dataset for upset of UpSetR
 }
 \examples{
+\dontrun{
 data(test_otu_data)
 upsetda <- get_upset(test_otu_data, factorNames="group")
 otudafile <- system.file("extdata", "otu_tax_table.txt",
@@ -52,9 +53,10 @@ head(otuda[1:5, 1:5])
 upsetda2 <- get_upset(obj=otuda, sampleda=sampleda, 
                      factorNames="group")
 #Then you can use `upset` of `UpSetR` to visualize the results.
-#library(UpSetR)
-#upset(upsetda, sets=c("B","D","M","N"), sets.bar.color = "#56B4E9",
-#      order.by = "freq", empty.intersections = "on")
+library(UpSetR)
+upset(upsetda, sets=c("B","D","M","N"), sets.bar.color = "#56B4E9",
+      order.by = "freq", empty.intersections = "on")
+}
 }
 \author{
 Shuangbin Xu

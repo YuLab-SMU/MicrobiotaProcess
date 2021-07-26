@@ -16,13 +16,15 @@
 ##' @author Shuangbin Xu
 ##' @export
 ##' @examples
-##' data(test_otu_data)
-##' set.seed(1024)
-##' res <- get_rarecurve(test_otu_data, chunks=200)
-##' p <- ggrarecurve(obj=res, 
-##'                  indexNames=c("Observe","Chao1","ACE"),
-##'                  shadow=FALSE,
-##'                  factorNames="Group")
+##' \dontrun{
+##'     data(test_otu_data)
+##'     set.seed(1024)
+##'     res <- get_rarecurve(test_otu_data, chunks=200)
+##'     p <- ggrarecurve(obj=res, 
+##'                      indexNames=c("Observe","Chao1","ACE"),
+##'                      shadow=FALSE,
+##'                      factorNames="group")
+##' }
 setGeneric("get_rarecurve", function(obj, ...)standardGeneric("get_rarecurve"))
 
 #' @aliases get_rarecurve,data.frame
@@ -66,8 +68,16 @@ setMethod("get_rarecurve", "phyloseq", function(obj, ...){
 #' '.abundance' is not be rarefied, default is FALSE
 #' @param ... additional parameters.
 #' @return update rarecurce calss
+#' @author Shuangbin Xu
 #' @export
-
+#' @examples
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %>% 
+#' mp_rrarefy() -> mpse
+#' mpse
+#' # bigger chunks means higher accuracy, but it will become slower.
+#' mpse %>% mp_cal_rarecurve(.abundance=RareAbundance, chunks=100, action="get") -> xx
+#' xx %>% ggrarecurve(factorNames="time")
 setGeneric("mp_cal_rarecurve", function(.data, .abundance=NULL, action="add", chunks=400, seed=123, force=FALSE, ...)standardGeneric("mp_cal_rarecurve"))
 
 #' @rdname mp_cal_rarecurve-methods
@@ -98,9 +108,8 @@ setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundanc
 
     da <- SummarizedExperiment::assays(.data)@listData[[rlang::as_name(.abundance)]] %>% as.data.frame(check.names=FALSE)
     
-    sampleda <- .data@colData %>%
-                avoid_conflict_names() %>%
-                tibble::as_tibble(rownames="Sample")
+    sampleda <- .data %>%
+                mp_extract_sample()
 
     dat <- .internal_apply_cal_rarecurve(da=da, sampleda=sampleda, chunks=chunks, seed=seed)
     if (action=="get"){
@@ -116,7 +125,7 @@ setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundanc
             as_tibble(rownames="Sample") %>%
             left_join(dat, by=c("Sample"="sample")) %>% 
             column_to_rownames(var="Sample") %>%
-            S4Vectors::DataFrame()
+            S4Vectors::DataFrame(check.names=FALSE)
         return(.data)
     }
     

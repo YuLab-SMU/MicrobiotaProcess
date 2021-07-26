@@ -16,6 +16,7 @@
 #' @rdname get_alphaindex
 #' @export
 #' @examples
+#' \dontrun{
 #' otudafile <- system.file("extdata", "otu_tax_table.txt", 
 #'                         package="MicrobiotaProcess")
 #' otuda <- read.table(otudafile, sep="\t", 
@@ -31,6 +32,7 @@
 #' set.seed(1024)
 #' alphatab2 <- get_alphaindex(test_otu_data)
 #' head(as.data.frame(alphatab2))
+#' }
 setGeneric("get_alphaindex", function(obj, ...){standardGeneric("get_alphaindex")})
 
 #' @aliases get_alphaindex,matrix
@@ -121,6 +123,13 @@ setMethod("get_alphaindex", "phyloseq", function(obj, ...){
 #' @param ... additional arguments
 #' @return update object or other (refer to action)
 #' @export
+#' @author Shuangbin Xu
+#' @examples
+#' data(mouse.time.mpse)
+#' mpse <- mouse.time.mpse %>% 
+#'         mp_rrarefy() %>%
+#'         mp_cal_alpha(.abundance=RareAbundance)
+#' mpse
 setGeneric("mp_cal_alpha", function(.data, .abundance=NULL, 
                                     action=c("add", "only", "get"), 
                                     force=FALSE, ...){
@@ -152,16 +161,16 @@ setMethod("mp_cal_alpha", signature(.data="MPSE"),
                t() %>% 
                get_alphaindex(force=TRUE)
     if (action=="get"){
-        alphada@sampleda <- .data@colData %>% as.data.frame()
+        alphada@sampleda <- .data@colData %>% data.frame(check.names=FALSE)
         return(alphada)
     }
     da <- alphada@alpha %>% as_tibble(rownames="Sample")
-    da <- .data@colData %>%
-          as_tibble(rownames="Sample") %>%
+    da <- .data %>%
+          mp_extract_sample() %>%
           left_join(da, by="Sample") %>% 
           column_to_rownames(var="Sample")
     if (action=="add"){
-        .data@colData <- S4Vectors::DataFrame(da)
+        .data@colData <- da %>% S4Vectors::DataFrame(check.names=FALSE)
         return(.data)
     }else if (action=="only"){
         return(da)

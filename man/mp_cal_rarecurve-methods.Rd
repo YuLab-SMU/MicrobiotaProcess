@@ -77,3 +77,15 @@ update rarecurce calss
 \description{
 Calculating the different alpha diversities index with different depth
 }
+\examples{
+data(mouse.time.mpse)
+mouse.time.mpse \%>\% 
+mp_rrarefy() -> mpse
+mpse
+# bigger chunks means higher accuracy, but it will become slower.
+mpse \%>\% mp_cal_rarecurve(.abundance=RareAbundance, chunks=100, action="get") -> xx
+xx \%>\% ggrarecurve(factorNames="time")
+}
+\author{
+Shuangbin Xu
+}

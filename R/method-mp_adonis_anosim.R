@@ -14,6 +14,18 @@
 #' @param ... additional parameters see also 'adonis' of vegan.
 #' @return update object according action argument
 #' @export
+#' @author Shuangbin Xu
+#' @examples
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %>%
+#'   mp_decostand(
+#'      .abundance=Abundance, 
+#'      method="hellinger") %>%
+#'   mp_adonis(.abundance=hellinger, 
+#'             .formula=~time, 
+#'             distmethod="bray", 
+#'             permutations=999, # for more robust, set it to 9999. 
+#'             action="get")
 setGeneric("mp_adonis", function(.data, .abundance, .formula, distmethod="bray", action="get", permutations=999, seed=123, ...)standardGeneric("mp_adonis"))
 
 .internal_cal_adonis <- function(.data, .abundance, .formula, distmethod="bray", action="get", permutations=999, seed=123, ...){
@@ -107,6 +119,25 @@ setMethod("mp_adonis", signature(.data="grouped_df_mpse"), .internal_cal_adonis)
 #' @param ... additional parameters see also 'anosim' of vegan.
 #' @return update object according action argument
 #' @export
+#' @author Shuangbin Xu
+#' @examples
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %<>%
+#'   mp_decostand(.abundance=Abundance)
+#' # action = "get" will return a anosim object
+#' mouse.time.mpse %>% 
+#'   mp_anosim(.abundance=hellinger, .group=time, action="get")
+#' # action = "only" will return a tbl_df that can be as the input of ggplot2.
+#' library(ggplot2)
+#' tbl <- mouse.time.mpse %>% 
+#'        mp_anosim(.abundance=hellinger, 
+#'                  .group=time,
+#'                  permutations=999, # for more robust, set it to 9999
+#'                  action="only")
+#' tbl
+#' tbl %>%
+#' ggplot(aes(x=class, y=rank, fill=class)) + 
+#' geom_boxplot(notch=TRUE, varwidth = TRUE)
 setGeneric("mp_anosim", function(.data, .abundance, .group, distmethod="bray", action="add", permutations=999, seed=123, ...)standardGeneric("mp_anosim"))
 
 .internal_cal_anosim_mrpp <- function(.data, .abundance, .group, distmethod="bray", action="add", permutations=999, seed=123, method="anosim", ...){
@@ -236,6 +267,16 @@ setMethod("mp_anosim", signature(.data="grouped_df_mpse"),
 #' @param ... additional parameters see also 'mrpp' of vegan.
 #' @return update object according action argument
 #' @export
+#' @author Shuangbin
+#' @examples 
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %>%
+#'   mp_decostand(.abundance=Abundance) %>% 
+#'   mp_mrpp(.abundance=hellinger, 
+#'           .group=time, 
+#'           distmethod="bray", 
+#'           permutations=999, # for more robust, set it to 9999. 
+#'           action="get")
 setGeneric("mp_mrpp", function(.data, .abundance, .group, distmethod="bray", action="add", permutations=999, seed=123, ...)standardGeneric("mp_mrpp"))
 
 #' @rdname mp_mrpp-methods

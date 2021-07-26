@@ -18,17 +18,19 @@
 #' @author Shuangbin Xu
 #' @export
 #' @examples
-#' library(phyloseq)
-#' data(GlobalPatterns)
-#' subGlobal <- subset_samples(GlobalPatterns, 
-#'               SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
-#' #pcoares <- get_pcoa(subGlobal, 
-#' #                   distmethod="euclidean",
-#' #                   method="hellinger")
-#' # pcoaplot <- ggordpoint(pcoares, biplot=FALSE,
-#' #                        speciesannot=FALSE,
-#' #                        factorNames=c("SampleType"), 
-#' #                        ellipse=FALSE)
+#' \dontrun{
+#'     library(phyloseq)
+#'     data(GlobalPatterns)
+#'     subGlobal <- subset_samples(GlobalPatterns, 
+#'                   SampleType %in% c("Feces", "Mock", "Ocean", "Skin"))
+#'     pcoares <- get_pcoa(subGlobal, 
+#'                        distmethod="euclidean",
+#'                        method="hellinger")
+#'     pcoaplot <- ggordpoint(pcoares, biplot=FALSE,
+#'                             speciesannot=FALSE,
+#'                             factorNames=c("SampleType"), 
+#'                             ellipse=FALSE)
+#' }
 get_pcoa <- function(obj, ...){
     UseMethod("get_pcoa")
 }
@@ -162,6 +164,23 @@ get_varct.pcoa <- function(obj,...){
 #' @param ... additional parameters see also 'mp_cal_dist'.
 #' @return update object or tbl according to the action.
 #' @export
+#' @author Shuangbin Xu
+#' @examples
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %>% 
+#'   mp_decostand(.abundance=Abundance) %>% 
+#'   mp_cal_pcoa(.abundance=hellinger, distmethod="bray", .dim=2, action="only") -> tbl
+#' tbl
+#' x <- names(tbl)[grepl("PCo1 ", names(tbl))] %>% as.symbol()
+#' y <- names(tbl)[grepl("PCo2 ", names(tbl))] %>% as.symbol()
+#' library(ggplot2)
+#' tbl %>% 
+#'  ggplot(aes(x=!!x, y=!!y, color=time)) + 
+#'  geom_point() +
+#'  geom_vline(xintercept=0, color="grey20", linetype=2) + 
+#'  geom_hline(yintercept=0, color="grey20", linetype=2) +
+#'  theme_bw() +
+#'  theme(panel.grid=element_blank())
 setGeneric("mp_cal_pcoa", function(.data, .abundance, distmethod="bray", .dim=3, action="add", ...)standardGeneric("mp_cal_pcoa"))
 
 #' @rdname mp_cal_pcoa-methods
@@ -192,24 +211,24 @@ setMethod("mp_cal_pcoa", signature(.data="MPSE"), function(.data, .abundance, di
         #res <- new("pcasample", pca=pcoa, sampleda=sampleda)
         return(pcoa)         
     }
+    dat <- pcoa %>% tidydr(display=c("sites", "features"))
 
     da <- .data %>%
           mp_extract_sample() %>%
           dplyr::left_join(
-                 pcoa$vectors[, seq_len(.dim)] %>%
-                 as_tibble(rownames="Sample") %>%
-                 setNames(c("Sample", paste0("PCoA", seq_len(.dim)))),
-                 by="Sample"
+                 dat[, seq_len(.dim+1)],
+                 by=c("Sample"="sites")
           )
 
     if (action=="only"){
         da %<>%
+             add_attr(dat %>% attr("features_tb"), name="features_tb") %>%
              add_internal_attr(object=pcoa, name="PCoA")
         return(da)
     }else if (action=="add"){
         .data@colData <- da %>%
                          tibble::column_to_rownames(var="Sample") %>%
-                         S4Vectors::DataFrame()
+                         S4Vectors::DataFrame(check.names=FALSE)
         .data %<>% add_internal_attr(object=pcoa, name="PCoA")
         return(.data)
     }
@@ -287,7 +306,24 @@ setMethod("mp_cal_pcoa", signature(.data="grouped_df_mpse"), .internal_cal_pcoa)
 #' @param seed a random seed to make this analysis reproducible, default is 123.
 #' @param ... additional parameters see also 'mp_cal_dist'.
 #' @return update object or tbl according to the action.
+#' @author Shuangbin Xu
 #' @export
+#' @examples
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %>%
+#'   mp_decostand(.abundance=Abundance) %>%
+#'   mp_cal_nmds(.abundance=hellinger, distmethod="bray", .dim=2, action="only") -> tbl
+#' tbl
+#' x <- names(tbl)[grepl("NMDS1", names(tbl))] %>% as.symbol()
+#' y <- names(tbl)[grepl("NMDS2", names(tbl))] %>% as.symbol()
+#' library(ggplot2)
+#' tbl %>%
+#'  ggplot(aes(x=!!x, y=!!y, color=time)) +
+#'  geom_point() +
+#'  geom_vline(xintercept=0, color="grey20", linetype=2) +
+#'  geom_hline(yintercept=0, color="grey20", linetype=2) +
+#'  theme_bw() +
+#'  theme(panel.grid=element_blank())
 setGeneric("mp_cal_nmds", function(.data, .abundance, distmethod="bray", .dim=2, action="add", seed=123, ...)standardGeneric("mp_cal_nmds"))
 
 #' @rdname mp_cal_nmds-methods
@@ -323,25 +359,28 @@ setMethod("mp_cal_nmds", signature(.data="MPSE"), function(.data, .abundance, di
         return(nmds)
     }
 
+    dat <- nmds %>% 
+           tidydr(display=c("sites", "features"), 
+                  choices=seq_len(.dim))
+
     da <- .data %>%
           mp_extract_sample() %>%
           dplyr::left_join(
-                 nmds$points[, seq_len(.dim)] %>%
-                 as_tibble(rownames="Sample") %>%
-                 setNames(c("Sample", paste0("NMDS", seq_len(.dim)))),
-                 by="Sample"
+                 dat,
+                 by=c("Sample"="sites")
           )
 
     if (action=="only"){
         da %<>%
+             add_attr(dat %>% attr("features_tb"), name="features_tb") %>%
              add_internal_attr(object=nmds, name="NMDS")
         return(da)
     }else if (action=="add"){
         .data@colData <- da %>%
                          tibble::column_to_rownames(var="Sample") %>%
-                         S4Vectors::DataFrame()
+                         S4Vectors::DataFrame(check.names=FALSE)
         .data %<>% add_internal_attr(object=nmds, name="NMDS")
-        return(.data)
+        return (.data)
     }
 })
 
@@ -371,27 +410,28 @@ setMethod("mp_cal_nmds", signature(.data="MPSE"), function(.data, .abundance, di
         nmds <- withr::with_seed(seed, vegan::metaMDS(distobj, distance=distmethod, k=.dim, ...))
     }
 
+    dat <- nmds %>%
+           tidydr(display=c("sites", "features"), choices=seq_len(.dim))
+
     if (action=="get"){
         return(nmds)
     }else if (action=="only"){
         da <- .data %>%
               mp_extract_sample() %>%
               dplyr::left_join(
-                  nmds$points[, seq_len(.dim)] %>%
-                  as_tibble(rownames="Sample") %>%
-                  setNames(c("Sample", paste0("NMDS", seq_len(.dim)))),
-                 by="Sample"
+                  dat,
+                  by=c("Sample"="sites")
               ) %>%
+              add_attr(dat %>% attr("features_tb"), name="features_tb") %>%
               add_internal_attr(object=nmds, name="NMDS")
         return(da)
     }else if (action=="add"){
         .data %<>%
             dplyr::left_join(
-                nmds$points[,seq_len(.dim)] %>%
-                as_tibble(rownames="Sample") %>%
-                setNames(c("Sample", paste0("NMDS", seq_len(.dim)))),
-                by="Sample"
+                dat,
+                by=c("Sample"="sites")
             ) %>%
+            add_attr(dat %>% attr("features_tb"), name="features_tb") %>%
             add_internal_attr(object=nmds, name="NMDS")
         return(.data)
     }

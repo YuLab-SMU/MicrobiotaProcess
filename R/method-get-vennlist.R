@@ -11,20 +11,22 @@
 #' @author Shuangbin Xu
 #' @export 
 #' @examples
+#' \dontrun{
 #' data(test_otu_data)
 #' vennlist <- get_vennlist(test_otu_data, 
 #'                  factorNames="group")
 #' vennlist
-#' #library(VennDiagram)
-#' #venn.diagram(vennlist, height=5, 
-#' #             width=5, filename = "./test_venn.pdf", 
-#' #             alpha = 0.85, fontfamily = "serif", 
-#' #             fontface = "bold",cex = 1.2, 
-#' #             cat.cex = 1.2, cat.default.pos = "outer",
-#' #             cat.dist = c(0.22,0.22,0.12,0.12), 
-#' #             margin = 0.1, lwd = 3, 
-#' #             lty ='dotted', 
-#' #             imagetype = "pdf")
+#' library(VennDiagram)
+#' venn.diagram(vennlist, height=5, 
+#'              width=5, filename = "./test_venn.pdf", 
+#'              alpha = 0.85, fontfamily = "serif", 
+#'              fontface = "bold",cex = 1.2, 
+#'              cat.cex = 1.2, cat.default.pos = "outer",
+#'              cat.dist = c(0.22,0.22,0.12,0.12), 
+#'              margin = 0.1, lwd = 3, 
+#'              lty ='dotted', 
+#'              imagetype = "pdf")
+#' }
 setGeneric("get_vennlist", function(obj, ...)standardGeneric("get_vennlist"))
 
 #' @aliases get_vennlist,phyloseq
@@ -75,6 +77,20 @@ setMethod("get_vennlist", "data.frame", function(obj,
 #' @param ... additional parameters.
 #' @return update object or tibble according the 'action'
 #' @export
+#' @author Shuangbin Xu
+#' @examples
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %>%
+#' mp_rrarefy() %>%
+#' mp_cal_venn(.abundance=RareAbundance, .group=time, action="add") -> mpse
+#' mpse
+#' library(ggplot2)
+#' mpse %>% 
+#'   mp_extract_sample() %>% 
+#'   select(time, vennOftime) %>%
+#'   distinct() %>%
+#'   pull(var=vennOftime, name=time) %>%
+#'   ggVennDiagram::ggVennDiagram()
 setGeneric("mp_cal_venn", function(.data, .group, .abundance=NULL, action="add", force=FALSE, ...)standardGeneric("mp_cal_venn"))
 
 #' @rdname mp_cal_venn-methods
@@ -111,9 +127,8 @@ setMethod("mp_cal_venn", signature(.data="MPSE"), function(.data, .group, .abund
                               names_to="Sample", 
                               values_to=rlang::as_name(.abundance))
 
-    sampleda <- .data@colData %>%
-                avoid_conflict_names() %>%
-                tibble::as_tibble(rownames="Sample")
+    sampleda <- .data %>%
+                mp_extract_sample()
 
     if (ncol(sampleda)>1){
         da %<>% left_join(sampleda, by="Sample")
@@ -124,12 +139,10 @@ setMethod("mp_cal_venn", signature(.data="MPSE"), function(.data, .group, .abund
 
     if (action == "add"){
         .data@colData <- 
-             .data@colData %>%
-             avoid_conflict_names() %>%
-             tibble::as_tibble(rownames="Sample") %>%
+             sampleda %>%
              dplyr::left_join(dat, by=rlang::as_name(.group)) %>%
              tibble::column_to_rownames(var="Sample") %>%
-             S4Vectors::DataFrame()
+             S4Vectors::DataFrame(check.names=FALSE)
 
         return(.data)
     

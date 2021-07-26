@@ -59,3 +59,18 @@ treedata object contained hierarchical cluster analysis of sample
 \description{
 Hierarchical cluster analysis for the samples with MPSE or tbl_mpse object
 }
+\examples{
+library(ggtree)
+library(ggplot2)
+data(mouse.time.mpse)
+res <- mouse.time.mpse \%>\%
+ mp_decostand(.abundance=Abundance) \%>\% 
+ mp_cal_clust(.abundance=hellinger, distmethod="bray")
+res
+res \%>\%
+ ggtree() + 
+ geom_tippoint(aes(color=time))
+}
+\author{
+Shuangbin Xu
+}
