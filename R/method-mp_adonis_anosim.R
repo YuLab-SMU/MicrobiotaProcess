@@ -24,7 +24,7 @@
 #'   mp_adonis(.abundance=hellinger, 
 #'             .formula=~time, 
 #'             distmethod="bray", 
-#'             permutations=9999, 
+#'             permutations=999, # for more robust, set it to 9999. 
 #'             action="get")
 setGeneric("mp_adonis", function(.data, .abundance, .formula, distmethod="bray", action="get", permutations=999, seed=123, ...)standardGeneric("mp_adonis"))
 
@@ -132,7 +132,7 @@ setMethod("mp_adonis", signature(.data="grouped_df_mpse"), .internal_cal_adonis)
 #' tbl <- mouse.time.mpse %>% 
 #'        mp_anosim(.abundance=hellinger, 
 #'                  .group=time,
-#'                  permutations=9999,
+#'                  permutations=999, # for more robust, set it to 9999
 #'                  action="only")
 #' tbl
 #' tbl %>%
@@ -275,7 +275,7 @@ setMethod("mp_anosim", signature(.data="grouped_df_mpse"),
 #'   mp_mrpp(.abundance=hellinger, 
 #'           .group=time, 
 #'           distmethod="bray", 
-#'           permutations=9999, 
+#'           permutations=999, # for more robust, set it to 9999. 
 #'           action="get")
 setGeneric("mp_mrpp", function(.data, .abundance, .group, distmethod="bray", action="add", permutations=999, seed=123, ...)standardGeneric("mp_mrpp"))
 

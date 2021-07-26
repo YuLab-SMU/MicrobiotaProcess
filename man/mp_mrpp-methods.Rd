@@ -88,7 +88,7 @@ mouse.time.mpse \%>\%
   mp_mrpp(.abundance=hellinger, 
           .group=time, 
           distmethod="bray", 
-          permutations=9999, 
+          permutations=999, # for more robust, set it to 9999. 
           action="get")
 }
 \author{

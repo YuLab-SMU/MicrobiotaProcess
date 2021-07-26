@@ -92,7 +92,7 @@ library(ggplot2)
 tbl <- mouse.time.mpse \%>\% 
        mp_anosim(.abundance=hellinger, 
                  .group=time,
-                 permutations=9999,
+                 permutations=999, # for more robust, set it to 9999
                  action="only")
 tbl
 tbl \%>\%

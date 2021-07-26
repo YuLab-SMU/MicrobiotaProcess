@@ -76,9 +76,24 @@ Calculate the distances between the samples with specified abundance.
 }
 \examples{
 data(mouse.time.mpse)
-mouse.time.mpse \%>\%
+mouse.time.mpse \%<>\%
 mp_decostand(.abundance=Abundance) \%>\% 
-mp_cal_dist(.abundance=hellinger)
+mp_cal_dist(.abundance=hellinger, distmethod="bray")
+# Visualization
+library(ggplot2)
+tbl <- mouse.time.mpse \%>\% 
+       mp_extract_sample 
+tbl
+tbl \%>\% 
+  select(Sample, time, bray) \%>\% 
+  unnest(cols=c(bray)) \%>\% 
+  mutate(time=paste0(time, "-vs-", time[match(braySampley, Sample)])) \%>\% 
+  dplyr::filter(time!="Late-vs-Early" & bray!=0) \%>\%
+  ggplot(aes(x=time, y=bray)) + 
+  geom_boxplot(aes(fill=time)) + 
+  geom_jitter(width=0.1) + 
+  xlab(NULL) + 
+  theme(legend.position="none")
 }
 \author{
 Shuangbin Xu

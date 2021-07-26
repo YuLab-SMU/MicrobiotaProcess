@@ -95,9 +95,24 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #' @export
 #' @examples
 #' data(mouse.time.mpse)
-#' mouse.time.mpse %>%
+#' mouse.time.mpse %<>%
 #' mp_decostand(.abundance=Abundance) %>% 
-#' mp_cal_dist(.abundance=hellinger)
+#' mp_cal_dist(.abundance=hellinger, distmethod="bray")
+#' # Visualization
+#' library(ggplot2)
+#' tbl <- mouse.time.mpse %>% 
+#'        mp_extract_sample 
+#' tbl
+#' tbl %>% 
+#'   select(Sample, time, bray) %>% 
+#'   unnest(cols=c(bray)) %>% 
+#'   mutate(time=paste0(time, "-vs-", time[match(braySampley, Sample)])) %>% 
+#'   dplyr::filter(time!="Late-vs-Early" & bray!=0) %>%
+#'   ggplot(aes(x=time, y=bray)) + 
+#'   geom_boxplot(aes(fill=time)) + 
+#'   geom_jitter(width=0.1) + 
+#'   xlab(NULL) + 
+#'   theme(legend.position="none")
 setGeneric("mp_cal_dist", function(.data, .abundance, .env=NULL, distmethod="bray", action="add", ...)standardGeneric("mp_cal_dist"))
 
 #' @rdname mp_cal_dist-methods
