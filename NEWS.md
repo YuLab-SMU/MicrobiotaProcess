@@ -1,5 +1,6 @@
 # MicrobiotaProcess 1.5.2.990
 
++ add `mp_diff_analysis` for `MPSE` or `tbl_mpse` object. (2021-07-27, Tue)
 + add `dr_extract` for the visualization of the result of ordination. (2021-07-26, Mon)
 + comment out the function for `phyloseq` and add rd of the function for `MPSE` or `tbl_mpse`. (2021-07-24, Sat)
 + update the function to parsing the result of `rda`, `cca`, `envfit`. (2021-07-23, Fri)
