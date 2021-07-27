@@ -62,6 +62,7 @@ of diffAnalysisClass.
 boxplot for the result of diff_analysis
 }
 \examples{
+\dontrun{
 data(kostic2012crc)
 kostic2012crc
 head(phyloseq::sample_data(kostic2012crc),3)
@@ -79,8 +80,9 @@ diffres <- diff_analysis(kostic2012crc, classgroup="DIAGNOSIS",
 library(ggplot2)
 p <- ggdiffbox(diffres, box_notch=FALSE, l_xlabtext="relative abundance")
 # set factor levels
-#p2 <- ggdiffbox(diffres, box_notch=FALSE, l_xlabtext="relative abundance", 
-#                factorLevels=list(DIAGNOSIS=c("Tumor", "Healthy")))
+p2 <- ggdiffbox(diffres, box_notch=FALSE, l_xlabtext="relative abundance", 
+                factorLevels=list(DIAGNOSIS=c("Tumor", "Healthy")))
+}
 }
 \author{
 Shuangbin Xu

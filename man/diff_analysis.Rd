@@ -119,6 +119,7 @@ diff_analysis class.
 Differential expression analysis
 }
 \examples{
+\dontrun{
 data(kostic2012crc)
 kostic2012crc
 head(phyloseq::sample_data(kostic2012crc),3)
@@ -132,6 +133,7 @@ diffres <- diff_analysis(kostic2012crc, classgroup="DIAGNOSIS",
                         secondcomfun = "wilcox.test",
                         subclmin=3, subclwilc=TRUE,
                         secondalpha=0.01, ldascore=3)
+}
 }
 \author{
 Shuangbin Xu

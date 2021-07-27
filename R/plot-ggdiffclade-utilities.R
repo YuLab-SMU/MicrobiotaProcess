@@ -2,14 +2,15 @@
 #' @keywords internal 
 get_cladedf <- function(ggtree, node){
     data <- ggtree$data
-    if ("nodeClass" %in% colnames(data)){
-        data <- set_newlevels(data=data, 
-                newlevels=taxlevelchar[seq_len(length(unique(data$nodeClass)))],
-                factorNames="nodeClass")
-        levelsnum <- length(levels(data$nodeClass)) + 1
-        tmpnum <- levelsnum - as.numeric(data$nodeClass)
-        data$extend <- get_extend(tmpnum)
-    }
+    #if ("nodeClass" %in% colnames(data)){
+    #    data <- set_newlevels(data=data, 
+    #            newlevels=taxlevelchar[seq_len(length(unique(data$nodeClass)))],
+    #            factorNames="nodeClass")
+    #    levelsnum <- length(levels(data$nodeClass)) + 1
+    #    tmpnum <- levelsnum - as.numeric(data$nodeClass)
+    #    data$extend <- get_extend(tmpnum)
+    #}
+    data$extend <- get_extend(max(data$nodeDepth) + 1 - data$nodeDepth)
     df <-lapply(node, function(x)get_clade_position_(data=data, node=x))
     df <- do.call("rbind", df)
     df$node <- node
@@ -22,15 +23,16 @@ get_cladedf <- function(ggtree, node){
 #' @keywords internal
 get_labeldf <- function(ggtree, node, angle="auto"){
     data <- ggtree$data
-    if ("nodeClass" %in% colnames(data)){
-        data <- set_newlevels(data=data,
-                newlevels=taxlevelchar[seq_len(length(unique(data$nodeClass)))],
-                factorNames="nodeClass")
-    	levelsnum <- length(levels(data$nodeClass)) + 1
-    	tmpnum <- levelsnum - as.numeric(data$nodeClass)
-    	data$levelindex <- tmpnum
-    	data$extend <- get_extend(tmpnum)*0.9
-    }
+    #if ("nodeClass" %in% colnames(data)){
+    #    data <- set_newlevels(data=data,
+    #            newlevels=taxlevelchar[seq_len(length(unique(data$nodeClass)))],
+    #            factorNames="nodeClass")
+    #	levelsnum <- length(levels(data$nodeClass)) + 1
+    #	tmpnum <- levelsnum - as.numeric(data$nodeClass)
+    #	data$levelindex <- tmpnum
+    #	data$extend <- get_extend(tmpnum)*0.9
+    #}
+    data$extend <- get_extend(max(data$nodeDepth) + 1 - data$nodeDepth) * 0.9
     df <- lapply(node, function(x)get_cladelabelposition(data, 
                  x, angle=angle, angleoff=90))
     df <- do.call("rbind", df)
@@ -83,9 +85,9 @@ get_cladelabelposition <- function(data,
 
 #' @author Shuangbin Xu, GuangChuang Yu
 #' @keywords internal
-get_annotlabel <- function(labeldf,classlevel=4){
-    df <- labeldf[labeldf$levelindex <= classlevel, ]
-    dat <- labeldf[labeldf$levelindex > classlevel, ]
+get_annotlabel <- function(labeldf, classlevel=4){
+    df <- labeldf[labeldf$nodeDepth >= classlevel, ]
+    dat <- labeldf[labeldf$nodeDepth < classlevel, ]
     lett <- c(letters, toupper(letters))
     if (nrow(df)>52){
         lengthtmp <- round(nrow(df)/52,0) + 1

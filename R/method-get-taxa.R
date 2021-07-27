@@ -241,9 +241,8 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     }else if (action=="only"){
        if (is.null(.data@taxatree)){
            da1 %<>% 
-               setNames(taxavar) %>%
-               dplyr::bind_rows(.id="TaxaClass") %>% 
-               dplyr::rename(AllTaxa="OTU")
+               tidyr::unnest () %>% 
+               suppressWarnings()
            
            if (ncol(sampleda)>1){
                sampleda %<>% dplyr::select(c("Sample", setdiff(colnames(sampleda), colnames(da1))))
@@ -252,7 +251,8 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
        }else{
            da1 <- .data@taxatree %>% 
                    as_tibble() %>%
-                   dplyr::select(-c("parent", "node", "nodeDepth"))
+                   dplyr::select(-c("parent", "node", "nodeDepth")) %>%
+                   dplyr::filter(.data$nodeClass != "Root")
        }
        return(da1)
     }
@@ -380,7 +380,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     
     if (action=="get"){
         if (is.null(taxatree)){
-            message("The taxatree of the MPSE object is empty")
+            message("The taxatree of the object is empty")
         }
 
         return(attr(.data, "taxatree"))
@@ -390,10 +390,9 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     }else if(action=="only"){
         if (is.null(taxatree)){
             da1 %<>%
-                setNames(taxavar) %>%
-                dplyr::bind_rows(.id="TaxaClass") %>%
-                dplyr::rename(AllTaxa="OTU")
-            
+                  tidyr::unnest() %>%
+                  suppressWarnings() 
+
             samplevar <- .data %>% attr("samplevar")
 
             if (length(samplevar)>1){
@@ -406,7 +405,8 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
             da1 <- .data %>% 
                    attr("taxatree") %>% 
                    as_tibble %>%
-                   dplyr::select(-c("parent", "node", "nodeDepth"))
+                   dplyr::select(-c("parent", "node", "nodeDepth")) %>%
+                   dplyr::filter(.data$nodeClass != "Root")
         }
         return(da1)
     }

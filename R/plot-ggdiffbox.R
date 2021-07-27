@@ -22,6 +22,7 @@
 #' @author Shuangbin Xu
 #' @export
 #' @examples
+#' \dontrun{
 #' data(kostic2012crc)
 #' kostic2012crc
 #' head(phyloseq::sample_data(kostic2012crc),3)
@@ -39,8 +40,9 @@
 #' library(ggplot2)
 #' p <- ggdiffbox(diffres, box_notch=FALSE, l_xlabtext="relative abundance")
 #' # set factor levels
-#' #p2 <- ggdiffbox(diffres, box_notch=FALSE, l_xlabtext="relative abundance", 
-#' #                factorLevels=list(DIAGNOSIS=c("Tumor", "Healthy")))
+#' p2 <- ggdiffbox(diffres, box_notch=FALSE, l_xlabtext="relative abundance", 
+#'                 factorLevels=list(DIAGNOSIS=c("Tumor", "Healthy")))
+#' }
 setGeneric("ggdiffbox", function(obj, ...){standardGeneric("ggdiffbox")})
 
 #' @aliases ggdiffbox,diffAnalysisClass

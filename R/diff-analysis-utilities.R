@@ -339,17 +339,23 @@ get_second_true_var <- function(obj){
 merge_total_res <- function(kwres, secondvars, mlres, params){
     f <- LDAmean <- MDAmean <- NULL
     secondvars <- do.call("rbind",c(secondvars,make.row.names=FALSE))
-    secondvars <- secondvars %>% dplyr::filter(eval(parse(text="gfc"))%in%"TRUE")
+    secondvars <- secondvars %>% dplyr::filter(.data$gfc == "TRUE" )
     classname <- params$classgroup
     efres <- merge(mlres, secondvars, by.x="f", by.y="f") %>%  
              select (-c("gfc", "Freq"))
     if ("LDAmean" %in% colnames(efres)){
-        efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)), LDAmean)]))
+        effectnm <- "LDAmean"
     }else{
-        efres <- efres %>% mutate(f = factor(f, levels=f[order(eval(parse(text=classname)),
-                                                         MDAmean)]))
+        effectnm <- "MDAmean"
     }
-    res <- merge(efres, kwres, by.x="f", by.y="f")
-    res <- res[order(res$pvalue),]
-    return(res)
+    newlevels <- efres %>%
+                 dplyr::group_by(!!as.symbol(classname)) %>%
+                 dplyr::arrange(!!as.symbol(effectnm)) %>%
+                 dplyr::pull(.data$f)
+
+    efres %<>% 
+         dplyr::inner_join(kwres, by="f") %>%   
+         mutate(f=factor(.data$f, levels=newlevels)) %>%
+         dplyr::arrange(.data$pvalue)
+    return(efres)
 }

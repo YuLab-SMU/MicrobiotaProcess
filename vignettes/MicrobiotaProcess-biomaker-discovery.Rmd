@@ -95,7 +95,7 @@ If the `taxda` was provided, it also can be visualized by `ggdiffclade`. The col
 diffcladeplot <- ggdiffclade(obj=diffres,
                              alpha=0.3, size=0.2, 
                              skpointsize=0.6,
-                             taxlevel=3,
+                             taxlevel=5,
                              settheme=FALSE, 
                              setColors=FALSE) +
                  scale_fill_manual(values=c("#00AED7", "#FD9347"))+
@@ -183,7 +183,7 @@ The explanation of figures refer to the previous section.
 
 ```{r, fig.width=7, fig.height=7, fig.align="center", error=FALSE, hmpdiffclade}
 hmpdiffclade <- ggdiffclade(obj=hmpdiffres, alpha=0.3, size=0.2, 
-                            skpointsize=0.4, taxlevel=3,
+                            skpointsize=0.4, taxlevel=4,
                             settheme=TRUE,
                             setColors=FALSE) +
                 scale_fill_manual(values=c('#00AED7', '#FD9347', '#C1E168'))

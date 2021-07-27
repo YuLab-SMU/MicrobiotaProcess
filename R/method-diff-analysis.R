@@ -50,6 +50,7 @@
 #' @importFrom magrittr %>%
 #' @export
 #' @examples
+#' \dontrun{
 #' data(kostic2012crc)
 #' kostic2012crc
 #' head(phyloseq::sample_data(kostic2012crc),3)
@@ -63,6 +64,7 @@
 #'                         secondcomfun = "wilcox.test",
 #'                         subclmin=3, subclwilc=TRUE,
 #'                         secondalpha=0.01, ldascore=3)
+#' }
 diff_analysis <- function(obj, ...){
 	UseMethod("diff_analysis")
 }

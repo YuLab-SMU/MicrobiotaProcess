@@ -195,19 +195,25 @@ setMethod("mp_extract_abundance", signature(x="grouped_df_mpse"), .internal_extr
 #' @rdname mp_extract_tree-methods
 #' @param x MPSE object
 #' @param type character taxatree or otutree
+#' @param tip.level character This argument will keep the nodes 
+#' belong to the tip.level as tip nodes when type is taxatree, default is OTU, 
+#' which will return the taxa tree with OTU level as tips.
 #' @param ... additional arguments
 #' @return taxatree treedata object
 #' @export
-setGeneric("mp_extract_tree", function(x, type="taxatree", ...){standardGeneric("mp_extract_tree")})
+setGeneric("mp_extract_tree", function(x, type="taxatree", tip.level="OTU", ...){standardGeneric("mp_extract_tree")})
 
 
 #' @rdname mp_extract_tree-methods
 #' @aliases mp_extract_tree,MPSE
 #' @exportMethod mp_extract_tree
-setMethod("mp_extract_tree", signature(x="MPSE"), function(x, type="taxatree", ...){
+setMethod("mp_extract_tree", signature(x="MPSE"), function(x, type="taxatree", tip.level="OTU", ...){
     type %<>% match.arg(c("taxatree", "otutree"))
     tree <- slot(x, type)
     if (!is.null(tree)){
+        if (type == "taxatree"){
+            tree <- .extract_tree_at_tiplevel(tree, tip.level=tip.level)
+        }
         return(tree)
     }else{
         message(tree_empty(type=type))
@@ -217,15 +223,15 @@ setMethod("mp_extract_tree", signature(x="MPSE"), function(x, type="taxatree", .
 #' @rdname mp_extract_tree-methods
 #' @aliases mp_extract_tree,tbl_mpse
 #' @exportMethod mp_extract_tree
-setMethod("mp_extract_tree", signature(x="tbl_mpse"),function(x, type="taxatree", ...){
-    .internal_tree(x=x, type=type)
+setMethod("mp_extract_tree", signature(x="tbl_mpse"),function(x, type="taxatree", tip.level="OTU", ...){
+    .internal_tree(x=x, type=type, tip.level=tip.level)
 })
 
 #' @rdname mp_extract_tree-methods
 #' @aliases mp_extract_tree,grouped_df_mpse
 #' @exportMethod mp_extract_tree
-setMethod("mp_extract_tree", signature(x="grouped_df_mpse"),function(x, type="taxatree", ...){
-    .internal_tree(x=x, type=type)
+setMethod("mp_extract_tree", signature(x="grouped_df_mpse"),function(x, type="taxatree", tip.level="OTU", ...){
+    .internal_tree(x=x, type=type, tip.level=tip.level)
 })
 
 #' @title extract the taxonomy annotation in MPSE object
@@ -463,8 +469,9 @@ setMethod("mp_extract_internal_attr", signature(x="tbl_mpse"), .internal_extract
 setMethod("mp_extract_internal_attr", signature(x="grouped_df_mpse"), .internal_extract_internal_attr)
 
 .internal_extract_dist <- function(data, distmethod, env){
-    distmethod <- switch(as.character(env),                                                                                                                                                                                               "TRUE" = paste0("Env_", distmethod),
-                       "FALSE" = distmethod)
+    distmethod <- switch(as.character(env),
+                         "TRUE" = paste0("Env_", distmethod),
+                         "FALSE" = distmethod)
 
     if (!distmethod %in% colnames(data)){
         rlang::abort(paste0("There is not ", distmethod, 
@@ -488,14 +495,36 @@ setMethod("mp_extract_internal_attr", signature(x="grouped_df_mpse"), .internal_
     return(distobj)
 }
 
-.internal_tree <- function(x, type){
+.internal_tree <- function(x, type, tip.level){
     type %<>% match.arg(c("taxatree", "otutree"))
     tree <- x %>% attr(type)
     if (!is.null(tree)){
+        if (type == "taxatree"){
+            tree <- .extract_tree_at_tiplevel(tree, tip.level=tip.level)
+        }
         return(tree)
     }else{
         message(tree_empty(type=type))
     }
+}
+
+.extract_tree_at_tiplevel <- function(tree, tip.level){
+    if (tip.level=="OTU"){
+        return(tree)
+    }
+    rmnms <- tree %>% as_tibble %>% 
+             dplyr::filter(.data$nodeDepth > .data$nodeDepth[match(tip.level, .data$nodeClass)]) %>%
+             select(.data$label, .data$nodeDepth) %>% 
+             group_by(.data$nodeDepth) %>% 
+             dplyr::summarize(label=list(.data$label)) %>% 
+             arrange(dplyr::desc(.data$nodeDepth)) %>% 
+             pull(.data$label) 
+    if (length(rmnms) > 0){
+        for ( i in rmnms){
+            tree <- treeio::drop.tip(tree, tip=i, collapse.singles=FALSE, trim.internal=FALSE)
+        }
+    }
+    return(tree)
 }
 
 tree_empty <- function(type){

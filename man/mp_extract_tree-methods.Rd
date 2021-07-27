@@ -11,18 +11,22 @@
 \alias{mp_extract_tree,grouped_df_mpse}
 \title{extract the taxonomy tree in MPSE object}
 \usage{
-mp_extract_tree(x, type = "taxatree", ...)
+mp_extract_tree(x, type = "taxatree", tip.level = "OTU", ...)
 
-\S4method{mp_extract_tree}{MPSE}(x, type = "taxatree", ...)
+\S4method{mp_extract_tree}{MPSE}(x, type = "taxatree", tip.level = "OTU", ...)
 
-\S4method{mp_extract_tree}{tbl_mpse}(x, type = "taxatree", ...)
+\S4method{mp_extract_tree}{tbl_mpse}(x, type = "taxatree", tip.level = "OTU", ...)
 
-\S4method{mp_extract_tree}{grouped_df_mpse}(x, type = "taxatree", ...)
+\S4method{mp_extract_tree}{grouped_df_mpse}(x, type = "taxatree", tip.level = "OTU", ...)
 }
 \arguments{
 \item{x}{MPSE object}
 
 \item{type}{character taxatree or otutree}
+
+\item{tip.level}{character This argument will keep the nodes 
+belong to the tip.level as tip nodes when type is taxatree, default is OTU, 
+which will return the taxa tree with OTU level as tips.}
 
 \item{...}{additional arguments}
 }

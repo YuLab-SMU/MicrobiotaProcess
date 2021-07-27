@@ -16,29 +16,31 @@
 #' @author Shuangbin Xu
 #' @export
 #' @examples
+#' \dontrun{
 #' data(kostic2012crc)
 #' kostic2012crc
 #' head(phyloseq::sample_data(kostic2012crc),3)
 #' kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
 #' table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
-#' #set.seed(1024)
-#' #diffres <- diff_analysis(kostic2012crc, classgroup="DIAGNOSIS",
-#' #                        mlfun="lda", filtermod="fdr",
-#' #                        firstcomfun = "kruskal.test",
-#' #                        firstalpha=0.05, strictmod=TRUE,
-#' #                        secondcomfun = "wilcox.test", 
-#' #                        subclmin=3, subclwilc=TRUE,
-#' #                        secondalpha=0.01, ldascore=3) 
-#' #library(ggplot2)
-#' #effectplot <- ggeffectsize(diffres) +
-#' #              scale_color_manual(values=c('#00AED7', 
-#' #                                          '#FD9347', 
-#' #                                          '#C1E168'))+
-#' #              theme_bw()+
-#' #              theme(strip.background=element_rect(fill=NA),
-#' #                    panel.spacing = unit(0.2, "mm"),
-#' #                    panel.grid=element_blank(),
-#' #                    strip.text.y=element_blank())
+#' set.seed(1024)
+#' diffres <- diff_analysis(kostic2012crc, classgroup="DIAGNOSIS",
+#'                         mlfun="lda", filtermod="fdr",
+#'                         firstcomfun = "kruskal.test",
+#'                         firstalpha=0.05, strictmod=TRUE,
+#'                         secondcomfun = "wilcox.test", 
+#'                         subclmin=3, subclwilc=TRUE,
+#'                         secondalpha=0.01, ldascore=3) 
+#' library(ggplot2)
+#' effectplot <- ggeffectsize(diffres) +
+#'               scale_color_manual(values=c('#00AED7', 
+#'                                           '#FD9347', 
+#'                                           '#C1E168'))+
+#'               theme_bw()+
+#'               theme(strip.background=element_rect(fill=NA),
+#'                     panel.spacing = unit(0.2, "mm"),
+#'                     panel.grid=element_blank(),
+#'                     strip.text.y=element_blank())
+#' }
 ggeffectsize <- function(obj,...){
     UseMethod("ggeffectsize")
 }
@@ -98,7 +100,7 @@ ggeffectsize.data.frame <- function(obj,
     #}
     p <- p + theme_bw()+
     	theme(axis.text.y = element_text(size=12),
-	      axis.text.x = element_text(size=12),
+	          axis.text.x = element_text(size=12),
       	      panel.grid=element_blank(),
     	      #panel.spacing = unit(0.2, "mm"),
     	      legend.title=element_text(size=10),

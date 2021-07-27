@@ -16,7 +16,7 @@ ggdiffclade(obj, ...)
   linewd = 0.6,
   skpointsize = 0.8,
   alpha = 0.4,
-  taxlevel = 6,
+  taxlevel = 5,
   cladetext = 2,
   factorLevels = NULL,
   setColors = TRUE,
@@ -84,6 +84,7 @@ contained hierarchical relationship or other classes,such like the
 tax_data of phyloseq.
 }
 \examples{
+\dontrun{
 data(kostic2012crc)
 kostic2012crc
 head(phyloseq::sample_data(kostic2012crc),3)
@@ -98,14 +99,15 @@ diffres <- diff_analysis(kostic2012crc, classgroup="DIAGNOSIS",
                         secondcomfun = "wilcox.test",
                         subclmin=3, subclwilc=TRUE,
                         secondalpha=0.01, ldascore=3)
-#library(ggplot2)
-#diffcladeplot <- ggdiffclade(diffres,alpha=0.3, linewd=0.2, 
-#                        skpointsize=0.4, 
-#                        taxlevel=3,
-#                        setColors=FALSE) +
-#        scale_fill_manual(values=c('#00AED7', 
-#                                   '#FD9347', 
-#                                   '#C1E168'))
+library(ggplot2)
+diffcladeplot <- ggdiffclade(diffres,alpha=0.3, linewd=0.2, 
+                        skpointsize=0.4, 
+                        taxlevel=5,
+                        setColors=FALSE) +
+        scale_fill_manual(values=c('#00AED7', 
+                                   '#FD9347', 
+                                   '#C1E168'))
+}
 }
 \author{
 Shuangbin Xu
