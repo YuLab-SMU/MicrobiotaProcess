@@ -3,18 +3,24 @@
 \name{as.phyloseq}
 \alias{as.phyloseq}
 \alias{as_phyloseq}
+\alias{as.phyloseq.MPSE}
 \alias{as.phyloseq.tbl_mpse}
 \title{convert to phyloseq object.}
 \usage{
-as.phyloseq(x, ...)
+as.phyloseq(x, .abundance, ...)
 
-as_phyloseq(x, ...)
+as_phyloseq(x, .abundance, ...)
 
-\method{as.phyloseq}{tbl_mpse}(x, ...)
+\method{as.phyloseq}{MPSE}(x, .abundance, ...)
+
+\method{as.phyloseq}{tbl_mpse}(x, .abundance, ...)
 }
 \arguments{
 \item{x}{object, tbl_mpse object, which the result of 
 as_tibble for phyloseq objcet.}
+
+\item{.abundance}{the column name to be as the abundance 
+of otu table, default is Abundance.}
 
 \item{...}{additional params}
 }

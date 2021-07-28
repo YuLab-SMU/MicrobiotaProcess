@@ -310,16 +310,16 @@ setGeneric("mp_diff_analysis", function(.data,
              otu_tb <- .data %>% 
                        mp_extract_feature() 
              result %<>% dplyr::rename(label="f")
-             result %<>% dplyr::select(c("label",setdiff(colnames(result), colnames(otu_tb))))
+             #result %<>% dplyr::select(c("label",setdiff(colnames(result), colnames(otu_tb))))
              otu_tb %<>% dplyr::left_join(result, by="label")
              return(otu_tb)                  
          }else{
              result %<>% 
                  dplyr::rename(label="f") 
-             result %<>% dplyr::select(setdiff(colnames(result), 
-                                       c(colnames(taxatree@data), 
-                                         colnames(taxatree@extraInfo)))
-                                      )
+             #result %<>% dplyr::select(setdiff(colnames(result), 
+             #                          c(colnames(taxatree@data), 
+             #                            colnames(taxatree@extraInfo)))
+             #                         )
              taxatree %<>% treeio::full_join(result, by="label")
              return(taxatree)
          }

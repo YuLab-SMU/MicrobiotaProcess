@@ -128,8 +128,8 @@ setMethod("mp_rrarefy", signature(.data="tbl_mpse"), function(.data, raresize, t
                      dplyr::group_by(.data$OTU) %>% 
                      dplyr::summarise(Total=sum(.data$RareAbundance)) %>% 
                      filter(.data$Total==0) %>% 
-                     select("OTU") %>%
-                     unlist(use.names=FALSE)
+                     pull("OTU") %>%
+                     unique()
         if (length(removeOTU) > 0){
             message(length(removeOTU), " OTUs were removed because they are no longer present in any sample after ",
                     "rarefaction, if you want to keep them you can set 'trimOTU = FALSE' !")

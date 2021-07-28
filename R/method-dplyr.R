@@ -15,7 +15,6 @@ filter.alphasample <- function(.data, ..., .preserve = FALSE){
 }
 
 ##' @method filter MPSE
-##' @importFrom ape keep.tip
 ##' @export
 filter.MPSE <- function(.data, ..., .preserve = FALSE, .returnMPSE = FALSE){
     .data %<>% as_tibble()

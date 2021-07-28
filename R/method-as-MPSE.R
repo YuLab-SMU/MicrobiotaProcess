@@ -33,10 +33,10 @@ setMethod("as.MPSE", signature(.data="tbl_mpse"),
         .data %<>% as_tibble()
         assaysda <- lapply(assaysvar, function(x) 
             .data %>%
-            select(c("Sample", "OTU", x)) %>%
-            distinct() %>%
-            pivot_wider(names_from="Sample", values_from=x) %>%
-            column_to_rownames(var="OTU")
+            dplyr::select(c("Sample", "OTU", x)) %>%
+            dplyr::distinct() %>%
+            tidyr::pivot_wider(names_from="Sample", values_from=x) %>%
+            tibble::column_to_rownames(var="OTU")
         ) %>% stats::setNames(assaysvar)
 
         nsample <- ncol(assaysda[[1]])

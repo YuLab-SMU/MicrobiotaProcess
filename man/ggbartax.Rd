@@ -75,10 +75,12 @@ barplot of tax
 taxonomy barplot
 }
 \examples{
-library(ggplot2)
-data(test_otu_data)
-otubar <- ggbartax(test_otu_data) + 
-         xlab(NULL) + ylab("relative abundance(\%)")
+\dontrun{
+    library(ggplot2)
+    data(test_otu_data)
+    otubar <- ggbartax(test_otu_data) + 
+              xlab(NULL) + ylab("relative abundance(\%)")
+}
 }
 \author{
 Shuangbin Xu

@@ -1,10 +1,12 @@
 #' @title convert to phyloseq object. 
 #' @param x object, tbl_mpse object, which the result of 
 #' as_tibble for phyloseq objcet.
+#' @param .abundance the column name to be as the abundance 
+#' of otu table, default is Abundance.
 #' @param ... additional params
 #' @return phyloseq object.
 #' @export
-as.phyloseq <- function(x, ...){
+as.phyloseq <- function(x, .abundance, ...){
     UseMethod("as.phyloseq")
 }
 
@@ -12,55 +14,59 @@ as.phyloseq <- function(x, ...){
 #' @export
 as_phyloseq <- as.phyloseq
 
-#' @method as.phyloseq tbl_mpse
+#' @method as.phyloseq MPSE
 #' @rdname as.phyloseq
-#' @importFrom tidyr pivot_wider
-#' @importFrom dplyr distinct
 #' @export
-as.phyloseq.tbl_mpse <- function(x, ...){
-    samplevar <- attr(x, "samplevar")
-    taxatree <- attr(x, "taxatree")
-    tree <- attr(x, "otutree")
-    refseq <- attr(x, "refseq")
+
+as.phyloseq.MPSE <- function(x, .abundance, ...){
+    .abundance <- rlang::enquo(.abundance)
+    
+    if (rlang::quo_is_missing(.abundance)){
+        .abundance <- as.symbol("Abundance")
+    }
     otuda <- x %>% 
-             select(c("Sample", "OTU", "Abundance")) %>%
-             distinct() %>%
-             pivot_wider(names_from="OTU", values_from="Abundance") %>% 
-             column_to_rownames(var="Sample")
-    if (!is.null(samplevar)){
-        sampleda <- x[, colnames(x) %in% samplevar] %>%
-                    distinct() %>% 
-                    column_to_rownames(var="Sample")
-        sampleda <- phyloseq::sample_data(sampleda)
+              mp_extract_abundance(.abundance=!!.abundance) %>%
+              phyloseq::otu_table(taxa_are_rows=TRUE)     
+    
+    otutree <- x %>% mp_extract_tree(type="otutree")
+    sampleda <- x %>% mp_extract_sample()
+    taxada <- x %>% mp_extract_taxonomy()
+
+    if (inherits(x, "MPSE")){
+        refseq <- x@refseq
+    }else{
+        refseq <- x %>% attr("refseq")
+    }
+
+    if (ncol(sampleda) > 1){
+        sampleda <- sampleda %>% 
+                    tibble::column_to_rownames(var="Sample") %>%
+                    phyloseq::sample_data()
     }else{
         sampleda <- NULL
     }
 
-    if (!is.null(taxatree)){
-        #taxada <- x[,colnames(x) %in% c("OTU",taxavar)] %>% 
-        #          distinct() %>%
-        #          column_to_rownames(var="OTU") %>% 
-        #          as.matrix()
-        taxada <- taxatree_to_tb(taxatree)
-        taxada <- phyloseq::tax_table(taxada)
+    if (!is.null(taxada)){
+        taxada <- taxada %>%
+                as.matrix() %>% 
+                phyloseq::tax_table()
     }else{
         taxada <- NULL
     }
-    
-    if (!is.null(tree)){
-        tree <- keep.tip(tree, colnames(otuda))
+
+    if (!is.null(otutree)){
+        otutree <- otutree@phylo
     }
-    if (!is.null(refseq)){
-        refseq <- refseq[colnames(otuda)]
-    }
-    res <- phyloseq::phyloseq(phyloseq::otu_table(otuda, taxa_are_rows=FALSE), sampleda, taxada, tree, refseq)
-    return (res)
+
+    res <- phyloseq::phyloseq(otuda, sampleda, taxada, otutree, refseq)
+    return (res)    
 }
+
+#' @method as.phyloseq tbl_mpse
+#' @rdname as.phyloseq
+#' @export
+as.phyloseq.tbl_mpse <- as.phyloseq.MPSE
 
 #' @method as.phyloseq grouped_df_mpse
 #' @export
-as.phyloseq.grouped_df_mpse <- function(x, ...){
-    x %<>% ungroup()
-    res <- as.phyloseq(x=x,...)
-    return(res)
-}
+as.phyloseq.grouped_df_mpse <- as.phyloseq.MPSE
