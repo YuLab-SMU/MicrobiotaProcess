@@ -1,5 +1,6 @@
 # MicrobiotaProcess 1.5.2.990
 
++ update `as.phyloseq` for `MPSE` or `tbl_mpse` object. (2021-07-28, Wed)
 + add `mp_diff_analysis` for `MPSE` or `tbl_mpse` object. (2021-07-27, Tue)
 + add `dr_extract` for the visualization of the result of ordination. (2021-07-26, Mon)
 + comment out the function for `phyloseq` and add rd of the function for `MPSE` or `tbl_mpse`. (2021-07-24, Sat)
@@ -63,8 +64,9 @@
 + changed `clustplotClass` to `treedata`. (2021-06-28, Tue)
 + add `mp_rrarefy` method to rarefy species richness. (2021-06-29, Tue)
   - it supports `MPSE`, `tbl_mpse`, `grouped_df_mpse` object via wrapping `vegan::rrarefy`.
-+ update `as.MPSE` and `as.treedata` for `grouped_df_mpse` object. (2021-06-29, Tue)
-  - This feature is useful to explore the microbiome data in taxa tree. 
++ ~~update `as.MPSE` and `as.treedata` for `grouped_df_mpse` object. (2021-06-29, Tue)~~
+  ~~- This feature is useful to explore the microbiome data in taxa tree.~~ 
+  This feature has been replaced by the `taxatree` slot
   
 # MicrobiotaProcess 1.5.1
 
