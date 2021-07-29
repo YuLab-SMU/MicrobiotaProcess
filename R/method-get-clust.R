@@ -112,8 +112,13 @@ get_clust.phyloseq <- function(obj,
 #' @param .abundance the name of abundance to be calculated.
 #' @param distmethod the method of distance.
 #' @param hclustmethod the method of hierarchical cluster
+#' @param action a character "add" will return a MPSE object with the cluster 
+#' result as a attributes, and it can be extracted with 'object %>% mp_extract_cluster()', 
+#' "only" or "get" will return 'treedata' object, default is 'get'.
 #' @param ... additional parameters
-#' @return treedata object contained hierarchical cluster analysis of sample
+#' @return update object with the action argument, the treedata object 
+#' contained hierarchical cluster analysis of sample, it can be visualized 
+#' with 'ggtree' directly.
 #' @export
 #' @author Shuangbin Xu
 #' @examples
@@ -127,68 +132,54 @@ get_clust.phyloseq <- function(obj,
 #' res %>%
 #'  ggtree() + 
 #'  geom_tippoint(aes(color=time))
-setGeneric("mp_cal_clust", function(.data, .abundance, distmethod="bray", hclustmethod="average", ...)standardGeneric("mp_cal_clust"))
+setGeneric("mp_cal_clust", function(.data, .abundance, distmethod="bray", hclustmethod="average", action="get", ...)standardGeneric("mp_cal_clust"))
 
+.internal_cal_clust <-  function(.data, .abundance, distmethod="bray", hclustmethod="average", action="get", ...){
+    action %<>% match.arg(c("get", "only", "add"))
 
-#' @rdname mp_cal_clust-methods
-#' @aliases mp_cal_clust,MPSE
-#' @exportMethod mp_cal_clust
-setMethod("mp_cal_clust", signature(.data="MPSE"), function(.data, .abundance, distmethod="bray", hclustmethod="average", ...){
-    
     .abundance <- rlang::enquo(.abundance)
-     
-    if(! distmethod %in% colnames(.data@colData)){
-        if (rlang::quo_is_missing(.abundance)){
-            rlang::abort("The .abundance must be required, when the distmethod is not present in the object.")
-        }else{
-            .data %<>% mp_cal_dist(.abundance=!!.abundance, distmethod=distmethod, action="add", ...)
-        }
+
+    if (inherits(.data, "MPSE")){
+       flag <- !distmethod %in% colnames(.data@colData)
+    }else{
+       flag <- !distmethod %in% colnames(.data)
     }
-    
-    distobj <- .data %>% mp_extract_dist(distmethod=distmethod)
-    
-    res <- distobj %>% 
-           hclust(method=hclustmethod) %>%
-           ape::as.phylo() %>%
-           treeio::full_join(
-            y = .data@colData %>%
-                data.frame(check.names=FALSE) %>%
-                avoid_conflict_names(spename="label") %>%
-                as_tibble(rownames="label"),
-           by="label"
-           )
 
-    return(res)
-})
-
-
-.internal_cal_clust <-  function(.data, .abundance, distmethod="bray", hclustmethod="average", ...){
-    
-    .abundance <- rlang::enquo(.abundance)
-    if (!distmethod %in% colnames(.data)){
+    if (flag){
         if (rlang::quo_is_missing(.abundance)){
             rlang::abort("The .abundance must be required, when the distmethod is not present in the object.")
         }else{
-            .data %<>% mp_cal_dist(.abundance=!!.abundance, distmethod=distmethod, action="add", ...)
+            .data %<>% mp_cal_dist(.abundance=!!.abundance, distmethod=distmethod, action="add")
         }
     }
     
     distobj <- .data %>% mp_extract_dist(distmethod=distmethod)
 
     res <- distobj %>%
-           hclust(method=hclustmethod) %>%
+           hclust(method=hclustmethod, ...) %>%
            ape::as.phylo() %>%
            treeio::full_join(
                y = .data %>% 
-                    ungroup() %>% 
-                    select(.data %>% attr("samplevar")) %>%
-                    distinct() %>%
+                    mp_extract_sample() %>%
                     avoid_conflict_names(spename="label") %>%
                     rename(label="Sample"),
                by="label"
            )
-    return(res)
+    if (action %in% c("get", "only")){
+        return(res)
+    }else if (action=="add"){
+        message("The result was added to the internal attributes of the object")
+        message("It can be extracted via object %>% mp_extract_internal_attr(name='SampleClust') !")
+        .data %<>%
+             add_internal_attr(object=res, name="SampleClust")
+        return(.data)
+    }
 }
+
+#' @rdname mp_cal_clust-methods
+#' @aliases mp_cal_clust,MPSE
+#' @exportMethod mp_cal_clust
+setMethod("mp_cal_clust", signature(.data="MPSE"), .internal_cal_clust)
 
 #' @rdname mp_cal_clust-methods
 #' @aliases mp_cal_clust,tbl_mpse

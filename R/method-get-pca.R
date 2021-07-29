@@ -270,6 +270,7 @@ setMethod("mp_cal_dca", signature(.data="MPSE"), function(.data, .abundance, .di
                   dat,
                   by=c("Sample"="sites")
               ) %>%
+              add_attr(dat %>% attr("features_tb"), name="features_tb") %>%
               add_internal_attr(object=dca, name="DCA")
         return(da)
     }else if (action=="add"){

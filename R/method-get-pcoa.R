@@ -176,6 +176,7 @@ get_varct.pcoa <- function(obj,...){
 #' library(ggplot2)
 #' tbl %>% 
 #'  ggplot(aes(x=!!x, y=!!y, color=time)) + 
+#'  stat_ellipse(aes(fill=time), geom="polygon", alpha=0.5) +
 #'  geom_point() +
 #'  geom_vline(xintercept=0, color="grey20", linetype=2) + 
 #'  geom_hline(yintercept=0, color="grey20", linetype=2) +

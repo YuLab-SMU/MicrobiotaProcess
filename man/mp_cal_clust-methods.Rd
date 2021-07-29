@@ -15,6 +15,7 @@ mp_cal_clust(
   .abundance,
   distmethod = "bray",
   hclustmethod = "average",
+  action = "get",
   ...
 )
 
@@ -23,6 +24,7 @@ mp_cal_clust(
   .abundance,
   distmethod = "bray",
   hclustmethod = "average",
+  action = "get",
   ...
 )
 
@@ -31,6 +33,7 @@ mp_cal_clust(
   .abundance,
   distmethod = "bray",
   hclustmethod = "average",
+  action = "get",
   ...
 )
 
@@ -39,6 +42,7 @@ mp_cal_clust(
   .abundance,
   distmethod = "bray",
   hclustmethod = "average",
+  action = "get",
   ...
 )
 }
@@ -51,10 +55,16 @@ mp_cal_clust(
 
 \item{hclustmethod}{the method of hierarchical cluster}
 
+\item{action}{a character "add" will return a MPSE object with the cluster 
+result as a attributes, and it can be extracted with 'object %>% mp_extract_cluster()', 
+"only" or "get" will return 'treedata' object, default is 'get'.}
+
 \item{...}{additional parameters}
 }
 \value{
-treedata object contained hierarchical cluster analysis of sample
+update object with the action argument, the treedata object 
+contained hierarchical cluster analysis of sample, it can be visualized 
+with 'ggtree' directly.
 }
 \description{
 Hierarchical cluster analysis for the samples with MPSE or tbl_mpse object
