@@ -8,29 +8,28 @@
 \alias{mp_extract_abundance,tbl_mpse}
 \alias{mp_extract_abundance,grouped_df_mpse-method}
 \alias{mp_extract_abundance,grouped_df_mpse}
-\title{extract the abundance matrix from MPSE object or tbl_mpse object}
+\title{Extracting the abundance metric from MPSE or tbl_mpse object}
 \usage{
-mp_extract_abundance(x, .abundance, byRow = TRUE, ...)
+mp_extract_abundance(x, taxa.class = "all", ...)
 
-\S4method{mp_extract_abundance}{MPSE}(x, .abundance, byRow = TRUE, ...)
+\S4method{mp_extract_abundance}{MPSE}(x, taxa.class = "all", ...)
 
-\S4method{mp_extract_abundance}{tbl_mpse}(x, .abundance, byRow = TRUE, ...)
+\S4method{mp_extract_abundance}{tbl_mpse}(x, taxa.class = "all", ...)
 
-\S4method{mp_extract_abundance}{grouped_df_mpse}(x, .abundance, byRow = TRUE, ...)
+\S4method{mp_extract_abundance}{grouped_df_mpse}(x, taxa.class = "all", ...)
 }
 \arguments{
 \item{x}{MPSE or tbl_mpse object}
 
-\item{.abundance}{the name of abundance to be extracted.}
+\item{taxa.class}{character the name of taxonomy 
+class level what you want to extract}
 
-\item{byRow}{logical if it is set TRUE, 'otu X sample' shape will return,
-else 'sample X otu' will return.}
-
-\item{...}{additional parameters.}
-}
-\value{
-otu abundance a data.frame object
+\item{...}{additional parameters}
 }
 \description{
-extract the abundance matrix from MPSE object or tbl_mpse object
+Extracting the abundance metric from the MPSE or tbl_mpse,
+the 'mp_cal_abundance' must have been run with action='add'.
+}
+\author{
+Shuangbin Xu
 }
