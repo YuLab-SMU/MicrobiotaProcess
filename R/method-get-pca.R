@@ -91,7 +91,7 @@ setMethod("mp_cal_pca", signature(.data="MPSE"), function(.data, .abundance, .di
     
     .abundance <- rlang::enquo(.abundance)
 
-    x <- .data %>% mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+    x <- .data %>% mp_extract_assays(.abundance=!!.abundance, byRow=FALSE)
 
     pca <- prcomp(x, ...)
     
@@ -132,7 +132,7 @@ setMethod("mp_cal_pca", signature(.data="MPSE"), function(.data, .abundance, .di
 
     .abundance <- rlang::enquo(.abundance)
 
-    x <- .data %>% mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+    x <- .data %>% mp_extract_assays(.abundance=!!.abundance, byRow=FALSE)
     
     pca <- prcomp(x, ...)
 
@@ -205,7 +205,7 @@ setMethod("mp_cal_dca", signature(.data="MPSE"), function(.data, .abundance, .di
 
     .abundance <- rlang::enquo(.abundance)
 
-    x <- .data %>% mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+    x <- .data %>% mp_extract_assays(.abundance=!!.abundance, byRow=FALSE)
 
     dca <- vegan::decorana(x, ...)
 
@@ -247,7 +247,7 @@ setMethod("mp_cal_dca", signature(.data="MPSE"), function(.data, .abundance, .di
 
     .abundance <- rlang::enquo(.abundance)
 
-    x <- .data %>% mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+    x <- .data %>% mp_extract_assays(.abundance=!!.abundance, byRow=FALSE)
 
     dca <- vegan::decorana(x, ...)
 

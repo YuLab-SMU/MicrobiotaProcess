@@ -173,7 +173,7 @@ setGeneric("mp_diff_analysis", function(.data,
      taxatree <- .data %>% mp_extract_tree(tip.level=tip.level)
 
      if (is.null(taxatree)){
-         f_tb <- .data %>% mp_extract_abundance(.abundance=!!abundance.nm, byRow=FALSE)
+         f_tb <- .data %>% mp_extract_assays(.abundance=!!abundance.nm, byRow=FALSE)
      }else{
          f_tb <- taxatree %>%
                  as_tibble() %>%

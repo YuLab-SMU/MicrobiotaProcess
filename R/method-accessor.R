@@ -109,7 +109,7 @@ setMethod("[", signature(x="MPSE"),
 }
 
 #' extract the abundance matrix from MPSE object or tbl_mpse object
-#' @rdname mp_extract_abundance-methods
+#' @rdname mp_extract_assays-methods
 #' @param x MPSE or tbl_mpse object
 #' @param .abundance the name of abundance to be extracted.
 #' @param byRow logical if it is set TRUE, 'otu X sample' shape will return,
@@ -117,12 +117,12 @@ setMethod("[", signature(x="MPSE"),
 #' @return otu abundance a data.frame object
 #' @param ... additional parameters.
 #' @export
-setGeneric("mp_extract_abundance", function(x, .abundance, byRow=TRUE, ...)standardGeneric("mp_extract_abundance"))
+setGeneric("mp_extract_assays", function(x, .abundance, byRow=TRUE, ...)standardGeneric("mp_extract_assays"))
 
-#' @rdname mp_extract_abundance-methods
-#' @aliases mp_extract_abundance,MPSE
-#' @exportMethod mp_extract_abundance
-setMethod("mp_extract_abundance", signature(x="MPSE"), function(x, .abundance, byRow=TRUE, ...){
+#' @rdname mp_extract_assays-methods
+#' @aliases mp_extract_assays,MPSE
+#' @exportMethod mp_extract_assays
+setMethod("mp_extract_assays", signature(x="MPSE"), function(x, .abundance, byRow=TRUE, ...){
     .abundance <- rlang::enquo(.abundance)
     if (rlang::quo_is_missing(.abundance)){
         rlang::abort("The abundance name is required !")
@@ -179,15 +179,15 @@ setMethod("mp_extract_abundance", signature(x="MPSE"), function(x, .abundance, b
     return(dat)
 }
 
-#' @rdname mp_extract_abundance-methods
-#' @aliases mp_extract_abundance,tbl_mpse
-#' @exportMethod mp_extract_abundance
-setMethod("mp_extract_abundance", signature(x="tbl_mpse"), .internal_extract_abundance)
+#' @rdname mp_extract_assays-methods
+#' @aliases mp_extract_assays,tbl_mpse
+#' @exportMethod mp_extract_assays
+setMethod("mp_extract_assays", signature(x="tbl_mpse"), .internal_extract_abundance)
 
-#' @rdname mp_extract_abundance-methods
-#' @aliases mp_extract_abundance,grouped_df_mpse
-#' @exportMethod mp_extract_abundance
-setMethod("mp_extract_abundance", signature(x="grouped_df_mpse"), .internal_extract_abundance)
+#' @rdname mp_extract_assays-methods
+#' @aliases mp_extract_assays,grouped_df_mpse
+#' @exportMethod mp_extract_assays
+setMethod("mp_extract_assays", signature(x="grouped_df_mpse"), .internal_extract_abundance)
 
 
 #' @title extract the taxonomy tree in MPSE object
@@ -378,6 +378,68 @@ setMethod("mp_extract_feature", signature(x="tbl_mpse"), .internal_extract_featu
 #' @aliases mp_extract_feature,grouped_df_mpse
 #' @exportMethod mp_extract_feature
 setMethod("mp_extract_feature", signature(x="grouped_df_mpse"), .internal_extract_feature)
+
+#' Extracting the abundance metric from MPSE or tbl_mpse object
+#' @description 
+#' Extracting the abundance metric from the MPSE or tbl_mpse,
+#' the 'mp_cal_abundance' must have been run with action='add'.
+#' @rdname mp_extract_abundance-methods
+#' @param x MPSE or tbl_mpse object
+#' @param taxa.class character the name of taxonomy 
+#' class level what you want to extract
+#' @param ... additional parameters
+#' @author Shuangbin Xu
+#' @export
+setGeneric("mp_extract_abundance", function(x, taxa.class="all", ...)standardGeneric("mp_extract_abundance"))
+
+.internal_extract_abundance <- function(x, taxa.class="all", ...){
+    taxa.class <- rlang::enquo(taxa.class)
+    
+    taxatree <-  x %>% 
+                 mp_extract_tree()
+    
+    if (is.null(taxatree)){
+        da <- x %>% mp_extract_feature() 
+        if (ncol(da)==1){
+            message("Please make sure the mp_cal_abundance(..., action='add') has been run.")
+            return(NULL)
+        }
+        return(da)
+    }else{
+        flag <-c(colnames(taxatree@data), colnames(taxatree@extraInfo)) %>% 
+               unique() %in% c("node", "nodeClass", "nodeDepth")
+        if (length(flag)==3 && all(flag)){
+            message("Please make sure the mp_cal_abundance(..., action='add') has been run.")
+            return(NULL)        
+        }
+        taxatree %<>% 
+            as_tibble %>%    
+            dplyr::select(-c("parent", "node", "nodeDepth")) %>%
+            dplyr::filter(.data$nodeClass != "Root")
+        taxa.class <- rlang::as_name(taxa.class)
+        if (taxa.class!="all"){
+            taxatree %<>% 
+                  dplyr::filter(.data$nodeClass == taxa.class)
+        }
+        return(taxatree)
+    }
+
+}
+
+#' @rdname mp_extract_abundance-methods
+#' @aliases mp_extract_abundance,MPSE
+#' @export mp_extract_abundance
+setMethod("mp_extract_abundance", signature(x="MPSE"), .internal_extract_abundance)
+
+#' @rdname mp_extract_abundance-methods
+#' @aliases mp_extract_abundance,tbl_mpse
+#' @export mp_extract_abundance
+setMethod("mp_extract_abundance", signature(x="tbl_mpse"), .internal_extract_abundance)
+
+#' @rdname mp_extract_abundance-methods
+#' @aliases mp_extract_abundance,grouped_df_mpse
+#' @export mp_extract_abundance
+setMethod("mp_extract_abundance", signature(x="grouped_df_mpse"), .internal_extract_abundance)
 
 
 .internal_extract_taxonomy <- function(taxatree, classnm){

@@ -337,7 +337,7 @@ setMethod("mp_cal_nmds", signature(.data="MPSE"), function(.data, .abundance, di
     .abundance <- rlang::enquo(.abundance)
 
     if (distmethod %in% distMethods$vegdist ){
-        x <- .data %>% mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+        x <- .data %>% mp_extract_assays(.abundance=!!.abundance, byRow=FALSE)
         
         nmds <- withr::with_seed(seed, vegan::metaMDS(x, distance=distmethod, k=.dim, ...))
 
@@ -392,7 +392,7 @@ setMethod("mp_cal_nmds", signature(.data="MPSE"), function(.data, .abundance, di
     .abundance <- rlang::enquo(.abundance)
 
     if (distmethod %in% distMethods$vegdist ){
-        x <- .data %>% mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+        x <- .data %>% mp_extract_assays(.abundance=!!.abundance, byRow=FALSE)
 
         nmds <- withr::with_seed(seed, vegan::metaMDS(x, distance=distmethod, k=.dim, ...))
 

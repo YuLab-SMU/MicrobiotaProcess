@@ -25,7 +25,7 @@ as.phyloseq.MPSE <- function(x, .abundance, ...){
         .abundance <- as.symbol("Abundance")
     }
     otuda <- x %>% 
-              mp_extract_abundance(.abundance=!!.abundance) %>%
+              mp_extract_assays(.abundance=!!.abundance) %>%
               phyloseq::otu_table(taxa_are_rows=TRUE)     
     
     otutree <- x %>% mp_extract_tree(type="otutree")

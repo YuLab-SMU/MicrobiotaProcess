@@ -50,7 +50,7 @@ setMethod("mp_cal_cca", signature(.data="MPSE"),function(.data, .abundance, .for
 
     .abundance <- rlang::enquo(.abundance)
 
-    x <- .data %>% mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+    x <- .data %>% mp_extract_assays(.abundance=!!.abundance, byRow=FALSE)
 
     if (!is.null(.formula)){
         .formula <- paste0(c("x", .formula), collapse=" ") %>% as.formula()
@@ -102,7 +102,7 @@ setMethod("mp_cal_cca", signature(.data="MPSE"),function(.data, .abundance, .for
 
     .abundance <- rlang::enquo(.abundance)
 
-    x <- .data %>% mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+    x <- .data %>% mp_extract_assays(.abundance=!!.abundance, byRow=FALSE)
 
     if (!is.null(.formula)){
         .formula <- paste0(c("x", .formula), collapse=" ") %>% as.formula()

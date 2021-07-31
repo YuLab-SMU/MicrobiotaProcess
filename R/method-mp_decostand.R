@@ -61,7 +61,7 @@ setMethod("mp_decostand", signature(.data="MPSE"),function(.data, .abundance=NUL
     xx <- SummarizedExperiment::assays(.data)@listData
 
     da <- .data %>%
-          mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+          mp_extract_assays(.abundance=!!.abundance, byRow=FALSE)
 
     newda <- da %>% mp_decostand(method=method, logbase=logbase, ...) %>% t()
 
@@ -99,7 +99,7 @@ setMethod("mp_decostand", signature(.data="MPSE"),function(.data, .abundance=NUL
     othernms <- colnames(.data)[!colnames(.data) %in% c("OTU", "Sample", assaysvar)]
 
     newda <- .data %>% 
-             mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE) %>%
+             mp_extract_assays(.abundance=!!.abundance, byRow=FALSE) %>%
              mp_decostand(method=method, logbase=logbase, ...) %>%
              tibble::as_tibble(rownames="Sample") %>% 
              tidyr::pivot_longer(!as.symbol("Sample"), values_to=newnm, names_to="OTU")

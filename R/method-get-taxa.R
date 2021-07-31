@@ -111,7 +111,39 @@ setMethod("get_taxadf", "data.frame",
 #' is not be rarefied, default is FALSE.
 #' @param ... additional parameters.
 #' @return update object or tibble according the 'action'
+#' @author Shuangbin Xu
 #' @export
+#' @examples
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %<>%
+#'   mp_rrarefy() 
+#' mouse.time.mpse
+#' mouse.time.mpse %<>%
+#'   mp_cal_abundance(.abundance=RareAbundance, action="add") %>% 
+#'   mp_cal_abundance(.abundance=RareAbundance, .group=time, action="add") 
+#' tbl <- mouse.time.mpse %>%
+#'        mp_extract_abundance(taxa.class="all")
+#' tbl
+#' library(ggplot2)
+#' library(ggalluvial)
+#' library(forcats)
+#' library(dplyr)
+#' tbl %<>%
+#'   dplyr::filter(nodeClass=="Phylum") %>%
+#'   tidyr::unnest(cols=c(Sample, RelRareAbundanceBySample, time)) 
+#' tbl
+#' p <- ggplot(data=tbl,
+#'             mapping=aes(x=Sample, 
+#'                         y=RelRareAbundanceBySample, 
+#'                         alluvium=fct_reorder(label, desc(RelRareAbundanceBySample)),
+#'                         fill=fct_reorder(label, desc(RelRareAbundanceBySample)))) + 
+#'      geom_flow(stat="alluvium", lode.guidance = "frontback", color = "darkgray") +
+#'      geom_stratum(stat="alluvium") +
+#'      labs(x=NULL, y="Relative Abundance (%)") +
+#'      scale_fill_brewer(name="Phylum", type = "qual", palette = "Paired") +
+#'      facet_grid(cols=vars(time), scales="free_x", space="free") +
+#'      theme(axis.text.x=element_text(angle=-45, hjust=0))
+#' p  
 setGeneric("mp_cal_abundance", 
            function(.data, 
                     .abundance = NULL, 

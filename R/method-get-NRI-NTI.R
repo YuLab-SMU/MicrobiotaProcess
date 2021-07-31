@@ -157,7 +157,7 @@ setMethod("mp_cal_NRI_NTI", signature(.data="MPSE"), function(.data, .abundance,
     }
 
     indexda <- .data %>% 
-               mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE) %>%
+               mp_extract_assays(.abundance=!!.abundance, byRow=FALSE) %>%
                as.matrix() %>%
                get_NRI_NTI(tree=otutree@phylo, force=TRUE, abundance.weighted=TRUE, ...)
 

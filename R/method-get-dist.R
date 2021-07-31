@@ -186,7 +186,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
     }else{
 
         da <- .data %>% 
-              mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+              mp_extract_assays(.abundance=!!.abundance, byRow=FALSE)
         distsampley <- paste0(distmethod, "Sampley")
     }
 
@@ -299,7 +299,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
     }else{
 
         da <- .data %>%
-              mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+              mp_extract_assays(.abundance=!!.abundance, byRow=FALSE)
         distsampley <- paste0(distmethod, "Sampley")
     }    
 

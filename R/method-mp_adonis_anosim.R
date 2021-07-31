@@ -40,7 +40,7 @@ setGeneric("mp_adonis", function(.data, .abundance, .formula, distmethod="bray",
 
     if (distmethod %in% distMethods$vegdist ){
 
-        x <- .data %>% mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+        x <- .data %>% mp_extract_assays(.abundance=!!.abundance, byRow=FALSE)
 
         sampleda <- .data %>%
                     mp_extract_sample() %>%
@@ -156,7 +156,7 @@ setGeneric("mp_anosim", function(.data, .abundance, .group, distmethod="bray", a
                 select(c(!!as.symbol("Sample"), !!.group)) 
 
     if (distmethod %in% distMethods$vegdist ){
-        x <- .data %>% mp_extract_abundance(.abundance=!!.abundance, byRow=FALSE)
+        x <- .data %>% mp_extract_assays(.abundance=!!.abundance, byRow=FALSE)
 
         sampleda %<>% dplyr::arrange(match(rownames(x), !!as.symbol("Sample"))) %>%
                       pull(!!.group)
