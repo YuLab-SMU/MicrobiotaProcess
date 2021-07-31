@@ -1,5 +1,7 @@
-# MicrobiotaProcess 1.5.2.990
+# MicrobiotaProcess 1.5.3
 
++ rename `mp_extract_abundance` to `mp_extract_assays` from `MPSE` or `tbl_mpse`. (2021-07-31, Sat)
++ update the method to save the result of `mp_cal_clust` by introducing `action` argument. (2021-07-29, Thu).
 + update `as.phyloseq` for `MPSE` or `tbl_mpse` object. (2021-07-28, Wed)
 + add `mp_diff_analysis` for `MPSE` or `tbl_mpse` object. (2021-07-27, Tue)
 + add `dr_extract` for the visualization of the result of ordination. (2021-07-26, Mon)
