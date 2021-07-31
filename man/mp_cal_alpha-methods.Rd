@@ -60,7 +60,7 @@ library(ggplot2)
 library(ggsignif)
 library(gghalves)
 p <- ggplot(data=tbl, aes(x=time, y=alpha, fill=time)) + 
-     geom_half_violin(color=NA, side="l", trim=F) + 
+     geom_half_violin(color=NA, side="l", trim=FALSE) + 
      geom_boxplot(aes(color=time), fill=NA, position=position_nudge(x=.22), width=0.2) + 
      geom_half_point(side="r", shape=21) + 
      geom_signif(comparisons=list(c("Early", "Late")), test="wilcox.test", textsize=2) + 
