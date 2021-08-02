@@ -89,6 +89,9 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #' of stats), "unifrac", "weighted unifrac" (implement in phyloseq),
 #' @param action character, "add" joins the distance data to the object, "only" return
 #' a non-redundant tibble with the distance information. "get" return 'dist' object.
+#' @param scale logical whether scale the metric of environment (.env is provided) before
+#' the distance was calculated, default is FALSE. The environment matrix can be processed
+#' when it was joined to the MPSE or tbl_mpse object.
 #' @param ... additional parameters.
 #' @return update object or tibble according the 'action'
 #' @author Shuangbin Xu
@@ -113,13 +116,13 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #'   geom_jitter(width=0.1) + 
 #'   xlab(NULL) + 
 #'   theme(legend.position="none")
-setGeneric("mp_cal_dist", function(.data, .abundance, .env=NULL, distmethod="bray", action="add", ...)standardGeneric("mp_cal_dist"))
+setGeneric("mp_cal_dist", function(.data, .abundance, .env=NULL, distmethod="bray", action="add", scale=FALSE, ...)standardGeneric("mp_cal_dist"))
 
 #' @rdname mp_cal_dist-methods
 #' @aliases mp_cal_dist,MPSE
 #' @importFrom rlang :=
 #' @exportMethod mp_cal_dist
-setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .env=NULL, distmethod="bray", action="add", ...){
+setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .env=NULL, distmethod="bray", action="add", scale=FALSE, ...){
     
     action %<>% match.arg(c("add", "get", "only"))
 
@@ -182,6 +185,9 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
                                   ) %>%
                 column_to_rownames(var="Sample")
         }
+        if (scale){
+            da %<>% scale()
+        }
         distsampley <- paste0("Env_", distmethod, "Sampley")
     }else{
 
@@ -233,7 +239,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
 })
 
 
-.internal_cal_dist <- function(.data, .abundance, .env=NULL, distmethod="bray", action="add", ...){
+.internal_cal_dist <- function(.data, .abundance, .env=NULL, distmethod="bray", action="add", scale=FALSE, ...){
     action %<>% match.arg(c("add", "get", "only"))
 
     .abundance <- rlang::enquo(.abundance)
@@ -294,6 +300,9 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
                                                select_true_nm()
                                   ) %>%
                 column_to_rownames(var="Sample")
+        }
+        if (scale){
+            da %<>% scale()
         }
         distsampley <- paste0("Env_", distmethod, "Sampley")
     }else{

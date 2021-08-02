@@ -22,6 +22,8 @@ mp_mantel(
   permutations = 999,
   action = "get",
   seed = 123,
+  scale.y = FALSE,
+  scale.z = FALSE,
   ...
 )
 
@@ -37,6 +39,8 @@ mp_mantel(
   permutations = 999,
   action = "get",
   seed = 123,
+  scale.y = FALSE,
+  scale.z = FALSE,
   ...
 )
 
@@ -52,6 +56,8 @@ mp_mantel(
   permutations = 999,
   action = "get",
   seed = 123,
+  scale.y = FALSE,
+  scale.z = FALSE,
   ...
 )
 
@@ -67,6 +73,8 @@ mp_mantel(
   permutations = 999,
   action = "get",
   seed = 123,
+  scale.y = FALSE,
+  scale.z = FALSE,
   ...
 )
 }
@@ -98,6 +106,12 @@ provided) object.}
 
 \item{seed}{a random seed to make the analysis reproducible, default is 123.}
 
+\item{scale.y}{logical whether scale the environment matrix (.y.env) before 
+the distance is calculated, default is FALSE}
+
+\item{scale.z}{logical whether scale the environment matrix (.z.env) before
+the distance is calculated, default is FALSE}
+
 \item{...}{additional parameters, see also \code{\link[vegan]{mantel}}.}
 }
 \value{
@@ -105,6 +119,16 @@ update object or tibble according the 'action'
 }
 \description{
 Mantel and Partial Mantel Tests for MPSE or tbl_mpse Object
+}
+\examples{
+library(vegan)
+data(varespec, varechem)
+mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
+mpse \%>\% mp_mantel(.abundance=Abundance, 
+                   .y.env=colnames(varechem),
+                   distmethod.y="euclidean",
+                   scale.y = TRUE
+                   )
 }
 \seealso{
 \code{\link[vegan]{mantel}}

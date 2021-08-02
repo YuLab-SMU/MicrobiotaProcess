@@ -16,6 +16,7 @@ mp_cal_dist(
   .env = NULL,
   distmethod = "bray",
   action = "add",
+  scale = FALSE,
   ...
 )
 
@@ -25,6 +26,7 @@ mp_cal_dist(
   .env = NULL,
   distmethod = "bray",
   action = "add",
+  scale = FALSE,
   ...
 )
 
@@ -34,6 +36,7 @@ mp_cal_dist(
   .env = NULL,
   distmethod = "bray",
   action = "add",
+  scale = FALSE,
   ...
 )
 
@@ -43,6 +46,7 @@ mp_cal_dist(
   .env = NULL,
   distmethod = "bray",
   action = "add",
+  scale = FALSE,
   ...
 )
 }
@@ -65,6 +69,10 @@ of stats), "unifrac", "weighted unifrac" (implement in phyloseq),}
 
 \item{action}{character, "add" joins the distance data to the object, "only" return
 a non-redundant tibble with the distance information. "get" return 'dist' object.}
+
+\item{scale}{logical whether scale the metric of environment (.env is provided) before
+the distance was calculated, default is FALSE. The environment matrix can be processed
+when it was joined to the MPSE or tbl_mpse object.}
 
 \item{...}{additional parameters.}
 }

@@ -16,10 +16,23 @@
 #' of the object, "only" and "get" return 'mantel' or 'mantel.partial' (if .z.env is
 #' provided) object.
 #' @param seed a random seed to make the analysis reproducible, default is 123.
+#' @param scale.y logical whether scale the environment matrix (.y.env) before 
+#' the distance is calculated, default is FALSE
+#' @param scale.z logical whether scale the environment matrix (.z.env) before
+#' the distance is calculated, default is FALSE
 #' @param ... additional parameters, see also \code{\link[vegan]{mantel}}.
 #' @return update object or tibble according the 'action'
 #' @seealso \code{\link[vegan]{mantel}}
 #' @export
+#' @examples
+#' library(vegan)
+#' data(varespec, varechem)
+#' mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
+#' mpse %>% mp_mantel(.abundance=Abundance, 
+#'                    .y.env=colnames(varechem),
+#'                    distmethod.y="euclidean",
+#'                    scale.y = TRUE
+#'                    )
 setGeneric("mp_mantel", 
            function(.data, 
                     .abundance, 
@@ -32,6 +45,8 @@ setGeneric("mp_mantel",
                     permutations=999,
                     action="get",
                     seed=123,
+                    scale.y = FALSE,
+                    scale.z = FALSE,
                     ...){
                standardGeneric("mp_mantel")
 })
@@ -48,6 +63,8 @@ setGeneric("mp_mantel",
                    permutations=999, 
                    action="get",
                    seed = 123,
+                   scale.y = FALSE,
+                   scale.z = FALSE,
                    ...
                    ){
 
@@ -71,16 +88,16 @@ setGeneric("mp_mantel",
 
     xdist <- .data %>% mp_extract_dist(distmethod=distmethod)
 
-    ydist <- .data %>% mp_cal_dist(.env=!!.y.env, distmethod.y=distmethod.y, action="get")
+    ydist <- .data %>% mp_cal_dist(.env=!!.y.env, distmethod=distmethod.y, action="get", scale=scale.y)
     
     if (!rlang::quo_is_null(.z.env)){
-        zdist <- .data %>% mp_cal_dist(.env=!!.z.env, distmethod=distmethod.z, action="get")
+        zdist <- .data %>% mp_cal_dist(.env=!!.z.env, distmethod=distmethod.z, action="get", scale=scale.z)
         res <- withr::with_seed(seed, vegan::mantel.partial(xdis=xdist, ydis=ydist, zdis=zdist, method=method, permutations=permutations, ...))
     }else{
         res <- withr::with_seed(seed, vegan::mantel(xdis=xdist, ydis=ydist, method=method, permutations=permutations, ...))
     }
 
-    if (action %in% c("get", "only")){
+    if (action %in% c("get")){
         return(res)
     }else if(action=="add"){
         print(res)
