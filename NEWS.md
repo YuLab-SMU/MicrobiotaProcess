@@ -1,3 +1,8 @@
+# MicrobiotaProcess 1.5.3.990
+
++ add `mp_stat_taxa` to count the number and total number taxa for each sample at 
+  different taxonomy levels (Kingdom, Phylum, Class, Order, Family, Genus, Species, OTU). (2021-08-03, Tue)
+
 # MicrobiotaProcess 1.5.3
 
 + rename `mp_extract_abundance` to `mp_extract_assays` from `MPSE` or `tbl_mpse`. (2021-07-31, Sat)
