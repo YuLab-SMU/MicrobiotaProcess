@@ -184,10 +184,11 @@ setMethod("mp_cal_alpha", signature(.data="MPSE"),
     da <- alphada@alpha %>% as_tibble(rownames="Sample")
     da <- .data %>%
           mp_extract_sample() %>%
-          left_join(da, by="Sample") %>% 
-          column_to_rownames(var="Sample")
+          left_join(da, by="Sample") 
     if (action=="add"){
-        .data@colData <- da %>% S4Vectors::DataFrame(check.names=FALSE)
+        .data@colData <- da %>% 
+                         column_to_rownames(var="Sample") %>% 
+                         S4Vectors::DataFrame(check.names=FALSE)
         return(.data)
     }else if (action=="only"){
         return(da)
