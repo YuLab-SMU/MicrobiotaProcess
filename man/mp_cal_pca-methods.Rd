@@ -26,8 +26,7 @@ mp_cal_pca(.data, .abundance, .dim = 3, action = "add", ...)
 \item{.dim}{integer The number of dimensions to be returned, default is 3.}
 
 \item{action}{character "add" joins the pca result to the object, "only" return
-a non-redundant tibble with the pca result. "get" return 'pcasample' object can
-be visualized with 'ggordpoint'.}
+a non-redundant tibble with the pca result. "get" return 'prcomp' object.}
 
 \item{...}{additional parameters see also 'prcomp'}
 }

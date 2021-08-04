@@ -496,47 +496,6 @@ setMethod("mp_extract_abundance", signature(x="grouped_df_mpse"), .internal_extr
 
 }
 
-#' @title extract the dist object from MPSE or tbl_mpse object
-#' @docType methods
-#' @rdname mp_extract_dist-methods
-#' @param x MPSE object or tbl_mpse object
-#' @param distmethod character the method of calculated distance.
-#' @param env logical whether extract the distance of samples calculated 
-#' based on continuous environment factors, default is FALSE.
-#' @return dist object.
-#' @export
-setGeneric("mp_extract_dist", function(x, distmethod, env=FALSE)standardGeneric("mp_extract_dist"))
-
-#' @rdname mp_extract_dist-methods
-#' @aliases mp_extract_dist,MPSE
-#' @exportMethod mp_extract_dist
-setMethod("mp_extract_dist", signature(x="MPSE"), function(x, distmethod, env=FALSE){
-    data <- x@colData %>%
-            data.frame(check.names=FALSE) %>%
-            avoid_conflict_names() %>% 
-            as_tibble(rownames="Sample")
-    res <- .internal_extract_dist(data=data, distmethod=distmethod, env=env)
-    return(res)
-})
-
-#' @rdname mp_extract_dist-methods
-#' @aliases mp_extract_dist,tbl_mpse
-#' @exportMethod mp_extract_dist
-setMethod("mp_extract_dist", signature(x="tbl_mpse"), function(x, distmethod, env=FALSE){
-    res <- .internal_extract_dist(data=x, distmethod=distmethod, env=env)
-    return(res)
-})
-
-#' @rdname mp_extract_dist-methods
-#' @aliases mp_extract_dist,grouped_df_mpse
-#' @exportMethod mp_extract_dist
-setMethod("mp_extract_dist", signature(x="grouped_df_mpse"), function(x, distmethod, env=FALSE){
-    data <- x %>% ungroup()
-    res <- .internal_extract_dist(data=data, distmethod=distmethod, env=env)
-    return(res)
-})
-
-
 #' Extracting the PCA, PCoA, etc results from MPSE or tbl_mpse object
 #' @rdname mp_extract_internal_attr-methods
 #' @param x MPSE or tbl_mpse object
@@ -568,8 +527,23 @@ setMethod("mp_extract_internal_attr", signature(x="tbl_mpse"), .internal_extract
 #' @exportMethod mp_extract_internal_attr
 setMethod("mp_extract_internal_attr", signature(x="grouped_df_mpse"), .internal_extract_internal_attr)
 
-.internal_extract_dist <- function(data, distmethod, env){
-    distmethod <- switch(as.character(env),
+#' @title extract the dist object from MPSE or tbl_mpse object
+#' @docType methods
+#' @rdname mp_extract_dist-methods
+#' @param x MPSE object or tbl_mpse object
+#' @param distmethod character the method of calculated distance.
+#' @param env.flag logical whether extract the distance of samples calculated
+#' based on continuous environment factors, default is FALSE.
+#' @param .group the column name of sample information, default is NULL, when it
+#' is provided, a tibble that can be visualized via ggplot2 will return.
+#' @return dist object or tbl_df object when .group is provided.
+#' @export
+setGeneric("mp_extract_dist", function(x, distmethod, env.flag=FALSE, .group=NULL)standardGeneric("mp_extract_dist"))
+
+.internal_extract_dist <- function(x, distmethod, env.flag=FALSE, .group=NULL){
+    .group <- rlang::enquo(.group)
+    data <- x %>% mp_extract_sample()
+    distmethod <- switch(as.character(env.flag),
                          "TRUE" = paste0("Env_", distmethod),
                          "FALSE" = distmethod)
 
@@ -578,22 +552,53 @@ setMethod("mp_extract_internal_attr", signature(x="grouped_df_mpse"), .internal_
                             " distance in the object, please check whether the mp_cal_dist has been performed!"))
     }
     
-    distname <- paste0(distmethod, "Sampley")
+    distname <- paste0(distmethod, "Sampley") %>% as.symbol()
 
-    distobj <- data %>%
-            select(c("Sample", distmethod)) %>%
-            distinct() %>%
-            tidyr::unnest() %>%
-            suppressWarnings() %>%
-            rename(x="Sample", y=distname, r=distmethod) %>%
-            corrr::retract() %>%
-            tibble::column_to_rownames(var=colnames(.)[1])
-    distobj <- distobj[colnames(distobj), ] %>%
-    #distobj[lower.tri(distobj)] <- t(distobj)[lower.tri(distobj)] 
-               stats::as.dist() %>%
-               add_attr(distmethod, "method")
-    return(distobj)
+    if (rlang::quo_is_null(.group)){
+        distobj <- data %>%
+                select(c("Sample", distmethod)) %>%
+                distinct() %>%
+                tidyr::unnest() %>%
+                suppressWarnings() %>%
+                rename(x="Sample", y=distname, r=distmethod) %>%
+                corrr::retract() %>%
+                tibble::column_to_rownames(var=colnames(.)[1])
+        distobj <- distobj[colnames(distobj), ] 
+        distobj[lower.tri(distobj)] <- t(distobj)[lower.tri(t(distobj))]
+        distobj %<>% stats::as.dist() %>%
+                     add_attr(distmethod, "method")
+        return(distobj)
+    }else{
+        group.y <- paste0(rlang::as_name(.group),".tmp") %>% as.symbol()
+        dist.tb <- data %>%
+                   dplyr::select(c("Sample", distmethod, !!.group)) %>%
+                   tidyr::unnest(cols=distmethod) %>%
+                   dplyr::mutate(dplyr::across(!!.group, 
+                                               ~.x[match(!!as.symbol(distname), !!as.symbol("Sample"))], 
+                                               .names=rlang::as_name(group.y))) %>% 
+                   dplyr::rowwise() %>% 
+                   dplyr::mutate(GroupsComparison=paste0(sort(c(!!.group, !!group.y)),collapse="-vs-")) %>%
+                   dplyr::filter(.data$Sample != !!as.symbol(distname)) %>%
+                   dplyr::select(c("Sample", distmethod, "GroupsComparison", distname))
+        return(dist.tb)
+    }
 }
+
+#' @rdname mp_extract_dist-methods
+#' @aliases mp_extract_dist,MPSE
+#' @exportMethod mp_extract_dist
+setMethod("mp_extract_dist", signature(x="MPSE"), .internal_extract_dist)
+
+#' @rdname mp_extract_dist-methods
+#' @aliases mp_extract_dist,tbl_mpse
+#' @exportMethod mp_extract_dist
+setMethod("mp_extract_dist", signature(x="tbl_mpse"), .internal_extract_dist)
+
+#' @rdname mp_extract_dist-methods
+#' @aliases mp_extract_dist,grouped_df_mpse
+#' @exportMethod mp_extract_dist
+setMethod("mp_extract_dist", signature(x="grouped_df_mpse"), .internal_extract_dist)
+
 
 .internal_tree <- function(x, type, tip.level){
     type %<>% match.arg(c("taxatree", "otutree"))

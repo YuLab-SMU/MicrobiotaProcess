@@ -99,20 +99,16 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #' @examples
 #' data(mouse.time.mpse)
 #' mouse.time.mpse %<>%
-#' mp_decostand(.abundance=Abundance) %>% 
-#' mp_cal_dist(.abundance=hellinger, distmethod="bray")
+#'     mp_decostand(.abundance=Abundance) %>% 
+#'     mp_cal_dist(.abundance=hellinger, distmethod="bray")
 #' # Visualization
 #' library(ggplot2)
-#' tbl <- mouse.time.mpse %>% 
-#'        mp_extract_sample 
+#' tbl <- mouse.time.mpse %>%
+#'        mp_extract_dist(distmethod="bray", .group=time)
 #' tbl
 #' tbl %>% 
-#'   select(Sample, time, bray) %>% 
-#'   unnest(cols=c(bray)) %>% 
-#'   mutate(time=paste0(time, "-vs-", time[match(braySampley, Sample)])) %>% 
-#'   dplyr::filter(time!="Late-vs-Early" & bray!=0) %>%
-#'   ggplot(aes(x=time, y=bray)) + 
-#'   geom_boxplot(aes(fill=time)) + 
+#'   ggplot(aes(x=GroupsComparison, y=bray)) + 
+#'   geom_boxplot(aes(fill=GroupsComparison)) + 
 #'   geom_jitter(width=0.1) + 
 #'   xlab(NULL) + 
 #'   theme(legend.position="none")
@@ -218,7 +214,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
     dat <- da %>% 
         as.matrix %>% 
         corrr::as_cordf(diagonal=0) %>% 
-        corrr::stretch(na.rm=FALSE, remove.dups=FALSE) %>%
+        corrr::stretch(na.rm=FALSE, remove.dups=TRUE) %>%
         dplyr::rename(!!distmethod:="r", !!distsampley:="y") %>% 
         tidyr::nest(!!distmethod:=c(!!as.symbol(distsampley), !!as.symbol(distmethod)))
 
@@ -334,7 +330,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
     dat <- da %>%
         as.matrix %>%
         corrr::as_cordf(diagonal=0) %>%
-        corrr::stretch(na.rm=FALSE, remove.dups=FALSE) %>%
+        corrr::stretch(na.rm=FALSE, remove.dups=TRUE) %>%
         dplyr::rename(!!distmethod:="r", !!distsampley:="y") %>%
         tidyr::nest(!!distmethod:=c(!!as.symbol(distsampley), !!as.symbol(distmethod)))
 

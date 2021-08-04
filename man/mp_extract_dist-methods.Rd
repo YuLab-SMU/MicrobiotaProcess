@@ -11,24 +11,27 @@
 \alias{mp_extract_dist,grouped_df_mpse}
 \title{extract the dist object from MPSE or tbl_mpse object}
 \usage{
-mp_extract_dist(x, distmethod, env = FALSE)
+mp_extract_dist(x, distmethod, env.flag = FALSE, .group = NULL)
 
-\S4method{mp_extract_dist}{MPSE}(x, distmethod, env = FALSE)
+\S4method{mp_extract_dist}{MPSE}(x, distmethod, env.flag = FALSE, .group = NULL)
 
-\S4method{mp_extract_dist}{tbl_mpse}(x, distmethod, env = FALSE)
+\S4method{mp_extract_dist}{tbl_mpse}(x, distmethod, env.flag = FALSE, .group = NULL)
 
-\S4method{mp_extract_dist}{grouped_df_mpse}(x, distmethod, env = FALSE)
+\S4method{mp_extract_dist}{grouped_df_mpse}(x, distmethod, env.flag = FALSE, .group = NULL)
 }
 \arguments{
 \item{x}{MPSE object or tbl_mpse object}
 
 \item{distmethod}{character the method of calculated distance.}
 
-\item{env}{logical whether extract the distance of samples calculated 
+\item{env.flag}{logical whether extract the distance of samples calculated
 based on continuous environment factors, default is FALSE.}
+
+\item{.group}{the column name of sample information, default is NULL, when it
+is provided, a tibble that can be visualized via ggplot2 will return.}
 }
 \value{
-dist object.
+dist object or tbl_df object when .group is provided.
 }
 \description{
 extract the dist object from MPSE or tbl_mpse object
