@@ -55,9 +55,9 @@ mp_cal_pcoa(
 
 \item{.dim}{integer The number of dimensions to be returned, default is 3.}
 
-\item{action}{character "add" joins the pca result to the object, "only" return
-a non-redundant tibble with the pca result. "get" return 'pcasample' object can
-be visualized with 'ggordpoint'.}
+\item{action}{character "add" joins the pca result to the object and the 'pcoa'
+object also was add to the internal attributes of the object, "only" return
+a non-redundant tibble with the pca result. "get" return 'pcoa' object.}
 
 \item{...}{additional parameters see also 'mp_cal_dist'.}
 }

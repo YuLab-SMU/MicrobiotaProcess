@@ -158,9 +158,9 @@ get_varct.pcoa <- function(obj,...){
 #' @param .abundance the name of abundance to be calculated.
 #' @param distmethod character the method to calculate distance.
 #' @param .dim integer The number of dimensions to be returned, default is 3.
-#' @param action character "add" joins the pca result to the object, "only" return
-#' a non-redundant tibble with the pca result. "get" return 'pcasample' object can
-#' be visualized with 'ggordpoint'.
+#' @param action character "add" joins the pca result to the object and the 'pcoa'
+#' object also was add to the internal attributes of the object, "only" return
+#' a non-redundant tibble with the pca result. "get" return 'pcoa' object.
 #' @param ... additional parameters see also 'mp_cal_dist'.
 #' @return update object or tbl according to the action.
 #' @export

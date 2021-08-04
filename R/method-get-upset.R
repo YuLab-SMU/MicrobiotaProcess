@@ -194,7 +194,7 @@ setMethod("mp_cal_upset", signature(.data="MPSE"), function(.data, .group, .abun
         .data %<>% 
             dplyr::left_join(dat, by="OTU")
         return(.data)
-    }else if(action == "get"){
+    }else if(action == "only"){
         return (dat)
     }else if(action == "get"){
         return (dat)

@@ -85,12 +85,6 @@ setGeneric("mp_cal_rarecurve", function(.data, .abundance=NULL, action="add", ch
 #' @exportMethod mp_cal_rarecurve
 setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundance=NULL, action="add", chunks=400, seed=123, force=FALSE, ...){
 
-
-    if ("rarecurve" %in% colnames(.data@colData) && inherits(.data@colData$rarecurve, "list")){
-        message("The rarecurve has been found in the colData of the MPSE object ")
-        return (.data)
-    }
-
     action %<>% match.arg(c("add", "get", "only"))
     .abundance <- rlang::enquo(.abundance)
 
@@ -106,21 +100,33 @@ setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundanc
         .abundance <- as.symbol("RareAbundance")
     }
 
+    clnm <- paste0(rlang::as_name(.abundance), "Rarecurve")
+
+    if (clnm %in% colnames(.data@colData)){
+        message("The rarecurve has been found in the colData of the MPSE object ")
+        return (.data)
+    }
+
     da <- SummarizedExperiment::assays(.data)@listData[[rlang::as_name(.abundance)]] %>% as.data.frame(check.names=FALSE)
     
     sampleda <- .data %>%
                 mp_extract_sample()
 
     dat <- .internal_apply_cal_rarecurve(da=da, sampleda=sampleda, chunks=chunks, seed=seed)
+
     if (action=="get"){
         dat <- structure(list(data=dat), class="rarecurve")
         return(dat)
-    }else if (action=="only"){
+    }
+    
+    nestnm <- colnames(dat)[!colnames(dat) %in% "sample"]
+    params <- list(.data=dat, rarecurve=nestnm)
+    dat <- do.call("nest", params) %>%
+           dplyr::rename(!!clnm:="rarecurve")
+    
+    if (action=="only"){
         return(dat)
     }else if (action=="add"){
-        nestnm <- colnames(dat)[!colnames(dat) %in% "sample"]
-        params <- list(.data=dat, rarecurve=nestnm)
-        dat <- do.call("nest", params) 
         .data@colData <- .data@colData %>%
             as_tibble(rownames="Sample") %>%
             left_join(dat, by=c("Sample"="sample")) %>% 
@@ -133,22 +139,13 @@ setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundanc
 
 
 .internal_mp_cal_rarecurve <- function(.data, .abundance=NULL, action="add", chunks=400, seed=123, force=FALSE, ...){
-
-    if ("rarecurve" %in% colnames(.data) &&
-        .data %>%
-        dplyr::pull("rarecurve") %>%
-        class == "list" || 
-        all(c("readsNums", "Alpha") %in% colnames(.data))){
-        message("The rarecurve has been found in the colData of the MPSE object !")
-        return (.data)
-    }
-
+    
     action %<>% match.arg(c("add", "get", "only"))
     .abundance <- rlang::enquo(.abundance)
 
     if (rlang::quo_is_null(.abundance)){
         .abundance <- as.symbol("RareAbundance")
-    }
+    }    
 
     if (!valid_rare(.data, .abundance=.abundance) && !force){
         glue::glue("The rarefied abundance of species might not be provided. Rarefaction of all
@@ -157,6 +154,17 @@ setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundanc
         .data <- mp_rrarefy(.data=.data, ...)
         .abundance <- as.symbol("RareAbundance")
     }
+
+    clnm <- paste0(rlang::as_name(.abundance), "Rarecurve")
+
+    if (paste0(rlang::as_name(.abundance), "Rarecurve") %in% colnames(.data) &&
+        .data %>%
+        dplyr::pull("rarecurve") %>%
+        class == "list" ||
+        all(c("readsNums", "Alpha") %in% colnames(.data))){
+        message("The rarecurve has been found in the object !")
+        return (.data)
+    }    
 
     da <- .data %>% 
            dplyr::ungroup() %>% 
@@ -171,12 +179,16 @@ setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundanc
     if (action=="get"){
         dat <- structure(list(data=dat), class="rarecurve")
         return(dat)
-    }else if (action=="only"){
+    }
+    
+    nestnm <- colnames(dat)[!colnames(dat) %in% "sample"]
+    params <- list(.data=dat, rarecurve=nestnm)
+    dat <- do.call("nest", params) %>%
+           dplyr::rename(!!clnm:="rarecurve")
+
+    if (action=="only"){
         return(dat)
     }else if (action=="add"){
-        nestnm <- colnames(dat)[!colnames(dat) %in% "sample"]
-        params <- list(.data=dat, rarecurve=nestnm)
-        dat <- do.call("nest", params)
         dat <- .data %>% 
                dplyr::left_join(dat, by=c("Sample"="sample"))
         return(dat)
@@ -187,6 +199,8 @@ setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundanc
     dat <- apply(da, 2, samplealpha, chunks=chunks, seed=seed) %>% 
            dplyr::bind_rows(.id="sample") %>%
            tidyr::pivot_longer(cols=!c("sample", "readsNums"), names_to="Alpha")
+    sampleda <- sampleda[, !vapply(sampleda, is.list, logical(1))] 
+    sampleda <- sampleda[, !colnames(sampleda) %in% colnames(dat)]
     if (ncol(sampleda) > 1){
         dat %<>%
             left_join(sampleda, by=c("sample"="Sample"))

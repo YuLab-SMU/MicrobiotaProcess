@@ -4,9 +4,15 @@
 \alias{MPSE}
 \title{Construct a MPSE object}
 \usage{
-MPSE(otutree = NULL, taxatree = NULL, refseq = NULL, ...)
+MPSE(assays, colData, otutree = NULL, taxatree = NULL, refseq = NULL, ...)
 }
 \arguments{
+\item{assays}{A 'list' or 'SimpleList' of matrix-like elements
+All elements of the list must have the same dimensions, and must have
+the names, eg. list(Abundance=xx1, RareAbundance=xx2).}
+
+\item{colData}{An optional DataFrame describing the samples.}
+
 \item{otutree}{A treedata object of tidytree package}
 
 \item{taxatree}{A treedata object of tidytree package}

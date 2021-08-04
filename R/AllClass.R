@@ -47,6 +47,10 @@ setClass("MPSE",
 )
 
 #' @title Construct a MPSE object
+#' @param assays A 'list' or 'SimpleList' of matrix-like elements
+#' All elements of the list must have the same dimensions, and must have
+#' the names, eg. list(Abundance=xx1, RareAbundance=xx2).
+#' @param colData An optional DataFrame describing the samples.
 #' @param otutree A treedata object of tidytree package
 #' @param taxatree A treedata object of tidytree package
 #' @param refseq A XStingSet object of Biostrings package
@@ -54,11 +58,13 @@ setClass("MPSE",
 #' of \code{\link[SummarizedExperiment]{SummarizedExperiment}}.
 #' @return MPSE object
 #' @export
-MPSE <- function(otutree = NULL, 
+MPSE <- function(assays,
+                 colData,
+                 otutree = NULL, 
                  taxatree = NULL, 
                  refseq = NULL, 
                  ...){
-    se <- SummarizedExperiment::SummarizedExperiment(...)
+    se <- SummarizedExperiment::SummarizedExperiment(assays=assays, colData=colData, ...)
     mpse <- new("MPSE",
                 se,
                 otutree = otutree,

@@ -255,12 +255,12 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
         da1 %<>% dplyr::select(extranm)
         .data@taxatree %<>% treeio::full_join(da1, by="label")
     }
-
-    if (!is.null(.data@otutree)){
-        da1 %<>% dplyr::filter(.data$label %in% .data@otutree@phylo$tip.label)
-        extranm <- setdiff(colnames(da1), c(colnames(.data@otutree@data), colnames(.data@otutree@extraInfo)))
+    otutree <- .data %>% mp_extract_tree(type="otutree")
+    if (!is.null(otutree)){
+        da1 %<>% dplyr::filter(!!as.symbol("label") %in% otutree@phylo$tip.label)
+        extranm <- setdiff(colnames(da1), c(colnames(otutree@data), colnames(otutree@extraInfo)))
         da1 %<>% dplyr::select(extranm)
-        .data@otutree %<>% treeio::full_join(da1, by="label")
+        otutree(.data) <- otutree %>% treeio::full_join(da1, by="label")
     }
     
     if (action=="add"){
@@ -405,7 +405,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     otutree <- .data %>% attr("otutree")
 
     if (!is.null(otutree)){
-        dat2 <- da1 %>% dplyr::filter(.data$label %in% .data@otutree@phylo$tip.label) %>%
+        dat2 <- da1 %>% dplyr::filter(!!as.symbol("label") %in% otutree@phylo$tip.label) %>%
                  select(setdiff(colnames(da1), c(colnames(otutree@data), colnames(otutree@extraInfo))))
         attr(.data, "otutree") <- otutree %>% treeio::full_join(dat2, by="label")
     }

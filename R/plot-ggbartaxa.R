@@ -198,11 +198,13 @@ mappingtaxda <- function(data, topn=30, count=FALSE, sampleda=NULL,
 #' @seealso \code{\link[ggplot2]{theme}}
 #' @export
 #' @examples
-#' library(ggplot2)
-#' data(test_otu_data)
-#' otubar <- ggbartax(test_otu_data, settheme=FALSE) + 
-#'     xlab(NULL) + ylab("relative abundance(%)") + 
-#'     theme_taxbar()
+#' \dontrun{
+#'     library(ggplot2)
+#'     data(test_otu_data)
+#'     otubar <- ggbartax(test_otu_data, settheme=FALSE) + 
+#'         xlab(NULL) + ylab("relative abundance(%)") + 
+#'         theme_taxbar()
+#' }
 theme_taxbar <- function(axis.text.x=element_text(angle = -45, hjust = 0, size=12),
 						 #panel.grid = element_blank(),
 						 legend.position = "bottom",

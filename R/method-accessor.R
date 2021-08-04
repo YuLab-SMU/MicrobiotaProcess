@@ -379,6 +379,44 @@ setMethod("mp_extract_feature", signature(x="tbl_mpse"), .internal_extract_featu
 #' @exportMethod mp_extract_feature
 setMethod("mp_extract_feature", signature(x="grouped_df_mpse"), .internal_extract_feature)
 
+#' Extract the result of mp_cal_rarecurve with action="add" from MPSE or tbl_mpse object
+#' @rdname mp_extract_rarecurve-methods
+#' @param x MPSE object or tbl_mpse object
+#' @param .rarecurve the column name of rarecurve after run mp_cal_rarecurve with action="add".
+#' @param ... additional parameter
+#' @return rarecurve object that be be visualized by ggrarecurve
+#' @export
+setGeneric("mp_extract_rarecurve", function(x, .rarecurve, ...)standardGeneric("mp_extract_rarecurve"))
+
+.internal_extract_rarecurve <- function(x, .rarecurve, ...){
+    .rarecurve <- rlang::enquo(.rarecurve)
+    if (rlang::quo_is_missing(.rarecurve)){
+        .rarecurve <- as.symbol("RareAbundanceRarecurve")
+    }
+    dat <- x %>% 
+        mp_extract_sample() %>%
+        dplyr::select("Sample", !!.rarecurve) %>% 
+        dplyr::rename(sample="Sample") %>%
+        tidyr::unnest() %>% 
+        suppressWarnings()
+    return(structure(list(data=dat), class="rarecurve"))
+}
+
+#' @rdname mp_extract_rarecurve-methods
+#' @aliases mp_extract_rarecurve,MPSE
+#' @exportMethod mp_extract_rarecurve
+setMethod("mp_extract_rarecurve", signature(x="MPSE"), .internal_extract_rarecurve)
+
+#' @rdname mp_extract_rarecurve-methods
+#' @aliases mp_extract_rarecurve,tbl_mpse
+#' @exportMethod mp_extract_rarecurve
+setMethod("mp_extract_rarecurve", signature(x="tbl_mpse"), .internal_extract_rarecurve)
+
+#' @rdname mp_extract_rarecurve-methods
+#' @aliases mp_extract_rarecurve,grouped_df_mpse
+#' @exportMethod mp_extract_rarecurve
+setMethod("mp_extract_rarecurve", signature(x="grouped_df_mpse"), .internal_extract_rarecurve)
+
 #' Extracting the abundance metric from MPSE or tbl_mpse object
 #' @description 
 #' Extracting the abundance metric from the MPSE or tbl_mpse,
@@ -593,6 +631,116 @@ tree_empty <- function(type){
     x <- paste0("The ", type," is empty in the MPSE object!")
     return(x)
 }
+
+#' @rdname MPSE-accessors
+#' @param x MPSE object
+#' @export
+setGeneric("otutree", function(x, ...)standardGeneric("otutree"))
+
+#' @rdname MPSE-accessors
+#' @aliases otutree,MPSE
+#' @export
+setMethod("otutree", signature(x="MPSE"),function(x,...){
+    tree <- x %>% mp_extract_tree(type="otutree")
+    return(tree)
+})
+
+#' @rdname MPSE-accessors 
+#' @param x MPSE object
+#' @param value treedata object
+#' @export
+setGeneric("otutree<-", function(x, ..., value)standardGeneric("otutree<-"))
+
+#' @rdname MPSE-accessors
+#' @aliases otutree<-,MPSE
+#' @export
+setReplaceMethod("otutree", signature(x="MPSE", value="treedata"), function(x, ..., value){
+    x@otutree <- .internal_drop.tip(tree=value, newnm=rownames(x)) 
+    methods::validObject(x)
+    return(x)
+})
+
+# #' @rdname MPSE-accessors
+# #' @aliases otutree<-,tbl_mpse
+# #' @export
+# setReplaceMethod("otutree", signature(x="tbl_mpse", value="treedata"), function(x, ..., value){
+#     nms <- x %>% dplyr::pull(.data$OTU) %>% unique()
+#     value <- .internal_drop.tip(tree=value, newnm=nms)
+#     x %<>%
+#           add_attr(value, name="otutree") 
+#     return(x)
+# })
+# 
+# #' @rdname MPSE-accessors
+# #' @aliases otutree<-,grouped_df_mpse
+# #' @export
+# setReplaceMethod("otutree", signature(x="grouped_df_mpse", value="treedata"), function(x, ..., value){
+#     nms <- x %>% dplyr::pull(.data$OTU) %>% unique()
+#     value <- .internal_drop.tip(tree=value, newnm=nms)
+#     x %<>%
+#           add_attr(value, name="otutree")
+#     return(x)
+# })
+
+
+#' @rdname MPSE-accessors
+#' @param x MPSE object
+#' @export
+setGeneric("taxatree", function(x, ...)standardGeneric("taxatree"))
+
+#' @rdname MPSE-accessors
+#' @aliases taxatree,MPSE
+#' @export
+setMethod("taxatree", signature(x="MPSE"),function(x, ...){
+    tree <- x %>% mp_extract_tree()
+    return(tree)
+})
+
+#' @rdname MPSE-accessors
+#' @param x MPSE object
+#' @param value  treedata object
+#' @export
+setGeneric("taxatree<-", function(x, ..., value)standardGeneric("taxatree<-"))
+
+#' @rdname MPSE-accessors
+#' @aliases taxatree<-,MPSE
+#' @export
+setReplaceMethod("taxatree", signature(x="MPSE", value="treedata"), function(x, ..., value){
+    x@taxatree <- .internal_drop.tip(tree=value, newnm=rownames(x), collapse.singles=FALSE)
+    methods::validObject(x)
+    return(x)
+})
+
+#' @rdname MPSE-accessors
+#' @param x MPSE object
+#' @export
+setGeneric("refseq", function(x, ...)standardGeneric("refseq"))
+
+#' @rdname MPSE-accessors
+#' @aliases refseq,MPSE
+#' @export
+setMethod("refseq", signature(x="MPSE"), function(x, ...){
+    refseq <- x@refseq
+    if (is.null(refseq)){
+        message("The representative sequence is empty")
+    }
+    return(refseq)
+})
+
+#' @rdname MPSE-accessors
+#' @param x MPSE object
+#' @param value XStringSet object
+#' @export
+setGeneric("refseq<-", function(x, ..., value)standardGeneric("refseq<-"))
+
+#' @rdname MPSE-accessors
+#' @aliases refseq<-,MPSE
+#' @export
+setReplaceMethod("refseq", signature(x="MPSE", value="XStringSet"), function(x, ..., value){
+    x@refseq <- value[rownames(x)]
+    methods::validObject(x)
+    return(x)
+})
 
 #' @rdname MPSE-accessors
 #' @aliases rownames<-,MPSE

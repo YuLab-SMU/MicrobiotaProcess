@@ -39,11 +39,13 @@ updated ggplot object with new theme
 theme_taxbar
 }
 \examples{
-library(ggplot2)
-data(test_otu_data)
-otubar <- ggbartax(test_otu_data, settheme=FALSE) + 
-    xlab(NULL) + ylab("relative abundance(\%)") + 
-    theme_taxbar()
+\dontrun{
+    library(ggplot2)
+    data(test_otu_data)
+    otubar <- ggbartax(test_otu_data, settheme=FALSE) + 
+        xlab(NULL) + ylab("relative abundance(\%)") + 
+        theme_taxbar()
+}
 }
 \seealso{
 \code{\link[ggplot2]{theme}}

@@ -59,8 +59,7 @@ get_pca.phyloseq <- function(obj, method="hellinger", ...){
 #' @param .abundance the name of abundance to be calculated.
 #' @param .dim integer The number of dimensions to be returned, default is 3.
 #' @param action character "add" joins the pca result to the object, "only" return
-#' a non-redundant tibble with the pca result. "get" return 'pcasample' object can
-#' be visualized with 'ggordpoint'. 
+#' a non-redundant tibble with the pca result. "get" return 'prcomp' object.
 #' @param ... additional parameters see also 'prcomp'
 #' @return update object or tbl according to the action.
 #' @export
