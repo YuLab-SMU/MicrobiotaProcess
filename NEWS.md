@@ -1,5 +1,8 @@
 # MicrobiotaProcess 1.5.3.990
 
++ add `taxatree`, `taxatree<-`, `otutree`, `otutree<-`, `refseq`, `refseq<-` for `MPSE`. (2021-08-04, Wed)
++ add `mp_extract_rarecurve` to extract the result of `mp_cal_rarecurve` from 
+  `MPSE` or `tbl_mpse` object. (2021-08-04, Wed)
 + add `mp_stat_taxa` to count the number and total number taxa for each sample at 
   different taxonomy levels (Kingdom, Phylum, Class, Order, Family, Genus, Species, OTU). (2021-08-03, Tue)
 
