@@ -43,6 +43,10 @@ bioccheck:
 	cd ..;\
 	Rscript -e 'BiocCheck::BiocCheck("$(PKGNAME)_$(PKGVERS).tar.gz")'
 
+bignore:
+	Rscript -e 'usethis::use_build_ignore(glob2rx("inst/figures/*.png"), escape = FALSE)'
+	Rscript -e 'usethis::use_build_ignore(c("Makefile", "README.md", "README.Rmd", "CONDUCT.md", ".Rproj.user", ".Rproj"))'
+
 gpcheck:
 	Rscript -e 'goodpractice::gp()'
 

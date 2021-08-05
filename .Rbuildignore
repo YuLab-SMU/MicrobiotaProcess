@@ -11,3 +11,4 @@ Makefile
 appveyor.yml
 mkdocs
 docs
+^inst/figures/.*\.png$

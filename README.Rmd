@@ -13,10 +13,61 @@ html_preview: false
 Biocpkg <- function (pkg) {
     sprintf("[%s](http://bioconductor.org/packages/%s)", pkg, pkg)
 }
+library(conflicted)
+conflicted::conflict_prefer("filter", "dplyr")
+knitr::opts_chunk$set(fig.path = "inst/figures/README-")
 ```
 
 ```{r comment="", echo=FALSE, results='asis'}
 cat(packageDescription('MicrobiotaProcess')$Description)
+```
+
+### tidy microbiome data structure
+
+```{r}
+library(MicrobiotaProcess)
+data(mouse.time.mpse)
+mouse.time.mpse
+```
+
+### Unified analysis grammar
+
+```{r, fig.width=7, fig.height=3, fig.align="center", dpi=300, plotalpha}
+# example of the analysis of alpha diversity
+library(ggplot2)
+library(ggsignif)
+library(gghalves)
+mpse <- mouse.time.mpse %>%
+        mp_rrarefy() %>%
+        mp_cal_alpha(.abundance=RareAbundance)
+
+mpse %>% print(n=5)
+tbl <- mpse %>%
+       mp_extract_sample()
+
+tbl %>% print(n=5)
+tbl %<>% tidyr::pivot_longer(
+                         cols=!c("Sample", "time"), 
+                         names_to="measure", 
+                         values_to="alpha"
+                       ) %>%
+         dplyr::mutate(measure=forcats::fct_relevel(measure, 
+                       c("Observe", "Chao1", "ACE", "Simpson", "Shannon", "J"))
+                   )
+tbl %>% print(n=5)
+p <- ggplot(data=tbl, aes(x=time, y=alpha, fill=time)) +
+     geom_half_violin(color=NA, side="l", trim=FALSE) +
+     geom_boxplot(aes(color=time), fill=NA, position=position_nudge(x=.22), width=0.2) +
+     geom_half_point(side="r", shape=21, size=1.2) +
+     geom_signif(comparisons=list(c("Early", "Late")), 
+                 margin_top = 0.2,
+                 test="wilcox.test", 
+                 textsize=2) +
+     facet_wrap(facet=vars(measure), scales="free_y", nrow=1) +
+     scale_fill_manual(values=c("#00A087FF", "#3C5488FF"), guide="none") +
+     scale_color_manual(values=c("#00A087FF", "#3C5488FF"), guide="none") +
+     labs(x=NULL, y="alpha diversity index")
+p
 ```
 
 ## :writing_hand: Authors
