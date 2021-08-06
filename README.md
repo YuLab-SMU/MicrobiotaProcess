@@ -21,7 +21,7 @@ mouse.time.mpse
 ```
 
     ## # A MPSE-tibble (MPSE object) abstraction: 4,408 x 11
-    ## [90m# OTU=232 | Samples=19 | Assays=Abundance | Taxanomy=Kingdom, Phylum, Class, Order, Family, Genus, Species[39m
+    ## # OTU=232 | Samples=19 | Assays=Abundance | Taxanomy=Kingdom, Phylum, Class, Order, Family, Genus, Species
     ##    OTU   Sample Abundance time  Kingdom  Phylum Class Order Family Genus Species
     ##    <chr> <chr>      <int> <chr> <chr>    <chr>  <chr> <chr> <chr>  <chr> <chr>  
     ##  1 OTU_1 F3D0         579 Early k__Bact… p__Ba… c__B… o__B… f__Mu… g__u… s__un_…
@@ -51,7 +51,7 @@ mpse %>% print(n=5)
 ```
 
     ## # A MPSE-tibble (MPSE object) abstraction: 4,408 x 18
-    ## [90m# OTU=232 | Samples=19 | Assays=Abundance, RareAbundance | Taxanomy=Kingdom, Phylum, Class, Order, Family, Genus, Species[39m
+    ## # OTU=232 | Samples=19 | Assays=Abundance, RareAbundance | Taxanomy=Kingdom, Phylum, Class, Order, Family, Genus, Species
     ##   OTU   Sample Abundance RareAbundance time  Observe Chao1   ACE Shannon Simpson
     ##   <chr> <chr>      <int>         <int> <chr>   <dbl> <dbl> <dbl>   <dbl>   <dbl>
     ## 1 OTU_1 F3D0         579           214 Early     104  104.  105.    3.88   0.965
