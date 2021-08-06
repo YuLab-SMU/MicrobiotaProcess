@@ -67,7 +67,8 @@ Suggests:
   ggVennDiagram,
   gghalves,
   ggalluvial,
-  forcats
+  forcats,
+  pillar
 License: GPL (>= 3.0)
 URL: https://github.com/YuLab-SMU/MicrobiotaProcess/
 BugReports: https://github.com/YuLab-SMU/MicrobiotaProcess/issues

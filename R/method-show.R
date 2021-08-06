@@ -226,20 +226,25 @@ print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
             x
           }            
     }
-    formatted_mpse %>%
-      append(sprintf(
-        "\033[90m# OTU=%s | Samples=%s | Assays=%s | Taxanomy=%s\033[39m",
-        nrow(x), 
+
+    subtitle <- sprintf(
+        "# OTU=%s | Samples=%s | Assays=%s | Taxanomy=%s",
+        nrow(x),
         ncol(x),
         SummarizedExperiment::assays(x) %>% names %>% paste(collapse=", "),
-        ifelse(is.null(x@taxatree), "NULL", 
-               x@taxatree@data %>% 
-                   select("nodeClass") %>% 
-                   filter(! .data[["nodeClass"]] %in% c("OTU", "Root")) %>% 
-                   unlist(use.names=FALSE) %>% 
-                   unique %>% 
+        ifelse(is.null(x@taxatree), "NULL",
+               x@taxatree@data %>%
+                   select("nodeClass") %>%
+                   filter(! .data[["nodeClass"]] %in% c("OTU", "Root")) %>%
+                   unlist(use.names=FALSE) %>%
+                   unique %>%
                    paste(collapse=", "))
-      ), after = 1) %>%
+      ) %>% pillar::style_subtle()
+
+    subtitle <- gsub("38;5;246m", "90m", subtitle)
+
+    formatted_mpse %>%
+      append(subtitle, after = 1) %>%
       writeLines()
     invisible(x)
 }
