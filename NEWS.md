@@ -1,5 +1,6 @@
 # MicrobiotaProcess 1.5.3.990
 
++ update the `print` of `MPSE` object via `pillar` package. (2021-08-06, Fri)
 + update `mp_extract_dist` by introducing `.group` argument to return a `tbl_df` for 
   visualization. (2021-08-04, Wed)
 + add `taxatree`, `taxatree<-`, `otutree`, `otutree<-`, `refseq`, `refseq<-` for `MPSE`. (2021-08-04, Wed)
