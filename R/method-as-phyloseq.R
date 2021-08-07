@@ -30,7 +30,9 @@ as.phyloseq.MPSE <- function(x, .abundance, ...){
     
     otutree <- x %>% mp_extract_tree(type="otutree")
     sampleda <- x %>% mp_extract_sample()
-    taxada <- x %>% mp_extract_taxonomy()
+    taxada <- x %>% 
+              mp_extract_taxonomy() %>% 
+              tibble::column_to_rownames(var="OTU")
 
     if (inherits(x, "MPSE")){
         refseq <- x@refseq

@@ -296,7 +296,8 @@ setGeneric("mp_diff_analysis", function(.data,
 
      if (action=="get"){
          taxda <- .data %>% 
-                  mp_extract_taxonomy()
+                  mp_extract_taxonomy() %>%
+                  tibble::column_to_rownames(var="OTU")
          taxda$OTU <- rownames(taxda)
          indx <- match(tip.level, colnames(taxda))
          taxda %<>% select(seq_len(indx))
@@ -312,10 +313,11 @@ setGeneric("mp_diff_analysis", function(.data,
              result %<>% dplyr::rename(label="f")
              #result %<>% dplyr::select(c("label",setdiff(colnames(result), colnames(otu_tb))))
              otu_tb %<>% dplyr::left_join(result, by="label")
-             return(otu_tb)                  
+             return(otu_tb)
          }else{
+             newgroup <- paste0("Sign_", rlang::as_name(.group))
              result %<>% 
-                 dplyr::rename(label="f") 
+                 dplyr::rename(label="f", !!newgroup:=!!.group) 
              #result %<>% dplyr::select(setdiff(colnames(result), 
              #                          c(colnames(taxatree@data), 
              #                            colnames(taxatree@extraInfo)))

@@ -490,8 +490,8 @@ setMethod("mp_extract_abundance", signature(x="grouped_df_mpse"), .internal_extr
               dplyr::pull(.data$nodeClass) %>% unique
     taxada <- taxatree_to_tb(taxatree) %>%
               tibble::as_tibble(rownames="OTU") %>%
-              dplyr::select(taxanm) %>%
-              tibble::column_to_rownames(var="OTU")
+              dplyr::select(taxanm) #%>%
+              #tibble::column_to_rownames(var="OTU")
     return(taxada)
 
 }
