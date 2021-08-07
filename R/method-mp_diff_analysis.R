@@ -19,17 +19,21 @@
 #' @param filter.p character the method to filter pvalue, default is fdr, meanings the features 
 #' that fdr <= .first.test.alpha will be kept, if it is set to pvalue, meanings the features that
 #' pvalue <= .first.test.alpha will be kept.
-#' @param strict logical whether to performed in one-against-one, default is TRUE (strict).
+#' @param strict logical whether to performed in one-against-one when .sec.group is provided, 
+#' default is TRUE (strict).
 #' @param fc.method character the method to check which group has more abundance for the 
 #' significantly different features, default is "generalizedFC".
 #' @param second.test.method the method for one-against-one (the second test), default is "wilcox.test" 
 #' other option is one of 'wilcox_test' of 'coin'; 'glm'; 'glm.nb' of 'MASS'.
 #' @param second.test.alpha numeric the alpha value for the second test, default is 0.05.
 #' @param cl.min integer the minimum number of samples per group for performing test, default is 5.
-#' @param cl.test logical whether to perform test (second test) between the groups, default is TRUE.
+#' @param cl.test logical whether to perform test (second test) between the groups (the number of sample
+#' of the .group should be also larger that cl.min), default is TRUE.
 #' @param subcl.min integer the minimum number of samples in each second groups for performing test, 
 #' default is 3.
-#' @param subcl.test logical whether to perform test for between the second groups, default is TRUE.
+#' @param subcl.test logical whether to perform test for between the second groups (the .sec.group 
+#' should be provided and the number sample of each .sec.group should be larger than subcl.min, and 
+#' strict is TRUE), default is TRUE.
 #' @param ml.method the method for calculating the effect size of features, option is 'lda' or 'rf'.
 #' default is 'lda'.
 #' @param normalization integer set a big number if to get more meaningful values for the LDA score, 
