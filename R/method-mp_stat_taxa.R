@@ -28,7 +28,11 @@ setGeneric("mp_stat_taxa", function(.data, .abundance, action="add", ...) standa
 
     dat <- .data %>% 
            mp_cal_abundance(.abundance=!!.abundance, force=TRUE, action="only") %>%
-           tidyr::unnest(cols=c("Sample", !!.abundance)) %>%
+           tidyr::unnest(cols=paste0(rlang::as_name(.abundance) %>% 
+                                     gsub("^Rel", "", .) %>%
+                                     gsub("BySample$", "", .), 
+                                 "BySample")
+             ) %>%
            dplyr::group_by(.data$Sample, .data$nodeClass) %>%
            dplyr::summarize(!!clnm1:=sum(!!.abundance>0), !!clnm2:=sum(!!.abundance))
 
