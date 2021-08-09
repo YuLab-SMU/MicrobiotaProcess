@@ -179,12 +179,16 @@ setGeneric("mp_diff_analysis", function(.data,
      if (is.null(taxatree)){
          f_tb <- .data %>% mp_extract_assays(.abundance=!!abundance.nm, byRow=FALSE)
      }else{
+         AbundBySample <- abundance.nm %>% 
+                          gsub("^Rel", "", .) %>%
+                          gsub("BySample", "", .) %>%
+                          paste0("BySample")
          f_tb <- taxatree %>%
                  as_tibble() %>%
                  dplyr::filter(.data$nodeClass!="Root") %>%
+                 dplyr::select(c("label", AbundBySample)) %>% 
+                 tidyr::unnest(cols=AbundBySample) %>%
                  dplyr::select(c("label", "Sample", abundance.nm)) %>% 
-                 tidyr::unnest() %>%
-                 suppressWarnings() %>% 
                  distinct() %>%
                  tidyr::pivot_wider(id_cols="Sample", names_from="label", values_from=abundance.nm) %>%
                  tibble::column_to_rownames(var="Sample")

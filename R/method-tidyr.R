@@ -37,7 +37,9 @@ nest.grouped_df_mpse <- function(.data, ..., .names_sep = NULL){
 nest_internal <- function(x, ..., .names_sep = NULL){
     class(x) <- class(x)[!class(x) %in% c("grouped_df_mpse", "tbl_mpse_nest", "tbl_mpse")]
     if (missing(...)){
+        idx <- x %>% vapply(is.list, logical(1))
         clnm <- colnames(x)
+		clnm <- clnm[!idx]
         taxavar <- attr(x, "taxavar")
         clnm <- clnm[!clnm %in% c("OTU", taxavar)]
         params <- c(list(x), lapply(clnm, function(x)x))

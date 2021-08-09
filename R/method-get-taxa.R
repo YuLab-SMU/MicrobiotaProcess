@@ -122,25 +122,24 @@ setMethod("get_taxadf", "data.frame",
 #'   mp_cal_abundance(.abundance=RareAbundance, action="add") %>% 
 #'   mp_cal_abundance(.abundance=RareAbundance, .group=time, action="add") 
 #' tbl <- mouse.time.mpse %>%
-#'        mp_extract_abundance(taxa.class="all")
+#'        mp_extract_abundance(taxa.class="Class", topn=10)
 #' tbl
 #' library(ggplot2)
 #' library(ggalluvial)
-#' library(forcats)
 #' library(dplyr)
 #' tbl %<>%
-#'   dplyr::filter(nodeClass=="Phylum") %>%
-#'   tidyr::unnest(cols=c(Sample, RelRareAbundanceBySample, time)) 
+#'   tidyr::unnest(cols=RareAbundanceBySample) 
 #' tbl
 #' p <- ggplot(data=tbl,
 #'             mapping=aes(x=Sample, 
 #'                         y=RelRareAbundanceBySample, 
-#'                         alluvium=fct_reorder(label, desc(RelRareAbundanceBySample)),
-#'                         fill=fct_reorder(label, desc(RelRareAbundanceBySample)))) + 
+#'                         alluvium=label,
+#'                         fill=label)
+#'      ) + 
 #'      geom_flow(stat="alluvium", lode.guidance = "frontback", color = "darkgray") +
 #'      geom_stratum(stat="alluvium") +
 #'      labs(x=NULL, y="Relative Abundance (%)") +
-#'      scale_fill_brewer(name="Phylum", type = "qual", palette = "Paired") +
+#'      scale_fill_brewer(name="Class", type = "qual", palette = "Paired") +
 #'      facet_grid(cols=vars(time), scales="free_x", space="free") +
 #'      theme(axis.text.x=element_text(angle=-45, hjust=0))
 #' p  
@@ -225,19 +224,24 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
                                          .abundance=.abundance, 
                                          feature=x, 
                                          byID=.group,
-                                         relative=relative))
+                                         relative=relative,
+										 sampleda=NULL))
     }else{
+        sampledat <- sampleda[, !vapply(sampleda, function(x)is.list(x)||is.numeric(x), logical(1))]
         da1 <- lapply(taxavar, function(x)
                       .internal_cal_feature_abun(da=da,
                                          .abundance=.abundance,
                                          feature=x,
                                          byID=as.symbol("Sample"),
-                                         relative=relative))
+                                         relative=relative,
+										 sampleda=sampledat)
+					                    )
     }
 
     if (rlang::quo_is_null(.group) && relative){
-        newRelabun <- paste0(c("Rel", rlang::as_name(.abundance), "BySample"), collapse="")
+        newRelabun <- paste0("Rel", rlang::as_name(.abundance), "BySample")
         otuRelabun <- da1[[1]] %>% 
+				      tidyr::unnest(cols=paste0(rlang::as_name(.abundance),"BySample")) %>%
                       select(-!!.abundance) %>%
                       tidyr::pivot_wider(id_cols="OTU", names_from="Sample", values_from=as.symbol(newRelabun)) %>%
                       tibble::column_to_rownames(var="OTU")
@@ -245,9 +249,10 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
             setNames(c(assaysvar, newRelabun))
     }
     
+    	
     da1 %<>% 
-         dplyr::bind_rows() %>% 
-         nest_internal() %>% 
+         dplyr::bind_rows() %>%
+         #nest_internal() 
          rename(label="OTU")
 
     if (!is.null(.data@taxatree)){
@@ -291,14 +296,16 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     
 })
 
-.internal_cal_feature_abun <- function(da, .abundance, feature, byID, relative){
+.internal_cal_feature_abun <- function(da, .abundance, feature, byID, relative, sampleda){
     Totalnm <- paste0("TotalNumsBy", rlang::as_name(byID))
     if(rlang::as_name(byID)=="Sample"){
         newabun <- rlang::as_name(.abundance)
-        sampleind <- NULL
+        bygroup <- paste0(newabun, "BySample")
+        #sampleind <- NULL
     }else{
-        newabun <- paste0(c(rlang::as_name(.abundance), "By", rlang::as_name(byID)), collapse="")
-        sampleind <- as.symbol("Sample")
+        newabun <- paste0(rlang::as_name(.abundance), "By", rlang::as_name(byID))
+        bygroup <- newabun
+        #sampleind <- as.symbol("Sample")
     }
 
     da %<>%
@@ -310,29 +317,42 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     if (relative){
         newRelabun <- paste0(c("Rel", rlang::as_name(.abundance), "By", rlang::as_name(byID)), collapse="")
         da %<>%
-            dplyr::mutate(across(!!as.symbol(newabun), ~ .x/!!as.symbol(Totalnm) * 100, .names=newRelabun))
-        if(is.null(sampleind)){
-            da %<>% select(c(as.symbol(feature), !!byID, as.symbol(newabun), as.symbol(newRelabun)))
-        }else{
-            da %<>% select(c(as.symbol(feature), !!sampleind, !!byID, as.symbol(newabun), as.symbol(newRelabun)))
-        }
-        da %<>% 
-            ungroup() %>%
-            distinct() 
-
-    }else{
-        if (is.null(sampleind)){
-            da %<>%
-            select(c(as.symbol(feature), !!byID, as.symbol(newabun)))
-        }else{
-            da %<>%
-            select(c(as.symbol(feature), !!sampleind, !!byID, as.symbol(newabun)))
-        }
-        da %<>%
+            dplyr::mutate(across(!!as.symbol(newabun), ~ .x/!!as.symbol(Totalnm) * 100, .names=newRelabun)) %>%
+            select(c(as.symbol(feature), !!byID, as.symbol(newabun), as.symbol(newRelabun))) %>%
             ungroup() %>%
             distinct()
+        #if(is.null(sampleind)){
+        #if (rlang::as_name(byID)!="Sample"){
+        #da %<>% tidyr::nest(!!bygroup:=c(!!byID, as.symbol(newabun), as.symbol(newRelabun)))
+            #da %<>% select(c(as.symbol(feature), !!byID, as.symbol(newabun), as.symbol(newRelabun)))
+        #}#else{
+            #da %<>% select(c(as.symbol(feature), !!sampleind, !!byID, as.symbol(newabun), as.symbol(newRelabun)))
+        #}
+        #da %<>% 
+        #    ungroup() %>%
+        #    distinct() 
+
+    }else{
+        #if (is.null(sampleind)){
+        da %<>% select(c(as.symbol(feature), !!byID, as.symbol(newabun))) %>% 
+                ungroup() %>% distinct()
+        #if (rlang::as_name(byID)!="Sample"){
+        #da %<>% tidyr::nest(!!bygroup:=c(!!byID, as.symbol(newabun)))
+            #select(c(as.symbol(feature), !!byID, as.symbol(newabun)))
+        #}#else{
+        #    da %<>%
+        #    select(c(as.symbol(feature), !!sampleind, !!byID, as.symbol(newabun)))
+        #}
+        #da %<>%
+        #    ungroup() %>%
+        #    distinct()
+    }
+
+	if (!is.null(sampleda) && ncol(sampleda)>1){
+        da <- da %>% dplyr::left_join(sampleda, by="Sample")
     }
     colnames(da)[1] <- "OTU"
+    da %<>% tidyr::nest(!!bygroup:=colnames(da)[ colnames(da) !="OTU"])
     return(da)
 }
 
@@ -381,8 +401,10 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     }
     
     if (rlang::quo_is_null(.group) && relative){
-        newRelabun <- paste0(c("Rel", rlang::as_name(.abundance), "BySample"), collapse="")
-        dx1 <- da1[[1]] %>% select(c("OTU", "Sample", as.symbol(newRelabun)))
+        newRelabun <- paste0("Rel", rlang::as_name(.abundance), "BySample")
+        dx1 <- da1[[1]] %>% 
+               tidyr::unnest(cols=paste0(rlang::as_name(.abundance),"BySample")) %>% 
+               select(c("OTU", "Sample", as.symbol(newRelabun)))
         othernm <- colnames(.data)[!colnames(.data) %in% c("OTU", "Sample", assaysvar)]
         attr(.data, "assaysvar") <- c(assaysvar, newRelabun)
         .data %<>% 
@@ -392,7 +414,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
 
     da1 %<>%
          dplyr::bind_rows() %>%
-         nest_internal() %>%
+         #nest_internal() %>%
          rename(label="OTU")
 
     taxatree <- .data %>% attr("taxatree")

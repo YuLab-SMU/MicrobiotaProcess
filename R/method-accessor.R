@@ -425,16 +425,24 @@ setMethod("mp_extract_rarecurve", signature(x="grouped_df_mpse"), .internal_extr
 #' @param x MPSE or tbl_mpse object
 #' @param taxa.class character the name of taxonomy 
 #' class level what you want to extract
+#' @param topn integer the number of the top most abundant, default
+#' is NULL.
 #' @param ... additional parameters
 #' @author Shuangbin Xu
 #' @export
-setGeneric("mp_extract_abundance", function(x, taxa.class="all", ...)standardGeneric("mp_extract_abundance"))
+setGeneric("mp_extract_abundance", function(x, taxa.class="all", topn=NULL, ...)standardGeneric("mp_extract_abundance"))
 
-.internal_extract_abundance <- function(x, taxa.class="all", ...){
+#' @importFrom dplyr all_of
+.internal_extract_abundance <- function(x, taxa.class="all", topn, ...){
     taxa.class <- rlang::enquo(taxa.class)
-    
+
     taxatree <-  x %>% 
                  mp_extract_tree()
+    if (inherits(x, "MPSE")){
+        assaysvar <- x %>% SummarizedExperiment::assayNames()
+    }else{
+        assaysvar <- x %>% attr("assaysvar")
+	}
     
     if (is.null(taxatree)){
         da <- x %>% mp_extract_feature() 
@@ -442,7 +450,7 @@ setGeneric("mp_extract_abundance", function(x, taxa.class="all", ...)standardGen
             message("Please make sure the mp_cal_abundance(..., action='add') has been run.")
             return(NULL)
         }
-        return(da)
+        #return(da)
     }else{
         flag <-c(colnames(taxatree@data), colnames(taxatree@extraInfo)) %>% 
                unique() %in% c("node", "nodeClass", "nodeDepth")
@@ -450,18 +458,58 @@ setGeneric("mp_extract_abundance", function(x, taxa.class="all", ...)standardGen
             message("Please make sure the mp_cal_abundance(..., action='add') has been run.")
             return(NULL)        
         }
-        taxatree %<>% 
-            as_tibble %>%    
-            dplyr::select(-c("parent", "node", "nodeDepth")) %>%
-            dplyr::filter(.data$nodeClass != "Root")
+        da <- taxatree %>% 
+              as_tibble %>%    
+              dplyr::select(-c("parent", "node", "nodeDepth")) %>%
+              dplyr::filter(.data$nodeClass != "Root")
         taxa.class <- rlang::as_name(taxa.class)
         if (taxa.class!="all"){
-            taxatree %<>% 
+            da <- da %>% 
                   dplyr::filter(.data$nodeClass == taxa.class)
         }
-        return(taxatree)
     }
 
+    if (taxa.class!="all"){
+        AbundBy <- colnames(da)[vapply(da, is.list, logical(1))]
+        dat <- da %>% tidyr::unnest(cols=AbundBy[1])
+        clnm <- colnames(dat)[vapply(dat, is.numeric, logical(1))]
+        totallabel <- dat %>%
+              dplyr::group_by(.data$label) %>%
+              dplyr::summarize(TotalByLabel=sum(!!as.symbol(clnm[1]))) %>%
+              dplyr::arrange(dplyr::desc(.data$TotalByLabel)) %>% 
+              dplyr::pull(.data$label)
+        if (is.null(topn)){topn <- length(totallabel)}
+        keepn <- min(topn, length(totallabel))
+        if (keepn < length(totallabel)){
+            keeplabel <- totallabel[seq_len(keepn)]
+		}else{
+            keeplabel <- totallabel
+        }
+        dtf <- list()
+        for (i in AbundBy){
+            df <- da %>% 
+                  select(c("label", "nodeClass", i)) %>%
+                  tidyr::unnest(cols=i)
+            nms <- colnames(df)
+            abunnm <- nms[vapply(df, is.numeric, logical(1))]
+            gpnm <- nms[!nms %in% c("label", "nodeClass", abunnm)][1]
+            df1 <- df %>% 
+                   dplyr::filter(.data$label %in% keeplabel)
+            df2 <- df %>%
+                   dplyr::filter(!.data$label %in% keeplabel) %>%
+                   dplyr::mutate(label="Others") %>% 
+                   dplyr::group_by(!!as.symbol(gpnm)) %>%
+                   dplyr::mutate(across(all_of(abunnm), sum)) %>%
+				   dplyr::ungroup() %>%
+                   distinct() 
+            dtf[[i]] <- dplyr::bind_rows(df1, df2) %>%
+                  dplyr::mutate(label=factor(.data$label, levels=c(keeplabel, "Others"))) %>%
+                  tidyr::nest(!!i:=nms[!nms %in% c("label", "nodeClass")])
+
+        }
+        da <- dtf %>% purrr::reduce(left_join, by=c("label", "nodeClass"))
+    }
+	return(da)
 }
 
 #' @rdname mp_extract_abundance-methods

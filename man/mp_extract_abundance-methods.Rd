@@ -10,19 +10,22 @@
 \alias{mp_extract_abundance,grouped_df_mpse}
 \title{Extracting the abundance metric from MPSE or tbl_mpse object}
 \usage{
-mp_extract_abundance(x, taxa.class = "all", ...)
+mp_extract_abundance(x, taxa.class = "all", topn = NULL, ...)
 
-\S4method{mp_extract_abundance}{MPSE}(x, taxa.class = "all", ...)
+\S4method{mp_extract_abundance}{MPSE}(x, taxa.class = "all", topn = NULL, ...)
 
-\S4method{mp_extract_abundance}{tbl_mpse}(x, taxa.class = "all", ...)
+\S4method{mp_extract_abundance}{tbl_mpse}(x, taxa.class = "all", topn = NULL, ...)
 
-\S4method{mp_extract_abundance}{grouped_df_mpse}(x, taxa.class = "all", ...)
+\S4method{mp_extract_abundance}{grouped_df_mpse}(x, taxa.class = "all", topn = NULL, ...)
 }
 \arguments{
 \item{x}{MPSE or tbl_mpse object}
 
 \item{taxa.class}{character the name of taxonomy 
 class level what you want to extract}
+
+\item{topn}{integer the number of the top most abundant, default
+is NULL.}
 
 \item{...}{additional parameters}
 }

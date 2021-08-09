@@ -85,25 +85,24 @@ mouse.time.mpse \%<>\%
   mp_cal_abundance(.abundance=RareAbundance, action="add") \%>\% 
   mp_cal_abundance(.abundance=RareAbundance, .group=time, action="add") 
 tbl <- mouse.time.mpse \%>\%
-       mp_extract_abundance(taxa.class="all")
+       mp_extract_abundance(taxa.class="Class", topn=10)
 tbl
 library(ggplot2)
 library(ggalluvial)
-library(forcats)
 library(dplyr)
 tbl \%<>\%
-  dplyr::filter(nodeClass=="Phylum") \%>\%
-  tidyr::unnest(cols=c(Sample, RelRareAbundanceBySample, time)) 
+  tidyr::unnest(cols=RareAbundanceBySample) 
 tbl
 p <- ggplot(data=tbl,
             mapping=aes(x=Sample, 
                         y=RelRareAbundanceBySample, 
-                        alluvium=fct_reorder(label, desc(RelRareAbundanceBySample)),
-                        fill=fct_reorder(label, desc(RelRareAbundanceBySample)))) + 
+                        alluvium=label,
+                        fill=label)
+     ) + 
      geom_flow(stat="alluvium", lode.guidance = "frontback", color = "darkgray") +
      geom_stratum(stat="alluvium") +
      labs(x=NULL, y="Relative Abundance (\%)") +
-     scale_fill_brewer(name="Phylum", type = "qual", palette = "Paired") +
+     scale_fill_brewer(name="Class", type = "qual", palette = "Paired") +
      facet_grid(cols=vars(time), scales="free_x", space="free") +
      theme(axis.text.x=element_text(angle=-45, hjust=0))
 p  
