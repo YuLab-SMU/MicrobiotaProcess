@@ -53,7 +53,7 @@ convert_to_treedata <- function(data, type="species", ...){
     tip.label <- as.vector(mapping$labelnames)[mapping$isTip]
     mapping <- mapping[,colnames(mapping) %in% c("node", "nodeClass", "nodeDepth")]#, "nodeSize")]
     taxphylo <- structure(list(edge=edges, node.label=node.label,
-                               tip.label=tip.label, edge.length=rep(0.5, nrow(edges)),
+                               tip.label=tip.label, #edge.length=rep(0.5, nrow(edges)),
                                Nnode = length(node.label)), class="phylo")
     res <- treedata(phylo=taxphylo, data=as_tibble(mapping))
 }

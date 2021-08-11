@@ -84,11 +84,14 @@ ggordpoint.default <-  function(obj, pc=c(1,2), mapping=NULL, sampleda=NULL, fac
         ellipsemapping <- modifyList(ellipsemapping,aes_string(starshape=NULL,size=NULL))
         if (!is.null(factorLevels)){plotcoord <- setfactorlevels(plotcoord, factorLevels)}
     }
-    p <- ggplot() + geom_star(data=plotcoord, mapping=mapping, size=poinsize, starstroke=stroke) + labs(x=xlab_text, y=ylab_text, title=title_text)
+    p <- ggplot() 
     if ("starshape" %in% names(mapping)){
-        shapes <- c(13, 15, 12, 6, 1, 2, 9, 29, 27, 5, 14, 22, 11, 23)[seq_len(length(unique(as.vector(plotcoord[[rlang::as_name(mapping$starshape)]]))))]
-        p <- p + scale_starshape_manual(values=shapes)
+        shapes <- c(15, 13, 12, 6, 1, 2, 9, 29, 27, 5, 14, 22, 11, 23)[seq_len(length(unique(as.vector(plotcoord[[rlang::as_name(mapping$starshape)]]))))]
+        p <- p + geom_star(data=plotcoord, mapping=mapping, size=poinsize, starstroke=stroke) + scale_starshape_manual(values=shapes)
+    }else{
+        p <- p + geom_star(data=plotcoord, mapping=mapping, size=poinsize, starstroke=stroke, starshape=15)
     }
+    p <- p + labs(x=xlab_text, y=ylab_text, title=title_text)
     if (ellipse){
         p <- p + 
             geom_ord_ellipse(data=plotcoord, 
