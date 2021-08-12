@@ -40,25 +40,30 @@ setGeneric("get_alphaindex", function(obj, ...){standardGeneric("get_alphaindex"
 #' @importFrom vegan estimateR diversity specnumber
 #' @export
 setMethod("get_alphaindex", "matrix", function(obj, mindepth, sampleda, force=FALSE, ...){
-    if (!identical(all.equal(obj, round(obj)),TRUE)){
-        stop("the data should be integer (counts)!")
-    }
+    #if (!identical(all.equal(obj, round(obj)),TRUE)){
+    #    stop("the data should be integer (counts)!")
+    #}
     if (missing(mindepth) || is.null(mindepth)){
         mindepth <- min(rowSums(obj))
     }
     if (obj %>% rowSums %>% var != 0 && !force){
         obj <- vegan::rrarefy(obj, mindepth)
     }
-    Chao <- estimateR(obj)
     Shannon <- diversity(obj)
     Simpson <- diversity(obj, index="simpson")
     J <- Shannon/log(specnumber(obj))
-    alpha <- data.frame(Observe=Chao[1,],
-                        Chao1=Chao[2,],
-                        ACE=Chao[4,],
-                        Shannon,
-                        Simpson,
-                        J)
+    if (identical(all.equal(obj, round(obj)),TRUE)){
+        spn <- estimateR(obj)
+        Observe <- spn[1,]
+        Chao1 <- spn[2, ] 
+        ACE <- spn[4, ]
+        alpha <- data.frame(Observe=Observe, Chao1=Chao1, ACE=ACE, Shannon, Simpson, J)
+    }else{
+        Observe <- apply(obj, 1, function(x)sum(x>0))
+        Chao1 <- NULL
+        ACE <- NULL
+        alpha <- data.frame(Observe=Observe, Shannon, Simpson, J)
+    }
     if (missing(sampleda)){
         sampleda <- NULL
     }
