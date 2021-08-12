@@ -153,9 +153,12 @@
     otutree <- res$otutree
     refseq <- res$refseq
 
+    otuda <- otuda[rowSums(otuda) > 0, ,drop=FALSE]
+    otuda <- otuda[,colSums(otuda)>0, drop=FALSE]
+    
     rownm <- rownames(otuda)
     colnm <- colnames(otuda)
-
+    
     if (is.null(sampleda)){
         sampleda <- S4Vectors::DataFrame(row.names=colnames(otuda))
     }else{
@@ -232,6 +235,7 @@
             }
         }
     }
+    
     mpse <- MPSE(
                  assays = list(Abundance=otuda),
                  colData = sampleda,

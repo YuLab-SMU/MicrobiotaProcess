@@ -143,14 +143,16 @@ setGeneric("mp_diff_analysis", function(.data,
      sampleda <- .data %>%
                  mp_extract_sample() %>%
                  select(!!as.symbol("Sample"), !!.group, !!.sec.group) %>%
-                 tibble::column_to_rownames(var="Sample")
-                 #dplyr::mutate(across(!!.group, ~if(!is.factor(.x))as.factor(.x)))
+                 tibble::column_to_rownames(var="Sample") %>%
+                 dplyr::mutate(across(!!.group, ~if(!is.factor(.x))as.factor(.x)))
 
 
      if (!rlang::quo_is_null(.sec.group)){
          sampleda %<>% 
              duplicatedtaxcheck() %>% 
-             tibble::column_to_rownames(var="rowname")
+             tibble::column_to_rownames(var="rowname") %>%
+             dplyr::mutate(across(!!.sec.group, ~if(!is.factor(.x))as.factor(.x)))
+             #dplyr::mutate(!!.sec.group:=factor(!!.sec.group, levels=unique(as.vector(!!.sec.group))))
          .sec.group <- rlang::as_name(.sec.group)
      }else{
          .sec.group <- NULL
@@ -196,7 +198,7 @@ setGeneric("mp_diff_analysis", function(.data,
 
      vars <- f_tb %>% colnames()
 
-     datameta <- merge(f_tb, sampleda, by=0)
+     datameta <- merge(f_tb, sampleda, by=0) 
 
      first.res <- multi_compare(fun=first.test.method,
                                data=datameta,

@@ -22,8 +22,10 @@ taxonomy table, tree and represent sequences.
 the function was designed to read the ouput of qiime2.
 }
 \examples{
+\dontrun{
 otuqzafile <- system.file("extdata", "table.qza",
                           package="MicrobiotaProcess")
 otuqza <- read_qza(otuqzafile)
 str(otuqza)
+}
 }

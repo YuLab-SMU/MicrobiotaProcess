@@ -153,6 +153,119 @@ mp_import_qiime <- function(otufilename,
     return(mpse)
 }
 
+#' Import function to load the output of MetaPhlAn.
+#' @param profile the output file (text format) of MetaPhlAn.
+#' @param mapfilename the sample information file or data.frame,
+#' default is NULL.
+#' @param linenum a integer, sometimes the output file of MetaPhlAn ( < 3)
+#' contained the sample information in the first several lines.
+#' The linenum should be required.
+#' for example:
+#' group A A A A B B B B 
+#' sungroup A1 A1 A2 A2 B1 B1 B2 B2
+#' subject S1 S2 S3 S4 S5 S6 S7 S8
+#' Bacteria 99 99 99 99 99 99 99 99
+#' ...
+#' linenum should be set to 3.
+#' @param ... additional parameters, meaningless now.
+#' @details
+#' When the output abundance of MetaPhlAn is relative abundance, the \code{force} of \code{mp_cal_abundance}
+#' should be set to TRUE, and the \code{relative} of \code{mp_cal_abundance} should be set to FALSE.
+#' Because the abundance profile will be rarefied in the default (force=FALSE), then the 
+#' relative abundance will be calculated in the default (relative=TRUE).
+#' @author Shuangbin Xu
+#' @export
+#' @examples
+#' file1 <- system.file("extdata/MetaPhlAn", "metaphlan_test.txt", package="MicrobiotaProcess")
+#' readLines(file1, n=3) %>% writeLines()
+#' mpse1 <- mp_import_metaphlan(profile=file1)
+#' mpse1
+mp_import_metaphlan <- function(profile, mapfilename=NULL, linenum=NULL, ...){
+    if (!is.null(linenum)){
+        sampleda <- utils::read.table(profile, sep="\t", row.names=1, nrow=linenum, comment.char="", quote="") %>%
+                    t() %>% as.data.frame()
+        da <- utils::read.table(profile, sep="\t", skip=linenum, comment.char="", quote="")
+        sampleindx <- da %>%
+                      vapply(.,function(x)is.numeric(x), logical(1)) %>%
+                      which(.) 
+        colnames(da)[sampleindx] <- paste0("sample", sampleindx - 1)
+        sampleda %<>%
+            dplyr::slice(sampleindx - 1) %>%
+            magrittr::set_rownames(paste0("sample", sampleindx -1))
+    }else{
+        da <- utils::read.table(profile, sep="\t", head=TRUE, comment.char="", quote="")
+        sampleda <- NULL
+    }
+
+    if (is.null(linenum) && !is.null(mapfilename)){
+        if (inherits(mapfilename, "character") && file.exists(mapfilename)){
+            sampleda <- read_qiime_sample(mapfilename)
+        }else if (!inherits(mapfilename, "data.frame")){
+            rlang::abort("The mapfilename should be a file or data.frame contained sample information!")
+        }else{
+            sampleda <- mapfilename
+        }
+    }
+
+    clnm <- colnames(da)
+
+    max.sep <- da %>%
+               dplyr::pull(1) %>%
+               gregexpr("\\|", .) %>%
+               lapply(length) %>%
+               unlist %>%
+               max
+
+    dat <- da %>%
+           dplyr::filter(!!as.symbol(clnm[1]) %>%
+                         gregexpr("\\|", .) %>%
+                         lapply(length) %>%
+                         unlist %>%
+                         magrittr::equals(max.sep))
+
+    taxatab <- dat %>%
+                 dplyr::select(1) %>%
+                 split_str_to_list(sep="\\|") %>%
+                 magrittr::set_colnames(c(taxaclass[seq_len(max.sep)], "OTU")) %>%
+                 magrittr::set_rownames(paste0("row", seq_len(nrow(dat)))) %>%
+                 fillNAtax() %>% 
+                 magrittr::extract(paste0("row", seq_len(nrow(dat))), ) %>%
+                 magrittr::set_rownames(NULL) %>%
+                 tibble::column_to_rownames(var="OTU") 
+    
+    assay <- dat %>%
+             dplyr::mutate(!!as.symbol(clnm[1]):=strsplit(!!as.symbol(clnm[1]), split="\\|") %>%
+                           lapply(function(x) x %>% magrittr::extract2(max.sep+1))) %>%
+             tibble::column_to_rownames(var=clnm[1])
+    rownames(assay) <- rownames(taxatab)
+
+    rowdaindx <- assay %>%
+                 vapply(.,function(x)!is.numeric(x), logical(1)) %>%
+                 which() %>%
+                 unname()
+    
+    if (length(rowdaindx)>0){
+        rowda <- assay %>%
+                 dplyr::select(rowdaindx)
+        assay %<>% dplyr::select(-rowdaindx)
+    }else{
+        rowda <- NULL
+    }
+
+    res <- list(otutab=assay, 
+                sampleda=sampleda, 
+                taxatab=taxatab)
+    mpse <- .build_mpse(res)
+
+    if (!is.null(rowda)){
+        rowda <- rowda[rownames(rowda) %in% rownames(mpse), ,drop=FALSE] %>% 
+                 S4Vectors::DataFrame()
+        SummarizedExperiment::rowData(mpse) <- rowda
+    }
+
+    return(mpse)
+}    
+
 
 #' @title read the qza file, output of qiime2.
 #' @description
@@ -168,10 +281,12 @@ mp_import_qiime <- function(otufilename,
 #' @importFrom utils unzip
 #' @export
 #' @examples
+#' \dontrun{
 #' otuqzafile <- system.file("extdata", "table.qza",
 #'                           package="MicrobiotaProcess")
 #' otuqza <- read_qza(otuqzafile)
 #' str(otuqza)
+#' }
 read_qza <- function(qzafile, parallel=FALSE){
     tmpdir <- tempdir()
     unzipfiles <- unzip(qzafile, exdir=tmpdir)
