@@ -36,8 +36,9 @@ relative abundance will be calculated in the default (relative=TRUE).
 }
 \examples{
 file1 <- system.file("extdata/MetaPhlAn", "metaphlan_test.txt", package="MicrobiotaProcess")
+sample.file <- system.file("extdata/MetaPhlAn", "sample_test.txt", package="MicrobiotaProcess")
 readLines(file1, n=3) \%>\% writeLines()
-mpse1 <- mp_import_metaphlan(profile=file1)
+mpse1 <- mp_import_metaphlan(profile=file1, mapfilename=sample.file)
 mpse1
 }
 \author{

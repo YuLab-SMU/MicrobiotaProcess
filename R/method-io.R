@@ -177,8 +177,9 @@ mp_import_qiime <- function(otufilename,
 #' @export
 #' @examples
 #' file1 <- system.file("extdata/MetaPhlAn", "metaphlan_test.txt", package="MicrobiotaProcess")
+#' sample.file <- system.file("extdata/MetaPhlAn", "sample_test.txt", package="MicrobiotaProcess")
 #' readLines(file1, n=3) %>% writeLines()
-#' mpse1 <- mp_import_metaphlan(profile=file1)
+#' mpse1 <- mp_import_metaphlan(profile=file1, mapfilename=sample.file)
 #' mpse1
 mp_import_metaphlan <- function(profile, mapfilename=NULL, linenum=NULL, ...){
     if (!is.null(linenum)){
@@ -193,7 +194,7 @@ mp_import_metaphlan <- function(profile, mapfilename=NULL, linenum=NULL, ...){
             dplyr::slice(sampleindx - 1) %>%
             magrittr::set_rownames(paste0("sample", sampleindx -1))
     }else{
-        da <- utils::read.table(profile, sep="\t", head=TRUE, comment.char="", quote="")
+        da <- utils::read.table(profile, sep="\t", head=TRUE, comment.char="", quote="", check.names=FALSE)
         sampleda <- NULL
     }
 
