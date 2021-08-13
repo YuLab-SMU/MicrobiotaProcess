@@ -143,6 +143,8 @@ extract_count_data <- function(SE_object){
               SIMPLIFY=FALSE) %>%
           purrr::reduce(left_join, by=c("OTU", "Sample"), suffix = c("", ".y")) %>%
           suppressMessages()
+    abunclnm <- da %>% colnames() %>% magrittr::extract(3)
+    da %<>% dplyr::filter(!is.na(!!as.symbol(abunclnm)))
     return (da)
 }
 

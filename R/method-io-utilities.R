@@ -189,19 +189,20 @@
     }
 
     if (!is.null(otutree)){
+        tip.label <- otutree@phylo$tip.label
         flagn <- intersect(otutree@phylo$tip.label, rownm)
         if ( !check_equal_len(list(flagn, otutree@phylo$tip.label, rownm))){
             rlang::warn(c("The number of features in otu table is not equal the number of tips in otu tree.",
                           "The same features will be extract automatically !"))
-            rmotus <- setdiff(rownm, flagn)
+            rmotus <- setdiff(tip.label, flagn)
         }else{
             rmotus <- NULL
         }
-        if (length(rmotus) > 0 && length(rmotus) != treeio::Ntip(otutree)){
+        if (length(rmotus) > 0){
             otutree <- treeio::drop.tip(otutree, tip=rmotus)
             otuda <- otuda[match(flagn, rownm), , drop = FALSE]
-            if (!is.null(taxatree) && length(rmotus) != treeio::Ntip(taxatree)){
-                taxatree <- treeio::drop.tip(taxatree, tip=rmotus, collapse.singles=FALSE)
+            if (!is.null(taxatree)){
+                taxatree <- treeio::drop.tip(taxatree, tip=setdiff(rownm, flagn), collapse.singles=FALSE)
             }else{
                 taxatree <- NULL
             }
@@ -265,7 +266,7 @@
 }
 
 read_qiime_otu <- function(otufilename){
-    skipn <- guess_skipnum(otufilename)
+    skipn <- guess_skip_nrow(otufilename)
     xx <- utils::read.table(otufilename, sep="\t", skip=skipn, header=TRUE, 
                             row.names=1, comment.char="", quote="")
     indy <- vapply(xx, function(i)is.numeric(i), logical(1)) %>% setNames(NULL)
@@ -345,9 +346,35 @@ guess_rownames <- function(string){
     return("AA")
 }
 
-guess_skipnum <- function(otufilename){
-    x <- readLines(otufilename, n=50)
-    n <- sum(substr(x, 1, 1) == "#") - 1
+#guess_skipnum <- function(otufilename){
+#    x <- readLines(otufilename, n=50)
+#   n <- sum(substr(x, 1, 1) == "#") - 1
+#    return(n)
+#}
+
+guess_skip_nrow <- function(filename){
+    x <- readLines(filename, n=80)
+    n <- x %>% 
+         strsplit("\t") %>% 
+         lapply(length) %>% 
+         unlist() %>% 
+         magrittr::equals(max(.)) %>% 
+         magrittr::not() %>% 
+         which()
+    if (length(n)==0){
+        return (0)
+    }
+    if (length(n)==1){
+        return (n)
+    }
+    if (length(n)>1 &&       
+        all(n %>% 
+         diff() %>% 
+         magrittr::equals(1))){ 
+        n <- max(n)
+    }else{
+        rlang::abort(paste0("The number ", max(n), " line has different number elements!"))
+    }
     return(n)
 }
 

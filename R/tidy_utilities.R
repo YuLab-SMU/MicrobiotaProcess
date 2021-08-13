@@ -1,7 +1,9 @@
 formatted_out <- function(x){
     x1 <- "\033[38;5;246m"
     x2 <- "\033[39m"
-    paste0(c(x1, x, x2), collapse="")
+    mg <- paste0(c(x1, x, x2), collapse="") %>% 
+          pillar::style_subtle()
+    return(mg)
 }
 
 tbl_mpse_return_message <- function(flag){

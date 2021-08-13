@@ -4,13 +4,22 @@
 \alias{mp_import_metaphlan}
 \title{Import function to load the output of MetaPhlAn.}
 \usage{
-mp_import_metaphlan(profile, mapfilename = NULL, linenum = NULL, ...)
+mp_import_metaphlan(
+  profile,
+  mapfilename = NULL,
+  treefile = NULL,
+  linenum = NULL,
+  ...
+)
 }
 \arguments{
 \item{profile}{the output file (text format) of MetaPhlAn.}
 
 \item{mapfilename}{the sample information file or data.frame,
 default is NULL.}
+
+\item{treefile}{the path of MetaPhlAn tree file (
+mpa_v30_CHOCOPhlAn_201901_species_tree.nwk), default is NULL.}
 
 \item{linenum}{a integer, sometimes the output file of MetaPhlAn ( < 3)
 contained the sample information in the first several lines.

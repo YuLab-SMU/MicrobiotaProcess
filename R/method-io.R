@@ -157,6 +157,8 @@ mp_import_qiime <- function(otufilename,
 #' @param profile the output file (text format) of MetaPhlAn.
 #' @param mapfilename the sample information file or data.frame,
 #' default is NULL.
+#' @param treefile the path of MetaPhlAn tree file (
+#' mpa_v30_CHOCOPhlAn_201901_species_tree.nwk), default is NULL.
 #' @param linenum a integer, sometimes the output file of MetaPhlAn ( < 3)
 #' contained the sample information in the first several lines.
 #' The linenum should be required.
@@ -181,11 +183,12 @@ mp_import_qiime <- function(otufilename,
 #' readLines(file1, n=3) %>% writeLines()
 #' mpse1 <- mp_import_metaphlan(profile=file1, mapfilename=sample.file)
 #' mpse1
-mp_import_metaphlan <- function(profile, mapfilename=NULL, linenum=NULL, ...){
+mp_import_metaphlan <- function(profile, mapfilename=NULL, treefile=NULL, linenum=NULL, ...){
+    skipnrow <- guess_skip_nrow(profile)
     if (!is.null(linenum)){
-        sampleda <- utils::read.table(profile, sep="\t", row.names=1, nrow=linenum, comment.char="", quote="") %>%
+        sampleda <- utils::read.table(profile, sep="\t", row.names=1, skip=skipnrow, nrow=linenum, comment.char="", quote="") %>%
                     t() %>% as.data.frame()
-        da <- utils::read.table(profile, sep="\t", skip=linenum, comment.char="", quote="")
+        da <- utils::read.table(profile, sep="\t", skip=linenum + skipnrow, comment.char="", quote="")
         sampleindx <- da %>%
                       vapply(.,function(x)is.numeric(x), logical(1)) %>%
                       which(.) 
@@ -194,7 +197,7 @@ mp_import_metaphlan <- function(profile, mapfilename=NULL, linenum=NULL, ...){
             dplyr::slice(sampleindx - 1) %>%
             magrittr::set_rownames(paste0("sample", sampleindx -1))
     }else{
-        da <- utils::read.table(profile, sep="\t", head=TRUE, comment.char="", quote="", check.names=FALSE)
+        da <- utils::read.table(profile, sep="\t", head=TRUE, skip=skipnrow, comment.char="", quote="", check.names=FALSE)
         sampleda <- NULL
     }
 
@@ -206,6 +209,17 @@ mp_import_metaphlan <- function(profile, mapfilename=NULL, linenum=NULL, ...){
         }else{
             sampleda <- mapfilename
         }
+    }
+
+    if (!is.null(treefile)){
+        otutree <- ape::read.tree(treefile)
+        otutree$tip.label %<>% 
+             strsplit("\\|") %>% 
+             lapply(., function(x)x[length(x)]) %>% 
+             unlist()
+        otutree %<>% treeio::as.treedata()
+    }else{
+        otutree <- NULL
     }
 
     clnm <- colnames(da)
@@ -253,9 +267,16 @@ mp_import_metaphlan <- function(profile, mapfilename=NULL, linenum=NULL, ...){
         rowda <- NULL
     }
 
-    res <- list(otutab=assay, 
-                sampleda=sampleda, 
-                taxatab=taxatab)
+    #if (!is.null(otutree)){
+    #    otutree %<>% 
+    #        ape::keep.tip(intersect(rownames(assay), otutree$tip.label)) %>% 
+    #        treeio::as.treedata()
+    #}
+
+    res <- list(otutab = assay, 
+                otutree = otutree,
+                sampleda = sampleda, 
+                taxatab = taxatab)
     mpse <- .build_mpse(res)
 
     if (!is.null(rowda)){
