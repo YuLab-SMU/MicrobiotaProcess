@@ -1,6 +1,7 @@
 # MicrobiotaProcess 1.5.3.990
 
 + add `mp_import_metaphlan` to parsing the output of `MetaPhlAn`. (2021-08-12, Thu)
+  - add `treefile` argument to import the tree of `MetaPhlAn3` (`mpa_v30_CHOCOPhlAn_201901_species_tree.nwk`) (2021-08-13, Fri)
 + update the `print` of `MPSE` object via `pillar` package. (2021-08-06, Fri)
 + update `mp_extract_dist` by introducing `.group` argument to return a `tbl_df` for 
   visualization. (2021-08-04, Wed)
