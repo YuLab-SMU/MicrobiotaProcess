@@ -6,5 +6,5 @@
     #                   MP_citations(), "\n")
 
     #packageStartupMessage(paste0(msg, citation))
-    options(radial.line.type="curved")
+    options(layout.radial.linetype="curved")
 }
