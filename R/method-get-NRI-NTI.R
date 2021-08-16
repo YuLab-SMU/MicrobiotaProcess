@@ -13,6 +13,7 @@
 #' @param force logical whether calculate the index even the count of otu is
 #' not rarefied, default is FALSE. If it is TRUE, meaning the rarefaction is not be
 #' performed automatically.
+#' @param seed integer a random seed to make the result reproducible, default is 123.
 #' @param ... additional arguments see also "ses.mpd" and "ses.mntd" of "picante".
 #' @return alphasample object contained NRT and NTI.
 #' @rdname get_NRI_NTI-methods
@@ -23,7 +24,7 @@ setGeneric("get_NRI_NTI", function(obj, ...){standardGeneric("get_NRI_NTI")})
 #' @aliases get_NRI_NTI,matrix
 #' @rdname get_NRI_NTI-methods
 #' @export
-setMethod("get_NRI_NTI", "matrix", function(obj, mindepth, sampleda, tree, abundance.weighted=TRUE, force=FALSE, ...){
+setMethod("get_NRI_NTI", "matrix", function(obj, mindepth, sampleda, tree, abundance.weighted=TRUE, force=FALSE, seed=123, ...){
     if (missing(mindepth) || is.null(mindepth)){
            mindepth <- min(rowSums(obj))
     }
@@ -31,11 +32,12 @@ setMethod("get_NRI_NTI", "matrix", function(obj, mindepth, sampleda, tree, abund
         obj <- vegan::rrarefy(obj, mindepth)
     }
     treedist <- cal_treedist(tree=tree)
-    resnri <- picante::ses.mpd(samp=obj, dis=treedist, abundance.weighted=abundance.weighted, ...)
-    resnti <- picante::ses.mntd(samp=obj, dis=treedist, abundance.weighted=abundance.weighted, ...)
-    resda <- data.frame(NRI = -resnri$mpd.obs.z,
-                      NTI = -resnti$mntd.obs.z
-                      )
+    resnri <- withr::with_seed(seed, picante::ses.mpd(samp=obj, dis=treedist, abundance.weighted=abundance.weighted, ...))
+    resnti <- withr::with_seed(seed, picante::ses.mntd(samp=obj, dis=treedist, abundance.weighted=abundance.weighted, ...))
+    resda <- data.frame(NRI = abs(resnri$mpd.obs.z),
+                      NTI = abs(resnti$mntd.obs.z)
+                      ) %>% magrittr::set_rownames(rownames(resnri))
+    
     if (missing(sampleda)){
         sampleda <- NULL
     }
@@ -94,23 +96,25 @@ cal_treedist <- function(tree){
 #' weighted by species abundance, default is TRUE.
 #' @param force logical whether calculate the alpha index even the '.abundance' is
 #' not rarefied, default is FALSE.
+#' @param seed integer a random seed to make the result reproducible, default is 123.
 #' @param ... additional arguments see also "ses.mpd" and "ses.mntd" of "picante".
 #' @return update object.
 #' @rdname mp_cal_NRI_NTI-methods
 #' @author Shuangbin Xu
 #' @export
-setGeneric("mp_cal_NRI_NTI", function(.data, .abundance, action="add", abundance.weighted=TRUE, force=FALSE, ...)standardGeneric("mp_cal_NRI_NTI"))
+setGeneric("mp_cal_NRI_NTI", function(.data, .abundance, action="add", abundance.weighted=TRUE, force=FALSE, seed=123, ...)standardGeneric("mp_cal_NRI_NTI"))
 
 #' @rdname mp_cal_NRI_NTI-methods
 #' @aliases mp_cal_NRI_NTI,MPSE
 #' @exportMethod mp_cal_NRI_NTI
-setMethod("mp_cal_NRI_NTI", signature(.data="MPSE"), function(.data, .abundance, action="add", abundance.weighted=TRUE, force=FALSE, ...){
+setMethod("mp_cal_NRI_NTI", signature(.data="MPSE"), function(.data, .abundance, action="add", abundance.weighted=TRUE, force=FALSE, seed=123, ...){
     action %<>% match.arg(c("add", "only", "get"))
 
     res <- .internal_cal_NRI_NTI(.data=.data,
                                  .abundance=!!rlang::enquo(.abundance),
                                  abundance.weighted=abundance.weighted,
                                  force=force,
+                                 seed = seed,
                                  ...)
     if (action=="get"){
         res@sampleda <- .data %>%
@@ -123,10 +127,12 @@ setMethod("mp_cal_NRI_NTI", signature(.data="MPSE"), function(.data, .abundance,
 
     da <- .data %>%
           mp_extract_sample() %>%
-          left_join(da, by="Sample") %>%
-          column_to_rownames(var="Sample")
+          left_join(da, by="Sample") #%>%
+          #column_to_rownames(var="Sample")
     if (action=="add"){
-        .data@colData <- da %>% S4Vectors::DataFrame(check.names=FALSE)
+        .data@colData <- da %>% 
+                         column_to_rownames(var="Sample") %>% 
+                         S4Vectors::DataFrame(check.names=FALSE)
         return(.data)
     }else if (action=="only"){
         return(da)
@@ -134,7 +140,7 @@ setMethod("mp_cal_NRI_NTI", signature(.data="MPSE"), function(.data, .abundance,
 
 })
           
-.internal_cal_NRI_NTI <- function(.data, .abundance, abundance.weighted=TRUE, force=FALSE, ...){
+.internal_cal_NRI_NTI <- function(.data, .abundance, abundance.weighted=TRUE, force=FALSE, seed=123, ...){
 
     .abundance <- rlang::enquo(.abundance)
     if (rlang::quo_is_null(.abundance)){
@@ -159,16 +165,17 @@ setMethod("mp_cal_NRI_NTI", signature(.data="MPSE"), function(.data, .abundance,
     indexda <- .data %>% 
                mp_extract_assays(.abundance=!!.abundance, byRow=FALSE) %>%
                as.matrix() %>%
-               get_NRI_NTI(tree=otutree@phylo, force=TRUE, abundance.weighted=TRUE, ...)
+               get_NRI_NTI(tree=otutree@phylo, force=TRUE, abundance.weighted=abundance.weighted, seed=seed, ...)
 
     return(indexda)
 }
 
-.internal_cal_NRI_NTI_ <- function(.data, .abundance, action="add", abundance.weighted=TRUE, force=FALSE, ...){
+.internal_cal_NRI_NTI_ <- function(.data, .abundance, action="add", abundance.weighted=TRUE, force=FALSE, seed=123, ...){
     action %<>% match.arg(c("add", "only", "get"))
     res <- .internal_cal_NRI_NTI(.data=.data,
                                  .abundance=!!rlang::enquo(.abundance),
                                  force=force,
+                                 seed = seed,
                                  ...)
     if (action=="get"){
         res@sampleda <- .data %>%
@@ -181,8 +188,8 @@ setMethod("mp_cal_NRI_NTI", signature(.data="MPSE"), function(.data, .abundance,
 
     da <- .data %>%
           mp_extract_sample() %>%
-          left_join(da, by="Sample") %>%
-          column_to_rownames(var="Sample")
+          left_join(da, by="Sample") #%>%
+          #column_to_rownames(var="Sample")
     if (action=="add"){
         samplevar <- .data %>% attr("samplevar")
         assaysvar <- .data %>% attr("assaysvar")

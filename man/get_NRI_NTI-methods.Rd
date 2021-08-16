@@ -19,6 +19,7 @@ get_NRI_NTI(obj, ...)
   tree,
   abundance.weighted = TRUE,
   force = FALSE,
+  seed = 123,
   ...
 )
 
@@ -44,6 +45,8 @@ weighted by species abundance, default is TRUE.}
 \item{force}{logical whether calculate the index even the count of otu is
 not rarefied, default is FALSE. If it is TRUE, meaning the rarefaction is not be
 performed automatically.}
+
+\item{seed}{integer a random seed to make the result reproducible, default is 123.}
 }
 \value{
 alphasample object contained NRT and NTI.

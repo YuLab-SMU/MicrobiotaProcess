@@ -16,6 +16,7 @@ mp_cal_NRI_NTI(
   action = "add",
   abundance.weighted = TRUE,
   force = FALSE,
+  seed = 123,
   ...
 )
 
@@ -25,6 +26,7 @@ mp_cal_NRI_NTI(
   action = "add",
   abundance.weighted = TRUE,
   force = FALSE,
+  seed = 123,
   ...
 )
 
@@ -34,6 +36,7 @@ mp_cal_NRI_NTI(
   action = "add",
   abundance.weighted = TRUE,
   force = FALSE,
+  seed = 123,
   ...
 )
 
@@ -43,6 +46,7 @@ mp_cal_NRI_NTI(
   action = "add",
   abundance.weighted = TRUE,
   force = FALSE,
+  seed = 123,
   ...
 )
 }
@@ -60,6 +64,8 @@ weighted by species abundance, default is TRUE.}
 
 \item{force}{logical whether calculate the alpha index even the '.abundance' is
 not rarefied, default is FALSE.}
+
+\item{seed}{integer a random seed to make the result reproducible, default is 123.}
 
 \item{...}{additional arguments see also "ses.mpd" and "ses.mntd" of "picante".}
 }
