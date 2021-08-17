@@ -65,7 +65,7 @@ option is "manhattan", "euclidean", "canberra", "bray", "kulczynski",
 "w", "-1", "c", "wb", "r", "I", "e", "t", "me", "j", "sor", "m", "-2", "co"
 "cc", "g", "-3", "l", "19", "hk", "rlb", "sim", "gl", "z" (implemented in 
 betadiver of vegan), "maximum", "binary", "minkowski" (implemented in dist 
-of stats), "unifrac", "weighted unifrac" (implement in phyloseq),}
+of stats), "unifrac", "weighted unifrac" (implemented in phyloseq),}
 
 \item{action}{character, "add" joins the distance data to the object, "only" return
 a non-redundant tibble with the distance information. "get" return 'dist' object.}
@@ -74,7 +74,17 @@ a non-redundant tibble with the distance information. "get" return 'dist' object
 the distance was calculated, default is FALSE. The environment matrix can be processed
 when it was joined to the MPSE or tbl_mpse object.}
 
-\item{...}{additional parameters.}
+\item{...}{additional parameters.
+
+some dot arguments if \code{distmethod} is \code{unifrac} or \code{weighted unifrac}:
+\itemize{
+  \item \code{weighted} logical, whether to use weighted-UniFrac calculation, which considers the relative 
+    abundance of taxa, default is FALSE, meaning unweightrd-UniFrac, which only considers 
+    presence/absence of taxa.
+  \item \code{normalized} logical, whether normaized the branch length of tree to the range between 0 and 1 
+    when the \code{weighted}=\code{TRUE}.
+  \item \code{parallel} logical, whether to execute the calculation in parallel, default is FALSE.
+}}
 }
 \value{
 update object or tibble according the 'action'

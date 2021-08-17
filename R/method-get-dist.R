@@ -74,6 +74,7 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 
 
 #' Calculate the distances between the samples with specified abundance.
+#'
 #' @rdname mp_cal_dist-methods
 #' @param .data MPSE or tbl_mpse object
 #' @param .abundance the name of otu abundance to be calculated
@@ -86,13 +87,23 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #' "w", "-1", "c", "wb", "r", "I", "e", "t", "me", "j", "sor", "m", "-2", "co"
 #' "cc", "g", "-3", "l", "19", "hk", "rlb", "sim", "gl", "z" (implemented in 
 #' betadiver of vegan), "maximum", "binary", "minkowski" (implemented in dist 
-#' of stats), "unifrac", "weighted unifrac" (implement in phyloseq),
+#' of stats), "unifrac", "weighted unifrac" (implemented in phyloseq),
 #' @param action character, "add" joins the distance data to the object, "only" return
 #' a non-redundant tibble with the distance information. "get" return 'dist' object.
 #' @param scale logical whether scale the metric of environment (.env is provided) before
 #' the distance was calculated, default is FALSE. The environment matrix can be processed
 #' when it was joined to the MPSE or tbl_mpse object.
 #' @param ... additional parameters.
+#'
+#' some dot arguments if \code{distmethod} is \code{unifrac} or \code{weighted unifrac}:
+#' \itemize{
+#'   \item \code{weighted} logical, whether to use weighted-UniFrac calculation, which considers the relative 
+#'     abundance of taxa, default is FALSE, meaning unweightrd-UniFrac, which only considers 
+#'     presence/absence of taxa.
+#'   \item \code{normalized} logical, whether normaized the branch length of tree to the range between 0 and 1 
+#'     when the \code{weighted}=\code{TRUE}.
+#'   \item \code{parallel} logical, whether to execute the calculation in parallel, default is FALSE.
+#' }
 #' @return update object or tibble according the 'action'
 #' @author Shuangbin Xu
 #' @export
@@ -379,8 +390,9 @@ cal_Unifrac_dist <- function(x, tree, weighted = FALSE, normalized = TRUE, paral
 
     ntip <- ape::Ntip(tree)
     node_num <- ape::Nnode(tree, internal.only=FALSE)
-
-    node.desc <- matrix(tree$edge[order(tree$edge[,1]), 2], byrow=TRUE, ncol=2) 
+    # The original method might generate error when a node has three or larger than tree children nodes.
+    #node.desc <- matrix(tree$edge[order(tree$edge[,1]), 2], byrow=TRUE, ncol=2) 
+    edge <- tree$edge
 
     edge_array <- matrix(0, nrow=node_num, ncol=ncol(x),
                          dimnames=list(NULL, sample_names=colnames(x)))
@@ -390,7 +402,9 @@ cal_Unifrac_dist <- function(x, tree, weighted = FALSE, normalized = TRUE, paral
     ord.node <- order(ape::node.depth(tree))[seq(from=ntip+1, to=node_num, by=1)]
 
     for(i in ord.node){
-        edge_array[i,] <- colSums(edge_array[node.desc[i-ntip,], , drop=FALSE], na.rm = TRUE)
+        # The original method might generate error when a node has three or larger than tree children nodes.
+        #edge_array[i,] <- colSums(edge_array[node.desc[i-ntip,], , drop=FALSE], na.rm = TRUE)
+        edge_array[i, ] <- colSums(edge_array[edge[edge[,1]==i, 2], ,drop=FALSE], na.rm=TRUE)
     }
     
     spn <- utils::combn(colnames(x), 2, simplify=FALSE)
