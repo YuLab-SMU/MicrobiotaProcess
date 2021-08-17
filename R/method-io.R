@@ -16,7 +16,6 @@
 #' @param parallel logical, whether parsing the column of taxonomy multi-parallel, default is FALSE.
 #' @param ..., additional parameters.
 #' @return MPSE-class or phyloseq-class contained the argument class.
-#' @importFrom phyloseq phyloseq
 #' @export
 #' @author Shuangbin Xu
 #' @examples
@@ -339,29 +338,45 @@ read_qza <- function(qzafile, parallel=FALSE){
 read.featuretab <- function(file){
     biomobj <- suppressWarnings(biomformat::read_biom(file))
     x <- data.frame(as(biomformat::biom_data(biomobj),"matrix"), check.names=FALSE)
-    taxflag <- all(unlist(lapply(biomobj$rows, function(i){length(i$metadata)}))==0)
+    taxflag <- all(unlist(lapply(biomobj$rows, function(i){length(i$metadata$taxonomy)}))==0)
     if (taxflag){
         taxatab <- NULL
     }else{
-        taxatab <- lapply(biomobj$rows, function(i){phyloseq::parse_taxonomy_greengenes(i$metadata$taxonomy)})
-        names(taxatab) <- rownames(x)
-        taxatab <- phyloseq::build_tax_table(taxatab)
+        taxatab <- lapply(biomobj$rows, function(i)paste0(i$metadata$taxonomy, collapse=";")) %>% 
+            unlist() %>% 
+            data.frame() %>%
+            split_str_to_list(sep=";") %>%
+            magrittr::set_colnames(taxaclass[seq_len(ncol(.))]) %>%
+            magrittr::set_rownames(rownames(x)) %>%
+            fillNAtax()
+        #colnames(taxatab) <- taxaclass[seq_len(ncol(taxatab))]
+        #taxatab <- lapply(biomobj$rows, function(i){phyloseq::parse_taxonomy_greengenes(i$metadata$taxonomy)})
+        #names(taxatab) <- rownames(x)
+        #taxatab <- phyloseq::build_tax_table(taxatab)
         #taxatab <- remove_na_taxonomy_rank(taxatab)
-        taxatab <- fillNAtax(taxatab)
+        #taxatab <- fillNAtax(taxatab)
     }
     return(list(otutab = x, taxatab=taxatab))
 }
 
 #' @keywords internal
 read.taxa <- function(file, parallel=FALSE){
-    x <- utils::read.table(file, sep="\t", row.names=1, header=TRUE, comment.char="")
-    taxstring <- as.vector(x[[1]])
-    taxatab <- suppressWarnings(plyr::llply(taxstring, phyloseq::parse_taxonomy_qiime, .parallel = parallel))
-    names(taxatab) <- rownames(x)
-    taxatab <- phyloseq::build_tax_table(taxatab)
-    #taxatab <- remove_na_taxonomy_rank(taxatab)
-    taxatab <- fillNAtax(taxatab)
+    skipn <- guess_skip_nrow(file)
+    x <- utils::read.table(file, sep="\t", row.names=1, header=TRUE, comment.char="", skip=skipn)
+    x <- x[,1,drop=FALSE] 
+    taxatab <- x %>% apply(., 2, function(i)gsub(";\\s+", ";", i)) %>% data.frame() %>%
+        split_str_to_list(sep=";") %>%
+        magrittr::set_colnames(taxaclass[seq_len(ncol(.))]) %>%
+        magrittr::set_rownames(rownames(x)) %>%
+        fillNAtax()
     return(taxatab)
+    #taxstring <- as.vector(x[[1]])
+    #taxatab <- suppressWarnings(plyr::llply(taxstring, phyloseq::parse_taxonomy_qiime, .parallel = parallel))
+    #names(taxatab) <- rownames(x)
+    #taxatab <- phyloseq::build_tax_table(taxatab)
+    #taxatab <- remove_na_taxonomy_rank(taxatab)
+    #taxatab <- fillNAtax(taxatab)
+    #return(taxatab)
 }
 
 

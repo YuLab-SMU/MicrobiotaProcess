@@ -2,7 +2,7 @@
 ##' @name as.MPSE
 ##' @rdname as.MPSE-methods
 ##' @title as.MPSE method
-##' @param .data tbl_mpse object
+##' @param .data tbl_mpse or phyloseq or TreeSummarizedExperiment object
 ##' @param ... additional parameters.
 ##' @return MPSE object
 ##' @export
@@ -146,3 +146,82 @@ setMethod("as.MPSE", signature(.data="grouped_df_mpse"),
     methods::validObject(mpse)
     return(mpse)          
 })
+
+
+##' @rdname as.MPSE-methods
+##' @aliases as.MPSE,TreeSummarizedExperiment
+##' @exportMethod as.MPSE
+setMethod("as.MPSE", signature(.data="TreeSummarizedExperiment"), function(.data, ...){
+    assaysvar <- SummarizedExperiment::assayNames(.data)
+    SummarizedExperiment::assayNames(.data) <- c("Abundance", assaysvar[-1])
+
+    flag <- rownames(.data) %>% base::strsplit("\\|") %>% lapply(length) %>% unlist
+    rowda <- SummarizedExperiment::rowData(.data)
+    res <- .internal_check_taxonomy(rowda, flag)
+    taxatab <- res$taxatab
+    newrowda <- res$newrowda
+    if (all(flag>5)){
+        `rownames<-` <- getMethod("rownames<-", "TreeSummarizedExperiment")
+        rownames(.data) <- rownames(taxatab)
+    }
+    rowTree <- getFromNamespace("rowTree", "TreeSummarizedExperiment")
+    otu.tree <- rowTree(.data)
+
+    if (!is.null(otu.tree)){
+        if (all(flag>5)){
+            otu.tree$tip.label %<>%
+              base::strsplit("\\|") %>%
+              lapply(., function(x)x[length(x)]) %>%
+              unlist()
+        }
+        keepnms <- intersect(otu.tree$tip.label, rownames(.data))
+        otu.tree <- ape::keep.tip(otu.tree, tip=keepnms)
+        .data <- .data[rownames(.data) %in% keepnms, ]
+        taxatab <- taxatab[rownames(taxatab) %in% keepnms, ]
+        newrowda <- newrowda[rownames(newrowda) %in% keepnms, ]
+        otu.tree %<>% treeio::as.treedata()
+    }
+
+    if (ncol(taxatab)>0){
+        taxa.tree <- convert_to_treedata2(x=data.frame(taxatab))
+    }else{
+        taxa.tree <- NULL
+    }
+    
+    referenceSeq <- getFromNamespace("referenceSeq", "TreeSummarizedExperiment")
+
+    mpse <- MPSE(assays=SummarizedExperiment::assays(.data),
+                 colData=SummarizedExperiment::colData(.data),
+                 refseq=referenceSeq(.data)[[1]],
+                 otutree=otu.tree,
+                 taxatree=taxa.tree
+            ) 
+
+    if (ncol(newrowda)>0){
+        SummarizedExperiment::rowData(mpse) <- newrowda
+    }
+
+    return(mpse)
+})
+
+.internal_check_taxonomy <- function(x, flag){
+    #flag <- rownames(x) %>% strsplit("\\|") %>% lapply(length) %>% unlist 
+    col.ind <- colnames(x) %in% c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+    if (all(flag>5)){
+        max.sep <- max(flag)
+        taxatab <- x %>% 
+          rownames() %>% 
+          data.frame() %>% 
+          split_str_to_list(sep="\\|") %>% 
+          magrittr::set_colnames(c(taxaclass[seq_len(max.sep-1)], "OTU")) %>%
+          magrittr::set_rownames(paste0("row", seq_len(nrow(x)))) %>%
+          fillNAtax() %>%
+          magrittr::extract(paste0("row", seq_len(nrow(x))), ) %>%
+          magrittr::set_rownames(NULL) %>%
+          tibble::column_to_rownames(var="OTU")
+    }else{
+        taxatab <- x[, col.ind]
+    }
+    newrowda <- x[, !col.ind]
+    return(list(taxatab=taxatab, newrowda=newrowda))
+}

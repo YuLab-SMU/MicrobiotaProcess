@@ -12,6 +12,13 @@ setOldClass("prcomp")
 #' @noRd
 setOldClass("tbl_mpse")
 
+#' @noRd
+TreeSummarizedExperiment <- methods::getClassDef("TreeSummarizedExperiment", "TreeSummarizedExperiment") %>% 
+                              suppressMessages()
+
+#' @noRd
+phyloseq <- methods::getClassDef("phyloseq", "phyloseq") %>% suppressMessages()
+
 #' @title grouped_df_mpse class
 #' @name grouped_df_mpse-class
 #' @rdname grouped_df_mpse-class

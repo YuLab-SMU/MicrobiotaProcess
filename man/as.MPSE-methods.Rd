@@ -9,6 +9,8 @@
 \alias{as.MPSE,phyloseq}
 \alias{as.MPSE,grouped_df_mpse-method}
 \alias{as.MPSE,grouped_df_mpse}
+\alias{as.MPSE,TreeSummarizedExperiment-method}
+\alias{as.MPSE,TreeSummarizedExperiment}
 \title{as.MPSE method}
 \usage{
 as.MPSE(.data, ...)
@@ -18,9 +20,11 @@ as.MPSE(.data, ...)
 \S4method{as.MPSE}{phyloseq}(.data, ...)
 
 \S4method{as.MPSE}{grouped_df_mpse}(.data, ...)
+
+\S4method{as.MPSE}{TreeSummarizedExperiment}(.data, ...)
 }
 \arguments{
-\item{.data}{tbl_mpse object}
+\item{.data}{tbl_mpse or phyloseq or TreeSummarizedExperiment object}
 
 \item{...}{additional parameters.}
 }
