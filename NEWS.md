@@ -1,5 +1,7 @@
-# MicrobiotaProcess 1.5.3.990
+# MicrobiotaProcess 1.5.3.991
 
++ don't import the `parse_taxonomy_greengenes` and `parse_taxonomy_qiime` from `phyloseq`. (2021-08-17, Tue)
++ add `as.MPSE` for `TreeSummarizedExperiment` class. (2021-08-17, Tue)
 + add `mp_import_metaphlan` to parsing the output of `MetaPhlAn`. (2021-08-12, Thu)
   - add `treefile` argument to import the tree of `MetaPhlAn3` (`mpa_v30_CHOCOPhlAn_201901_species_tree.nwk`) (2021-08-13, Fri)
 + update the `print` of `MPSE` object via `pillar` package. (2021-08-06, Fri)
