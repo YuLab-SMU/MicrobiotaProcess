@@ -182,12 +182,26 @@ ungroup.grouped_df_mpse <- function(x, ...){
 
 ##' @method mutate MPSE
 ##' @export
-mutate.MPSE <- function(.data, ...){
-    writeLines(tbl_mpse_return_message(TRUE))
+mutate.MPSE <- function(.data, .returnMPSE=TRUE, ...){
+    #writeLines(tbl_mpse_return_message(TRUE))
     .data %<>% as_tibble()
     res <- mutate(.data=.data, ...)
     res <- add_attr.tbl_mpse(x1=res, x2=.data)
     res <- add_var(res, type="mutate")
+    if (!.returnMPSE){
+        flag <- valid_names(res, type="tbl_mpse")
+        xm <- tbl_mpse_return_message(flag)
+        if (flag){
+           xm <- c(xm, keep_mpse_message)
+        }else{
+           res %<>% tibble::as_tibble()
+        }
+        writeLines(xm)
+    }else{
+        if (valid_names(res)){
+            res %<>% as.MPSE()
+        }
+    }
     return (res)
 }
 

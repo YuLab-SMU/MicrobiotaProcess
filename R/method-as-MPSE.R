@@ -31,24 +31,18 @@ setMethod("as.MPSE", signature(.data="tbl_mpse"),
         internal_attr <- attr(.data, "internal_attr")
 
         .data %<>% as_tibble()
-        assaysda <- lapply(assaysvar, function(x) 
-            .data %>%
-            dplyr::select(c("Sample", "OTU", x)) %>%
-            dplyr::distinct() %>%
-            tidyr::pivot_wider(names_from="Sample", values_from=x) %>%
-            tibble::column_to_rownames(var="OTU")
-        ) %>% stats::setNames(assaysvar)
+        assaysda <- .internal_build_assay(da=.data, x=assaysvar)
 
-        nsample <- ncol(assaysda[[1]])
         if (!is.null(mutatevar)){
-            indx <- lapply(mutatevar, function(i)
-                        .data %>% 
-                        select(i) %>% 
-                        distinct() %>% 
-                        nrow() == nsample
-                        ) %>% unlist()
-            mutatevar <- mutatevar[indx]
-            samplevar <- c(samplevar, mutatevar)
+            res.var <- .internal_check_mutate(da=.data, 
+                                              x=mutatevar, 
+                                              assay=assaysda[[1]])
+            samplevar <- union(samplevar, res.var$samplevar)
+            otumetavar <- union(otumetavar, res.var$otumetavar)
+            newassay <- setdiff(res.var$assaysvar, assaysvar)
+            if (length(newassay) > 0) {
+                assaysda <- c(assaysda, .internal_build_assay(da=.data, x=newassay))
+            }
         }
         if (!is.null(samplevar)){
             sampleda <- .data %>% 
@@ -95,6 +89,58 @@ setMethod("as.MPSE", signature(.data="tbl_mpse"),
         methods::validObject(mpse)
         return (mpse)
 })
+
+.internal_build_assay <- function(da, x){
+    assayda <- lapply(x, function(i)
+        da %>%
+            dplyr::select(c("Sample", "OTU", i)) %>%
+            dplyr::distinct() %>%
+            tidyr::pivot_wider(names_from="Sample", values_from=i) %>%
+            tibble::column_to_rownames(var="OTU")
+        ) %>% stats::setNames(x)
+    return(assayda)
+}
+
+.internal_check_mutate <- function(da, x, assay){
+    indx1 <- lapply(x, function(i) 
+               da %>%
+               select(c("OTU", i)) %>%
+               distinct() %>% 
+               nrow() %>%
+               magrittr::equals(nrow(assay))
+             ) %>% unlist()
+
+    otumetavar <- x[indx1]
+    x <- x[!indx1]
+    if (length(x)==0){
+        return(list(otumetavar=otumetavar))
+    }
+
+    indx2 <- lapply(x, function(i)
+               da %>%
+               select(c("Sample", i)) %>%
+               distinct() %>%
+               nrow() %>%
+               magrittr::equals(ncol(assay))
+             ) %>% unlist()
+
+    samplevar <- x[indx2]
+    x <- x[!indx2]
+    if (length(x)==0){
+        return(list(otumetavar=otumetavar, samplevar=samplevar))
+    }
+
+    indx3 <- lapply(x, function(i)
+               da %>% 
+               select(c("OTU", "Sample", i)) %>%
+               distinct() %>%
+               nrow() %>%
+               magrittr::equals(nrow(assay)*ncol(assay)) &&
+               da %>% pull(i) %>% is.numeric()
+             ) %>% unlist()
+
+    return(list(otumetavar=otumetavar, samplevar=samplevar, assaysvar=x[indx3]))
+}
 
 
 ##' @rdname as.MPSE-methods
