@@ -16,7 +16,6 @@ Depends:
   R (>= 4.0.0)
 Imports:
   ape,
-  plyr,	
   tidyr,
   ggplot2,
   magrittr,
@@ -51,6 +50,7 @@ Suggests:
   nlme,
   phangorn,
   picante,
+  plyr,
   DECIPHER,
   randomForest,
   biomformat,

@@ -1,5 +1,6 @@
 # MicrobiotaProcess 1.5.3.991
 
++ fix `mutate` for `MPSE` object. 
 + don't import the `parse_taxonomy_greengenes` and `parse_taxonomy_qiime` from `phyloseq`. (2021-08-17, Tue)
 + add `as.MPSE` for `TreeSummarizedExperiment` class. (2021-08-17, Tue)
 + add `mp_import_metaphlan` to parsing the output of `MetaPhlAn`. (2021-08-12, Thu)
