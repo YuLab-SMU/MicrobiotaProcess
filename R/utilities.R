@@ -219,8 +219,8 @@ extract_args <- function(obj, arg){
 #' @importFrom utils globalVariables
 utils::globalVariables('taxlevelchar')
 
+ddply <- getFromNamespace("ddply", "plyr")
 
-#' @importFrom plyr ddply
 #' @importFrom stats sd 
 # Adapted from Rmisc
 summarySE <- function (data = NULL, measurevar, groupvars = NULL, na.rm = FALSE,

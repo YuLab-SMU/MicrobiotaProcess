@@ -39,7 +39,6 @@ geom_ord_ellipse <- function(data=NULL, mapping = NULL, ellipse_pro = 0.9, alpha
 
 #' @importFrom ggplot2 ggproto
 #' @importFrom ggplot2 Stat
-#' @importFrom plyr ddply
 #' @importFrom grDevices chull
 #' @keywords internal
 StatOrdEllipse <- ggproto("StatOrdEllipse", Stat,

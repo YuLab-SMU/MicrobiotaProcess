@@ -11,8 +11,6 @@
 #' @return mean of data.frame by featurelist
 #' @export 
 #' @author Shuangbin Xu
-#' @importFrom plyr ddply 
-#' @importFrom plyr numcolwise
 #' @examples
 #' \dontrun{
 #' otudafile <- system.file("extdata", "otu_tax_table.txt", 
@@ -42,7 +40,8 @@ get_count <- function(data,
         data$Row.names <- NULL
         group <- colnames(featurelist)
     }
-    data <- data.frame(plyr::ddply(data, group, plyr::numcolwise(sum), ...), 
+    numcolwise <- getFromNamespace("numcolwise", "plyr")
+    data <- data.frame(ddply(data, group, numcolwise(sum), ...), 
     	     check.names=FALSE, stringsAsFactors=FALSE)   
     rownames(data) <- as.vector(data[[group]])
     data[[group]] <- NULL
