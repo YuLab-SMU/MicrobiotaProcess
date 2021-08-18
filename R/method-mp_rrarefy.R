@@ -3,28 +3,32 @@
 ##' @rdname mp_rrarefy-methods
 ##' @title mp_rrarefy method
 ##' @param .data MPSE or tbl_mpse object
+##' @param .abundance the name of OTU(feature) abundance column,
+##' default is Abundance.
 ##' @param raresize integer Subsample size for rarefying community.
 ##' @param trimOTU logical Whether to remove the otus that are no 
 ##' longer present in any sample after rarefaction
 ##' @param seed a random seed to make the rrarefy reproducible,
 ##' default is 123. 
+##' @param ... additional parameters, meaningless now.
 ##' @return update object
 ##' @export
 ##' @author Shuangbin Xu
 ##' @examples
 ##' data(mouse.time.mpse)
 ##' mouse.time.mpse %>% mp_rrarefy()
-setGeneric("mp_rrarefy", function(.data, raresize, trimOTU=FALSE, seed=123){standardGeneric("mp_rrarefy")}) 
+setGeneric("mp_rrarefy", function(.data, .abundance=NULL, raresize, trimOTU=FALSE, seed=123, ...){standardGeneric("mp_rrarefy")}) 
 
-##' @rdname mp_rrarefy-methods
-##' @aliases mp_rrarefy,matrix
-##' @exportMethod mp_rrarefy
-##' @source 
-##' mp_rrarefy for matrix object is a wrapper method of vegan::rrarefy from the vegan 
-##' package. 
-##' @seealso
-##' \link[vegan]{rrarefy}
-setMethod("mp_rrarefy", signature(.data="matrix"), function(.data, raresize, trimOTU=FALSE, seed=123){
+# ##' @rdname mp_rrarefy-methods
+# ##' @aliases mp_rrarefy,matrix
+# ##' @exportMethod mp_rrarefy
+# ##' @source 
+# ##' mp_rrarefy for matrix object is a wrapper method of vegan::rrarefy from the vegan 
+# ##' package. 
+# ##' @seealso
+# ##' \link[vegan]{rrarefy}
+# setMethod("mp_rrarefy", signature(.data="matrix"), function(.data, raresize, trimOTU=FALSE, seed=123, ...){
+.internal_mp_rrarefy <- function(.data, raresize, trimOTU=FALSE, seed=123, ...){
     if (missing(raresize)||is.null(raresize)){
         raresize <- min(rowSums(.data))
     }
@@ -42,18 +46,18 @@ setMethod("mp_rrarefy", signature(.data="matrix"), function(.data, raresize, tri
         res <- res[, !removeOTU]
     }
     return(res)
-})
+}
 
 
-##' @rdname mp_rrarefy-methods
-##' @aliases mp_rrarefy,data.frame
-##' @exportMethod mp_rrarefy
-setMethod("mp_rrarefy", signature(.data="data.frame"), function(.data, raresize, trimOTU=FALSE, seed=123){
-    .data <- as.matrix(.data)
-    res <- mp_rrarefy(.data=.data, raresize=raresize, trimOTU=trimOTU, seed=seed)
-    res <- data.frame(res) 
-    return(res)
-})
+# ##' @rdname mp_rrarefy-methods
+# ##' @aliases mp_rrarefy,data.frame
+# ##' @exportMethod mp_rrarefy
+# setMethod("mp_rrarefy", signature(.data="data.frame"), function(.data, raresize, trimOTU=FALSE, seed=123, ...){
+#     .data <- as.matrix(.data)
+#     res <- mp_rrarefy(.data=.data, raresize=raresize, trimOTU=trimOTU, seed=seed)
+#     res <- data.frame(res) 
+#     return(res)
+# })
 
 # ##' @rdname mp_rrarefy-methods
 # ##' @aliases mp_rrarefy,phyloseq
@@ -81,13 +85,17 @@ setMethod("mp_rrarefy", signature(.data="data.frame"), function(.data, raresize,
 ##' @rdname mp_rrarefy-methods
 ##' @aliases mp_rrarefy,MPSE
 ##' @exportMethod mp_rrarefy
-setMethod("mp_rrarefy", signature(.data="MPSE"), function(.data, raresize, trimOTU=FALSE, seed=123){
+setMethod("mp_rrarefy", signature(.data="MPSE"), function(.data, .abundance=NULL, raresize, trimOTU=FALSE, seed=123, ...){
+    .abundance <- rlang::enquo(.abundance)
+    if (rlang::quo_is_null(.abundance)){
+        .abundance <- as.symbol("Abundance")
+    }
     allassays <- SummarizedExperiment::assays(.data) %>% as.list()
     if ("RareAbundance" %in% names(allassays)){
         message("The RareAbundance was in the MPSE object, please check whether it has been rarefied !")
         return(.data)
     }
-    rare <- mp_rrarefy(.data=t(allassays[["Abundance"]]), raresize=raresize, trimOTU=FALSE, seed=123) %>% t()
+    rare <- .internal_mp_rrarefy(.data=t(allassays[[rlang::as_name(.abundance)]]), raresize=raresize, trimOTU=FALSE, seed=123) %>% t()
     SummarizedExperiment::assays(.data)@listData <- c(allassays, list(RareAbundance=rare))
     if (trimOTU){
         removeOTU <- rowSums(rare)==0
@@ -103,7 +111,11 @@ setMethod("mp_rrarefy", signature(.data="MPSE"), function(.data, raresize, trimO
 ##' @rdname mp_rrarefy-methods
 ##' @aliases mp_rrarefy,tbl_mpse
 ##' @exportMethod mp_rrarefy
-setMethod("mp_rrarefy", signature(.data="tbl_mpse"), function(.data, raresize, trimOTU=FALSE, seed=123){
+setMethod("mp_rrarefy", signature(.data="tbl_mpse"), function(.data, .abundance=NULL, raresize, trimOTU=FALSE, seed=123, ...){
+    .abundance <- rlang::enquo(.abundance)
+    if (rlang::quo_is_null(.abundance)){
+        .abundance <- as.symbol("Abundance")
+    }
     assaysvar <- attr(.data, "assaysvar")
     otutree <- attr(.data, "otutree")
     taxatree <- attr(.data, "taxatree")
@@ -111,12 +123,12 @@ setMethod("mp_rrarefy", signature(.data="tbl_mpse"), function(.data, raresize, t
         message("The RareAbundance was in the MPSE object, please check whether it has been rarefied !")
         return(.data)
     }
-    tmpotu <- .data %>% 
-              tibble::as_tibble() %>% 
-              select(c("OTU", "Sample", "Abundance")) %>%
-              tidyr::pivot_wider(names_from="OTU", values_from="Abundance") %>% 
-              tibble::column_to_rownames(var="Sample")
-    rare <- mp_rrarefy(.data=tmpotu, raresize=raresize, trimOTU=FALSE, seed=seed) %>%
+    tmpotu <- .data %>% mp_extract_assays(.abundance=!!.abundance, byRow=FALSE)
+              #tibble::as_tibble() %>% 
+              #select(c("OTU", "Sample", "Abundance")) %>%
+              #tidyr::pivot_wider(names_from="OTU", values_from="Abundance") %>% 
+              #tibble::column_to_rownames(var="Sample")
+    rare <- .internal_mp_rrarefy(.data=tmpotu, raresize=raresize, trimOTU=FALSE, seed=seed, ...) %>%
             t() %>% 
             tibble::as_tibble(rownames="OTU") %>% 
             tidyr::pivot_longer(!"OTU", names_to="Sample", values_to="RareAbundance")
@@ -144,12 +156,16 @@ setMethod("mp_rrarefy", signature(.data="tbl_mpse"), function(.data, raresize, t
 ##' @rdname mp_rrarefy-methods
 ##' @aliases mp_rrarefy,grouped_df_mpse
 ##' @exportMethod mp_rrarefy
-setMethod("mp_rrarefy", signature(.data="grouped_df_mpse"), function(.data, raresize, trimOTU=FALSE, seed=123){
+setMethod("mp_rrarefy", signature(.data="grouped_df_mpse"), function(.data, .abundance=NULL, raresize, trimOTU=FALSE, seed=123, ...){
+    .abundance <- rlang::enquo(.abundance)
+    if (rlang::quo_is_null(.abundance)){
+        .abundance <- as.symbol("Abundance")
+    }
     tmpgroups <- attr(.data, "groups")
     groupvars <- names(tmpgroups)[names(tmpgroups) != ".rows"]
     groupvars <- lapply(groupvars, function(i) as.symbol(i))
     .data %<>% ungroup
-    res <- mp_rrarefy(.data=.data, raresize=raresize, trimOTU=trimOTU, seed=seed)
+    res <- mp_rrarefy(.data=.data, .abundance=!!.abundance, raresize=raresize, trimOTU=trimOTU, seed=seed, ...)
     res <- do.call(group_by, c(list(res), groupvars))
     return (res)
 })

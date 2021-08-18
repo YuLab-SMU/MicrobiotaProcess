@@ -3,10 +3,6 @@
 \docType{methods}
 \name{mp_rrarefy}
 \alias{mp_rrarefy}
-\alias{mp_rrarefy,matrix-method}
-\alias{mp_rrarefy,matrix}
-\alias{mp_rrarefy,data.frame-method}
-\alias{mp_rrarefy,data.frame}
 \alias{mp_rrarefy,MPSE-method}
 \alias{mp_rrarefy,MPSE}
 \alias{mp_rrarefy,tbl_mpse-method}
@@ -14,25 +10,48 @@
 \alias{mp_rrarefy,grouped_df_mpse-method}
 \alias{mp_rrarefy,grouped_df_mpse}
 \title{mp_rrarefy method}
-\source{
-mp_rrarefy for matrix object is a wrapper method of vegan::rrarefy from the vegan 
-package.
-}
 \usage{
-mp_rrarefy(.data, raresize, trimOTU = FALSE, seed = 123)
+mp_rrarefy(
+  .data,
+  .abundance = NULL,
+  raresize,
+  trimOTU = FALSE,
+  seed = 123,
+  ...
+)
 
-\S4method{mp_rrarefy}{matrix}(.data, raresize, trimOTU = FALSE, seed = 123)
+\S4method{mp_rrarefy}{MPSE}(
+  .data,
+  .abundance = NULL,
+  raresize,
+  trimOTU = FALSE,
+  seed = 123,
+  ...
+)
 
-\S4method{mp_rrarefy}{data.frame}(.data, raresize, trimOTU = FALSE, seed = 123)
+\S4method{mp_rrarefy}{tbl_mpse}(
+  .data,
+  .abundance = NULL,
+  raresize,
+  trimOTU = FALSE,
+  seed = 123,
+  ...
+)
 
-\S4method{mp_rrarefy}{MPSE}(.data, raresize, trimOTU = FALSE, seed = 123)
-
-\S4method{mp_rrarefy}{tbl_mpse}(.data, raresize, trimOTU = FALSE, seed = 123)
-
-\S4method{mp_rrarefy}{grouped_df_mpse}(.data, raresize, trimOTU = FALSE, seed = 123)
+\S4method{mp_rrarefy}{grouped_df_mpse}(
+  .data,
+  .abundance = NULL,
+  raresize,
+  trimOTU = FALSE,
+  seed = 123,
+  ...
+)
 }
 \arguments{
 \item{.data}{MPSE or tbl_mpse object}
+
+\item{.abundance}{the name of OTU(feature) abundance column,
+default is Abundance.}
 
 \item{raresize}{integer Subsample size for rarefying community.}
 
@@ -41,6 +60,8 @@ longer present in any sample after rarefaction}
 
 \item{seed}{a random seed to make the rrarefy reproducible,
 default is 123.}
+
+\item{...}{additional parameters, meaningless now.}
 }
 \value{
 update object
@@ -51,9 +72,6 @@ mp_rrarefy method
 \examples{
 data(mouse.time.mpse)
 mouse.time.mpse \%>\% mp_rrarefy()
-}
-\seealso{
-\link[vegan]{rrarefy}
 }
 \author{
 Shuangbin Xu

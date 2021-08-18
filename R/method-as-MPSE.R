@@ -33,7 +33,7 @@ setMethod("as.MPSE", signature(.data="tbl_mpse"),
         .data %<>% as_tibble()
         assaysda <- .internal_build_assay(da=.data, x=assaysvar)
 
-        if (!is.null(mutatevar)){
+        if (length(mutatevar)>0){
             res.var <- .internal_check_mutate(da=.data, 
                                               x=mutatevar, 
                                               assay=assaysda[[1]])
@@ -109,7 +109,6 @@ setMethod("as.MPSE", signature(.data="tbl_mpse"),
                nrow() %>%
                magrittr::equals(nrow(assay))
              ) %>% unlist()
-
     otumetavar <- x[indx1]
     x <- x[!indx1]
     if (length(x)==0){
