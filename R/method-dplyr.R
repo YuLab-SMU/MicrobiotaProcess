@@ -439,7 +439,7 @@ check_attr.tbl_mpse <- function(x, recol, type="rename"){
     assaysvar <- attr(x, "assaysvar")
     otumetavar <- attr(x, "otumetavar")
     if (any(renm %in% c("Sample", "OTU", "Abundance")) && type=="rename"){
-        stop("The Sample, OTU, and Abundance are not be renamed !")
+        rlang::abort("The Sample, OTU, and Abundance do not be renamed !")
     }
     item1 <- intersect(samplevar, renm)
     item2 <- intersect(taxavar, renm)
