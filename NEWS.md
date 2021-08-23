@@ -1,5 +1,6 @@
-# MicrobiotaProcess 1.5.3.991
+# MicrobiotaProcess 1.5.3.992
 
++ add `colData<-` and `left_join` for `MPSE`. (2021-08-23, Mon)
 + fix `mutate` for `MPSE` object. 
 + don't import the `parse_taxonomy_greengenes` and `parse_taxonomy_qiime` from `phyloseq`. (2021-08-17, Tue)
 + add `as.MPSE` for `TreeSummarizedExperiment` class. (2021-08-17, Tue)
