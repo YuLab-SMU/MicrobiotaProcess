@@ -13,10 +13,6 @@ setOldClass("prcomp")
 setOldClass("tbl_mpse")
 
 #' @noRd
-TreeSummarizedExperiment <- methods::getClassDef("TreeSummarizedExperiment", "TreeSummarizedExperiment") %>% 
-                              suppressMessages()
-
-#' @noRd
 phyloseq <- methods::getClassDef("phyloseq", "phyloseq") %>% suppressMessages()
 
 #' @title grouped_df_mpse class
@@ -64,6 +60,7 @@ setClass("MPSE",
 #' @param ... additional parameters, see also the usage 
 #' of \code{\link[SummarizedExperiment]{SummarizedExperiment}}.
 #' @return MPSE object
+#' @importFrom methods new
 #' @export
 MPSE <- function(assays,
                  colData,

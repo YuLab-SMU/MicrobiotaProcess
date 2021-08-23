@@ -1,9 +1,8 @@
-##' @docType methods
-##' @name as.MPSE
-##' @rdname as.MPSE-methods
 ##' @title as.MPSE method
+##' @description 
+##' convert the .data object to MPSE object
 ##' @param .data tbl_mpse or phyloseq or TreeSummarizedExperiment object
-##' @param ... additional parameters.
+##' @param ... additional parameters, meaningless now.
 ##' @return MPSE object
 ##' @export
 ##' @author Shuangbin Xu
@@ -11,13 +10,23 @@
 ##' data(test_otu_data)
 ##' test_otu_data %>% as.MPSE -> mpse
 ##' mpse
-setGeneric("as.MPSE", function(.data, ...){standardGeneric("as.MPSE")})
+as.MPSE <- function(.data, ...){
+    if (inherits(.data, "grouped_df_mpse")){
+        res <- .as.MPSE.grouped_df_mpse(.data, ...)
+    }else if (inherits(.data, "tbl_mpse")){
+        res <- .as.MPSE.tbl_mpse(.data, ...)
+    }else if (inherits(.data, "phyloseq")){
+        res <- .as.MPSE.phyloseq(.data, ...)
+    }else if (inherits(.data, "TreeSummarizedExperiment")){
+        res <- .as.MPSE.TSE(.data, ...)
+    }else {
+        message("The as.MPSE now only works for tbl_mpse, grouped_df_mpse, phyloseq, TreeSummarizedExperiment class.")
+        return()
+    }
+    return (res)
+}
 
-##' @rdname as.MPSE-methods
-##' @aliases as.MPSE,tbl_mpse
-##' @exportMethod as.MPSE
-setMethod("as.MPSE", signature(.data="tbl_mpse"),
-    function(.data, ...){
+.as.MPSE.tbl_mpse <- function(.data, ...){
 
         otutree <- attr(.data, "otutree")
         refseq <- attr(.data, "refseq")
@@ -88,7 +97,7 @@ setMethod("as.MPSE", signature(.data="tbl_mpse"),
         }
         methods::validObject(mpse)
         return (mpse)
-})
+}
 
 .internal_build_assay <- function(da, x){
     assayda <- lapply(x, function(i)
@@ -141,12 +150,7 @@ setMethod("as.MPSE", signature(.data="tbl_mpse"),
     return(list(otumetavar=otumetavar, samplevar=samplevar, assaysvar=x[indx3]))
 }
 
-
-##' @rdname as.MPSE-methods
-##' @aliases as.MPSE,phyloseq
-##' @exportMethod as.MPSE
-setMethod("as.MPSE", signature(.data="phyloseq"), 
-    function(.data, ...){
+.as.MPSE.phyloseq <- function(.data, ...){
 
         otuda <- checkotu(.data) %>% as.matrix() %>% t()
         sampleda <- get_sample(.data) 
@@ -180,23 +184,17 @@ setMethod("as.MPSE", signature(.data="phyloseq"),
         #}
         methods::validObject(mpse)
         return(mpse)
-})
+}
 
-##' @rdname as.MPSE-methods
-##' @aliases as.MPSE,grouped_df_mpse
-##' @exportMethod as.MPSE
-setMethod("as.MPSE", signature(.data="grouped_df_mpse"), 
-          function(.data, ...){
+.as.MPSE.grouped_df_mpse <- function(.data, ...){
     mpse <- .data %>% ungroup() %>% as.MPSE()
     methods::validObject(mpse)
     return(mpse)          
-})
+}
 
 
-##' @rdname as.MPSE-methods
-##' @aliases as.MPSE,TreeSummarizedExperiment
-##' @exportMethod as.MPSE
-setMethod("as.MPSE", signature(.data="TreeSummarizedExperiment"), function(.data, ...){
+.as.MPSE.TSE <- function(.data, ...){
+
     assaysvar <- SummarizedExperiment::assayNames(.data)
     SummarizedExperiment::assayNames(.data) <- c("Abundance", assaysvar[-1])
 
@@ -206,7 +204,7 @@ setMethod("as.MPSE", signature(.data="TreeSummarizedExperiment"), function(.data
     taxatab <- res$taxatab
     newrowda <- res$newrowda
     if (all(flag>5)){
-        `rownames<-` <- getMethod("rownames<-", "TreeSummarizedExperiment")
+        `rownames<-` <- methods::getMethod("rownames<-", "TreeSummarizedExperiment")
         rownames(.data) <- rownames(taxatab)
     }
     rowTree <- getFromNamespace("rowTree", "TreeSummarizedExperiment")
@@ -247,7 +245,7 @@ setMethod("as.MPSE", signature(.data="TreeSummarizedExperiment"), function(.data
     }
 
     return(mpse)
-})
+}
 
 .internal_check_taxonomy <- function(x, flag){
     #flag <- rownames(x) %>% strsplit("\\|") %>% lapply(length) %>% unlist 
