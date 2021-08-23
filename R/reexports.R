@@ -54,6 +54,10 @@ tidyr::unnest
 #' @export
 tibble::as_tibble
 
+#' @importFrom dplyr left_join
+#' @export
+dplyr::left_join
+
 #' @importFrom magrittr %>%
 #' @export
 magrittr::`%>%`
@@ -65,3 +69,7 @@ magrittr::`%<>%`
 #' @importFrom ggtree td_filter
 #' @export
 ggtree::td_filter
+
+#' @importFrom SummarizedExperiment colData<-
+#' @export
+SummarizedExperiment::`colData<-`

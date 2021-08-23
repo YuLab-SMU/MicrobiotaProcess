@@ -207,7 +207,7 @@ repduplicatedtaxcheck <- function(taxdf){
 
 #' @keywords internal
 extract_args <- function(obj, arg){
-    if (!"someparams" %in% slotNames(obj)){
+    if (!"someparams" %in% methods::slotNames(obj)){
         stop("The object don't have someparams slot!")
     }else{
         args <- obj@someparams
@@ -256,3 +256,4 @@ CI <- function (x, ci = 0.95, na.rm=FALSE){
     error <- qt(ci + (1 - ci)/2, df = n - 1) * s/sqrt(n)
     return(c(upper = a + error, mean = a, lower = a - error))
 }
+

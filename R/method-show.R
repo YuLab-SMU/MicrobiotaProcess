@@ -150,7 +150,7 @@ setMethod("show", "MPSE", function(object){
             writeLines("NULL")
         }
         writeLines(formatted_out("The abundance and sample data of the MPSE object are: "))
-        f <- getMethod(f="show", signature = "SummarizedExperiment", where = asNamespace(ns = "SummarizedExperiment"))
+        f <- methods::getMethod(f="show", signature = "SummarizedExperiment", where = asNamespace(ns = "SummarizedExperiment"))
         f(object)
     }else{
         object %>% print()

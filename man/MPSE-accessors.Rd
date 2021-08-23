@@ -3,6 +3,8 @@
 \name{MPSE-accessors}
 \alias{MPSE-accessors}
 \alias{[,MPSE,ANY,ANY,ANY-method}
+\alias{colData<-,MPSE,DataFrame-method}
+\alias{colData<-,MPSE,NULL-method}
 \alias{otutree}
 \alias{otutree,MPSE-method}
 \alias{otutree,MPSE}
@@ -26,6 +28,10 @@
 \title{MPSE accessors}
 \usage{
 \S4method{[}{MPSE,ANY,ANY,ANY}(x, i, j, ..., drop = TRUE)
+
+\S4method{colData}{MPSE,DataFrame}(x, ...) <- value
+
+\S4method{colData}{MPSE,`NULL`}(x, ...) <- value
 
 otutree(x, ...)
 

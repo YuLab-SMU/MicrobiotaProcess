@@ -108,6 +108,18 @@ setMethod("[", signature(x="MPSE"),
     return (res)
 }
 
+#' @rdname MPSE-accessors
+#' @export
+setReplaceMethod("colData", c("MPSE", "DataFrame"), function(x, ..., value){
+    res <- methods::callNextMethod()
+})
+
+#' @rdname MPSE-accessors
+#' @export
+setReplaceMethod("colData", c("MPSE", "NULL"), function(x, ..., value){
+    res <- methods::callNextMethod()
+})
+
 #' extract the abundance matrix from MPSE object or tbl_mpse object
 #' @rdname mp_extract_assays-methods
 #' @param x MPSE or tbl_mpse object
@@ -209,7 +221,7 @@ setGeneric("mp_extract_tree", function(x, type="taxatree", tip.level="OTU", ...)
 #' @exportMethod mp_extract_tree
 setMethod("mp_extract_tree", signature(x="MPSE"), function(x, type="taxatree", tip.level="OTU", ...){
     type %<>% match.arg(c("taxatree", "otutree"))
-    tree <- slot(x, type)
+    tree <- methods::slot(x, type)
     if (!is.null(tree)){
         if (type == "taxatree"){
             tree <- .extract_tree_at_tiplevel(tree, tip.level=tip.level)
@@ -311,7 +323,6 @@ setMethod("mp_extract_sample", signature(x="tbl_mpse"), .internal_extract_sample
 #' @aliases mp_extract_sample,grouped_df_mpse
 #' @exportMethod mp_extract_sample
 setMethod("mp_extract_sample", signature(x="grouped_df_mpse"), .internal_extract_sample)
-
 
 #' @title extract the feature (OTU) information in MPSE object
 #' @docType methods
