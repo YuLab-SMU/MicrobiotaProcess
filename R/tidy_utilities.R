@@ -1,8 +1,8 @@
 formatted_out <- function(x){
-    x1 <- "\033[38;5;246m"
-    x2 <- "\033[39m"
-    mg <- paste0(c(x1, x, x2), collapse="") %>% 
-          pillar::style_subtle()
+    #x1 <- "\033[38;5;246m"
+    #x2 <- "\033[39m"
+    #mg <- paste0(c(x1, x, x2), collapse="") %>% 
+    mg <- x %>% pillar::style_subtle()
     return(mg)
 }
 
@@ -18,7 +18,7 @@ tbl_mpse_return_message <- function(flag){
     formatted_out(x)
 }
 
-keep_mpse_message <- formatted_out("#       A new MPSE object can be returned by setting .returnMPSE = TRUE.")
+keep_mpse_message <- formatted_out("# \tA new MPSE object can be returned by setting keep.mpse = TRUE.")
 
 
 drop_class <- function(x, class){
@@ -41,4 +41,27 @@ add_internal_attr <- function(data, object, name){
 add_attr <- function(x, attribute, name){
     attr(x, name) <- attribute
     return(x)
+}
+
+left_join_msg <- paste0("The 'by' has some conditions, it should be specified 'OTU' or 'Sample' via by='OTU' or by=c('OTU'='id'),\n",
+                       "by='Sample' or by=c('Sample'='sid').\n",
+                       "Or the 'OTU' and 'Sample' can also be specified simultaneously via by=c('OTU', 'Sample') or\n",
+                       "by = c('OTU'='id', 'Sample'='sid').")
+
+.internal_nest <- function(x, keepnm, ..., .names_sep = NULL){
+    nest <- utils::getFromNamespace("nest", "tidyr")
+    if (missing(...)){
+        clnm <- colnames(x)
+        clnm <- clnm[!clnm %in% keepnm]
+        params <- c(list(x), lapply(clnm, function(x)x))
+        names(params) <- c(".data", clnm)
+    }else{
+        res <- nest(.data=x, ..., .names_sep=.names_sep)
+        return(res)
+    }
+    if (!is.null(.names_sep)){
+        params <- c(params, .names_sep=.names_sep)
+    }
+    res <- do.call(nest, params)
+    return(res)
 }

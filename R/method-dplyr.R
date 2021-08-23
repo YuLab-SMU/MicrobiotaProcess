@@ -16,12 +16,12 @@ filter.alphasample <- function(.data, ..., .preserve = FALSE){
 
 ##' @method filter MPSE
 ##' @export
-filter.MPSE <- function(.data, ..., .preserve = FALSE, .returnMPSE = FALSE){
+filter.MPSE <- function(.data, ..., .preserve = FALSE, keep.mpse = FALSE){
     .data %<>% as_tibble()
     dots <- quos(...)
     res <- .data %>% filter(!!!dots, .preserve = .preserve)
     res <- add_attr.tbl_mpse(x1=res, x2=.data)
-    if (!.returnMPSE){
+    if (!keep.mpse){
         flag <- valid_names(res, type="tbl_mpse")
         xm <- tbl_mpse_return_message(flag)
         if (flag){
@@ -83,14 +83,14 @@ select.alphasample <- function(.data, ...) {
 
 ##' @method select MPSE 
 ##' @export
-select.MPSE <- function(.data, ..., .returnMPSE = FALSE){
+select.MPSE <- function(.data, ..., keep.mpse = FALSE){
     .data %<>% as_tibble()
     loc <- tidyselect::eval_select(expr(c(...)), .data)
     #loc <- loc[!names(loc) %in% c("Sample", "OTU", "Abundance")]
     .data <- check_attr.tbl_mpse(x=.data, recol=loc, type="select")
     res <- select(.data=.data, ...)
     res <- add_attr.tbl_mpse(x1=res, x2=.data)
-    if (!.returnMPSE){
+    if (! keep.mpse){
         flag <- valid_names(res, type="tbl_mpse")
         xm <- tbl_mpse_return_message(flag)
         if (flag){
@@ -182,13 +182,13 @@ ungroup.grouped_df_mpse <- function(x, ...){
 
 ##' @method mutate MPSE
 ##' @export
-mutate.MPSE <- function(.data, .returnMPSE=TRUE, ...){
+mutate.MPSE <- function(.data, keep.mpse = TRUE, ...){
     #writeLines(tbl_mpse_return_message(TRUE))
     .data %<>% as_tibble()
     res <- mutate(.data=.data, ...)
     res <- add_attr.tbl_mpse(x1=res, x2=.data)
     res <- add_var(res, type="mutate")
-    if (!.returnMPSE){
+    if (! keep.mpse){
         flag <- valid_names(res, type="tbl_mpse")
         xm <- tbl_mpse_return_message(flag)
         if (flag){
@@ -267,13 +267,13 @@ distinct.grouped_df_mpse <- function(.data, ..., .keep_all = FALSE){
 
 ##' @method rename MPSE
 ##' @export
-rename.MPSE <- function(.data, ..., .returnMPSE=FALSE){
+rename.MPSE <- function(.data, ..., keep.mpse = FALSE){
     .data %<>% as_tibble()
     cols <- tidyselect::eval_select(expr(c(...)), .data)
     .data <- check_attr.tbl_mpse(x=.data, recol=cols)
     res <- rename(.data=.data, ...)
     res <- add_attr.tbl_mpse(x1=res, x2=.data)
-    if (!.returnMPSE){
+    if (! keep.mpse){
         flag <- valid_names(res, type="tbl_mpse")
         xm <- tbl_mpse_return_message(flag)
         if (flag){
@@ -320,11 +320,11 @@ rename.grouped_df_mpse <- function(.data, ...){
 
 ##' @method arrange MPSE
 ##' @export
-arrange.MPSE <- function(.data, ..., by_group = FALSE, .returnMPSE=FALSE){
+arrange.MPSE <- function(.data, ..., by_group = FALSE, keep.mpse=FALSE){
     .data %<>% as_tibble()
     res <- arrange(.data=.data, ..., by_group = FALSE)
     res <- add_attr.tbl_mpse(x1 = res, x2 = .data)
-    if (!.returnMPSE){
+    if (! keep.mpse){
         flag <- valid_names(res, type="tbl_mpse")
         xm <- tbl_mpse_return_message(flag)
         if (flag){
@@ -363,9 +363,85 @@ arrange.grouped_df_mpse <- function(.data, ..., by_group = FALSE){
     return (res)
 }
 
+##' @method left_join MPSE
+##' @export
+left_join.MPSE <- function(x, y, by=NULL, copy=FALSE, ...){
+    dots <- rlang::quos(...)
+    suffix <- c("", ".y")
+    if ("suffix" %in% names(dots)){
+        dots <- dots[names(dots)!="suffix"]
+    }
+    if (is.null(by)){
+        if (all(c("OTU", "Sample") %in% colnames(y))){
+            by <- c("OTU", "Sample")
+        }else if ("OTU" %in% colnames(y)){
+            by <- "OTU"
+        }else if ("Sample" %in% colnames(y)){
+            by <- "Sample"
+        }else{
+            rlang::abort(left_join_msg)
+        }
+    }
+
+    idx <- names(by)
+    if (length(by)==1){
+        idnm <- ifelse(!is.null(idx), idx, by)
+        if (!idnm %in% c("OTU", "Sample")){
+            rlang::abort(left_join_msg)
+        }
+        idnm %<>% match.arg(c("OTU", "Sample"))
+        if (idnm=="Sample"){
+            sampleda <- x %>% mp_extract_sample()
+            ornm <- sampleda %>% colnames() 
+            sampleda <- sampleda %>% left_join(y, by=by, copy=copy, suffix=suffix, !!!dots)
+            if (any(duplicated(sampleda$Sample))){
+                sampleda %<>% .internal_nest(keepnm=ornm)
+            }
+            x@colData <- sampleda %>% 
+                         tibble::column_to_rownames(var="Sample") %>%
+                         S4Vectors::DataFrame()
+        }
+        if (idnm=="OTU"){
+            featureda <- x %>% mp_extract_feature()
+            ornm <- featureda %>% colnames()
+            featureda %<>% left_join(y, by=by, copy=copy, suffix=suffix, !!!dots)
+            if (any(duplicated(featureda$OTU))){
+                featureda %<>% .internal_nest(keepnm=ornm)
+            }
+            SummarizedExperiment::rowData(x) <- featureda %>% 
+                         tibble::column_to_rownames(var="OTU") %>%
+                         S4Vectors::DataFrame() 
+        }
+    }else if (length(by==2)){
+       if (is.null(idx)){
+           idnm <- by
+       }else{
+           idx[which(nchar(idx)==0)] <- by[which(nchar(idx)==0)]
+           idnm <- idx
+       }
+       names(by) <- idnm
+       if (!all(idnm %in% c("OTU", "Sample"))){
+           rlang::abort(left_join_msg)
+       }else{
+           y %<>% dplyr::rename(by)
+           ynm <- y %>% select(-c("OTU", "Sample")) %>% lapply(is.numeric) %>% unlist()
+           ynm <- ynm[ynm] %>% names()
+           y <- x %>%
+                mp_extract_assays(.abundance="Abundance") %>% 
+                tibble::as_tibble(rownames="OTU") %>% 
+                tidyr::pivot_longer(cols=!.data$OTU, names_to="Sample", values_to="Abundance") %>%
+                left_join(y, suffix=suffix, by=by) %>%
+                dplyr::mutate_if(is.numeric, ~replace(., is.na(.), 0)) 
+           newassay <- .internal_build_assay(y, ynm)
+           SummarizedExperiment::assays(x) <- c(SummarizedExperiment::assays(x), newassay)
+       }
+    }
+    return(x)
+}
+
 ##' @method left_join tbl_mpse
 ##' @export
-left_join.tbl_mpse <- function(x, y, by=NULL, copy=FALSE, suffix = c(".x", ".y")){
+left_join.tbl_mpse <- function(x, y, by=NULL, copy=FALSE, suffix = c("", ".y"), ...){
     res <- NextMethod()
     if (valid_names(res, type="tbl_mpse")){
         res <- add_attr.tbl_mpse(x1 = res, x2 = x) 
@@ -409,15 +485,17 @@ add_attr.tbl_mpse <- function(x1, x2, class="tbl_mpse"){
     otutree <- attr(x2, "otutree")
     taxatree <- attr(x2, "taxatree")
     refseq <- attr(x2, "refseq")
-    rmotus <- setdiff(unique(x2$OTU), unique(x1$OTU))
-    otutree <- .internal_drop.tip(tree=otutree, rmotus=rmotus)
-    taxatree <- .internal_drop.tip(tree=taxatree, rmotus=rmotus, collapse.singles=FALSE)
-    if (!is.null(refseq)){
-        refseq <- refseq[!names(refseq) %in% rmotus]
+    if ("OTU" %in% colnames(x1)){
+        rmotus <- setdiff(unique(x2$OTU), unique(x1$OTU))
+        otutree <- .internal_drop.tip(tree=otutree, rmotus=rmotus)
+        taxatree <- .internal_drop.tip(tree=taxatree, rmotus=rmotus, collapse.singles=FALSE)
+        if (!is.null(refseq)){
+            refseq <- refseq[!names(refseq) %in% rmotus]
+        }
+        attr(x1, "otutree") <- otutree
+        attr(x1, "taxatree") <- taxatree
+        attr(x1, "refseq") <- refseq
     }
-    attr(x1, "otutree") <- otutree
-    attr(x1, "taxatree") <- taxatree
-    attr(x1, "refseq") <- refseq
     class(x1) <- add_class(new=class, old=class(x1))
     return(x1)   
 }
