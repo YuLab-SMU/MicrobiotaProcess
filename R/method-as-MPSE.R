@@ -1,7 +1,7 @@
 ##' @title as.MPSE method
 ##' @description 
 ##' convert the .data object to MPSE object
-##' @param .data tbl_mpse or phyloseq or TreeSummarizedExperiment object
+##' @param .data one type of tbl_mpse, phyloseq, SummarizedExperiment or TreeSummarizedExperiment object
 ##' @param ... additional parameters, meaningless now.
 ##' @return MPSE object
 ##' @export
@@ -11,16 +11,18 @@
 ##' test_otu_data %>% as.MPSE -> mpse
 ##' mpse
 as.MPSE <- function(.data, ...){
-    if (inherits(.data, "grouped_df_mpse")){
+    if (inherits(.data, "MPSE")){
+        return (.data)
+    }else if (inherits(.data, "grouped_df_mpse")){
         res <- .as.MPSE.grouped_df_mpse(.data, ...)
     }else if (inherits(.data, "tbl_mpse")){
         res <- .as.MPSE.tbl_mpse(.data, ...)
     }else if (inherits(.data, "phyloseq")){
         res <- .as.MPSE.phyloseq(.data, ...)
-    }else if (inherits(.data, "TreeSummarizedExperiment")){
+    }else if (inherits(.data, "SummarizedExperiment")){
         res <- .as.MPSE.TSE(.data, ...)
     }else {
-        message("The as.MPSE now only works for tbl_mpse, grouped_df_mpse, phyloseq, TreeSummarizedExperiment class.")
+        message("The as.MPSE now only works for tbl_mpse, grouped_df_mpse, phyloseq, SummarizedExperiment, and TreeSummarizedExperiment class.")
         return()
     }
     return (res)
@@ -204,12 +206,25 @@ as.MPSE <- function(.data, ...){
     taxatab <- res$taxatab
     newrowda <- res$newrowda
     if (all(flag>5)){
-        `rownames<-` <- methods::getMethod("rownames<-", "TreeSummarizedExperiment")
-        rownames(.data) <- rownames(taxatab)
+        #`rownames<-` <- methods::getMethod("rownames<-", "TreeSummarizedExperiment")
+        if (inherits(.data, "TreeSummarizedExperiment")){
+            rownames(.data) <- rownames(taxatab)
+        }
     }
-    rowTree <- getFromNamespace("rowTree", "TreeSummarizedExperiment")
-    otu.tree <- rowTree(.data)
 
+    if (inherits(.data, "TreeSummarizedExperiment")){
+        rowTree <- getFromNamespace("rowTree", "TreeSummarizedExperiment")
+        otu.tree <- rowTree(.data)
+    }else if (inherits(.data, "SummarizedExperiment")){
+        meta.da <- S4Vectors::metadata(.data)
+        indx <- which(meta.da %>% lapply(class)=="phylo")
+        if (length(indx) == 0){
+            otu.tree <- NULL
+        }else{
+            otu.tree <- meta.da[[indx[1]]]
+        }
+    }
+    
     if (!is.null(otu.tree)){
         if (all(flag>5)){
             otu.tree$tip.label %<>%
@@ -219,9 +234,9 @@ as.MPSE <- function(.data, ...){
         }
         keepnms <- intersect(otu.tree$tip.label, rownames(.data))
         otu.tree <- ape::keep.tip(otu.tree, tip=keepnms)
-        .data <- .data[rownames(.data) %in% keepnms, ]
-        taxatab <- taxatab[rownames(taxatab) %in% keepnms, ]
-        newrowda <- newrowda[rownames(newrowda) %in% keepnms, ]
+        .data <- .data[rownames(.data) %in% keepnms, , drop=FALSE]
+        taxatab <- taxatab[rownames(taxatab) %in% keepnms, , drop=FALSE]
+        newrowda <- newrowda[rownames(newrowda) %in% keepnms, , drop=FALSE]
         otu.tree %<>% treeio::as.treedata()
     }
 
@@ -230,17 +245,22 @@ as.MPSE <- function(.data, ...){
     }else{
         taxa.tree <- NULL
     }
-    
-    referenceSeq <- getFromNamespace("referenceSeq", "TreeSummarizedExperiment")
+
+    if (inherits(.data, "TreeSummarizedExperiment")){
+        referenceSeq <- getFromNamespace("referenceSeq", "TreeSummarizedExperiment")
+        refseq <- referenceSeq(.data)[[1]]
+    }else{
+        refseq <- NULL
+    }
 
     mpse <- MPSE(assays=SummarizedExperiment::assays(.data),
                  colData=SummarizedExperiment::colData(.data),
-                 refseq=referenceSeq(.data)[[1]],
+                 refseq=refseq,
                  otutree=otu.tree,
                  taxatree=taxa.tree
             ) 
-
-    if (ncol(newrowda)>0){
+    
+    if (!is.null(newrowda) && ncol(newrowda)>0){
         SummarizedExperiment::rowData(mpse) <- newrowda
     }
 
@@ -249,7 +269,9 @@ as.MPSE <- function(.data, ...){
 
 .internal_check_taxonomy <- function(x, flag){
     #flag <- rownames(x) %>% strsplit("\\|") %>% lapply(length) %>% unlist 
-    col.ind <- colnames(x) %in% c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+    #col.ind <- colnames(x) %in% c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+    df <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+    col.ind <- lapply(df, function(i)which(grepl(i, colnames(x), ignore.case=TRUE))) %>% unlist()
     if (all(flag>5)){
         max.sep <- max(flag)
         taxatab <- x %>% 
@@ -263,8 +285,11 @@ as.MPSE <- function(.data, ...){
           magrittr::set_rownames(NULL) %>%
           tibble::column_to_rownames(var="OTU")
     }else{
-        taxatab <- x[, col.ind]
+        taxatab <- x[, col.ind] %>% data.frame(check.names=FALSE)
+        if (ncol(taxatab)>2){
+          taxatab <- fillNAtax(taxatab)
+        }
     }
-    newrowda <- x[, !col.ind]
+    newrowda <- x[, !seq_len(ncol(x)) %in% col.ind, drop=FALSE]
     return(list(taxatab=taxatab, newrowda=newrowda))
 }
