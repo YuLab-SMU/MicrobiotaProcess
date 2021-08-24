@@ -496,17 +496,17 @@ add_attr.tbl_mpse <- function(x1, x2, class="tbl_mpse"){
         attr(x1, "taxatree") <- taxatree
         attr(x1, "refseq") <- refseq
     }
-    class(x1) <- add_class(new=class, old=class(x1))
+    x1 <- add_class(x=x1, new=class)
     return(x1)   
 }
 
-add_class <- function(new, old){
-    x <- setdiff(new, old)
-    if (length(x)>0){
-        return(c(x, old))
-    }else{
-        return (old)
+add_class <- function(x, new){
+    xx <- setdiff(new, class(x))
+    if (length(xx)>0){
+        class(x) <- base::union(xx, class(x))
     }
+    return (x)
+    
 }
 
 check_attr.tbl_mpse <- function(x, recol, type="rename"){

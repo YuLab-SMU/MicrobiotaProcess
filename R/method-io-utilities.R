@@ -153,8 +153,8 @@
     otutree <- res$otutree
     refseq <- res$refseq
 
-    otuda <- otuda[rowSums(otuda) > 0, ,drop=FALSE]
-    otuda <- otuda[,colSums(otuda)>0, drop=FALSE]
+    otuda <- otuda[rowSums(otuda) > 0, colSums(otuda) > 0, drop=FALSE]
+    #otuda <- otuda[,colSums(otuda)>0, drop=FALSE]
     
     rownm <- rownames(otuda)
     colnm <- colnames(otuda)

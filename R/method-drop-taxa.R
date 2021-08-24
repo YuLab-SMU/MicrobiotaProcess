@@ -75,3 +75,117 @@ setMethod("drop_taxa", "phyloseq", function(obj, ...){
     return(obj)
 })
 
+#' Filter OTU (Features) By Abundance Level
+#' @rdname mp_filter_taxa-methods
+#' @param .data MPSE or tbl_mpse or grouped_df_mpse object.
+#' @param .abundance the column names of abundance, default is NULL, 
+#' meaning the 'Abundance' column.
+#' @param min.abun numeric minimum abundance required for each one sample
+#' default is 0 (.abundance=Abundance or NULL), meaning the abundance of
+#' OTU (Features) for each one sample should be >= 0.
+#' @param min.prop numeric minimum proportion of samples that contains the OTU (Features)
+#' when min.prop larger than 1, meaning the minimum number of samples that contains 
+#' the OTU (Features).
+#' @param ... additional parameters, meaningless now.
+#' @author Shuangbin Xu
+#' @export
+#' @examples
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %>% mp_filter_taxa(.abundance=Abundance, min.abun=1, min.prop=1)
+#' # For tbl_mpse object.
+#' mouse.time.mpse %>% as_tibble %>% mp_filter_taxa(.abundance=Abundance, min.abun=1, min.prop=1)
+#' # This also can be done using group_by, filter of dplyr.
+#' mouse.time.mpse %>% 
+#'  dplyr::group_by(OTU) %>% 
+#'  dplyr::filter(sum(Abundance>=1)>=1)
+setGeneric("mp_filter_taxa", 
+  function(
+    .data, 
+    .abundance=NULL, 
+    min.abun=0,
+    min.prop=0.05, 
+    ...)
+  standardGeneric("mp_filter_taxa")
+)
+
+#' @rdname mp_filter_taxa-methods
+#' @aliases mp_filter_taxa,MPSE
+#' @exportMethod mp_filter_taxa
+setMethod("mp_filter_taxa", 
+  signature(.data="MPSE"), 
+  function(
+    .data, 
+    .abundance=NULL, 
+    min.abun=0, 
+    min.prop=0.05, 
+    ...){
+
+    .abundance <- rlang::enquo(.abundance)
+
+    if (rlang::quo_is_null(.abundance)){
+        .abundance <- as.symbol("Abundance")
+    }
+
+    assayda <- .data %>% 
+               mp_extract_assays(.abundance=!!.abundance)
+
+    if (min.prop < 1){
+        min.prop <- ncol(assayda) * min.prop
+    }
+
+    assayda <- assayda[rowSums(assayda >= min.abun) >= min.prop, ,drop=FALSE]
+    .data <- .data[rownames(.data) %in% rownames(assayda),,drop=FALSE]
+    
+    return(.data)
+})
+
+.internal_filter_taxa <- function(.data, .abundance=NULL, min.abun=0, min.prop=0.05, ...){
+
+    .abundance <- rlang::enquo(.abundance)
+
+    if (rlang::quo_is_null(.abundance)){
+        .abundance <- as.symbol("Abundance")
+    }
+
+    if (min.prop < 1){
+        min.prop <- .data %>% 
+                    pull("Sample") %>% 
+                    unique() %>% 
+                    length() %>%
+                    magrittr::multiply_by(min.prop)
+    }
+    
+    if (inherits(.data, "grouped_df_mpse")){
+        tmpgroups <- attr(.data, "groups")
+        groupvars <- names(tmpgroups)[names(tmpgroups) != ".rows"]
+        groupvars <- lapply(groupvars, function(i) as.symbol(i))
+        .data %<>% ungroup
+    }
+
+    otus <- .data %>% 
+        dplyr::select(c("OTU", "Sample", rlang::as_name(.abundance))) %>%
+        dplyr::group_by(!!as.symbol("OTU")) %>%
+        dplyr::summarize(across(!!.abundance, ~magrittr::is_weakly_greater_than(., min.abun),.names="KEEP")) %>%
+        dplyr::mutate(KEEP=sum(!!as.symbol("KEEP"))) %>% 
+        dplyr::mutate(KEEP=!!as.symbol("KEEP") >= min.prop) %>% 
+        dplyr::filter(!!as.symbol("KEEP")) %>%
+        dplyr::pull("OTU") %>% unique()
+
+    .data <- .data %>% 
+             dplyr::filter(.data$OTU %in% otus)
+
+    if (inherits(.data, "grouped_df_mpse")){
+        .data <- do.call(group_by, c(list(.data), groupvars)) 
+    }
+    return(.data)
+}
+
+#' @rdname mp_filter_taxa-methods
+#' @aliases mp_filter_taxa,tbl_mpse
+#' @exportMethod mp_filter_taxa
+setMethod("mp_filter_taxa", signature(.data="tbl_mpse"), .internal_filter_taxa)
+
+#' @rdname mp_filter_taxa-methods
+#' @aliases mp_filter_taxa,grouped_df_mpse
+#' @exportMethod mp_filter_taxa
+setMethod("mp_filter_taxa", signature(.data="grouped_df_mpse"), .internal_filter_taxa)
