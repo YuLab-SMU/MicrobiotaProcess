@@ -127,7 +127,7 @@ setMethod("mp_cal_NRI_NTI", signature(.data="MPSE"), function(.data, .abundance,
 
     da <- .data %>%
           mp_extract_sample() %>%
-          left_join(da, by="Sample") #%>%
+          left_join(da, by="Sample", suffix=c("", ".y")) #%>%
           #column_to_rownames(var="Sample")
     if (action=="add"){
         .data@colData <- da %>% 
@@ -188,13 +188,13 @@ setMethod("mp_cal_NRI_NTI", signature(.data="MPSE"), function(.data, .abundance,
 
     da <- .data %>%
           mp_extract_sample() %>%
-          left_join(da, by="Sample") #%>%
+          left_join(da, by="Sample", suffix=c("", ".y")) #%>%
           #column_to_rownames(var="Sample")
     if (action=="add"){
         samplevar <- .data %>% attr("samplevar")
         assaysvar <- .data %>% attr("assaysvar")
         othernm <- colnames(.data)[!colnames(.data) %in% c("OTU", "Sample", assaysvar, samplevar)]
-        .data %<>% left_join(da, by="Sample") %>%
+        .data %<>% left_join(da, by="Sample", suffix=c("", ".y")) %>%
                    select(c("OTU", "Sample", assaysvar, samplevar, colnames(da), othernm))
         return(.data)
     }else if (action=="only"){

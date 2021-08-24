@@ -105,7 +105,7 @@ setMethod("mp_decostand", signature(.data="MPSE"),function(.data, .abundance=NUL
              tidyr::pivot_longer(!as.symbol("Sample"), values_to=newnm, names_to="OTU")
 
     res <- .data %>% 
-            dplyr::left_join(newda, by=c("OTU", "Sample")) %>%
+            dplyr::left_join(newda, by=c("OTU", "Sample"), suffix=c("", ".y")) %>%
             select(c("OTU", "Sample", assaysvar, newnm, othernms))
 
     res <- add_attr.tbl_mpse(x1 = res, x2 = .data)

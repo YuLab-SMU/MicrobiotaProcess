@@ -231,7 +231,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
 
     dat <- .data %>% 
            mp_extract_sample() %>%
-           left_join(dat, by=c("Sample"="x")) 
+           left_join(dat, by=c("Sample"="x"), suffix=c("", ".y")) 
 
     if (action=="only"){
         return(dat)   
@@ -348,11 +348,11 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
     if (action=="only"){
         dat <- .data %>% 
                mp_extract_sample() %>%
-               dplyr::left_join(dat, by=c("Sample"="x")) 
+               dplyr::left_join(dat, by=c("Sample"="x"), suffix=c("", ".y")) 
         return(dat)
     }else if (action=="add"){
         .data %<>% 
-            dplyr::left_join(dat, by=c("Sample"="x"))
+            dplyr::left_join(dat, by=c("Sample"="x"), suffix=c("", ".y"))
         return(.data)
     }
 }

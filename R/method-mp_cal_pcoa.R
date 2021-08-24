@@ -218,7 +218,8 @@ setMethod("mp_cal_pcoa", signature(.data="MPSE"), function(.data, .abundance, di
           mp_extract_sample() %>%
           dplyr::left_join(
                  dat[, seq_len(.dim+1)],
-                 by=c("Sample"="sites")
+                 by=c("Sample"="sites"),
+                 suffix=c("", ".y")
           )
 
     if (action=="only"){
@@ -267,7 +268,8 @@ setMethod("mp_cal_pcoa", signature(.data="MPSE"), function(.data, .abundance, di
                   pcoa$vectors[,seq_len(.dim)] %>%
                   as_tibble(rownames="Sample") %>%
                   setNames(c("Sample", paste0("PCoA", seq_len(.dim)))),
-                 by="Sample"
+                 by="Sample",
+                 suffix=c("", ".y")
               ) %>%
               add_internal_attr(object=pcoa, name="PCoA")
         return(da)
@@ -277,7 +279,8 @@ setMethod("mp_cal_pcoa", signature(.data="MPSE"), function(.data, .abundance, di
                 pcoa$vectors[,seq_len(.dim)] %>%
                 as_tibble(rownames="Sample") %>%
                 setNames(c("Sample", paste0("PCoA", seq_len(.dim)))),
-                by="Sample"
+                by="Sample",
+                suffix=c("", ".y")
             ) %>%
             add_internal_attr(object=pcoa, name="PCoA")
 
@@ -368,7 +371,8 @@ setMethod("mp_cal_nmds", signature(.data="MPSE"), function(.data, .abundance, di
           mp_extract_sample() %>%
           dplyr::left_join(
                  dat,
-                 by=c("Sample"="sites")
+                 by=c("Sample"="sites"),
+                 suffix=c("", ".y")
           )
 
     if (action=="only"){
@@ -421,7 +425,8 @@ setMethod("mp_cal_nmds", signature(.data="MPSE"), function(.data, .abundance, di
               mp_extract_sample() %>%
               dplyr::left_join(
                   dat,
-                  by=c("Sample"="sites")
+                  by=c("Sample"="sites"),
+                  suffix=c("", ".y")
               ) %>%
               add_attr(dat %>% attr("features_tb"), name="features_tb") %>%
               add_internal_attr(object=nmds, name="NMDS")

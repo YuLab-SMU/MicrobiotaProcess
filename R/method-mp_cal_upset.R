@@ -139,7 +139,7 @@ setMethod("mp_cal_upset", signature(.data="MPSE"), function(.data, .group, .abun
                 mp_extract_sample() 
 
     if (ncol(sampleda)>1){
-        da %<>% left_join(sampleda, by="Sample")
+        da %<>% left_join(sampleda, by="Sample", suffix=c("", ".y"))
     }
 
     dat <- da %>% 
@@ -150,7 +150,7 @@ setMethod("mp_cal_upset", signature(.data="MPSE"), function(.data, .group, .abun
              SummarizedExperiment::rowData(.data) %>%
              avoid_conflict_names() %>%
              tibble::as_tibble(rownames="OTU") %>%
-             dplyr::left_join(dat, by="OTU") %>%
+             dplyr::left_join(dat, by="OTU", suffix=c("", ".y")) %>%
              tibble::column_to_rownames(var="OTU")
 
         return(.data)
@@ -192,7 +192,7 @@ setMethod("mp_cal_upset", signature(.data="MPSE"), function(.data, .group, .abun
     
     if (action=="add"){
         .data %<>% 
-            dplyr::left_join(dat, by="OTU")
+            dplyr::left_join(dat, by="OTU", suffix=c("", ".y"))
         return(.data)
     }else if(action == "only"){
         return (dat)

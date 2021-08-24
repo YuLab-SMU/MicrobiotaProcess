@@ -189,7 +189,7 @@ setMethod("mp_cal_alpha", signature(.data="MPSE"),
     da <- alphada@alpha %>% as_tibble(rownames="Sample")
     da <- .data %>%
           mp_extract_sample() %>%
-          left_join(da, by="Sample") 
+          left_join(da, by="Sample", suffix=c("", ".y")) 
     if (action=="add"){
         .data@colData <- da %>% 
                          column_to_rownames(var="Sample") %>% 
@@ -239,7 +239,7 @@ setMethod("mp_cal_alpha", signature(.data="MPSE"),
         samplevar <- .data %>% attr("samplevar")
         assaysvar <- .data %>% attr("assaysvar")
         othernm <- colnames(.data)[!colnames(.data) %in% c("OTU", "Sample", assaysvar, samplevar)]
-        .data %<>% left_join(da, by="Sample") %>%
+        .data %<>% left_join(da, by="Sample", suffix=c("", ".y")) %>%
                    select(c("OTU", "Sample", assaysvar, samplevar, colnames(da), othernm))
         return(.data)
     }else if (action=="only"){

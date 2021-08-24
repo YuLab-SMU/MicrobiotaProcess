@@ -11,7 +11,7 @@ as_tibble.phyloseq <- function(x, ...){
                 avoid_conflict_names() %>%
                 rownames_to_column(var="Sample")
     if (ncol(sampleda)!=0){
-        otuda <- otuda %>% left_join(sampleda, by="Sample")
+        otuda <- otuda %>% left_join(sampleda, by="Sample", suffix=c("", ".y"))
         samplevar <- colnames(sampleda)
     }else{
         samplevar <- NULL
@@ -24,7 +24,7 @@ as_tibble.phyloseq <- function(x, ...){
         taxatree <- convert_to_treedata2(taxada)
         taxada <- avoid_conflict_names() %>% 
                     tibble::as_tibble(rownames="OTU")
-        otuda <- otuda %>% left_join(taxada, by="OTU")
+        otuda <- otuda %>% left_join(taxada, by="OTU", suffix=c("", ".y"))
         fillNAtaxflag <- TRUE
     }else{
         taxavar <- NULL
@@ -70,7 +70,7 @@ as_tibble.MPSE <- function(x, ...){
                 mp_extract_sample()
 
     if (ncol(sampleda)>1){
-        otuda <- otuda %>% left_join(sampleda, by="Sample")
+        otuda <- otuda %>% left_join(sampleda, by="Sample", suffix=c("", ".y"))
         samplevar <- colnames(sampleda)
     }else{
         samplevar <- "Sample"
@@ -81,7 +81,7 @@ as_tibble.MPSE <- function(x, ...){
     if (ncol(otumeta)>0){
         otumetavar <- colnames(otumeta)
         otumeta %<>% tibble::as_tibble(rownames="OTU")
-        otuda <- otuda %>% left_join(otumeta, by="OTU")
+        otuda <- otuda %>% left_join(otumeta, by="OTU", suffix=c("", ".y"))
     }else{
         otumetavar <- NULL
     }
@@ -93,7 +93,7 @@ as_tibble.MPSE <- function(x, ...){
         taxada <- taxada[,!vapply(taxada, rlang::is_list, logical(1)),drop=FALSE]
         taxavar <- colnames(taxada)  
         taxada %<>% tibble::as_tibble(rownames="OTU")
-        otuda <- otuda %>% left_join(taxada, by="OTU")
+        otuda <- otuda %>% left_join(taxada, by="OTU", suffix=c("", ".y"))
         fillNAtaxflag <- TRUE
     }else{
         taxavar <- NULL

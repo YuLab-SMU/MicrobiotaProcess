@@ -51,14 +51,14 @@ setGeneric("mp_stat_taxa", function(.data, .abundance, action="add", ...) standa
         if (inherits(.data, "MPSE")){
             .data@colData <- .data %>% 
                              mp_extract_sample() %>%
-                             dplyr::left_join(dat, by="Sample") %>%
+                             dplyr::left_join(dat, by="Sample", suffix=c("", ".y")) %>%
                              column_to_rownames(var="Sample") %>% 
                              S4Vectors::DataFrame(check.names=FALSE)
         }else{
             samplevar <- .data %>% attr("samplevar")
             assaysvar <- .data %>% attr("assaysvar")
             othernm <- colnames(.data)[!colnames(.data) %in% c("OTU", "Sample", assaysvar, samplevar)]
-            .data %<>% left_join(dat, by="Sample") %>%
+            .data %<>% left_join(dat, by="Sample", suffix=c("", ".y")) %>%
                        select(c("OTU", "Sample", assaysvar, samplevar, colnames(dat), othernm))
         }
         return(.data)

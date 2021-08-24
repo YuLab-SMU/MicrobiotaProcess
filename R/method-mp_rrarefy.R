@@ -133,7 +133,7 @@ setMethod("mp_rrarefy", signature(.data="tbl_mpse"), function(.data, .abundance=
             tibble::as_tibble(rownames="OTU") %>% 
             tidyr::pivot_longer(!"OTU", names_to="Sample", values_to="RareAbundance")
     othernms <- colnames(.data)[!colnames(.data) %in% c("OTU", "Sample", assaysvar)]
-    res <- .data %>% left_join(rare, by=c("OTU", "Sample")) %>% 
+    res <- .data %>% left_join(rare, by=c("OTU", "Sample"), suffix=c("", ".y")) %>% 
            select(c("OTU", "Sample", assaysvar, "RareAbundance", othernms))
     if (trimOTU){
         removeOTU <- res %>% 

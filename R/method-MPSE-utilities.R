@@ -62,7 +62,7 @@ taxatree_to_tb <- function(x){
         suppressMessages() %>%
         select(-c("Root")) 
     if (ncol(extrada)>1){
-        d %<>% dplyr::left_join(extrada, by=c("OTU"="label"))
+        d %<>% dplyr::left_join(extrada, by=c("OTU"="label"), suffix=c("", ".y"))
     }    
     d %<>% column_to_rownames(var="OTU")
     return (d)   

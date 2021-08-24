@@ -72,7 +72,8 @@ setMethod("mp_cal_cca", signature(.data="MPSE"),function(.data, .abundance, .for
     da <- .data %>% 
           mp_extract_sample() %>%
           dplyr::left_join(dat[, seq_len(.dim+1)], 
-                           by=c("Sample"="sites")
+                           by=c("Sample"="sites"),
+                           suffix=c("", ".y")
                            )
 
     if (action == "only"){
@@ -126,7 +127,8 @@ setMethod("mp_cal_cca", signature(.data="MPSE"),function(.data, .abundance, .for
               mp_extract_sample() %>%
               dplyr::left_join(
                   dat[,seq_len(.dim+1)],
-                  by=c("Sample"="sites")
+                  by=c("Sample"="sites"),
+                  suffix=c("", ".y")
               ) %>%
               add_total_attr(oldda=dat) %>%
               add_internal_attr(object=ccares, 
@@ -136,7 +138,8 @@ setMethod("mp_cal_cca", signature(.data="MPSE"),function(.data, .abundance, .for
         .data %<>%
             dplyr::left_join(
                  dat[,seq_len(.dim+1)],
-                 by=c("Sample"="sites")
+                 by=c("Sample"="sites"),
+                 suffix=c("", ".y")
             ) %>%
             add_total_attr(oldda=dat) %>%
             add_internal_attr(object=ccares, 

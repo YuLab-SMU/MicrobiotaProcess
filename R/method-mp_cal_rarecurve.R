@@ -129,7 +129,7 @@ setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundanc
     }else if (action=="add"){
         .data@colData <- .data@colData %>%
             as_tibble(rownames="Sample") %>%
-            left_join(dat, by=c("Sample"="sample")) %>% 
+            left_join(dat, by=c("Sample"="sample"), suffix=c("", ".y")) %>% 
             column_to_rownames(var="Sample") %>%
             S4Vectors::DataFrame(check.names=FALSE)
         return(.data)
@@ -190,7 +190,7 @@ setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundanc
         return(dat)
     }else if (action=="add"){
         dat <- .data %>% 
-               dplyr::left_join(dat, by=c("Sample"="sample"))
+               dplyr::left_join(dat, by=c("Sample"="sample"), suffix=c("", ".y"))
         return(dat)
     }
 }
@@ -203,7 +203,7 @@ setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundanc
     sampleda <- sampleda[, !colnames(sampleda) %in% colnames(dat)]
     if (ncol(sampleda) > 1){
         dat %<>%
-            left_join(sampleda, by=c("sample"="Sample"))
+            left_join(sampleda, by=c("sample"="Sample"), suffix=c("", ".y"))
     }
     #dat <- structure(list(data=dat), class="rarecurve")
     return(dat)

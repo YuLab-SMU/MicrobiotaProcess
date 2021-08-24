@@ -109,7 +109,8 @@ setMethod("mp_cal_pca", signature(.data="MPSE"), function(.data, .abundance, .di
           dplyr::left_join(
                  dat %>%
                  select(seq_len(.dim+1)),
-                 by=c("Sample"="sites")
+                 by=c("Sample"="sites"),
+                 suffix=c("", ".y")
           )
     if (action=="only"){
         da %<>%
@@ -151,7 +152,8 @@ setMethod("mp_cal_pca", signature(.data="MPSE"), function(.data, .abundance, .di
               mp_extract_sample() %>%
               dplyr::left_join(
                  dat[, seq_len(.dim+1)],
-                 by=c("Sample"="sites")
+                 by=c("Sample"="sites"),
+                 suffix = c(".x", ".y")
               ) %>%
               add_attr(attribute=dat %>% attr("features_tb"), 
                        name="features_tb") %>%
@@ -161,7 +163,8 @@ setMethod("mp_cal_pca", signature(.data="MPSE"), function(.data, .abundance, .di
         .data %<>% 
             dplyr::left_join(
                 dat[,seq_len(.dim+1)],
-                by=c("Sample"="sites")
+                by=c("Sample"="sites"),
+                suffix = c(".x", ".y")
             ) %>%
             add_internal_attr(object=pca, name="PCA")
 
@@ -222,7 +225,8 @@ setMethod("mp_cal_dca", signature(.data="MPSE"), function(.data, .abundance, .di
           mp_extract_sample() %>%
           dplyr::left_join(
                  dat,
-                 by=c("Sample"="sites")
+                 by=c("Sample"="sites"),
+                 suffix = c("", ".y")
           )
 
     if (action=="only"){
@@ -267,7 +271,8 @@ setMethod("mp_cal_dca", signature(.data="MPSE"), function(.data, .abundance, .di
               mp_extract_sample() %>%
               dplyr::left_join(
                   dat,
-                  by=c("Sample"="sites")
+                  by=c("Sample"="sites"),
+                  suffix = c("", ".y")
               ) %>%
               add_attr(dat %>% attr("features_tb"), name="features_tb") %>%
               add_internal_attr(object=dca, name="DCA")
@@ -276,7 +281,8 @@ setMethod("mp_cal_dca", signature(.data="MPSE"), function(.data, .abundance, .di
         .data %<>%
             dplyr::left_join(
                 dat,
-                by=c("Sample"="sites")
+                by=c("Sample"="sites"),
+                suffix = c("", ".y")
             ) %>%
             add_internal_attr(object=dca, name="DCA")
 

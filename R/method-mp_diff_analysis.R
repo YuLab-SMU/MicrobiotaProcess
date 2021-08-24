@@ -322,7 +322,7 @@ setGeneric("mp_diff_analysis", function(.data,
                        mp_extract_feature() 
              result %<>% dplyr::rename(label="f")
              #result %<>% dplyr::select(c("label",setdiff(colnames(result), colnames(otu_tb))))
-             otu_tb %<>% dplyr::left_join(result, by="label")
+             otu_tb %<>% dplyr::left_join(result, by="label", suffix=c("", ".y"))
              return(otu_tb)
          }else{
              newgroup <- paste0("Sign_", rlang::as_name(.group))

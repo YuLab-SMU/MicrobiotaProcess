@@ -193,7 +193,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     sampleda <- .data %>% mp_extract_sample()
 
     if (ncol(sampleda)>1){
-        da %<>% left_join(sampleda, by="Sample")
+        da %<>% left_join(sampleda, by="Sample", suffix=c("", ".y"))
     }
 
     otumeta <-
@@ -202,7 +202,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
         tibble::as_tibble(rownames="OTU")
     
     if (ncol(otumeta) > 1){
-        da %<>% dplyr::left_join(otumeta, by="OTU")
+        da %<>% dplyr::left_join(otumeta, by="OTU", suffix=c("", ".y"))
     }
     
     if (!is.null(.data@taxatree)){
@@ -212,7 +212,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
                            c(colnames(.data@taxatree@data), 
                              colnames(.data@taxatree@extraInfo)),
                            drop=FALSE]
-        da %<>% dplyr::left_join(taxada, by="OTU")
+        da %<>% dplyr::left_join(taxada, by="OTU", suffix=c("", ".y"))
         taxavar <- colnames(taxada)
     }else{
         taxavar <- "OTU"
@@ -283,7 +283,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
            
            if (ncol(sampleda)>1){
                sampleda %<>% dplyr::select(c("Sample", setdiff(colnames(sampleda), colnames(da1))))
-               da1 %<>% dplyr::left_join(sampleda, by="Sample") %>% dplyr::distinct()
+               da1 %<>% dplyr::left_join(sampleda, by="Sample", suffix=c("", ".y")) %>% dplyr::distinct()
            }
        }else{
            da1 <- .data@taxatree %>% 
@@ -349,7 +349,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     }
 
 	if (!is.null(sampleda) && ncol(sampleda)>1){
-        da <- da %>% dplyr::left_join(sampleda, by="Sample")
+        da <- da %>% dplyr::left_join(sampleda, by="Sample", suffix=c("", ".y"))
     }
     colnames(da)[1] <- "OTU"
     da %<>% tidyr::nest(!!bygroup:=colnames(da)[ colnames(da) !="OTU"])
@@ -408,7 +408,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
         othernm <- colnames(.data)[!colnames(.data) %in% c("OTU", "Sample", assaysvar)]
         attr(.data, "assaysvar") <- c(assaysvar, newRelabun)
         .data %<>% 
-              left_join(dx1, by=c("OTU", "Sample")) %>%
+              left_join(dx1, by=c("OTU", "Sample"), suffix=c("", ".y")) %>%
               select(c("OTU", "Sample", assaysvar, newRelabun, othernm))
     }
 
@@ -453,7 +453,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
                 sampleda <- .data %>% 
                             ungroup() %>% 
                             select(c("Sample", setdiff(samplevar, colnames(da1))))
-                da1 %<>% dplyr::left_join(sampleda, by="Sample")
+                da1 %<>% dplyr::left_join(sampleda, by="Sample", suffix=c("", ".y"))
             }
         }else{
             da1 <- .data %>% 

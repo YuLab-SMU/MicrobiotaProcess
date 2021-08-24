@@ -131,7 +131,7 @@ setMethod("mp_cal_venn", signature(.data="MPSE"), function(.data, .group, .abund
                 mp_extract_sample()
 
     if (ncol(sampleda)>1){
-        da %<>% left_join(sampleda, by="Sample")
+        da %<>% left_join(sampleda, by="Sample", suffix=c("", ".y"))
     }
 
     dat <- da %>% 
@@ -140,7 +140,7 @@ setMethod("mp_cal_venn", signature(.data="MPSE"), function(.data, .group, .abund
     if (action == "add"){
         .data@colData <- 
              sampleda %>%
-             dplyr::left_join(dat, by=rlang::as_name(.group)) %>%
+             dplyr::left_join(dat, by=rlang::as_name(.group), suffix=c("", ".y")) %>%
              tibble::column_to_rownames(var="Sample") %>%
              S4Vectors::DataFrame(check.names=FALSE)
 
@@ -183,7 +183,7 @@ setMethod("mp_cal_venn", signature(.data="MPSE"), function(.data, .group, .abund
     
     if (action=="add"){
         .data %<>% 
-            dplyr::left_join(dat, by=rlang::as_name(.group))
+            dplyr::left_join(dat, by=rlang::as_name(.group), suffix=c("", ".y"))
         return(.data)
     }else if(action == "get"){
         return (dat)
