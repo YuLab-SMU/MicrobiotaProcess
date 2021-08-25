@@ -1,5 +1,6 @@
-# MicrobiotaProcess 1.5.3.993
+# MicrobiotaProcess 1.5.3.994
 
++ add `mp_extract_refseq` for `MPSE` object. (2021-08-25, Wed)
 + update `as.MPSE` for `SummarizedExperiment` object. (2021-08-24, Tue)
 + add `mp_filter_taxa` to drop the taxa that low abundance and low occurrences. (2021-08-24, Tue)
 + add `colData<-` and `left_join` for `MPSE`. (2021-08-23, Mon)
