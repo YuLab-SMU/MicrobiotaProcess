@@ -806,6 +806,38 @@ setReplaceMethod("refseq", signature(x="MPSE", value="XStringSet"), function(x, 
     return(x)
 })
 
+#' Extract the representative sequences from MPSE object
+#' @param x MPSE object
+#' @param ... additional parameters, meaningless now.
+#' @rdname mp_extract_refseq-methods
+#' @export
+setGeneric("mp_extract_refseq", function(x, ...)standardGeneric("mp_extract_refseq"))
+
+.internal_extract_refseq <- function(x, ...){
+    if (inherits(x, "MPSE")){
+        ref.seq <- x@refseq
+    }else{
+        ref.seq <- x %>% attr("refseq")
+    }
+    return(ref.seq)
+}
+
+#' @rdname mp_extract_refseq-methods
+#' @aliases mp_extract_refseq,MPSE
+#' @export mp_extract_refseq
+setMethod("mp_extract_refseq", signature(x="MPSE"), .internal_extract_refseq)
+
+#' @rdname mp_extract_refseq-methods
+#' @aliases mp_extract_refseq,tbl_mpse
+#' @export mp_extract_refseq
+setMethod("mp_extract_refseq", signature(x="tbl_mpse"), .internal_extract_refseq)
+
+#' @rdname mp_extract_refseq-methods
+#' @aliases mp_extract_refseq,grouped_df_mpse
+#' @export mp_extract_refseq
+setMethod("mp_extract_refseq", signature(x="grouped_df_mpse"), .internal_extract_refseq)
+
+
 #' @rdname MPSE-accessors
 #' @aliases rownames<-,MPSE
 #' @export
