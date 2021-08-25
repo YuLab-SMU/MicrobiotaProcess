@@ -178,7 +178,7 @@ tidydr.rda <- tidydr.cca
 #' mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
 #' tbl <- 
 #' mpse %>%
-#'   mp_cal_nmds(.abundance=Abundance) %>%
+#'   mp_cal_nmds(.abundance=Abundance, action="add") %>%
 #'   mp_envfit(.ord=NMDS, .env=colnames(varechem), action="only") 
 #' tbl 
 #' tbl %>% attributes %>% names

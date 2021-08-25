@@ -182,12 +182,12 @@ get_varct.pcoa <- function(obj,...){
 #'  geom_hline(yintercept=0, color="grey20", linetype=2) +
 #'  theme_bw() +
 #'  theme(panel.grid=element_blank())
-setGeneric("mp_cal_pcoa", function(.data, .abundance, distmethod="bray", .dim=3, action="add", ...)standardGeneric("mp_cal_pcoa"))
+setGeneric("mp_cal_pcoa", function(.data, .abundance, distmethod="bray", .dim=3, action="only", ...)standardGeneric("mp_cal_pcoa"))
 
 #' @rdname mp_cal_pcoa-methods
 #' @aliases mp_cal_pcoa,MPSE
 #' @exportMethod mp_cal_pcoa
-setMethod("mp_cal_pcoa", signature(.data="MPSE"), function(.data, .abundance, distmethod="bray", .dim=3, action="add", ...){
+setMethod("mp_cal_pcoa", signature(.data="MPSE"), function(.data, .abundance, distmethod="bray", .dim=3, action="only", ...){
     
     action %<>% match.arg(c("add", "only", "get"))
 
@@ -237,7 +237,7 @@ setMethod("mp_cal_pcoa", signature(.data="MPSE"), function(.data, .abundance, di
 })
 
 
-.internal_cal_pcoa <- function(.data, .abundance, distmethod="bray", .dim=3, action="add", ...){
+.internal_cal_pcoa <- function(.data, .abundance, distmethod="bray", .dim=3, action="only", ...){
 
     action %<>% match.arg(c("add", "only", "get"))
 
@@ -328,12 +328,12 @@ setMethod("mp_cal_pcoa", signature(.data="grouped_df_mpse"), .internal_cal_pcoa)
 #'  geom_hline(yintercept=0, color="grey20", linetype=2) +
 #'  theme_bw() +
 #'  theme(panel.grid=element_blank())
-setGeneric("mp_cal_nmds", function(.data, .abundance, distmethod="bray", .dim=2, action="add", seed=123, ...)standardGeneric("mp_cal_nmds"))
+setGeneric("mp_cal_nmds", function(.data, .abundance, distmethod="bray", .dim=2, action="only", seed=123, ...)standardGeneric("mp_cal_nmds"))
 
 #' @rdname mp_cal_nmds-methods
 #' @aliases mp_cal_nmds,MPSE
 #' @exportMethod mp_cal_nmds
-setMethod("mp_cal_nmds", signature(.data="MPSE"), function(.data, .abundance, distmethod="bray", .dim=2, action="add", seed=123, ...){
+setMethod("mp_cal_nmds", signature(.data="MPSE"), function(.data, .abundance, distmethod="bray", .dim=2, action="only", seed=123, ...){
 
     action %<>% match.arg(c("add", "only", "get"))
 
@@ -389,7 +389,7 @@ setMethod("mp_cal_nmds", signature(.data="MPSE"), function(.data, .abundance, di
     }
 })
 
-.internal_cal_nmds <- function(.data, .abundance, distmethod="bray", .dim=2, action="add", seed=123, ...){
+.internal_cal_nmds <- function(.data, .abundance, distmethod="bray", .dim=2, action="only", seed=123, ...){
 
     action %<>% match.arg(c("add", "only", "get"))
 

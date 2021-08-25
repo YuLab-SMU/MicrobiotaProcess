@@ -10,13 +10,13 @@
 \alias{mp_cal_pca,grouped_df_mpse}
 \title{Principal Components Analysis with MPSE or tbl_mpse object}
 \usage{
-mp_cal_pca(.data, .abundance, .dim = 3, action = "add", ...)
+mp_cal_pca(.data, .abundance, .dim = 3, action = "only", ...)
 
-\S4method{mp_cal_pca}{MPSE}(.data, .abundance, .dim = 3, action = "add", ...)
+\S4method{mp_cal_pca}{MPSE}(.data, .abundance, .dim = 3, action = "only", ...)
 
-\S4method{mp_cal_pca}{tbl_mpse}(.data, .abundance, .dim = 3, action = "add", ...)
+\S4method{mp_cal_pca}{tbl_mpse}(.data, .abundance, .dim = 3, action = "only", ...)
 
-\S4method{mp_cal_pca}{grouped_df_mpse}(.data, .abundance, .dim = 3, action = "add", ...)
+\S4method{mp_cal_pca}{grouped_df_mpse}(.data, .abundance, .dim = 3, action = "only", ...)
 }
 \arguments{
 \item{.data}{MPSE or tbl_mpse object}
@@ -41,7 +41,7 @@ data(mouse.time.mpse)
 library(ggplot2)
 mpse <- mouse.time.mpse \%>\% 
           mp_decostand(.abundance=Abundance) \%>\% 
-          mp_cal_pca(.abundance=hellinger)
+          mp_cal_pca(.abundance=hellinger, action="add")
 # action = "only" to extract the non-redundant tibble to visualize
 tbl <- mouse.time.mpse \%>\%
           mp_decostand(.abundance=Abundance) \%>\%

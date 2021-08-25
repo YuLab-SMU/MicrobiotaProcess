@@ -19,7 +19,7 @@
 #' mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
 #' envformula <- paste("~", paste(colnames(varechem), collapse="+")) %>% as.formula
 #' tbl <- mpse %>% 
-#'        mp_cal_cca(.abundance=Abundance, .formula=envformula) %>%
+#'        mp_cal_cca(.abundance=Abundance, .formula=envformula, action="add") %>%
 #'        mp_envfit(.ord=CCA, 
 #'                  .env=colnames(varechem), 
 #'                  permutations=9999, 
@@ -50,9 +50,9 @@
 #'      theme_bw() +
 #'      theme(panel.grid=element_blank())
 #' p
-setGeneric("mp_envfit", function(.data, .ord, .env, .dim=3, action="add", permutations=999, seed=123, ...)standardGeneric("mp_envfit"))
+setGeneric("mp_envfit", function(.data, .ord, .env, .dim=3, action="only", permutations=999, seed=123, ...)standardGeneric("mp_envfit"))
 
-.internal_cal_envfit <- function(.data, .ord, .env, .dim, action="add", permutations=999, seed=123, ...){
+.internal_cal_envfit <- function(.data, .ord, .env, .dim, action="only", permutations=999, seed=123, ...){
 
     .ord <- rlang::enquo(.ord) %>%
             rlang::as_name() %>%

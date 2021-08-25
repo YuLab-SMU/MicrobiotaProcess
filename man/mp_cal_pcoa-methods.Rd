@@ -15,7 +15,7 @@ mp_cal_pcoa(
   .abundance,
   distmethod = "bray",
   .dim = 3,
-  action = "add",
+  action = "only",
   ...
 )
 
@@ -24,7 +24,7 @@ mp_cal_pcoa(
   .abundance,
   distmethod = "bray",
   .dim = 3,
-  action = "add",
+  action = "only",
   ...
 )
 
@@ -33,7 +33,7 @@ mp_cal_pcoa(
   .abundance,
   distmethod = "bray",
   .dim = 3,
-  action = "add",
+  action = "only",
   ...
 )
 
@@ -42,7 +42,7 @@ mp_cal_pcoa(
   .abundance,
   distmethod = "bray",
   .dim = 3,
-  action = "add",
+  action = "only",
   ...
 )
 }

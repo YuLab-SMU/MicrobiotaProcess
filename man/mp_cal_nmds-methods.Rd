@@ -15,7 +15,7 @@ mp_cal_nmds(
   .abundance,
   distmethod = "bray",
   .dim = 2,
-  action = "add",
+  action = "only",
   seed = 123,
   ...
 )
@@ -25,7 +25,7 @@ mp_cal_nmds(
   .abundance,
   distmethod = "bray",
   .dim = 2,
-  action = "add",
+  action = "only",
   seed = 123,
   ...
 )
@@ -35,7 +35,7 @@ mp_cal_nmds(
   .abundance,
   distmethod = "bray",
   .dim = 2,
-  action = "add",
+  action = "only",
   seed = 123,
   ...
 )
@@ -45,7 +45,7 @@ mp_cal_nmds(
   .abundance,
   distmethod = "bray",
   .dim = 2,
-  action = "add",
+  action = "only",
   seed = 123,
   ...
 )

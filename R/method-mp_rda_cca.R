@@ -23,12 +23,12 @@
 #'     mp_cal_cca(.abundance=Abundance, 
 #'                .formula=~Al + P*(K + Baresoil), 
 #'                action="add")
-setGeneric("mp_cal_cca", function(.data, .abundance, .formula=NULL, .dim=3, action="add", ...)standardGeneric("mp_cal_cca"))
+setGeneric("mp_cal_cca", function(.data, .abundance, .formula=NULL, .dim=3, action="only", ...)standardGeneric("mp_cal_cca"))
 
 #' @rdname mp_cal_cca-methods
 #' @aliases mp_cal_cca,MPSE
 #' @exportMethod mp_cal_cca
-setMethod("mp_cal_cca", signature(.data="MPSE"),function(.data, .abundance, .formula, .dim=3, action="add", ...){
+setMethod("mp_cal_cca", signature(.data="MPSE"),function(.data, .abundance, .formula, .dim=3, action="only", ...){
     res <- .internal_cal_rda_cca1(.data=.data, 
                                   .abundance=!!rlang::enquo(.abundance), 
                                   .formula=.formula, 
@@ -40,7 +40,7 @@ setMethod("mp_cal_cca", signature(.data="MPSE"),function(.data, .abundance, .for
     return(res)
 })
 
-.internal_cal_rda_cca1 <- function(.data, .abundance, .formula, .dim=3, action="add", method="cca", ...){
+.internal_cal_rda_cca1 <- function(.data, .abundance, .formula, .dim=3, action="only", method="cca", ...){
     
     cca_rda_method <- switch(method,
                             cca = vegan::cca,
@@ -93,7 +93,7 @@ setMethod("mp_cal_cca", signature(.data="MPSE"),function(.data, .abundance, .for
 }
 
 
-.internal_cal_rda_cca2 <- function(.data, .abundance, .formula=NULL, .dim=3, action="add", method="cca", ...){
+.internal_cal_rda_cca2 <- function(.data, .abundance, .formula=NULL, .dim=3, action="only", method="cca", ...){
     
     cca_rda_method <- switch(method,
                             cca = vegan::cca,
@@ -166,7 +166,7 @@ add_total_attr <- function(newda, oldda){
 #' @rdname mp_cal_cca-methods
 #' @aliases mp_cal_cca,tbl_mpse
 #' @exportMethod mp_cal_cca
-setMethod("mp_cal_cca", signature(.data="tbl_mpse"), function(.data, .abundance, .formula=NULL, .dim=3, action="add", ...){
+setMethod("mp_cal_cca", signature(.data="tbl_mpse"), function(.data, .abundance, .formula=NULL, .dim=3, action="only", ...){
     res <- .internal_cal_rda_cca2(.data=.data,
                                   .abundance = !!rlang::enquo(.abundance),
                                   .formula = .formula,
@@ -180,7 +180,7 @@ setMethod("mp_cal_cca", signature(.data="tbl_mpse"), function(.data, .abundance,
 #' @rdname mp_cal_cca-methods
 #' @aliases mp_cal_cca,grouped_df_mpse
 #' @exportMethod mp_cal_cca
-setMethod("mp_cal_cca", signature(.data="grouped_df_mpse"), function(.data, .abundance, .formula=NULL, .dim=3, action="add", ...){
+setMethod("mp_cal_cca", signature(.data="grouped_df_mpse"), function(.data, .abundance, .formula=NULL, .dim=3, action="only", ...){
     res <- .internal_cal_rda_cca2(.data=.data,
                                   .abundance = !!rlang::enquo(.abundance),
                                   .formula = .formula,
@@ -218,12 +218,12 @@ setMethod("mp_cal_cca", signature(.data="grouped_df_mpse"), function(.data, .abu
 #'              .formula=~Al + P*(K + Baresoil),
 #'              .dim = 3,
 #'              action="only")
-setGeneric("mp_cal_rda", function(.data, .abundance, .formula=NULL, .dim=3, action="add", ...)standardGeneric("mp_cal_rda"))
+setGeneric("mp_cal_rda", function(.data, .abundance, .formula=NULL, .dim=3, action="only", ...)standardGeneric("mp_cal_rda"))
 
 #' @rdname mp_cal_rda-methods
 #' @aliases mp_cal_rda,MPSE
 #' @exportMethod mp_cal_rda
-setMethod("mp_cal_rda", signature(.data="MPSE"),function(.data, .abundance, .formula=NULL, .dim=3, action="add", ...){
+setMethod("mp_cal_rda", signature(.data="MPSE"),function(.data, .abundance, .formula=NULL, .dim=3, action="only", ...){
     res <- .internal_cal_rda_cca1(.data=.data,
                                   .abundance=!!rlang::enquo(.abundance),
                                   .formula=.formula,
@@ -238,7 +238,7 @@ setMethod("mp_cal_rda", signature(.data="MPSE"),function(.data, .abundance, .for
 #' @rdname mp_cal_rda-methods
 #' @aliases mp_cal_rda,tbl_mpse
 #' @exportMethod mp_cal_rda
-setMethod("mp_cal_rda", signature(.data="tbl_mpse"), function(.data, .abundance, .formula=NULL, .dim=3, action="add", ...){
+setMethod("mp_cal_rda", signature(.data="tbl_mpse"), function(.data, .abundance, .formula=NULL, .dim=3, action="only", ...){
     res <- .internal_cal_rda_cca2(.data=.data,
                                   .abundance = !!rlang::enquo(.abundance),
                                   .formula = .formula,
@@ -252,7 +252,7 @@ setMethod("mp_cal_rda", signature(.data="tbl_mpse"), function(.data, .abundance,
 #' @rdname mp_cal_rda-methods
 #' @aliases mp_cal_rda,grouped_df_mpse
 #' @exportMethod mp_cal_rda
-setMethod("mp_cal_rda", signature(.data="grouped_df_mpse"), function(.data, .abundance, .formula=NULL, .dim=3, action="add", ...){
+setMethod("mp_cal_rda", signature(.data="grouped_df_mpse"), function(.data, .abundance, .formula=NULL, .dim=3, action="only", ...){
     res <- .internal_cal_rda_cca2(.data=.data,
                                   .abundance = !!rlang::enquo(.abundance),
                                   .formula = .formula,

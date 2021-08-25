@@ -10,13 +10,13 @@
 \alias{mp_cal_dca,grouped_df_mpse}
 \title{Detrended Correspondence Analysis with MPSE or tbl_mpse object}
 \usage{
-mp_cal_dca(.data, .abundance, .dim = 3, action = "add", origin = TRUE, ...)
+mp_cal_dca(.data, .abundance, .dim = 3, action = "only", origin = TRUE, ...)
 
-\S4method{mp_cal_dca}{MPSE}(.data, .abundance, .dim = 3, action = "add", origin = TRUE, ...)
+\S4method{mp_cal_dca}{MPSE}(.data, .abundance, .dim = 3, action = "only", origin = TRUE, ...)
 
-\S4method{mp_cal_dca}{tbl_mpse}(.data, .abundance, .dim = 3, action = "add", origin = TRUE, ...)
+\S4method{mp_cal_dca}{tbl_mpse}(.data, .abundance, .dim = 3, action = "only", origin = TRUE, ...)
 
-\S4method{mp_cal_dca}{grouped_df_mpse}(.data, .abundance, .dim = 3, action = "add", origin = TRUE, ...)
+\S4method{mp_cal_dca}{grouped_df_mpse}(.data, .abundance, .dim = 3, action = "only", origin = TRUE, ...)
 }
 \arguments{
 \item{.data}{MPSE or tbl_mpse object}

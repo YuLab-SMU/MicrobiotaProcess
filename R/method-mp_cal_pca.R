@@ -69,7 +69,7 @@ get_pca.phyloseq <- function(obj, method="hellinger", ...){
 #' library(ggplot2)
 #' mpse <- mouse.time.mpse %>% 
 #'           mp_decostand(.abundance=Abundance) %>% 
-#'           mp_cal_pca(.abundance=hellinger)
+#'           mp_cal_pca(.abundance=hellinger, action="add")
 #' # action = "only" to extract the non-redundant tibble to visualize
 #' tbl <- mouse.time.mpse %>%
 #'           mp_decostand(.abundance=Abundance) %>%
@@ -79,12 +79,12 @@ get_pca.phyloseq <- function(obj, method="hellinger", ...){
 #' y <- names(tbl)[grepl("PC2 ", names(tbl))] %>% as.symbol()
 #' ggplot(tbl) + 
 #'  geom_point(aes(x=!!x, y=!!y, color=time))
-setGeneric("mp_cal_pca", function(.data, .abundance, .dim=3, action="add", ...)standardGeneric("mp_cal_pca"))
+setGeneric("mp_cal_pca", function(.data, .abundance, .dim=3, action="only", ...)standardGeneric("mp_cal_pca"))
 
 #' @rdname mp_cal_pca-methods
 #' @aliases mp_cal_pca,MPSE
 #' @exportMethod mp_cal_pca
-setMethod("mp_cal_pca", signature(.data="MPSE"), function(.data, .abundance, .dim=3, action="add", ...){
+setMethod("mp_cal_pca", signature(.data="MPSE"), function(.data, .abundance, .dim=3, action="only", ...){
 
     action %<>% match.arg(c("add", "only", "get"))
     
@@ -126,7 +126,7 @@ setMethod("mp_cal_pca", signature(.data="MPSE"), function(.data, .abundance, .di
     }
 })
 
-.internal_cal_pca <- function(.data, .abundance, .dim=3, action="add", ...){
+.internal_cal_pca <- function(.data, .abundance, .dim=3, action="only", ...){
     
     action %<>% match.arg(c("add", "only", "get"))
 
@@ -196,12 +196,12 @@ setMethod("mp_cal_pca", signature(.data="grouped_df_mpse"), .internal_cal_pca)
 #' @param ... additional parameters see also 'vegan::decorana'
 #' @return update object or tbl according to the action.
 #' @export
-setGeneric("mp_cal_dca", function(.data, .abundance, .dim=3, action="add", origin=TRUE, ...)standardGeneric("mp_cal_dca"))
+setGeneric("mp_cal_dca", function(.data, .abundance, .dim=3, action="only", origin=TRUE, ...)standardGeneric("mp_cal_dca"))
 
 #' @rdname mp_cal_dca-methods
 #' @aliases mp_cal_dca,MPSE
 #' @exportMethod mp_cal_dca
-setMethod("mp_cal_dca", signature(.data="MPSE"), function(.data, .abundance, .dim=3, action="add", origin=TRUE, ...){
+setMethod("mp_cal_dca", signature(.data="MPSE"), function(.data, .abundance, .dim=3, action="only", origin=TRUE, ...){
 
     action %<>% match.arg(c("add", "only", "get"))
 
@@ -244,7 +244,7 @@ setMethod("mp_cal_dca", signature(.data="MPSE"), function(.data, .abundance, .di
             
 })
 
-.internal_cal_dca <- function(.data, .abundance, .dim=3, action="add", origin=TRUE, ...){
+.internal_cal_dca <- function(.data, .abundance, .dim=3, action="only", origin=TRUE, ...){
 
     action %<>% match.arg(c("add", "only", "get"))
 

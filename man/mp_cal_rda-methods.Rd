@@ -10,13 +10,13 @@
 \alias{mp_cal_rda,grouped_df_mpse}
 \title{[Partial] [Constrained] Redundancy Analysis with MPSE or tbl_mpse object}
 \usage{
-mp_cal_rda(.data, .abundance, .formula = NULL, .dim = 3, action = "add", ...)
+mp_cal_rda(.data, .abundance, .formula = NULL, .dim = 3, action = "only", ...)
 
-\S4method{mp_cal_rda}{MPSE}(.data, .abundance, .formula = NULL, .dim = 3, action = "add", ...)
+\S4method{mp_cal_rda}{MPSE}(.data, .abundance, .formula = NULL, .dim = 3, action = "only", ...)
 
-\S4method{mp_cal_rda}{tbl_mpse}(.data, .abundance, .formula = NULL, .dim = 3, action = "add", ...)
+\S4method{mp_cal_rda}{tbl_mpse}(.data, .abundance, .formula = NULL, .dim = 3, action = "only", ...)
 
-\S4method{mp_cal_rda}{grouped_df_mpse}(.data, .abundance, .formula = NULL, .dim = 3, action = "add", ...)
+\S4method{mp_cal_rda}{grouped_df_mpse}(.data, .abundance, .formula = NULL, .dim = 3, action = "only", ...)
 }
 \arguments{
 \item{.data}{MPSE or tbl_mpse object}

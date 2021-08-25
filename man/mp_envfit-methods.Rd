@@ -15,7 +15,7 @@ mp_envfit(
   .ord,
   .env,
   .dim = 3,
-  action = "add",
+  action = "only",
   permutations = 999,
   seed = 123,
   ...
@@ -26,7 +26,7 @@ mp_envfit(
   .ord,
   .env,
   .dim = 3,
-  action = "add",
+  action = "only",
   permutations = 999,
   seed = 123,
   ...
@@ -37,7 +37,7 @@ mp_envfit(
   .ord,
   .env,
   .dim = 3,
-  action = "add",
+  action = "only",
   permutations = 999,
   seed = 123,
   ...
@@ -48,7 +48,7 @@ mp_envfit(
   .ord,
   .env,
   .dim = 3,
-  action = "add",
+  action = "only",
   permutations = 999,
   seed = 123,
   ...
@@ -85,7 +85,7 @@ data(varespec, varechem)
 mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
 envformula <- paste("~", paste(colnames(varechem), collapse="+")) \%>\% as.formula
 tbl <- mpse \%>\% 
-       mp_cal_cca(.abundance=Abundance, .formula=envformula) \%>\%
+       mp_cal_cca(.abundance=Abundance, .formula=envformula, action="add") \%>\%
        mp_envfit(.ord=CCA, 
                  .env=colnames(varechem), 
                  permutations=9999, 
