@@ -45,7 +45,10 @@
         if (inherits(treeqza, "treedata")){
             reftree <- treeqza
         }else if (inherits(treeqza, "character") && file.exists(treeqza)){
-            reftree <- treeio::read.treeqza(treeqza)
+            reftree <- treeio::read.treeqza(treeqza) %>% 
+                       treeio::as.treedata()
+        }else if (inherits(treeqza, "phylo")){
+            reftree <- treeio::as.treedata(treeqza)
         }
     }
 
@@ -170,6 +173,8 @@
         
             sampleda <- sampleda[match(flagn, rnm), , drop = FALSE]
             otuda <- otuda[, match(flagn, colnm), drop=FALSE]
+        }else{
+            sampleda <- sampleda[match(colnames(otuda), rownames(sampleda)),,drop=FALSE]
         }
     }
 
@@ -236,7 +241,6 @@
             }
         }
     }
-    
     mpse <- MPSE(
                  assays = list(Abundance=otuda),
                  colData = sampleda,
