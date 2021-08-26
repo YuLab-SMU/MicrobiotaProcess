@@ -199,8 +199,12 @@ as.MPSE <- function(.data, ...){
 
     assaysvar <- SummarizedExperiment::assayNames(.data)
     SummarizedExperiment::assayNames(.data) <- c("Abundance", assaysvar[-1])
-
-    flag <- rownames(.data) %>% base::strsplit("\\|") %>% lapply(length) %>% unlist
+    
+    if (is.null(rownames(.data))){
+        flag <- NULL
+    }else{
+        flag <- rownames(.data) %>% base::strsplit("\\|") %>% lapply(length) %>% unlist
+    }
     rowda <- SummarizedExperiment::rowData(.data)
     res <- .internal_check_taxonomy(rowda, flag)
     taxatab <- res$taxatab
@@ -240,7 +244,7 @@ as.MPSE <- function(.data, ...){
         otu.tree %<>% treeio::as.treedata()
     }
 
-    if (ncol(taxatab)>0){
+    if (!is.null(taxatab) && ncol(taxatab)>0){
         taxa.tree <- convert_to_treedata2(x=data.frame(taxatab))
     }else{
         taxa.tree <- NULL
@@ -270,6 +274,9 @@ as.MPSE <- function(.data, ...){
 .internal_check_taxonomy <- function(x, flag){
     #flag <- rownames(x) %>% strsplit("\\|") %>% lapply(length) %>% unlist 
     #col.ind <- colnames(x) %in% c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+    if (is.null(flag)){
+        return(NULL)
+    }
     df <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
     col.ind <- lapply(df, function(i)which(grepl(i, colnames(x), ignore.case=TRUE))) %>% unlist()
     if (all(flag>5)){

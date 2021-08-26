@@ -134,9 +134,17 @@ avoid_conflict_names <- function(.data, spename=NULL){
 extract_count_data <- function(SE_object){
     allda <- SummarizedExperiment::assays(SE_object) %>% as.list()
     clnm <- names(allda)
-    if (any(is.na(clnm)) || length(clnm) != length(allda)){
-        stop ("The names of assays should be provided !", call. = FALSE)
+
+    if (clnm[1] != "Abundance" || is.null(clnm)){
+        clnm[1] <- "Abundance"
     }
+    if (any(nchar(clnm)==0)){
+       indx <- which(nchar(clnm)==0) 
+       clnm[indx] <- paste0("Abund.", seq_len(length(indx)))
+    }else if (length(clnm) != length(allda)){
+       clnm[seq_len(length(allda))!=1] <- paste0("Abund.", seq_len(length(allda)-length(clnm)))
+    }
+
     da <- mapply(trans_to_longer, 
               allda, 
               clnm, 
@@ -149,8 +157,14 @@ extract_count_data <- function(SE_object){
 }
 
 trans_to_longer <- function(.data, name){
-    .data %<>% 
-        tibble::as_tibble(rownames = "OTU", .name_repair = "minimal") %>%
+    if (is.null(colnames(data))){
+        .data %<>% tibble::as_tibble(rownames="OTU") %>% 
+            suppressWarnings()
+    }else{
+        .data %<>% 
+           tibble::as_tibble(rownames = "OTU", .name_repair = "minimal")
+    }
+    .data %<>%
         tidyr::pivot_longer(!.data$OTU, names_to = "Sample", values_to=name)
     return(.data)
 }
