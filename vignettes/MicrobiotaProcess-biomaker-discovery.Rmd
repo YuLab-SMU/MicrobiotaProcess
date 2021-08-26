@@ -35,7 +35,7 @@ CRANpkg <- function(pkg){
 ```
 
 ```{r, echo=FALSE, results="hide", message=FALSE, Loadpackages}
-library(tidyverse)
+library(ggplot2)
 library(phyloseq)
 library(ggtree)
 library(treeio)
