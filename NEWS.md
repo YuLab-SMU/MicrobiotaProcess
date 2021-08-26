@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.5.4.990
+
++ fix the issue when the `rowname` or `colnames` of `SummarizedExperiment` is NULL for `as.MPSE`. (2021-08-26, Thu)
+
 # MicrobiotaProcess 1.5.4
 
 + fix the `rownames` of `assays` and `colnames` of `colData` to identical for `SummarizedExperiment(1.23.3)`. (2021-08-26, Thu)
