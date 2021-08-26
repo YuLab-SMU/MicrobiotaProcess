@@ -1,5 +1,6 @@
-# MicrobiotaProcess 1.5.3.994
+# MicrobiotaProcess 1.5.4
 
++ fix the `rownames` of `assays` and `colnames` of `colData` to identical for `SummarizedExperiment(1.23.3)`. (2021-08-26, Thu)
 + add `mp_extract_refseq` for `MPSE` object. (2021-08-25, Wed)
 + update `as.MPSE` for `SummarizedExperiment` object. (2021-08-24, Tue)
 + add `mp_filter_taxa` to drop the taxa that low abundance and low occurrences. (2021-08-24, Tue)
