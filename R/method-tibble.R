@@ -157,7 +157,7 @@ extract_count_data <- function(SE_object){
 }
 
 trans_to_longer <- function(.data, name){
-    if (is.null(colnames(data))){
+    if (is.null(colnames(.data))){
         .data %<>% tibble::as_tibble(rownames="OTU") %>% 
             suppressWarnings()
     }else{

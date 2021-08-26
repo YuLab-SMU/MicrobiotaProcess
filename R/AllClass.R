@@ -51,8 +51,8 @@ setClass("MPSE",
 
 #' @title Construct a MPSE object
 #' @param assays A 'list' or 'SimpleList' of matrix-like elements
-#' All elements of the list must have the same dimensions, and must have
-#' the names, eg. list(Abundance=xx1, RareAbundance=xx2).
+#' All elements of the list must have the same dimensions, we also 
+#' recommend they have names, e.g. list(Abundance=xx1, RareAbundance=xx2).
 #' @param colData An optional DataFrame describing the samples.
 #' @param otutree A treedata object of tidytree package
 #' @param taxatree A treedata object of tidytree package
@@ -68,6 +68,22 @@ MPSE <- function(assays,
                  taxatree = NULL, 
                  refseq = NULL, 
                  ...){
+
+    clnm <- names(assays)
+
+    if (clnm[1] != "Abundance" || is.null(clnm)){
+        clnm[1] <- "Abundance"
+    }
+
+    if (any(nchar(clnm)==0)){
+       indx <- which(nchar(clnm)==0)
+       clnm[indx] <- paste0("Abund.", seq_len(length(indx)))
+    }else if (length(clnm) != length(assays)){
+       clnm[seq_len(length(assays))!=1] <- paste0("Abund.", seq_len(length(assays)-length(clnm)))
+    }
+
+    names(assays) <- clnm
+
     se <- SummarizedExperiment::SummarizedExperiment(assays=assays, colData=colData, ...)
     mpse <- new("MPSE",
                 se,

@@ -8,8 +8,8 @@ MPSE(assays, colData, otutree = NULL, taxatree = NULL, refseq = NULL, ...)
 }
 \arguments{
 \item{assays}{A 'list' or 'SimpleList' of matrix-like elements
-All elements of the list must have the same dimensions, and must have
-the names, eg. list(Abundance=xx1, RareAbundance=xx2).}
+All elements of the list must have the same dimensions, we also 
+recommend they have names, e.g. list(Abundance=xx1, RareAbundance=xx2).}
 
 \item{colData}{An optional DataFrame describing the samples.}
 

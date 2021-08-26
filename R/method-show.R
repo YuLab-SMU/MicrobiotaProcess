@@ -150,7 +150,7 @@ setMethod("show", "MPSE", function(object){
             writeLines("NULL")
         }
         writeLines(formatted_out("The abundance and sample data of the MPSE object are: "))
-        f <- methods::getMethod(f="show", signature = "SummarizedExperiment", where = asNamespace(ns = "SummarizedExperiment"))
+        f <- methods::getMethod(f="show", signature = "SummarizedExperiment")
         f(object)
     }else{
         object %>% print()
@@ -231,7 +231,7 @@ print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
         "# OTU=%s | Samples=%s | Assays=%s | Taxanomy=%s",
         nrow(x),
         ncol(x),
-        SummarizedExperiment::assays(x) %>% names %>% paste(collapse=", "),
+        SummarizedExperiment::assayNames(x) %>% paste(collapse=", "),
         ifelse(is.null(x@taxatree), "NULL",
                x@taxatree@data %>%
                    select("nodeClass") %>%
