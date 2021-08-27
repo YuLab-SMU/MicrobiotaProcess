@@ -22,6 +22,7 @@
 \alias{\%<>\%}
 \alias{td_filter}
 \alias{colData<-}
+\alias{remove_missing}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -30,6 +31,8 @@ below to see their documentation.
 
 \describe{
   \item{dplyr}{\code{\link[dplyr]{arrange}}, \code{\link[dplyr]{distinct}}, \code{\link[dplyr]{filter}}, \code{\link[dplyr]{group_by}}, \code{\link[dplyr:mutate-joins]{left_join}}, \code{\link[dplyr]{mutate}}, \code{\link[dplyr]{pull}}, \code{\link[dplyr]{rename}}, \code{\link[dplyr]{select}}, \code{\link[dplyr]{slice}}, \code{\link[dplyr:group_by]{ungroup}}}
+
+  \item{ggplot2}{\code{\link[ggplot2]{remove_missing}}}
 
   \item{ggtree}{\code{\link[ggtree]{td_filter}}}
 

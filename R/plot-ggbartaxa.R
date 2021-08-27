@@ -205,7 +205,7 @@ mappingtaxda <- function(data, topn=30, count=FALSE, sampleda=NULL,
 #'         xlab(NULL) + ylab("relative abundance(%)") + 
 #'         theme_taxbar()
 #' }
-theme_taxbar <- function(axis.text.x=element_text(angle = -45, hjust = 0, size=12),
+theme_taxbar <- function(axis.text.x=element_text(angle = -45, hjust = 0, size=8),
 						 #panel.grid = element_blank(),
 						 legend.position = "bottom",
 						 legend.box = "horizontal",
@@ -218,14 +218,14 @@ theme_taxbar <- function(axis.text.x=element_text(angle = -45, hjust = 0, size=1
 						 ){
     theme_bw()+
     theme(axis.text.x = axis.text.x,
-	  axis.text.y = element_text(size=12),
+	      axis.text.y = element_text(size=8),
           panel.grid = element_blank(),
           legend.position = legend.position, 
           legend.box = legend.box, 
           legend.text = legend.text, 
           legend.title = legend.title,
           plot.margin = unit(c(0.2,1,0.2,0.2),"cm"),
-          panel.spacing = unit(0.2, "mm"),
+          panel.spacing = unit(0.5, "mm"),
           strip.text.x = strip.text.x,
           strip.background = strip.background,
 		  ...)

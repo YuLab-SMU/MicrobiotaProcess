@@ -456,9 +456,13 @@ setGeneric("mp_extract_abundance", function(x, taxa.class="all", topn=NULL, ...)
 	}
     
     if (is.null(taxatree)){
-        da <- x %>% mp_extract_feature() 
+        taxa.class <- rlang::sym("OTU")
+        da <- x %>% mp_extract_feature() %>% 
+              dplyr::rename(label="OTU") %>% 
+              dplyr::mutate(nodeClass="OTU") 
         if (ncol(da)==1){
             message("Please make sure the mp_cal_abundance(..., action='add') has been run.")
+            message("Or you can extract the assay via mp_extract_assays since the taxonomy is NULL")
             return(NULL)
         }
         #return(da)
@@ -711,7 +715,7 @@ setMethod("otutree", signature(x="MPSE"),function(x,...){
 
 #' @rdname MPSE-accessors 
 #' @param x MPSE object
-#' @param value treedata object
+#' @param value treedata object or NULL
 #' @export
 setGeneric("otutree<-", function(x, ..., value)standardGeneric("otutree<-"))
 
@@ -720,6 +724,15 @@ setGeneric("otutree<-", function(x, ..., value)standardGeneric("otutree<-"))
 #' @export
 setReplaceMethod("otutree", signature(x="MPSE", value="treedata"), function(x, ..., value){
     x@otutree <- .internal_drop.tip(tree=value, newnm=rownames(x)) 
+    methods::validObject(x)
+    return(x)
+})
+
+#' @rdname MPSE-accessors
+#' @aliases otutree<-,MPSE
+#' @export
+setReplaceMethod("otutree", signature(x="MPSE", value="NULL"), function(x, ..., value){
+    x@otutree <- NULL
     methods::validObject(x)
     return(x)
 })
@@ -762,7 +775,7 @@ setMethod("taxatree", signature(x="MPSE"),function(x, ...){
 
 #' @rdname MPSE-accessors
 #' @param x MPSE object
-#' @param value  treedata object
+#' @param value  treedata object or NULL
 #' @export
 setGeneric("taxatree<-", function(x, ..., value)standardGeneric("taxatree<-"))
 
@@ -771,6 +784,15 @@ setGeneric("taxatree<-", function(x, ..., value)standardGeneric("taxatree<-"))
 #' @export
 setReplaceMethod("taxatree", signature(x="MPSE", value="treedata"), function(x, ..., value){
     x@taxatree <- .internal_drop.tip(tree=value, newnm=rownames(x), collapse.singles=FALSE)
+    methods::validObject(x)
+    return(x)
+})
+
+#' @rdname MPSE-accessors
+#' @aliases taxatree<-,MPSE
+#' @export
+setReplaceMethod("taxatree", signature(x="MPSE", value="NULL"), function(x, ..., value){
+    x@taxatree <- NULL
     methods::validObject(x)
     return(x)
 })
@@ -793,7 +815,7 @@ setMethod("refseq", signature(x="MPSE"), function(x, ...){
 
 #' @rdname MPSE-accessors
 #' @param x MPSE object
-#' @param value XStringSet object
+#' @param value XStringSet object or NULL
 #' @export
 setGeneric("refseq<-", function(x, ..., value)standardGeneric("refseq<-"))
 
@@ -802,6 +824,15 @@ setGeneric("refseq<-", function(x, ..., value)standardGeneric("refseq<-"))
 #' @export
 setReplaceMethod("refseq", signature(x="MPSE", value="XStringSet"), function(x, ..., value){
     x@refseq <- value[rownames(x)]
+    methods::validObject(x)
+    return(x)
+})
+
+#' @rdname MPSE-accessors
+#' @aliases refseq<-,MPSE
+#' @export
+setReplaceMethod("refseq", signature(x="MPSE", value="NULL"), function(x, ..., value){
+    x@refseq <- NULL
     methods::validObject(x)
     return(x)
 })

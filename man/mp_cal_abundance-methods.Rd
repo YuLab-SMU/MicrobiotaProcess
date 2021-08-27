@@ -84,6 +84,20 @@ mouse.time.mpse
 mouse.time.mpse \%<>\%
   mp_cal_abundance(.abundance=RareAbundance, action="add") \%>\% 
   mp_cal_abundance(.abundance=RareAbundance, .group=time, action="add") 
+mouse.time.mpse
+p1 <- mouse.time.mpse \%>\% 
+      mp_plot_abundance(.abundance=RelRareAbundanceBySample, 
+                        .group=time, taxa.class="Phylum", topn=20)
+p2 <- mouse.time.mpse \%>\% 
+      mp_plot_abundance(.abundance = RareAbundance, 
+                        .group = time, 
+                        taxa.class = Phylum, 
+                        topn = 20, 
+                        relative = FALSE, 
+                        force = TRUE)
+p1 / p2
+# Or you can also extract the result and visulize it with ggplot2 and ggplot2-extension
+\dontrun{
 tbl <- mouse.time.mpse \%>\%
        mp_extract_abundance(taxa.class="Class", topn=10)
 tbl
@@ -105,7 +119,11 @@ p <- ggplot(data=tbl,
      scale_fill_brewer(name="Class", type = "qual", palette = "Paired") +
      facet_grid(cols=vars(time), scales="free_x", space="free") +
      theme(axis.text.x=element_text(angle=-45, hjust=0))
-p  
+p
+}
+}
+\seealso{
+[mp_plot_abundance()]
 }
 \author{
 Shuangbin Xu

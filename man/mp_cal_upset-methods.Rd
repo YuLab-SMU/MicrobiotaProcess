@@ -72,16 +72,29 @@ Calculating the samples or groups for each OTU, the result can be visualized by 
 }
 \examples{
 data(mouse.time.mpse)
-mouse.time.mpse \%>\%
-mp_rrarefy() \%>\%
-mp_cal_upset(.abundance=RareAbundance, .group=time, action="only") -> tbl
-tbl
+mpse <- mouse.time.mpse \%>\%
+        mp_rrarefy() \%>\%
+        mp_cal_upset(.abundance=RareAbundance, .group=time, action="add")
+mpse
 library(ggplot2)
-tbl \%>\%
-  ggplot(aes(x=ggupsetOftime)) +
-  geom_bar() +
-  ggupset::scale_x_upset() +
-  ggupset::theme_combmatrix(combmatrix.label.extra_spacing=30)
+library(ggupset)
+p <- mpse \%>\% mp_plot_upset(.group=time, .upset=ggupsetOftime)
+p
+# or set action="only"
+\dontrun{
+tbl <- mouse.time.mpse \%>\% 
+       mp_rrarefy() \%>\% 
+       mp_cal_upset(.abundance=RareAbundance, .group=time, action="only") 
+tbl
+p2 <- tbl \%>\%
+      ggplot(aes(x=ggupsetOftime)) +
+      geom_bar() +
+      ggupset::scale_x_upset() +
+      ggupset::theme_combmatrix(combmatrix.label.extra_spacing=30)
+}
+}
+\seealso{
+[mp_plot_upset()]
 }
 \author{
 Shuangbin Xu

@@ -83,6 +83,9 @@ mpse \%>\%
   pull(var=vennOftime, name=time) \%>\%
   ggVennDiagram::ggVennDiagram()
 }
+\seealso{
+[mp_plot_venn()]
+}
 \author{
 Shuangbin Xu
 }

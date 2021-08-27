@@ -11,18 +11,21 @@
 \alias{otutree<-}
 \alias{otutree<-,MPSE,treedata-method}
 \alias{otutree<-,MPSE}
+\alias{otutree<-,MPSE,NULL-method}
 \alias{taxatree}
 \alias{taxatree,MPSE-method}
 \alias{taxatree,MPSE}
 \alias{taxatree<-}
 \alias{taxatree<-,MPSE,treedata-method}
 \alias{taxatree<-,MPSE}
+\alias{taxatree<-,MPSE,NULL-method}
 \alias{refseq}
 \alias{refseq,MPSE-method}
 \alias{refseq,MPSE}
 \alias{refseq<-}
 \alias{refseq<-,MPSE,XStringSet-method}
 \alias{refseq<-,MPSE}
+\alias{refseq<-,MPSE,NULL-method}
 \alias{rownames<-,MPSE-method}
 \alias{rownames<-,MPSE}
 \title{MPSE accessors}
@@ -41,6 +44,8 @@ otutree(x, ...) <- value
 
 \S4method{otutree}{MPSE,treedata}(x, ...) <- value
 
+\S4method{otutree}{MPSE,`NULL`}(x, ...) <- value
+
 taxatree(x, ...)
 
 \S4method{taxatree}{MPSE}(x, ...)
@@ -49,6 +54,8 @@ taxatree(x, ...) <- value
 
 \S4method{taxatree}{MPSE,treedata}(x, ...) <- value
 
+\S4method{taxatree}{MPSE,`NULL`}(x, ...) <- value
+
 refseq(x, ...)
 
 \S4method{refseq}{MPSE}(x, ...)
@@ -56,6 +63,8 @@ refseq(x, ...)
 refseq(x, ...) <- value
 
 \S4method{refseq}{MPSE,XStringSet}(x, ...) <- value
+
+\S4method{refseq}{MPSE,`NULL`}(x, ...) <- value
 
 \S4method{rownames}{MPSE}(x) <- value
 }
@@ -72,7 +81,7 @@ to the 'names' of the object (or for matrices/arrays, the 'dimnames')}
 possible dimension (see the examples).  This only works for extracting 
 elements, not for the replacement.}
 
-\item{value}{XStringSet object}
+\item{value}{XStringSet object or NULL}
 }
 \description{
 MPSE accessors

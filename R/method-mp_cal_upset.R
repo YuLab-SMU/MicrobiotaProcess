@@ -85,20 +85,31 @@ setMethod("get_upset", "phyloseq", function(obj,...){
 #' is not be rarefied, default is FALSE.
 #' @param ... additional parameters.
 #' @return update object or tibble according the 'action'
+#' @seealso [mp_plot_upset()] 
 #' @export
 #' @author Shuangbin Xu
 #' @examples
 #' data(mouse.time.mpse)
-#' mouse.time.mpse %>%
-#' mp_rrarefy() %>%
-#' mp_cal_upset(.abundance=RareAbundance, .group=time, action="only") -> tbl
-#' tbl
+#' mpse <- mouse.time.mpse %>%
+#'         mp_rrarefy() %>%
+#'         mp_cal_upset(.abundance=RareAbundance, .group=time, action="add")
+#' mpse
 #' library(ggplot2)
-#' tbl %>%
-#'   ggplot(aes(x=ggupsetOftime)) +
-#'   geom_bar() +
-#'   ggupset::scale_x_upset() +
-#'   ggupset::theme_combmatrix(combmatrix.label.extra_spacing=30)
+#' library(ggupset)
+#' p <- mpse %>% mp_plot_upset(.group=time, .upset=ggupsetOftime)
+#' p
+#' # or set action="only"
+#' \dontrun{
+#' tbl <- mouse.time.mpse %>% 
+#'        mp_rrarefy() %>% 
+#'        mp_cal_upset(.abundance=RareAbundance, .group=time, action="only") 
+#' tbl
+#' p2 <- tbl %>%
+#'       ggplot(aes(x=ggupsetOftime)) +
+#'       geom_bar() +
+#'       ggupset::scale_x_upset() +
+#'       ggupset::theme_combmatrix(combmatrix.label.extra_spacing=30)
+#'}
 setGeneric("mp_cal_upset", function(.data, .group, .abundance=NULL, action="add", force=FALSE, ...)standardGeneric("mp_cal_upset"))
 
 #' @rdname mp_cal_upset-methods

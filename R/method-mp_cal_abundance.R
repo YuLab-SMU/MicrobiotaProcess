@@ -111,6 +111,7 @@ setMethod("get_taxadf", "data.frame",
 #' is not be rarefied, default is FALSE.
 #' @param ... additional parameters.
 #' @return update object or tibble according the 'action'
+#' @seealso [mp_plot_abundance()]
 #' @author Shuangbin Xu
 #' @export
 #' @examples
@@ -121,6 +122,20 @@ setMethod("get_taxadf", "data.frame",
 #' mouse.time.mpse %<>%
 #'   mp_cal_abundance(.abundance=RareAbundance, action="add") %>% 
 #'   mp_cal_abundance(.abundance=RareAbundance, .group=time, action="add") 
+#' mouse.time.mpse
+#' p1 <- mouse.time.mpse %>% 
+#'       mp_plot_abundance(.abundance=RelRareAbundanceBySample, 
+#'                         .group=time, taxa.class="Phylum", topn=20)
+#' p2 <- mouse.time.mpse %>% 
+#'       mp_plot_abundance(.abundance = RareAbundance, 
+#'                         .group = time, 
+#'                         taxa.class = Phylum, 
+#'                         topn = 20, 
+#'                         relative = FALSE, 
+#'                         force = TRUE)
+#' p1 / p2
+#' # Or you can also extract the result and visulize it with ggplot2 and ggplot2-extension
+#' \dontrun{
 #' tbl <- mouse.time.mpse %>%
 #'        mp_extract_abundance(taxa.class="Class", topn=10)
 #' tbl
@@ -142,7 +157,8 @@ setMethod("get_taxadf", "data.frame",
 #'      scale_fill_brewer(name="Class", type = "qual", palette = "Paired") +
 #'      facet_grid(cols=vars(time), scales="free_x", space="free") +
 #'      theme(axis.text.x=element_text(angle=-45, hjust=0))
-#' p  
+#' p
+#' }
 setGeneric("mp_cal_abundance", 
            function(.data, 
                     .abundance = NULL, 
@@ -259,6 +275,8 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
         extranm <- setdiff(colnames(da1), c(colnames(.data@taxatree@data), colnames(.data@taxatree@extraInfo)))
         da1 %<>% dplyr::select(extranm)
         .data@taxatree %<>% treeio::full_join(da1, by="label")
+    }else{
+        .data %<>% left_join(da1, by=c("OTU"="label"))
     }
     otutree <- .data %>% mp_extract_tree(type="otutree")
     if (!is.null(otutree)){
@@ -377,7 +395,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
 
     assaysvar <- .data %>% attr("assaysvar")
     taxavar <- .data %>% attr("taxavar")
-
+    sampleda <- .data %>% mp_extract_sample()
     if (!is.null(taxavar)){
         taxavar <- c("OTU", taxavar)
     }else{
@@ -392,12 +410,14 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
                                          byID=.group,
                                          relative=relative))
     }else{
+        sampledat <- sampleda[, !vapply(sampleda, function(x)is.list(x)||is.numeric(x), logical(1))]
         da1 <- lapply(taxavar, function(x)
                       .internal_cal_feature_abun(da=.data,
                                          .abundance=.abundance,
                                          feature=x,
                                          byID=as.symbol("Sample"),
-                                         relative=relative))
+                                         relative=relative,
+                                         sampleda = sampledat))
     }
     
     if (rlang::quo_is_null(.group) && relative){
@@ -422,6 +442,8 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     if (!is.null(taxatree)){
         dat1 <- da1 %>% select(setdiff(colnames(da1), c(colnames(taxatree@data), colnames(taxatree@extraInfo))))
         attr(.data, "taxatree") <- taxatree %>% treeio::full_join(dat1, by="label")
+    }else{
+        .data %<>% left_join(dat1, by=c("OTU"="label"))
     }
     
     otutree <- .data %>% attr("otutree")

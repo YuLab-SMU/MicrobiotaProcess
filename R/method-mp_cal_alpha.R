@@ -127,6 +127,7 @@ setMethod("get_alphaindex", "phyloseq", function(obj, ...){
 #' not rarefied, default is FALSE.
 #' @param ... additional arguments
 #' @return update object or other (refer to action)
+#' @seealso [mp_plot_alpha()]
 #' @export
 #' @author Shuangbin Xu
 #' @examples
@@ -134,6 +135,11 @@ setMethod("get_alphaindex", "phyloseq", function(obj, ...){
 #' mpse <- mouse.time.mpse %>% 
 #'         mp_rrarefy() %>%
 #'         mp_cal_alpha(.abundance=RareAbundance)
+#' mpse
+#' p <- mpse %>% mp_plot_alpha(.group=time, .alpha=c(Observe, Shannon, J))
+#' p
+#' # Or you can extract the result and visualize it with ggplot2 and ggplot2-extensions
+#' \dontrun{
 #' tbl <- mpse %>% 
 #'        mp_extract_sample
 #' tbl
@@ -152,6 +158,7 @@ setMethod("get_alphaindex", "phyloseq", function(obj, ...){
 #'      scale_fill_manual(values=c("#00A087FF", "#3C5488FF")) + 
 #'      scale_color_manual(values=c("#00A087FF", "#3C5488FF"))
 #' p
+#' }
 setGeneric("mp_cal_alpha", function(.data, .abundance=NULL, 
                                     action=c("add", "only", "get"), 
                                     force=FALSE, ...){

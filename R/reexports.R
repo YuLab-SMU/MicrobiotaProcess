@@ -73,3 +73,7 @@ ggtree::td_filter
 #' @importFrom SummarizedExperiment colData<-
 #' @export
 SummarizedExperiment::`colData<-`
+
+#' @importFrom ggplot2 remove_missing
+#' @export
+ggplot2::remove_missing

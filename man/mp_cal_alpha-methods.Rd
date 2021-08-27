@@ -50,6 +50,11 @@ data(mouse.time.mpse)
 mpse <- mouse.time.mpse \%>\% 
         mp_rrarefy() \%>\%
         mp_cal_alpha(.abundance=RareAbundance)
+mpse
+p <- mpse \%>\% mp_plot_alpha(.group=time, .alpha=c(Observe, Shannon, J))
+p
+# Or you can extract the result and visualize it with ggplot2 and ggplot2-extensions
+\dontrun{
 tbl <- mpse \%>\% 
        mp_extract_sample
 tbl
@@ -68,6 +73,10 @@ p <- ggplot(data=tbl, aes(x=time, y=alpha, fill=time)) +
      scale_fill_manual(values=c("#00A087FF", "#3C5488FF")) + 
      scale_color_manual(values=c("#00A087FF", "#3C5488FF"))
 p
+}
+}
+\seealso{
+[mp_plot_alpha()]
 }
 \author{
 Shuangbin Xu

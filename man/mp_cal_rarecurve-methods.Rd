@@ -82,9 +82,13 @@ data(mouse.time.mpse)
 mouse.time.mpse \%>\% 
 mp_rrarefy() -> mpse
 mpse
-# bigger chunks means higher accuracy, but it will become slower.
-mpse \%>\% mp_cal_rarecurve(.abundance=RareAbundance, chunks=100, action="get") -> xx
-xx \%>\% ggrarecurve(factorNames="time")
+# bigger chunks means more robust, but it will become slower.
+mpse \%<>\% mp_cal_rarecurve(.abundance=RareAbundance, chunks=100, action="add")
+mpse
+p1 <- mpse \%>\% mp_plot_rarecurve(.rare=RareAbundanceRarecurve, .alpha="Observe")
+}
+\seealso{
+[mp_plot_rarecurve()]
 }
 \author{
 Shuangbin Xu

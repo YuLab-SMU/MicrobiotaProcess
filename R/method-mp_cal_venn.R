@@ -76,6 +76,7 @@ setMethod("get_vennlist", "data.frame", function(obj,
 #' is not be rarefied, default is FALSE.
 #' @param ... additional parameters.
 #' @return update object or tibble according the 'action'
+#' @seealso [mp_plot_venn()] 
 #' @export
 #' @author Shuangbin Xu
 #' @examples

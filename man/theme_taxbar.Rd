@@ -5,7 +5,7 @@
 \title{theme_taxbar}
 \usage{
 theme_taxbar(
-  axis.text.x = element_text(angle = -45, hjust = 0, size = 12),
+  axis.text.x = element_text(angle = -45, hjust = 0, size = 8),
   legend.position = "bottom",
   legend.box = "horizontal",
   legend.text = element_text(size = 8),
