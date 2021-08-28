@@ -11,6 +11,7 @@
 ##' @param ... additional parameters, see also \code{\link[vegan]{decostand}}
 ##' @return update object
 ##' @author Shuangbin Xu
+##' @seealso [mp_extract_assays()] and [mp_rrarefy()]
 ##' @export
 ##' @examples
 ##' data(mouse.time.mpse)

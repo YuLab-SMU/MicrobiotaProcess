@@ -283,7 +283,7 @@ setGeneric("mp_plot_alpha",
                                  position=ggplot2::position_nudge(x=.22), 
                                  width=0.2) +
            gghalves::geom_half_point(side="r", shape=21) +
-           ggsignif::geom_signif(comparisons=comparisons, test=test, ...) +
+           ggsignif::geom_signif(comparisons=comparisons, test=test, step_increase=step_increase, ...) +
            ggplot2::facet_wrap(facets=ggplot2::vars(!!rlang::sym("Measure")), scales="free_y", nrow=1) +
            ggplot2::scale_fill_manual(values=get_cols(tbl %>% pull(!!.group) %>% unique() %>% length())) +
            ggplot2::scale_color_manual(values=get_cols(tbl %>% pull(!!.group) %>% unique() %>% length()))
@@ -460,14 +460,7 @@ setGeneric("mp_plot_rarecurve", function(.data,
     .group <- rlang::enquo(.group)
     params <- list(...)
 
-    newlevels <- rlang::quo_text(.alpha) %>%
-                 gsub("c\\(", "", .) %>%
-                 gsub("\\)", "", .) %>%
-                 base::strsplit(",") %>%
-                 unlist() %>%
-                 gsub("\\s+", "",.) %>%
-                 gsub("\"", "", .) %>%
-                 gsub("\'", "", .)
+    newlevels <- quo.vect_to_str.vect(.alpha)
 
     tbl <- .data %>% 
            mp_extract_sample() %>%
@@ -532,3 +525,194 @@ setMethod("mp_plot_rarecurve", signature(.data="tbl_mpse"), .internal_plot_rarec
 #' @aliases mp_plot_rarecurve,grouped_tbl_mpse
 #' @export mp_plot_rarecurve
 setMethod("mp_plot_rarecurve", signature(.data="grouped_df_mpse"), .internal_plot_rarecurve)
+
+#' Plotting the distance between the samples with heatmap or boxplot.
+#' @rdname mp_plot_dist-methods
+#' @param .data the MPSE or tbl_mpse object after [mp_cal_dist()] is performed with action="add"
+#' @param .distmethod the column names of distance of samples, it will generate after
+#' [mp_cal_dist()] is performed.
+#' @param .group the column names of group, default is NULL, when it is not provided 
+#' the heatmap of distance between samples will be returned. If it is provided and
+#' \code{group.test} is TURE, the comparisons boxplot of distance between the group
+#' will be returned, but when \code{group.test} is FALSE, the heatmap of distance between
+#' samples with group information will be returned.
+#' @param group.test logical default is FALSE, see the \code{.group} argument.
+#' @param hclustmethod character the method of \code{\link[stats]{hclust}}, default is
+#' 'average' (= UPGMA).
+#' @param test the name of the statistical test, default is 'wilcox.test'
+#' @param comparisons A list of length-2 vectors. The entries in the vector are
+#' either the names of 2 values on the x-axis or the 2 integers that
+#' correspond to the index of the columns of interest, default is NULL, meaning
+#' it will be calculated automatically with the names in the .group.
+#' @param step_increase numeric vector with the increase in fraction of total
+#' height for every additional comparison to minimize overlap, default is 0.1.
+#' @param ... additional parameters, see also \code{\link[ggsignif]{geom_signif}}
+#' @seealso [mp_cal_dist()] and [mp_extract_dist()]
+#' @author Shuangbin Xu
+#' @export
+#' @examples
+#' \dontrun{
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %<>% mp_decostand(.abundance=Abundance)
+#' mouse.time.mpse
+#' mouse.time.mpse %<>% 
+#'   mp_cal_dist(.abundance=hellinger, distmethod="bray")
+#' mouse.time.mpse
+#' p1 <- mouse.time.mpse %>% 
+#'         mp_plot_dist(.distmethod=bray)
+#' p2 <- mouse.time.mpse %>% 
+#'         mp_plot_dist(.distmethod=bray, .group=time, group.test=TRUE)
+#' p3 <- mouse.time.mpse %>% 
+#'         mp_plot_dist(.distmethod=bray, .group=time)
+#' }
+setGeneric("mp_plot_dist", 
+  function(.data, 
+           .distmethod, 
+           .group = NULL, 
+           group.test = FALSE,
+           hclustmethod = "average",
+           test = "wilcox.test",
+           comparisons = NULL,
+           step_increase = 0.1,
+           ...
+  ) 
+  standardGeneric("mp_plot_dist")
+)
+
+.internal_plot_dist <- function(
+  .data, 
+  .distmethod,
+  .group = NULL,
+  group.test = FALSE, 
+  hclustmethod = "average",
+  test = "wilcox.test",
+  comparisons = NULL,
+  step_increase = 0.1,
+  ...
+){
+  .distmethod <- rlang::enquo(.distmethod)
+  .group <- rlang::enquo(.group)
+  params <- list(...)
+
+  if (!rlang::quo_is_null(.group) && group.test){
+     tbl <- .data %>%
+            mp_extract_dist(distmethod=rlang::as_name(.distmethod), .group=!!.group)  
+     if (is.null(comparisons)){
+         comparisons <- tbl %>%
+                        pull("GroupsComparison") %>%
+                        unique() %>%
+                        utils::combn(2) %>%
+                        apply(2, list) %>%
+                        unlist(recursive = FALSE)
+     }
+     mapps <- aes_string(x="GroupsComparison", y=rlang::as_name(.distmethod), color="GroupsComparison") 
+  }else{
+     dist.mat <- .data %>%
+                 mp_extract_dist(distmethod=rlang::as_name(.distmethod))
+     
+     sample.hclust <- hclust(dist.mat, method=hclustmethod)
+
+     tbl <- dist.mat %>% as.matrix() %>%
+            tibble::as_tibble(rownames="Sample") %>%
+            tidyr::pivot_longer(cols=-"Sample", 
+                                names_to="col.samples", 
+                                values_to=rlang::as_name(.distmethod))
+
+     mapps <- aes_string(x="Sample", 
+                         y="col.samples", 
+                         color=rlang::as_name(.distmethod), 
+                         size=rlang::as_name(.distmethod))
+
+     if (!rlang::quo_is_null(.group)){
+         sampleda <- .data %>% 
+                     mp_extract_sample() %>% 
+                     dplyr::select(!!rlang::sym("Sample"), !!.group)
+         gp <- quo.vect_to_str.vect(.group) %>% unique()
+         tbl %<>% dplyr::left_join(sampleda, by="Sample", suffix = c("", ".y"))
+         for (i in seq_len(length(gp))){
+             gh.layers <- list(ggplot2::geom_tile(data=sampleda, 
+                                        mapping=aes(x=!!rlang::sym("Sample"), fill=!!rlang::sym(gp[i]), y=gp[i])))
+             if (i < length(gp)){
+                 gh.layers<- list(gh.layers, new_scale("fill"))
+             }
+         }
+     }
+     
+  }
+
+  p <- ggplot(data=tbl, mapping=mapps)
+  xylabs <- labs(x=NULL, y=NULL)
+
+  if (!rlang::quo_is_null(.group) && group.test){
+      if ("color" %in% names(params)){
+          color <- params$color
+      }else if( "colour" %in% names(params)){
+          color <- params$colour
+      }else{
+          color <- "black"
+      }
+      p <- p + labs(y=NULL) + 
+           ggplot2::geom_boxplot() +
+           ggsignif::geom_signif(comparisons=comparisons, test=test, step_increase=step_increase, color=color, ...) +
+           ggplot2::geom_jitter(position=ggplot2::position_jitter(width=0.1, seed=123)) +
+           theme_taxbar(legend.position="none")
+  }else{
+
+      p <- p + ggplot2::geom_point() + xylabs +
+           ggplot2::scale_color_viridis_c() +
+           ggplot2::scale_y_discrete(position="right") + 
+           theme(axis.text = element_text(size=8),
+                 axis.text.x=element_text(angle=-45, hjust = 0),
+           )
+
+      if (!rlang::quo_is_null(.group)){
+          f <- ggplot() + gh.layers + xylabs
+          f.left <- f + 
+                    ggplot2::coord_flip() + 
+                    theme(axis.text=element_blank(), axis.ticks=element_blank())
+
+          f.top <- f + 
+                   ggplot2::scale_y_discrete(position="right") + 
+                   theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
+          p %<>% insert_top(f.top, height=0.06)
+          p %<>% insert_left(f.left, width=0.06)
+      }
+
+      p2 <- ggtree(sample.hclust, branch.length="none")
+      p <- p %>% insert_left(p2, width=0.12)
+      p <- p %>% insert_top(p2 + ggtree::layout_dendrogram(), height=0.12)
+  }
+  return(p)
+}
+
+#' @rdname mp_plot_dist-methods
+#' @aliases mp_plot_dist,MPSE
+#' @export mp_plot_dist
+setMethod("mp_plot_dist", signature(.data="MPSE"), .internal_plot_dist)
+
+#' @rdname mp_plot_dist-methods
+#' @aliases mp_plot_dist,tbl_mpse
+#' @export mp_plot_dist
+setMethod("mp_plot_dist", signature(.data="tbl_mpse"), .internal_plot_dist)
+
+#' @rdname mp_plot_dist-methods
+#' @aliases mp_plot_dist,grouped_df_mpse
+#' @export mp_plot_dist
+setMethod("mp_plot_dist", signature(.data="grouped_df_mpse"), .internal_plot_dist)
+
+quo.vect_to_str.vect <- function(quoexpr){
+   strvect <- rlang::quo_text(quoexpr) %>%
+                 gsub("c\\(", "", .) %>%
+                 gsub("\\)", "", .) %>%
+                 base::strsplit(",") %>%
+                 unlist() %>%
+                 gsub("\\s+", "",.) %>%
+                 gsub("\"", "", .) %>%
+                 gsub("\'", "", .)
+   return(strvect)
+}
+
+new_scale <- getFromNamespace("new_scale", "ggnewscale")
+insert_top <- getFromNamespace("insert_top", "aplot")
+insert_left <- getFromNamespace("insert_left", "aplot")

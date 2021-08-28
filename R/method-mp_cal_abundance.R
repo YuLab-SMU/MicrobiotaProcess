@@ -111,7 +111,7 @@ setMethod("get_taxadf", "data.frame",
 #' is not be rarefied, default is FALSE.
 #' @param ... additional parameters.
 #' @return update object or tibble according the 'action'
-#' @seealso [mp_plot_abundance()]
+#' @seealso [mp_plot_abundance()] and [mp_extract_abundance()]
 #' @author Shuangbin Xu
 #' @export
 #' @examples

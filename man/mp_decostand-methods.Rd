@@ -51,6 +51,8 @@ mouse.time.mpse \%>\%
 mp_decostand(.abundance=Abundance, method="hellinger")
 }
 \seealso{
+[mp_extract_assays()] and [mp_rrarefy()]
+
 \link[vegan]{decostand}
 }
 \author{

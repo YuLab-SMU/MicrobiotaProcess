@@ -12,6 +12,7 @@
 ##' default is 123. 
 ##' @param ... additional parameters, meaningless now.
 ##' @return update object
+##' @seealso [mp_extract_assays()] and [mp_decostand()]
 ##' @export
 ##' @author Shuangbin Xu
 ##' @examples

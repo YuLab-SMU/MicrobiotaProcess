@@ -97,7 +97,16 @@ data(mouse.time.mpse)
 mouse.time.mpse \%<>\%
     mp_decostand(.abundance=Abundance) \%>\% 
     mp_cal_dist(.abundance=hellinger, distmethod="bray")
-# Visualization
+mouse.time.mpse
+p1 <- mouse.time.mpse \%>\%
+        mp_plot_dist(.distmethod=bray)
+p2 <- mouse.time.mpse \%>\%
+        mp_plot_dist(.distmethod=bray, .group=time, group.test=TRUE)
+p3 <- mouse.time.mpse \%>\%
+        mp_plot_dist(.distmethod=bray, .group=time)
+
+\dontrun{
+# Visualization manual
 library(ggplot2)
 tbl <- mouse.time.mpse \%>\%
        mp_extract_dist(distmethod="bray", .group=time)
@@ -108,6 +117,10 @@ tbl \%>\%
   geom_jitter(width=0.1) + 
   xlab(NULL) + 
   theme(legend.position="none")
+}
+}
+\seealso{
+[mp_extract_dist()] and [mp_plot_dist()]
 }
 \author{
 Shuangbin Xu

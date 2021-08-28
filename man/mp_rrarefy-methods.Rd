@@ -73,6 +73,9 @@ mp_rrarefy method
 data(mouse.time.mpse)
 mouse.time.mpse \%>\% mp_rrarefy()
 }
+\seealso{
+[mp_extract_assays()] and [mp_decostand()]
+}
 \author{
 Shuangbin Xu
 }

@@ -68,7 +68,7 @@ setMethod("get_rarecurve", "phyloseq", function(obj, ...){
 #' '.abundance' is not be rarefied, default is FALSE
 #' @param ... additional parameters.
 #' @return update rarecurce calss
-#' @seealso [mp_plot_rarecurve()]
+#' @seealso [mp_plot_rarecurve()] and [mp_extract_rarecurve()]
 #' @author Shuangbin Xu
 #' @export
 #' @examples
@@ -76,10 +76,13 @@ setMethod("get_rarecurve", "phyloseq", function(obj, ...){
 #' mouse.time.mpse %>% 
 #' mp_rrarefy() -> mpse
 #' mpse
-#' # bigger chunks means more robust, but it will become slower.
+#' # larger 'chunks' means more robust, but it will become slower.
 #' mpse %<>% mp_cal_rarecurve(.abundance=RareAbundance, chunks=100, action="add")
 #' mpse
-#' p1 <- mpse %>% mp_plot_rarecurve(.rare=RareAbundanceRarecurve, .alpha="Observe")
+#' p1 <- mpse %>% 
+#'       mp_plot_rarecurve(.rare=RareAbundanceRarecurve, .alpha="Observe")
+#' p2 <- mpse %>%
+#'       mp_plot_rarecurve(.rare=RareAbundanceRarecurve, .alpha=c("Observe", "ACE"))
 setGeneric("mp_cal_rarecurve", function(.data, .abundance=NULL, action="add", chunks=400, seed=123, force=FALSE, ...)standardGeneric("mp_cal_rarecurve"))
 
 #' @rdname mp_cal_rarecurve-methods

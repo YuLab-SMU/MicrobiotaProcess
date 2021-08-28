@@ -104,6 +104,7 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #'     when the \code{weighted}=\code{TRUE}.
 #'   \item \code{parallel} logical, whether to execute the calculation in parallel, default is FALSE.
 #' }
+#' @seealso [mp_extract_dist()] and [mp_plot_dist()]
 #' @return update object or tibble according the 'action'
 #' @author Shuangbin Xu
 #' @export
@@ -112,7 +113,16 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #' mouse.time.mpse %<>%
 #'     mp_decostand(.abundance=Abundance) %>% 
 #'     mp_cal_dist(.abundance=hellinger, distmethod="bray")
-#' # Visualization
+#' mouse.time.mpse
+#' p1 <- mouse.time.mpse %>%
+#'         mp_plot_dist(.distmethod=bray)
+#' p2 <- mouse.time.mpse %>%
+#'         mp_plot_dist(.distmethod=bray, .group=time, group.test=TRUE)
+#' p3 <- mouse.time.mpse %>%
+#'         mp_plot_dist(.distmethod=bray, .group=time)
+#' 
+#' \dontrun{
+#' # Visualization manual
 #' library(ggplot2)
 #' tbl <- mouse.time.mpse %>%
 #'        mp_extract_dist(distmethod="bray", .group=time)
@@ -123,6 +133,7 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #'   geom_jitter(width=0.1) + 
 #'   xlab(NULL) + 
 #'   theme(legend.position="none")
+#' }
 setGeneric("mp_cal_dist", function(.data, .abundance, .env=NULL, distmethod="bray", action="add", scale=FALSE, ...)standardGeneric("mp_cal_dist"))
 
 #' @rdname mp_cal_dist-methods

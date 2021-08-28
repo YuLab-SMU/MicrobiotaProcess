@@ -123,7 +123,7 @@ p
 }
 }
 \seealso{
-[mp_plot_abundance()]
+[mp_plot_abundance()] and [mp_extract_abundance()]
 }
 \author{
 Shuangbin Xu
