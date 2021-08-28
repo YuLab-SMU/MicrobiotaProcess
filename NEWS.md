@@ -1,5 +1,9 @@
-# MicrobiotaProcess 1.5.4.990
+# MicrobiotaProcess 1.5.4.991
 
++ add `mp_plot_dist` for `MPSE` or `tbl_mpse` object after `mp_cal_dist` is performed with `action="add"`. (2021-08-28, Sat)
++ add `mp_plot_abundance`, `mp_plot_alpha`, `mp_plot_rarecurve`, `mp_plot_venn`, `mp_plot_upset` for `MPSE` after 
+  the corresponding `mp_cal_abundance`, `mp_cal_alpha`, `mp_cal_rarecurve`, `mp_cal_venn`, `mp_cal_upset`
+  are performed with `action="add"`. (2021-08-27, Fri)
 + fix the issue when the `rowname` or `colnames` of `SummarizedExperiment` is NULL for `as.MPSE`. (2021-08-26, Thu)
 
 # MicrobiotaProcess 1.5.4
