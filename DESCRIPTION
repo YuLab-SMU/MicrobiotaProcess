@@ -39,11 +39,11 @@ Imports:
   ggstar,
   tidyselect,
   SummarizedExperiment,
-  foreach
+  foreach,
+  treeio (>= 1.17.2)
 Suggests:
   rmarkdown,
   prettydoc,
-  treeio (>= 1.17.2),
   testthat,
   knitr,
   nlme,

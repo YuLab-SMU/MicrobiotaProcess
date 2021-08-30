@@ -677,6 +677,7 @@ setMethod("mp_extract_dist", signature(x="grouped_df_mpse"), .internal_extract_d
     }
 }
 
+#' @importFrom treeio drop.tip
 .extract_tree_at_tiplevel <- function(tree, tip.level){
     if (tip.level=="OTU"){
         return(tree)
@@ -690,7 +691,7 @@ setMethod("mp_extract_dist", signature(x="grouped_df_mpse"), .internal_extract_d
              pull(.data$label) 
     if (length(rmnms) > 0){
         for ( i in rmnms){
-            tree <- treeio::drop.tip(tree, tip=i, collapse.singles=FALSE, trim.internal=FALSE)
+            tree <- drop.tip(tree, tip=i, collapse.singles=FALSE, trim.internal=FALSE)
         }
     }
     return(tree)

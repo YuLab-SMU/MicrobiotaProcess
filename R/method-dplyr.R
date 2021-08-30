@@ -16,7 +16,7 @@ filter.alphasample <- function(.data, ..., .preserve = FALSE){
 
 ##' @method filter MPSE
 ##' @export
-filter.MPSE <- function(.data, ..., .preserve = FALSE, keep.mpse = FALSE){
+filter.MPSE <- function(.data, ..., .preserve = FALSE, keep.mpse = TRUE){
     .data %<>% as_tibble()
     dots <- quos(...)
     res <- .data %>% filter(!!!dots, .preserve = .preserve)
@@ -267,7 +267,7 @@ distinct.grouped_df_mpse <- function(.data, ..., .keep_all = FALSE){
 
 ##' @method rename MPSE
 ##' @export
-rename.MPSE <- function(.data, ..., keep.mpse = FALSE){
+rename.MPSE <- function(.data, ..., keep.mpse = TRUE){
     .data %<>% as_tibble()
     cols <- tidyselect::eval_select(expr(c(...)), .data)
     .data <- check_attr.tbl_mpse(x=.data, recol=cols)

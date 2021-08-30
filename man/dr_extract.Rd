@@ -19,6 +19,7 @@ tbl_df object
 Extracting the internal tbl_df attribute of tibble.
 }
 \examples{
+\dontrun{
 library(vegan)
 data(varespec, varechem)
 mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
@@ -34,6 +35,7 @@ dr_extract(name=NMDS_ENVFIT_tb)(tbl)
 # add .f function 
 dr_extract(name=NMDS_ENVFIT_tb, 
            .f=td_filter(pvals<=0.05 & label!="Humdepth"))(tbl)
+}
 }
 \author{
 Shuangbin Xu
