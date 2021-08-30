@@ -12,7 +12,7 @@
 #' @param factorLevels list, the levels of the factors, default is NULL,
 #' if you want to order the levels of factor, you can set this.
 #' @param indexNames character, default is "Observe",
-#' only for "Observe", "Chao1", "ACE", "Shannon", "Simpson", "J".
+#' only for "Observe", "Chao1", "ACE".
 #' @param se logical, default is FALSE.
 #' @param method character, default is lm. 
 #' @param formula formula, default is `y ~ log(x)`

@@ -10,13 +10,13 @@
 \alias{mp_cal_cca,grouped_df_mpse}
 \title{[Partial] [Constrained] Correspondence Analysis with MPSE or tbl_mpse object}
 \usage{
-mp_cal_cca(.data, .abundance, .formula = NULL, .dim = 3, action = "only", ...)
+mp_cal_cca(.data, .abundance, .formula = NULL, .dim = 3, action = "add", ...)
 
-\S4method{mp_cal_cca}{MPSE}(.data, .abundance, .formula = NULL, .dim = 3, action = "only", ...)
+\S4method{mp_cal_cca}{MPSE}(.data, .abundance, .formula = NULL, .dim = 3, action = "add", ...)
 
-\S4method{mp_cal_cca}{tbl_mpse}(.data, .abundance, .formula = NULL, .dim = 3, action = "only", ...)
+\S4method{mp_cal_cca}{tbl_mpse}(.data, .abundance, .formula = NULL, .dim = 3, action = "add", ...)
 
-\S4method{mp_cal_cca}{grouped_df_mpse}(.data, .abundance, .formula = NULL, .dim = 3, action = "only", ...)
+\S4method{mp_cal_cca}{grouped_df_mpse}(.data, .abundance, .formula = NULL, .dim = 3, action = "add", ...)
 }
 \arguments{
 \item{.data}{MPSE or tbl_mpse object}
@@ -47,10 +47,12 @@ library(vegan)
 data(varespec, varechem)
 mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
 mpse
-mpse \%>\% 
+mpse \%<>\% 
     mp_cal_cca(.abundance=Abundance, 
                .formula=~Al + P*(K + Baresoil), 
                action="add")
+mpse
+mpse \%>\% mp_plot_ord(.ord=CCA, .group=Al, .size=K, show.sample=TRUE)
 }
 \author{
 Shuangbin Xu

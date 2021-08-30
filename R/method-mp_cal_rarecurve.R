@@ -112,7 +112,8 @@ setMethod("mp_cal_rarecurve", signature(.data="MPSE"), function(.data, .abundanc
         return (.data)
     }
 
-    da <- SummarizedExperiment::assays(.data)@listData[[rlang::as_name(.abundance)]] %>% as.data.frame(check.names=FALSE)
+    #da <- SummarizedExperiment::assays(.data)@listData[[rlang::as_name(.abundance)]] %>% as.data.frame(check.names=FALSE)
+    da <- .data %>% mp_extract_assays(.abundance=!!.abundance)
     
     sampleda <- .data %>%
                 mp_extract_sample()

@@ -42,7 +42,7 @@ if you want to order the levels of factor, you can set this.}
 \item{sampleda}{data.frame, (nrow sample * ncol factor)}
 
 \item{indexNames}{character, default is "Observe",
-only for "Observe", "Chao1", "ACE", "Shannon", "Simpson", "J".}
+only for "Observe", "Chao1", "ACE".}
 
 \item{linesize}{integer, default is 0.5.}
 

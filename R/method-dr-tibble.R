@@ -19,7 +19,7 @@ tidydr.prcomp <- function(x, display="sites", digits=2, ...){
     vars <- x$sdev^2 
     vars <- (100 * vars/sum(vars)) %>%
              round(digits=digits) %>%
-             paste0("(%)")
+             paste0("(", ., "%)")
     
     if (inherits(x, "prcomp")){
         sites <- "x"
@@ -61,7 +61,7 @@ tidydr.princomp <- tidydr.prcomp
 tidydr.pcoa <- function(x, digits=2, ...){
     vars <- (100 * x$values$Relative_eig[seq_len(ncol(x$vectors))]) %>% 
              round(digits=digits) %>% 
-             paste0("(%)")
+             paste0("(", ., "%)")
 
     da <- x$vectors %>%
           as.data.frame() %>%
@@ -128,7 +128,7 @@ tidydr.cca <- function(x, display=c("sp", "wa", "lc", "bp", "cn"), digits=2, ...
             as.numeric() * 100
     vars %<>% 
         round(digits=digits) %>% 
-        paste0("(%)")
+        paste0("(", ., "%)")
 
     if (length(display)<=1){
         display <- "sp"
@@ -173,6 +173,7 @@ tidydr.rda <- tidydr.cca
 #' @return tbl_df object
 #' @author Shuangbin Xu
 #' @examples
+#' \dontrun{
 #' library(vegan)
 #' data(varespec, varechem)
 #' mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
@@ -188,6 +189,7 @@ tidydr.rda <- tidydr.cca
 #' # add .f function 
 #' dr_extract(name=NMDS_ENVFIT_tb, 
 #'            .f=td_filter(pvals<=0.05 & label!="Humdepth"))(tbl)
+#' }
 dr_extract <- function(name, .f=NULL){
     function(.data){
         name <- rlang::enquo(name)

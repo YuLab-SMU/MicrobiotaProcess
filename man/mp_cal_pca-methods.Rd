@@ -10,13 +10,13 @@
 \alias{mp_cal_pca,grouped_df_mpse}
 \title{Principal Components Analysis with MPSE or tbl_mpse object}
 \usage{
-mp_cal_pca(.data, .abundance, .dim = 3, action = "only", ...)
+mp_cal_pca(.data, .abundance, .dim = 3, action = "add", ...)
 
-\S4method{mp_cal_pca}{MPSE}(.data, .abundance, .dim = 3, action = "only", ...)
+\S4method{mp_cal_pca}{MPSE}(.data, .abundance, .dim = 3, action = "add", ...)
 
-\S4method{mp_cal_pca}{tbl_mpse}(.data, .abundance, .dim = 3, action = "only", ...)
+\S4method{mp_cal_pca}{tbl_mpse}(.data, .abundance, .dim = 3, action = "add", ...)
 
-\S4method{mp_cal_pca}{grouped_df_mpse}(.data, .abundance, .dim = 3, action = "only", ...)
+\S4method{mp_cal_pca}{grouped_df_mpse}(.data, .abundance, .dim = 3, action = "add", ...)
 }
 \arguments{
 \item{.data}{MPSE or tbl_mpse object}
@@ -42,6 +42,13 @@ library(ggplot2)
 mpse <- mouse.time.mpse \%>\% 
           mp_decostand(.abundance=Abundance) \%>\% 
           mp_cal_pca(.abundance=hellinger, action="add")
+mpse
+p1 <- mpse \%>\% mp_plot_ord(.ord=pca, .group=time, ellipse=TRUE)
+p2 <- mpse \%>\% mp_plot_ord(.ord=pca, .group=time, .color=time, ellipse=TRUE)
+p1 + scale_fill_manual(values=c("#00AED7", "#009E73"))
+p2 + scale_fill_manual(values=c("#00AED7", "#009E73")) +
+     scale_color_manual(values=c("#00AED7", "#009E73"))
+\dontrun{
 # action = "only" to extract the non-redundant tibble to visualize
 tbl <- mouse.time.mpse \%>\%
           mp_decostand(.abundance=Abundance) \%>\%
@@ -51,6 +58,7 @@ x <- names(tbl)[grepl("PC1 ", names(tbl))] \%>\% as.symbol()
 y <- names(tbl)[grepl("PC2 ", names(tbl))] \%>\% as.symbol()
 ggplot(tbl) + 
  geom_point(aes(x=!!x, y=!!y, color=time))
+}
 }
 \author{
 Shuangbin Xu

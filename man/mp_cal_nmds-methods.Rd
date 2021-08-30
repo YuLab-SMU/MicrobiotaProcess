@@ -75,6 +75,20 @@ Nonmetric Multidimensional Scaling Analysis with MPSE or tbl_mpse object
 }
 \examples{
 data(mouse.time.mpse)
+mpse <- mouse.time.mpse \%>\%
+        mp_decostand(.abundance=Abundance) \%>\%
+        mp_cal_nmds(.abundance=hellinger, distmethod="bray", action="add")
+library(ggplot2)
+p <- mpse \%>\% mp_plot_ord(.ord=nmds, 
+                          .group=time, 
+                          .color=time, 
+                          .alpha=0.8, 
+                          ellipse=TRUE, 
+                          show.sample=TRUE)
+p <- p +
+     scale_fill_manual(values=c("#00AED7", "#009E73")) + 
+     scale_color_manual(values=c("#00AED7", "#009E73"))
+\dontrun{
 mouse.time.mpse \%>\%
   mp_decostand(.abundance=Abundance) \%>\%
   mp_cal_nmds(.abundance=hellinger, distmethod="bray", .dim=2, action="only") -> tbl
@@ -89,6 +103,7 @@ tbl \%>\%
  geom_hline(yintercept=0, color="grey20", linetype=2) +
  theme_bw() +
  theme(panel.grid=element_blank())
+}
 }
 \author{
 Shuangbin Xu

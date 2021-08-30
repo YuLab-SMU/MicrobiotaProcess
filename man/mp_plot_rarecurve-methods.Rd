@@ -13,7 +13,7 @@
 mp_plot_rarecurve(
   .data,
   .rare,
-  .alpha,
+  .alpha = c("Observe", "Chao1", "ACE"),
   .group = NULL,
   nrow = 1,
   plot.group = FALSE,
@@ -23,7 +23,7 @@ mp_plot_rarecurve(
 \S4method{mp_plot_rarecurve}{MPSE}(
   .data,
   .rare,
-  .alpha = "Observe",
+  .alpha = c("Observe", "Chao1", "ACE"),
   .group = NULL,
   nrow = 1,
   plot.group = FALSE,
@@ -33,7 +33,7 @@ mp_plot_rarecurve(
 \S4method{mp_plot_rarecurve}{tbl_mpse}(
   .data,
   .rare,
-  .alpha = "Observe",
+  .alpha = c("Observe", "Chao1", "ACE"),
   .group = NULL,
   nrow = 1,
   plot.group = FALSE,
@@ -43,7 +43,7 @@ mp_plot_rarecurve(
 \S4method{mp_plot_rarecurve}{grouped_df_mpse}(
   .data,
   .rare,
-  .alpha = "Observe",
+  .alpha = c("Observe", "Chao1", "ACE"),
   .group = NULL,
   nrow = 1,
   plot.group = FALSE,
@@ -55,8 +55,8 @@ mp_plot_rarecurve(
 
 \item{.rare}{the column names of}
 
-\item{.alpha}{the names of alpha index, which should be one or more of Observe, Shannon, 
-ACE, Chao1, Simpson, J, default is Observe.}
+\item{.alpha}{the names of alpha index, which should be one or more of Observe, 
+ACE, Chao1, default is Observe.}
 
 \item{.group}{the column names of group, default is NULL, when it is provided, the
 rarecurve lines will group and color with the \code{group}.}

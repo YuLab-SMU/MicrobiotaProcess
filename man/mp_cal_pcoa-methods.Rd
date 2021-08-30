@@ -15,7 +15,7 @@ mp_cal_pcoa(
   .abundance,
   distmethod = "bray",
   .dim = 3,
-  action = "only",
+  action = "add",
   ...
 )
 
@@ -24,7 +24,7 @@ mp_cal_pcoa(
   .abundance,
   distmethod = "bray",
   .dim = 3,
-  action = "only",
+  action = "add",
   ...
 )
 
@@ -33,7 +33,7 @@ mp_cal_pcoa(
   .abundance,
   distmethod = "bray",
   .dim = 3,
-  action = "only",
+  action = "add",
   ...
 )
 
@@ -42,7 +42,7 @@ mp_cal_pcoa(
   .abundance,
   distmethod = "bray",
   .dim = 3,
-  action = "only",
+  action = "add",
   ...
 )
 }
@@ -69,6 +69,17 @@ Principal Coordinate Analysis with MPSE or tbl_mpse object
 }
 \examples{
 data(mouse.time.mpse)
+mpse <- mouse.time.mpse \%>\% 
+        mp_decostand(.abundance=Abundance)
+mpse
+mpse \%<>\% mp_cal_pcoa(.abundance=hellinger, stmethod="bray", action="add")
+library(ggplot2)
+p <- mpse \%>\% mp_plot_ord(.ord=pcoa, .group=time, .color=time, ellipse=TRUE)
+p <- p + 
+     scale_fill_manual(values=c("#00AED7", "#009E73")) + 
+     scale_color_manual(values=c("#00AED7", "#009E73"))  
+\dontrun{
+# Or run with action='only' and return tbl_df to visualize manual.
 mouse.time.mpse \%>\% 
   mp_decostand(.abundance=Abundance) \%>\% 
   mp_cal_pcoa(.abundance=hellinger, distmethod="bray", .dim=2, action="only") -> tbl
@@ -84,6 +95,7 @@ tbl \%>\%
  geom_hline(yintercept=0, color="grey20", linetype=2) +
  theme_bw() +
  theme(panel.grid=element_blank())
+}
 }
 \author{
 Shuangbin Xu

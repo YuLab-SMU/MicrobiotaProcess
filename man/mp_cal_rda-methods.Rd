@@ -10,13 +10,13 @@
 \alias{mp_cal_rda,grouped_df_mpse}
 \title{[Partial] [Constrained] Redundancy Analysis with MPSE or tbl_mpse object}
 \usage{
-mp_cal_rda(.data, .abundance, .formula = NULL, .dim = 3, action = "only", ...)
+mp_cal_rda(.data, .abundance, .formula = NULL, .dim = 3, action = "add", ...)
 
-\S4method{mp_cal_rda}{MPSE}(.data, .abundance, .formula = NULL, .dim = 3, action = "only", ...)
+\S4method{mp_cal_rda}{MPSE}(.data, .abundance, .formula = NULL, .dim = 3, action = "add", ...)
 
-\S4method{mp_cal_rda}{tbl_mpse}(.data, .abundance, .formula = NULL, .dim = 3, action = "only", ...)
+\S4method{mp_cal_rda}{tbl_mpse}(.data, .abundance, .formula = NULL, .dim = 3, action = "add", ...)
 
-\S4method{mp_cal_rda}{grouped_df_mpse}(.data, .abundance, .formula = NULL, .dim = 3, action = "only", ...)
+\S4method{mp_cal_rda}{grouped_df_mpse}(.data, .abundance, .formula = NULL, .dim = 3, action = "add", ...)
 }
 \arguments{
 \item{.data}{MPSE or tbl_mpse object}
@@ -51,7 +51,8 @@ mpse \%>\%
   mp_cal_rda(.abundance=Abundance, 
              .formula=~Al + P*(K + Baresoil),
              .dim = 3,
-             action="only")
+             action="add") \%>\%
+  mp_plot_ord(show.sample=TRUE)
 }
 \author{
 Shuangbin Xu

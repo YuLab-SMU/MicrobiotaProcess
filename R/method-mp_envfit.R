@@ -18,8 +18,16 @@
 #' data(varespec, varechem)
 #' mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
 #' envformula <- paste("~", paste(colnames(varechem), collapse="+")) %>% as.formula
-#' tbl <- mpse %>% 
-#'        mp_cal_cca(.abundance=Abundance, .formula=envformula, action="add") %>%
+#' mpse %<>% 
+#'        mp_cal_cca(.abundance=Abundance, .formula=envformula, action="add")
+#' mpse2 <- mpse %>%
+#'          mp_envfit(.ord=cca, 
+#'                    .env=colnames(varechem), 
+#'                    permutations=9999, 
+#'                    action="add")
+#' mpse2 %>% mp_plot_ord(.ord=cca, .group=Al, .size=Mn, show.shample=TRUE, show.envfit=TRUE)
+#' \dontrun{
+#' tbl <- mpse %>%
 #'        mp_envfit(.ord=CCA, 
 #'                  .env=colnames(varechem), 
 #'                  permutations=9999, 
@@ -50,6 +58,7 @@
 #'      theme_bw() +
 #'      theme(panel.grid=element_blank())
 #' p
+#' }
 setGeneric("mp_envfit", function(.data, .ord, .env, .dim=3, action="only", permutations=999, seed=123, ...)standardGeneric("mp_envfit"))
 
 .internal_cal_envfit <- function(.data, .ord, .env, .dim, action="only", permutations=999, seed=123, ...){
@@ -61,9 +70,9 @@ setGeneric("mp_envfit", function(.data, .ord, .env, .dim=3, action="only", permu
     .env <- rlang::enquo(.env)
 
     .ord %<>% match.arg(c("NMDS", "RDA", "CCA", "DCA"))
-
+    
     ordobj <- .data %>% 
-              mp_extract_internal_attr(name=.ord)
+              mp_extract_internal_attr(name=!!rlang::sym(.ord))
 
     if (is.null(ordobj)){
         ordfun <- switch(.ord,
@@ -87,7 +96,7 @@ setGeneric("mp_envfit", function(.data, .ord, .env, .dim=3, action="only", permu
         return(res)
     }else if (action=="only"){
         da.ord <- .data %>% 
-                 mp_extract_internal_attr(.ord) %>% 
+                 mp_extract_internal_attr(name=!!rlang::sym(.ord)) %>% 
                  tidydr()
 
         da <- .data %>% 

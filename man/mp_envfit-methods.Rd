@@ -84,8 +84,16 @@ library(vegan)
 data(varespec, varechem)
 mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
 envformula <- paste("~", paste(colnames(varechem), collapse="+")) \%>\% as.formula
-tbl <- mpse \%>\% 
-       mp_cal_cca(.abundance=Abundance, .formula=envformula, action="add") \%>\%
+mpse \%<>\% 
+       mp_cal_cca(.abundance=Abundance, .formula=envformula, action="add")
+mpse2 <- mpse \%>\%
+         mp_envfit(.ord=cca, 
+                   .env=colnames(varechem), 
+                   permutations=9999, 
+                   action="add")
+mpse2 \%>\% mp_plot_ord(.ord=cca, .group=Al, .size=Mn, show.shample=TRUE, show.envfit=TRUE)
+\dontrun{
+tbl <- mpse \%>\%
        mp_envfit(.ord=CCA, 
                  .env=colnames(varechem), 
                  permutations=9999, 
@@ -116,6 +124,7 @@ p <- tbl \%>\%
      theme_bw() +
      theme(panel.grid=element_blank())
 p
+}
 }
 \author{
 Shuangbin Xu

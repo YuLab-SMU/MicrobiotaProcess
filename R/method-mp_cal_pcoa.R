@@ -167,6 +167,17 @@ get_varct.pcoa <- function(obj,...){
 #' @author Shuangbin Xu
 #' @examples
 #' data(mouse.time.mpse)
+#' mpse <- mouse.time.mpse %>% 
+#'         mp_decostand(.abundance=Abundance)
+#' mpse
+#' mpse %<>% mp_cal_pcoa(.abundance=hellinger, stmethod="bray", action="add")
+#' library(ggplot2)
+#' p <- mpse %>% mp_plot_ord(.ord=pcoa, .group=time, .color=time, ellipse=TRUE)
+#' p <- p + 
+#'      scale_fill_manual(values=c("#00AED7", "#009E73")) + 
+#'      scale_color_manual(values=c("#00AED7", "#009E73"))  
+#' \dontrun{
+#' # Or run with action='only' and return tbl_df to visualize manual.
 #' mouse.time.mpse %>% 
 #'   mp_decostand(.abundance=Abundance) %>% 
 #'   mp_cal_pcoa(.abundance=hellinger, distmethod="bray", .dim=2, action="only") -> tbl
@@ -182,12 +193,13 @@ get_varct.pcoa <- function(obj,...){
 #'  geom_hline(yintercept=0, color="grey20", linetype=2) +
 #'  theme_bw() +
 #'  theme(panel.grid=element_blank())
-setGeneric("mp_cal_pcoa", function(.data, .abundance, distmethod="bray", .dim=3, action="only", ...)standardGeneric("mp_cal_pcoa"))
+#' }
+setGeneric("mp_cal_pcoa", function(.data, .abundance, distmethod="bray", .dim=3, action="add", ...)standardGeneric("mp_cal_pcoa"))
 
 #' @rdname mp_cal_pcoa-methods
 #' @aliases mp_cal_pcoa,MPSE
 #' @exportMethod mp_cal_pcoa
-setMethod("mp_cal_pcoa", signature(.data="MPSE"), function(.data, .abundance, distmethod="bray", .dim=3, action="only", ...){
+setMethod("mp_cal_pcoa", signature(.data="MPSE"), function(.data, .abundance, distmethod="bray", .dim=3, action="add", ...){
     
     action %<>% match.arg(c("add", "only", "get"))
 
@@ -237,7 +249,7 @@ setMethod("mp_cal_pcoa", signature(.data="MPSE"), function(.data, .abundance, di
 })
 
 
-.internal_cal_pcoa <- function(.data, .abundance, distmethod="bray", .dim=3, action="only", ...){
+.internal_cal_pcoa <- function(.data, .abundance, distmethod="bray", .dim=3, action="add", ...){
 
     action %<>% match.arg(c("add", "only", "get"))
 
@@ -314,6 +326,20 @@ setMethod("mp_cal_pcoa", signature(.data="grouped_df_mpse"), .internal_cal_pcoa)
 #' @export
 #' @examples
 #' data(mouse.time.mpse)
+#' mpse <- mouse.time.mpse %>%
+#'         mp_decostand(.abundance=Abundance) %>%
+#'         mp_cal_nmds(.abundance=hellinger, distmethod="bray", action="add")
+#' library(ggplot2)
+#' p <- mpse %>% mp_plot_ord(.ord=nmds, 
+#'                           .group=time, 
+#'                           .color=time, 
+#'                           .alpha=0.8, 
+#'                           ellipse=TRUE, 
+#'                           show.sample=TRUE)
+#' p <- p +
+#'      scale_fill_manual(values=c("#00AED7", "#009E73")) + 
+#'      scale_color_manual(values=c("#00AED7", "#009E73"))
+#' \dontrun{
 #' mouse.time.mpse %>%
 #'   mp_decostand(.abundance=Abundance) %>%
 #'   mp_cal_nmds(.abundance=hellinger, distmethod="bray", .dim=2, action="only") -> tbl
@@ -328,6 +354,7 @@ setMethod("mp_cal_pcoa", signature(.data="grouped_df_mpse"), .internal_cal_pcoa)
 #'  geom_hline(yintercept=0, color="grey20", linetype=2) +
 #'  theme_bw() +
 #'  theme(panel.grid=element_blank())
+#' }
 setGeneric("mp_cal_nmds", function(.data, .abundance, distmethod="bray", .dim=2, action="only", seed=123, ...)standardGeneric("mp_cal_nmds"))
 
 #' @rdname mp_cal_nmds-methods
