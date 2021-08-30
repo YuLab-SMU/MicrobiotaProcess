@@ -421,8 +421,8 @@ setMethod("mp_plot_upset", signature(.data="grouped_df_mpse"), .internal_plot_up
 #' @rdname mp_plot_rarecurve-methods
 #' @param .data MPSE object or tbl_mpse after it was performed \code{mp_cal_rarecurve} with \code{action='add'}
 #' @param .rare the column names of 
-#' @param .alpha the names of alpha index, which should be one or more of Observe, Shannon, 
-#' ACE, Chao1, Simpson, J, default is Observe.
+#' @param .alpha the names of alpha index, which should be one or more of Observe, 
+#' ACE, Chao1, default is Observe.
 #' @param .group the column names of group, default is NULL, when it is provided, the
 #' rarecurve lines will group and color with the \code{group}.
 #' @param nrow integer Number of rows in \code{\link[ggplot2]{facet_wrap}}.
@@ -445,7 +445,7 @@ setMethod("mp_plot_upset", signature(.data="grouped_df_mpse"), .internal_plot_up
 #' }
 setGeneric("mp_plot_rarecurve", function(.data, 
                                          .rare, 
-                                         .alpha,
+                                         .alpha=c('Observe', 'Chao1', 'ACE'),
                                          .group = NULL, 
                                          nrow = 1,
                                          plot.group = FALSE,
@@ -454,7 +454,7 @@ setGeneric("mp_plot_rarecurve", function(.data,
     standardGeneric("mp_plot_rarecurve")
 )
 
-.internal_plot_rarecurve <- function(.data, .rare, .alpha = "Observe", .group=NULL, nrow=1, plot.group=FALSE, ...){
+.internal_plot_rarecurve <- function(.data, .rare, .alpha = c('Observe', 'Chao1', 'ACE'), .group=NULL, nrow=1, plot.group=FALSE, ...){
     .rare <- rlang::enquo(.rare)
     .alpha <- rlang::enquo(.alpha)
     .group <- rlang::enquo(.group)
@@ -499,11 +499,12 @@ setGeneric("mp_plot_rarecurve", function(.data,
         alpha <- 0.5
     }
 
-    p <- ggplot2::ggplot() +
-         geom_smooth(mapping=maps, data=tbl, method = "lm", formula = y~log(x), alpha=alpha, ...)
+    p <- ggplot2::ggplot(data=tbl, mapping=maps) 
+    smoothlayer <- do.call(geom_smooth, c(method="lm", formula=y~log(x), alpha=alpha, params))
+    p <- p + smoothlayer + ggplot2::scale_y_continuous(limits=c(0,NA), expand=c(0, 0.1), oob=scales::squish)
 
     if (!rlang::quo_is_null(.group)){
-         p <- p + ggplot2::stat_summary(mapping=maps, data=tbl, fun.data = 'mean_se', geom = "ribbon", alpha = alpha)
+         p <- p + ggplot2::stat_summary(fun.data = 'mean_se', geom = "ribbon", alpha = alpha)
     }
      
     p <- p + facet_wrap(facets=ggplot2::vars(!!rlang::sym("Alpha")), scales="free_y", nrow=nrow) 
@@ -646,14 +647,23 @@ setGeneric("mp_plot_dist",
   if (!rlang::quo_is_null(.group) && group.test){
       if ("color" %in% names(params)){
           color <- params$color
+          params$color <- NULL
       }else if( "colour" %in% names(params)){
           color <- params$colour
+          params$color <- NULL
       }else{
           color <- "black"
       }
-      p <- p + labs(y=NULL) + 
-           ggplot2::geom_boxplot() +
-           ggsignif::geom_signif(comparisons=comparisons, test=test, step_increase=step_increase, color=color, ...) +
+      p <- p + 
+           labs(x=NULL) + 
+           ggplot2::geom_boxplot() 
+      signlayer <- do.call(geom_signif, 
+                           c(list(comparisons=comparisons), 
+                             test=test, 
+                             step_increase=step_increase, 
+                             color=color, 
+                             params))
+      p <- p + signlayer +
            ggplot2::geom_jitter(position=ggplot2::position_jitter(width=0.1, seed=123)) +
            theme_taxbar(legend.position="none")
   }else{
@@ -701,6 +711,300 @@ setMethod("mp_plot_dist", signature(.data="tbl_mpse"), .internal_plot_dist)
 #' @export mp_plot_dist
 setMethod("mp_plot_dist", signature(.data="grouped_df_mpse"), .internal_plot_dist)
 
+#' Plotting the result of PCA, PCoA, CCA, RDA, NDMS or DCA
+#' @rdname mp_plot_ord-methods
+#' @param .data MPSE or tbl_mpse object, it is required.
+#' @param .ord a name of ordination (required), options are PCA, PCoA, DCA, NMDS, RDA, CCA,
+#' but the corresponding calculation methods (mp_cal_pca, mp_cal_pcoa, ...) 
+#' should be run before it.
+#' @param .dim integer which dimensions will be displayed, it should be a vector (length=2) 
+#' default is c(1, 2). if the length is one the default will also be displayed.
+#' @param .group the column name of variable to be mapped to the color of points (fill character 
+#' of \code{geom_star}) or one specified color code, default is NULL, meaning \code{fill}=NA,
+#' the points are hollow.
+#' @param .starshape the column name of variable to be mapped to the shapes of points (starshape 
+#' character of \code{geom_star}) or one specified \code{starshape} of point of \code{ggstar},
+#' default is NULL, meaning \code{starshape}=15 (circle point).
+#' @param .size the column name of variable to be mapped to the size of points (size character of 
+#' \code{geom_star}) or one specified \code{size} of point of \code{ggstar}, default is NULL,
+#' meaning the \code{size}=1.5, the size of points.
+#' @param .alpha the column name of variable to be mapped to the transparency of points (alpha
+#' character of \code{geom_star}) or one specified \code{alpha} of point of \code{ggstar}.
+#' default is NULL, meaning the \code{alpha}=1, the transparency of points.
+#' @param .color the column name of variable to be mapped to the color of line of points (color 
+#' character of \code{geom_star}) or one specified \code{starshape} of point of \code{ggstar},
+#' default is NULL, meaning the \code{color} is 'black'.
+#' @param starstroke numeric the width of edge of points, default is 0.25.
+#' @param ellipse logical, whether to plot ellipses, default is FALSE. (.group or .color variables 
+#' according to the 'geom', the default geom is path, so .color can be mapped to the corresponding 
+#' variable).
+#' @param show.sample logical, whether display the sample names of points, default is FALSE.
+#' @param show.envfit logical, whether display the result after run [mp_envfit()], default is FALSE.
+#' @param p.adjust a character method of p.adjust \code{\link[stats]{p.adjust}}, default is NULL,
+#' options are 'fdr', 'bonferroni', 'BH' etc.
+#' @param filter.envfit logical or numeric, whether to remove the no significant environment factor after 
+#' run [mp_envfit()], default is FALSE, meaning do not remove. If it is numeric, meaning the keep p.value
+#' or the adjust p with \code{p.adjust} the factors smaller than the numeric, e.g when filter.envfit=0.05 or
+#' (filter.envfit=TRUE), meaning the factors of p <= 0.05 will be displayed.
+#' @param ... additional parameters, see also the \code{\link[ggplot2]{stat_ellipse}}.
+#' @seealso [mp_cal_pca()], [mp_cal_pcoa], [mp_cal_nmds], [mp_cal_rda], 
+#' [mp_cal_cca], [mp_envfit()] and [mp_extract_internal_attr()]
+#' @export 
+#' @examples
+#' \dontrun{
+#' library(vegan)
+#' data(varespec, varechem)
+#' mpse <- MPSE(assays=list(Abundance=t(varespec)), colData=varechem)
+#' envformula <- paste("~", paste(colnames(varechem), collapse="+")) %>% as.formula
+#' mpse %<>%
+#' mp_cal_cca(.abundance=Abundance, .formula=envformula, action="add") %>%
+#' mp_envfit(.ord=CCA, .env=colnames(varechem), permutations=9999, action="add")
+#' mpse
+#' p1 <- mpse %>% mp_plot_ord(.ord=CCA, .group=Al, .size=Mn)
+#' p1
+#' p2 <- mpse %>% mp_plot_ord(.ord=CCA, .group=Al, .size=Mn, show.sample=TRUE)
+#' p2
+#' p3 <- mpse %>% mp_plot_ord(.ord=CCA, .group="blue", .size=Mn, .alpha=0.8, show.sample=TRUE)
+#' p3
+#' p4 <- mpse %>% mp_plot_ord(.ord=CCA, .group=Al, .size=Mn, show.sample=TRUE, show.envfit=TRUE)
+#' p4
+#' }
+setGeneric("mp_plot_ord", function(
+    .data,
+    .ord,
+    .dim = c(1, 2),
+    .group = NULL,
+    .starshape = 15,
+    .size  = 2,
+    .alpha = 1,
+    .color = "black",
+    starstroke = 0.25,
+    ellipse = FALSE,
+    show.sample = FALSE,
+    show.envfit = FALSE,
+    p.adjust = NULL,
+    filter.envfit = FALSE,
+    ...    
+)
+  standardGeneric("mp_plot_ord")
+)
+
+.internal_plot_ord <- function(
+    .data, 
+    .ord,
+    .dim = c(1, 2), 
+    .group = NULL, 
+    .starshape = 15,
+    .size  = 2,
+    .alpha = 1, 
+    .color = "black",
+    starstroke = 0.5,
+    ellipse = FALSE,
+    show.sample = FALSE,
+    show.envfit = FALSE,
+    p.adjust = NULL,
+    filter.envfit = FALSE,
+    ...){
+
+    .ord <- rlang::enquo(.ord)
+    if (rlang::quo_is_missing(.ord)){
+        intnms <- .data %>% attr("internal_attr") %>% names() %>% toupper()
+        .ord <- intersect(intnms, c("PCA", "PCOA", "NMDS", "RDA", "CCA", "DCA")) %>% 
+                magrittr::extract(1) %>%
+                rlang::sym()
+    } 
+    .ord %<>% rlang::as_name() %>% 
+            gsub("\\s+", "", .) %>%
+            toupper()
+
+    .group <- rlang::enquo(.group)
+    .starshape <- rlang::enquo(.starshape)
+    .size <- rlang::enquo(.size)
+    .alpha <- rlang::enquo(.alpha)
+    .color <- rlang::enquo(.color)
+    paramlist <- list(...)
+
+    .ord %<>% match.arg(c("PCA", "PCOA", "NMDS", "RDA", "CCA", "DCA"))
+
+    if (length(.dim)>2){
+       message("The length of .dim can not be larger than 2.")
+       return()
+    }else if (length(.dim)==1){
+       .dim <- c(1, 2) + 1
+    }else{
+       .dim <- .dim + 1
+    }
+
+    sampleda <- .data %>% mp_extract_sample()
+
+    tbl <- .data %>% 
+           mp_extract_internal_attr(name=!!rlang::sym(.ord)) %>%
+           suppressMessages() %>%
+           tidydr() %>% 
+           dplyr::select(c(1, .dim)) %>%
+           dplyr::rename(Sample="sites") %>%
+           dplyr::left_join(sampleda, by="Sample", suffix=c("", ".y"))
+
+    maps <- aes(x=!!rlang::sym(colnames(tbl)[2]), 
+                y=!!rlang::sym(colnames(tbl)[3]))
+    params <- list(starstroke=starstroke)
+    if (!rlang::quo_is_null(.group)){
+       if (is.colors(.group)){
+          params <- c(fill=rlang::as_name(.group), params)
+       }else{
+          maps <- modifyList(maps, aes(fill=!!.group))
+       }
+    }else{
+       params <- c(fill=NA, params)
+    }
+
+    if (!rlang::quo_is_null(.color)){
+       if (is.colors(.color)){
+          params <- c(color=rlang::as_name(.color), params)
+       }else{
+          maps <- modifyList(maps, aes(color=!!.color))
+       }
+    }else{
+       params <- c(color="black", params)
+    }
+
+    if (!rlang::quo_is_null(.starshape)){
+       if (is.quo.numeric(.starshape) || is.starshape(.starshape)){
+          starshape <- ifelse(is.quo.numeric(.starshape),
+                              is.quo.numeric(.starshape, check=FALSE), 
+                              rlang::as_name(.starshape))
+          params <- c(starshape=starshape, params)
+       }else{
+          maps <- modifyList(maps, aes(starshape=!!.starshape))
+       }
+    }else{
+       params <- c(starshape=15, params)
+    }
+
+    if (!rlang::quo_is_null(.size)){
+       if (is.quo.numeric(.size)){
+          params <- c(size = is.quo.numeric(.size, check=FALSE), params)
+       }else{
+          maps <- modifyList(maps, aes(size=!!.size)) 
+       }
+    }else{
+       params <- c(size = 1.5, params)
+    }
+
+    if (!rlang::quo_is_null(.alpha)){
+       if (is.quo.numeric(.alpha)){
+          params <- c(alpha = is.quo.numeric(.alpha, check=FALSE), params)
+       }else{
+          maps <- modifyList(maps, aes(alpha=!!.alpha))
+       }
+    }else{
+       params <- c(alpha = 1, params)
+    }
+
+    #if ("starstroke" %in% names(paramlist)){
+    #   params[["starstroke"]] <- paramlist$starstroke 
+    #   paramlist <- NULL
+    #}
+
+    p <- ggplot(data=tbl, mapping=maps)
+    requireNamespace("ggstar")
+    point.layer <- do.call(geom_star, params)
+    p <- p + point.layer +
+         ggplot2::geom_vline(xintercept=0, color="grey20", linetype=2) +
+         ggplot2::geom_hline(yintercept=0, color="grey20", linetype=2) +
+         theme_bw() +
+         theme(panel.grid=element_blank())
+
+    labelparams <- list(mapping=aes_(label=~Sample), size=3, segment.size=0.25)
+    labelparams <- extract_params(labelparams,
+                                  paramlist,
+                                  ggrepel::GeomTextRepel$default_aes %>% names())
+    if (show.sample){
+        text.layer <- do.call(ggrepel::geom_text_repel, labelparams) 
+        p <- p + text.layer
+    }
+    
+    if (ellipse){
+        if (length(paramlist)>0){
+            ellipse.layer <- do.call(ggplot2::stat_ellipse, paramlist)
+        }else{
+            ellipse.layer <- ggplot2::stat_ellipse()
+        }
+        p <- p + ellipse.layer
+    }
+
+    if (show.envfit){
+        envfit.res <- check.envfit(x=.data, ord=.ord)
+        if (!is.null(envfit.res)){
+            tbl2 <- envfit.res %>% mp_fortify() 
+            if (!is.null(p.adjust)){
+                tbl2 %<>% 
+                    dplyr::mutate(pvals=stats::p.adjust(.data$pvals, method=p.adjust)) 
+            }
+            tbl2 %<>% 
+                dplyr::mutate(label = 
+                              dplyr::case_when(
+                                  .data$pvals <= 0.05 & .data$pvals > 0.01 ~ paste0(.data$label, " *"),
+                                  .data$pvals <= 0.01 & .data$pvals > 0.001 ~ paste0(.data$label, " **"),
+                                  .data$pvals <= 0.001 ~ paste0(.data$label, " ***"),
+                                  TRUE ~ .data$label
+                              )
+                )
+
+            if (filter.envfit){
+                tbl2 %<>% dplyr::filter(.data$pvals <= 0.05)
+            }else if(is.numeric(filter.envfit)){
+                tbl2 %<>%  dplyr::filter(.data$pvals <= filter.envfit)
+            }
+
+            if (nrow(tbl2)==0){
+                message("No signature environment factor was found!")
+                return(p) 
+            }
+            nms <- colnames(tbl2)
+            maps2 <- aes(x=0, y=0, 
+                         xend=!!rlang::sym(nms[.dim[1]]), 
+                         yend=!!rlang::sym(nms[.dim[2]]))
+            maps3 <- aes(x=!!rlang::sym(nms[.dim[1]]), 
+                         y=!!rlang::sym(nms[.dim[2]]), 
+                         label=!!rlang::sym("label"))
+
+            p <- p + 
+                 ggplot2::geom_segment(
+                    data = tbl2, 
+                    mapping = maps2, 
+                    arrow=ggplot2::arrow(length = unit(0.02, "npc")),
+                    inherit.aes = FALSE
+                 ) 
+            labelparams <- modifyList(labelparams, list(data=tbl2, mapping=maps3, inherit.aes=FALSE))
+
+            lab.layer <- do.call(ggrepel::geom_text_repel, labelparams) 
+            p <- p + lab.layer
+        }else{
+            message("Please check whether the 'mp_envfit' has been performed with action='add'!")
+            return(p)
+        }
+    }
+
+    return(p)
+}
+
+#' @rdname mp_plot_ord-methods
+#' @aliases mp_plot_ord,MPSE
+#' @export mp_plot_ord
+setMethod("mp_plot_ord", signature(.data="MPSE"), .internal_plot_ord)
+
+#' @rdname mp_plot_ord-methods
+#' @aliases mp_plot_ord,tbl_mpse
+#' @export mp_plot_ord
+setMethod("mp_plot_ord", signature(.data="tbl_mpse"), .internal_plot_ord)
+
+#' @rdname mp_plot_ord-methods
+#' @aliases mp_plot_ord,grouped_df_mpse
+#' @export mp_plot_ord
+setMethod("mp_plot_ord", signature(.data="grouped_df_mpse"), .internal_plot_ord)
+
+
 quo.vect_to_str.vect <- function(quoexpr){
    strvect <- rlang::quo_text(quoexpr) %>%
                  gsub("c\\(", "", .) %>%
@@ -713,6 +1017,57 @@ quo.vect_to_str.vect <- function(quoexpr){
    return(strvect)
 }
 
+is.colors <- function(x) {
+   x <- rlang::as_name(x)
+   lapply(x, function(i) {
+       tryCatch(is.matrix(grDevices::col2rgb(i)), 
+                error = function(e) FALSE)
+   }) %>% unlist()
+}
+
+is.quo.numeric <- function(quoexpr, check=TRUE){
+   xx <- rlang::quo_text(quoexpr) %>% 
+       gsub("\"", "", .) %>% 
+       gsub("\'", "", .) %>%
+       as.numeric() %>%
+       suppressWarnings() 
+   if (check){
+       xx %<>% anyNA() %>%
+             magrittr::not()
+   }
+   return(xx)
+}
+
+is.starshape <- function(quoexpr){
+   rlang::quo_text(quoexpr) %>% 
+       magrittr::is_in(names(starshapes))
+}
+
+check.envfit <- function(x, ord){
+   if (!ord %in% c("NMDS", "CCA", "RDA", "DCA")){
+       message("The mp_envfit only accept the result of CCA, RDA, NMDS or DCA!")
+       return(NULL)
+   }
+   nm <- paste0(ord, "_ENVFIT")
+
+   x <- tryCatch(x %>% 
+                 mp_extract_internal_attr(name=!!rlang::sym(nm)) %>% 
+                 suppressMessages(),
+                 error = function(e) NULL
+       )
+   return (x)
+}
+
+extract_params <- function(originparam, inputparam, defaultparam){
+    if (any(defaultparam %in% names(inputparam))){
+        args <- intersect(defaultparam, names(inputparam))
+        originparam <- modifyList(originparam, inputparam[names(inputparam) %in% args])
+    }
+    return (originparam)
+}
+
+starshapes <- getFromNamespace("starshape_table", "ggstar")
 new_scale <- getFromNamespace("new_scale", "ggnewscale")
 insert_top <- getFromNamespace("insert_top", "aplot")
 insert_left <- getFromNamespace("insert_left", "aplot")
+
