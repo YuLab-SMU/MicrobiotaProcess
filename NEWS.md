@@ -1,5 +1,7 @@
-# MicrobiotaProcess 1.5.4.991
+# MicrobiotaProcess 1.5.4.992
 
++ add `mp_plot_ord` for `MPSE` or `tbl_mpse` object after one of `mp_cal_pca`, `mp_cal_pcoa`, `mp_cal_rda`, 
+  `mp_cal_nmds`, `mp_cal_rda`, `mp_cal_cca`, `mp_cal_dca` or `mp_envfit` has been run with `action='add'`. (2021-08-30, Mon)
 + add `mp_plot_dist` for `MPSE` or `tbl_mpse` object after `mp_cal_dist` is performed with `action="add"`. (2021-08-28, Sat)
 + add `mp_plot_abundance`, `mp_plot_alpha`, `mp_plot_rarecurve`, `mp_plot_venn`, `mp_plot_upset` for `MPSE` after 
   the corresponding `mp_cal_abundance`, `mp_cal_alpha`, `mp_cal_rarecurve`, `mp_cal_venn`, `mp_cal_upset`
