@@ -5,12 +5,16 @@
                                     ...){
     otux <- read_qza(otuqza, parallel=parallel)
     otutab <- otux$otutab
-    refseq <- reftree <- taxatab <- sampleda <- NULL
+    refseq <- reftree <- taxatab <- otu.metada <- sampleda <- NULL
     if (!is.null(taxaqza)){
-        taxax <- read_qza(taxaqza, parallel=parallel)
+        otu.taxa.meta <- read_qza(taxaqza, parallel=parallel)
+        taxax <- otu.taxa.meta$taxatab
+        otu.metada <- otu.taxa.meta$otu.metada
         taxax <- taxax[match(rownames(otutab), rownames(taxax)),,drop=FALSE]
+        otu.metada <- otu.metada[match(rownames(otutab), rownames(otu.metada)),,drop=FALSE]
         if (!is.null(otux$taxatab)){
             taxax <- otux$taxatab
+            otu.metada <- NULL
         }
         flag <- guess_rownames(rownames(otutab))
         if (flag!="Other"){
@@ -55,6 +59,7 @@
     return (list(otutab=otutab, 
                 sampleda=sampleda, 
                 taxatab=taxatab, 
+                otu.metada = otu.metada,
                 refseq=refseq, 
                 otutree=reftree))
 }
@@ -155,6 +160,7 @@
     taxatab <- res$taxatab
     otutree <- res$otutree
     refseq <- res$refseq
+    otu.metada <- res$otu.metada
 
     otuda <- otuda[rowSums(otuda) > 0, colSums(otuda) > 0, drop=FALSE]
     #otuda <- otuda[,colSums(otuda)>0, drop=FALSE]
@@ -187,6 +193,10 @@
         
             taxatab <- taxatab[match(flagn, rnm), , drop = FALSE]
             otuda <- otuda[match(flagn, rownm), , drop = FALSE]
+            if (!is.null(otu.metada)){
+                otu.metada <- otu.metada[match(rnm, rownames(otu.metada)),,drop=FALSE]
+            }
+            rownm <- rownames(otuda)
         }
         taxatree <- convert_to_treedata2(x=data.frame(taxatab))
     }else{
@@ -206,10 +216,14 @@
         if (length(rmotus) > 0){
             otutree <- treeio::drop.tip(otutree, tip=rmotus)
             otuda <- otuda[match(flagn, rownm), , drop = FALSE]
+            rownm <- rownames(otuda)
             if (!is.null(taxatree)){
                 taxatree <- treeio::drop.tip(taxatree, tip=setdiff(rownm, flagn), collapse.singles=FALSE)
             }else{
                 taxatree <- NULL
+            }
+            if (!is.null(otu.metada)){
+                otu.metada <- otu.metada[match(flagn, rownames(otu.metada)),,drop=FALSE]
             }
         }else{
             otutree <- NULL
@@ -239,6 +253,9 @@
             }else{
                 taxatree <- NULL
             }
+            if (!is.null(otu.metada)){
+                otu.metada <- otu.metada[match(flagn, rownames(otu.metada)),,drop=FALSE]
+            }
         }
     }
     mpse <- MPSE(
@@ -248,6 +265,10 @@
                  taxatree =  taxatree,
                  refseq = refseq
             )
+
+    if (!is.null(otu.metada) && ncol(otu.metada)>0){
+        SummarizedExperiment::rowData(mpse) <- otu.metada
+    }
 
     methods::validObject(mpse)
     return(mpse)
