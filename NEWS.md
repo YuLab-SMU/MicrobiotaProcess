@@ -1,5 +1,6 @@
-# MicrobiotaProcess 1.5.4.992
+# MicrobiotaProcess 1.5.4.993
 
++ fix issue `print` for one line of `MPSE` and update `mp_plot_ord` to display the side `boxplot`. (2021-08-31, Tue)
 + add `mp_plot_ord` for `MPSE` or `tbl_mpse` object after one of `mp_cal_pca`, `mp_cal_pcoa`, `mp_cal_rda`, 
   `mp_cal_nmds`, `mp_cal_rda`, `mp_cal_cca`, `mp_cal_dca` or `mp_envfit` has been run with `action='add'`. (2021-08-30, Mon)
 + add `mp_plot_dist` for `MPSE` or `tbl_mpse` object after `mp_cal_dist` is performed with `action="add"`. (2021-08-28, Sat)
