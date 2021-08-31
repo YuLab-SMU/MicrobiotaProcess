@@ -716,7 +716,7 @@ setMethod("mp_plot_dist", signature(.data="grouped_df_mpse"), .internal_plot_dis
 #' @param .data MPSE or tbl_mpse object, it is required.
 #' @param .ord a name of ordination (required), options are PCA, PCoA, DCA, NMDS, RDA, CCA,
 #' but the corresponding calculation methods (mp_cal_pca, mp_cal_pcoa, ...) 
-#' should be run before it.
+#' should be done with action="add" before it.
 #' @param .dim integer which dimensions will be displayed, it should be a vector (length=2) 
 #' default is c(1, 2). if the length is one the default will also be displayed.
 #' @param .group the column name of variable to be mapped to the color of points (fill character 
@@ -734,7 +734,9 @@ setMethod("mp_plot_dist", signature(.data="grouped_df_mpse"), .internal_plot_dis
 #' @param .color the column name of variable to be mapped to the color of line of points (color 
 #' character of \code{geom_star}) or one specified \code{starshape} of point of \code{ggstar},
 #' default is NULL, meaning the \code{color} is 'black'.
-#' @param starstroke numeric the width of edge of points, default is 0.25.
+#' @param starstroke numeric the width of edge of points, default is 0.5.
+#' @param show.side logical whether display the side boxplot with the specified \code{.dim} 
+#' dimensions, default is TRUE.
 #' @param ellipse logical, whether to plot ellipses, default is FALSE. (.group or .color variables 
 #' according to the 'geom', the default geom is path, so .color can be mapped to the corresponding 
 #' variable).
@@ -778,7 +780,8 @@ setGeneric("mp_plot_ord", function(
     .size  = 2,
     .alpha = 1,
     .color = "black",
-    starstroke = 0.25,
+    starstroke = 0.5,
+    show.side = TRUE,
     ellipse = FALSE,
     show.sample = FALSE,
     show.envfit = FALSE,
@@ -799,6 +802,7 @@ setGeneric("mp_plot_ord", function(
     .alpha = 1, 
     .color = "black",
     starstroke = 0.5,
+    show.side = TRUE,
     ellipse = FALSE,
     show.sample = FALSE,
     show.envfit = FALSE,
@@ -907,7 +911,8 @@ setGeneric("mp_plot_ord", function(
     #}
 
     p <- ggplot(data=tbl, mapping=maps)
-    requireNamespace("ggstar")
+    ggstar <- "ggstar"
+    require(ggstar, character.only=TRUE)
     point.layer <- do.call(geom_star, params)
     p <- p + point.layer +
          ggplot2::geom_vline(xintercept=0, color="grey20", linetype=2) +
@@ -919,11 +924,41 @@ setGeneric("mp_plot_ord", function(
     labelparams <- extract_params(labelparams,
                                   paramlist,
                                   ggrepel::GeomTextRepel$default_aes %>% names())
+    if (show.side){
+       if ("fill" %in% names(maps) && !is.discrete(tbl, maps, "fill")){
+           side.y <- do.call(ggside::geom_xsideboxplot, 
+                             list(mapping=aes(y=!!.group), color = "black",orientation = "y"))
+           
+           side.x <- do.call(ggside::geom_ysideboxplot,
+                             list(mapping=aes(x=!!.group), color = "black",orientation = "x"))
+       }else if ("color" %in% names(maps) && !is.discrete(tbl, maps, "color")){
+           side.y <- do.call(ggside::geom_xsideboxplot, 
+                             list(mapping=aes(y=!!.color), fill=NA, orientation="y"))
+           side.x <- do.call(ggside::geom_ysideboxplot,
+                             list(mapping=aes(x=!!.color), fill=NA, orientation="x"))
+       }else if ("starshape" %in% names(maps) && !is.discrete(tbl, maps, "starshape")){
+           side.y <- do.call(ggside::geom_xsideboxplot, 
+                             list(mapping=aes(y=!!.starshape), orientation="y"))
+           side.x <- do.call(ggside::geom_ysideboxplot, 
+                             list(mapping=aes(x=!!.starshape), orientation="x"))
+       }else{
+           side.y <- NULL
+           side.x <- NULL
+       }
+
+       p <- p +
+            side.y + 
+            ggside::scale_xsidey_discrete() + 
+            side.x +
+            ggside::scale_ysidex_discrete() + 
+            theme(ggside.panel.scale = 0.25)
+    }
+
     if (show.sample){
         text.layer <- do.call(ggrepel::geom_text_repel, labelparams) 
         p <- p + text.layer
     }
-    
+
     if (ellipse){
         if (length(paramlist)>0){
             ellipse.layer <- do.call(ggplot2::stat_ellipse, paramlist)
@@ -1039,8 +1074,15 @@ is.quo.numeric <- function(quoexpr, check=TRUE){
 }
 
 is.starshape <- function(quoexpr){
-   rlang::quo_text(quoexpr) %>% 
-       magrittr::is_in(names(starshapes))
+   x <- tryCatch(rlang::quo_text(quoexpr) %>% 
+          magrittr::is_in(names(starshapes)),
+          error = function(e) FALSE
+        )
+   return(x)
+}
+
+is.discrete <- function(data, mapping, aesname){
+   data %>% pull(!!mapping[[aesname]]) %>% is.numeric()
 }
 
 check.envfit <- function(x, ord){

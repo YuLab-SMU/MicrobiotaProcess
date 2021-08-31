@@ -76,14 +76,31 @@ setMethod("[", signature(x="MPSE"),
     taxatree <- x@taxatree
     nx <- methods::callNextMethod()
     newotus <- rownames(nx)
-   
+    rowda <- SummarizedExperiment::rowData(nx)
+
     otutree <- .internal_drop.tip(tree=otutree, newnm=newotus)
  
-    taxatree <- .internal_drop.tip(
+    if (length(newotus) == 1){
+        if (!is.null(taxatree)){
+            taxatb <- taxatree %>% 
+                      taxatree_to_tb() %>% 
+                      tibble::as_tibble(rownames="OTU") %>%
+                      dplyr::filter(.data$OTU==newotus)
+            rowda <- rowda %>% 
+                     tibble::as_tibble(rownames="OTU") %>% 
+                     dplyr::filter(.data$OTU==newotus) %>%
+                     dplyr::left_join(taxatb, by="OTU") %>%
+                     tibble::column_to_rownames(var="OTU") %>%
+                     S4Vectors::DataFrame(check.names=FALSE)
+            taxatree <- NULL
+        }
+    }else{
+        taxatree <- .internal_drop.tip(
                                        tree=taxatree, 
                                        newnm=newotus, 
                                        collapse.singles=FALSE
                                 )
+    }
 
     if (!is.null(refseq)){
         refseq <- refseq[newotus]
@@ -92,6 +109,7 @@ setMethod("[", signature(x="MPSE"),
     nx@taxatree <- taxatree
     nx@otutree <- otutree
     nx@refseq <- refseq
+    SummarizedExperiment::rowData(nx) <- rowda
     methods::validObject(nx)
     return(nx)
 })

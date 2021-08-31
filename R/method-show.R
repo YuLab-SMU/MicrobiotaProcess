@@ -190,11 +190,10 @@ print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
     }
 
     if (n < nrow(x)){
-        tmpx <- x[seq_len(n), seq_len(min(2, ncol(x))), drop=FALSE]
+        tmpx <- x[seq_len(n), seq_len(min(1, ncol(x))), drop=FALSE]
     }else{
         tmpx <- x[, seq_len(min(round(n/nrow(x))+1, ncol(x))), drop=FALSE]
     }
-
     formatted_tb <- tmpx %>% 
                     as_tibble() %>% 
                     format(..., n = n, width = width, n_extra = n_extra)
@@ -203,9 +202,10 @@ print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
       "A MPSE-tibble (MPSE object) abstraction: %s",
        total_nrows %>% format(format="f", big.mark=",", digits=2)
     )
-    
     left_nrows <- total_nrows - n
-    if (left_nrows > 0){
+    flagtail <- grepl("([0-9,]+ more row)", formatted_tb[n + 4])
+    flagtail2 <- grepl("with [0-9,]+ more variable", formatted_tb[n + 4])
+    if (left_nrows > 0 && flagtail){
         new_tail <- sprintf("%s more rows", 
                             left_nrows %>% format(format="f", big.mark=",", digits=2)
                       )
@@ -214,7 +214,36 @@ print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
           {
             x = (.);
             x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
-            x[n+4] = gsub("([0-9,]+ more rows)", new_tail, x[n + 4]);
+            x[n+4] = gsub("([0-9,]+ more row)", new_tail, x[n + 4]);
+            x
+          }
+    }else if (left_nrows > 0 && !flagtail && !flagtail2){
+        new_tail <- paste0("# ", cli::symbol$ellipsis, 
+                           sprintf(" with %s more ", left_nrows %>% 
+                           format(format="f", big.mark=",", digits=2)),
+                           ifelse(left_nrows>1, "rows", "row")
+                        ) %>% 
+                    pillar::style_subtle()
+        formatted_mpse = 
+          formatted_tb %>%
+          {
+            x = (.);
+            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
+            x = append(x, new_tail)
+            x
+          }
+    }else if (left_nrows > 0 && !flagtail && flagtail2){
+        new_tail <- paste0("# ", cli::symbol$ellipsis, 
+                           sprintf(" with %s more ", left_nrows %>% 
+                           format(format="f", big.mark=",", digits=2)),
+                           ifelse(left_nrows>1, "rows, and", "row, and")
+                    ) 
+        formatted_mpse = 
+          formatted_tb %>%
+          {
+            x = (.);
+            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
+            x[n+4] = gsub(paste0("# ", cli::symbol$ellipsis," with"), new_tail, x[n+4]);
             x
           }
     }else{

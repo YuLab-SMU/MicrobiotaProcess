@@ -19,7 +19,8 @@ mp_plot_ord(
   .size = 2,
   .alpha = 1,
   .color = "black",
-  starstroke = 0.25,
+  starstroke = 0.5,
+  show.side = TRUE,
   ellipse = FALSE,
   show.sample = FALSE,
   show.envfit = FALSE,
@@ -38,6 +39,7 @@ mp_plot_ord(
   .alpha = 1,
   .color = "black",
   starstroke = 0.5,
+  show.side = TRUE,
   ellipse = FALSE,
   show.sample = FALSE,
   show.envfit = FALSE,
@@ -56,6 +58,7 @@ mp_plot_ord(
   .alpha = 1,
   .color = "black",
   starstroke = 0.5,
+  show.side = TRUE,
   ellipse = FALSE,
   show.sample = FALSE,
   show.envfit = FALSE,
@@ -74,6 +77,7 @@ mp_plot_ord(
   .alpha = 1,
   .color = "black",
   starstroke = 0.5,
+  show.side = TRUE,
   ellipse = FALSE,
   show.sample = FALSE,
   show.envfit = FALSE,
@@ -87,7 +91,7 @@ mp_plot_ord(
 
 \item{.ord}{a name of ordination (required), options are PCA, PCoA, DCA, NMDS, RDA, CCA,
 but the corresponding calculation methods (mp_cal_pca, mp_cal_pcoa, ...) 
-should be run before it.}
+should be done with action="add" before it.}
 
 \item{.dim}{integer which dimensions will be displayed, it should be a vector (length=2) 
 default is c(1, 2). if the length is one the default will also be displayed.}
@@ -112,7 +116,10 @@ default is NULL, meaning the \code{alpha}=1, the transparency of points.}
 character of \code{geom_star}) or one specified \code{starshape} of point of \code{ggstar},
 default is NULL, meaning the \code{color} is 'black'.}
 
-\item{starstroke}{numeric the width of edge of points, default is 0.25.}
+\item{starstroke}{numeric the width of edge of points, default is 0.5.}
+
+\item{show.side}{logical whether display the side boxplot with the specified \code{.dim} 
+dimensions, default is TRUE.}
 
 \item{ellipse}{logical, whether to plot ellipses, default is FALSE. (.group or .color variables 
 according to the 'geom', the default geom is path, so .color can be mapped to the corresponding 
