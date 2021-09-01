@@ -20,23 +20,25 @@ data(mouse.time.mpse)
 mouse.time.mpse
 ```
 
-    ## # A MPSE-tibble (MPSE object) abstraction: 4,408 x 11
+    ## # A MPSE-tibble (MPSE object) abstraction: 4,408 × 11
     ## # OTU=232 | Samples=19 | Assays=Abundance | Taxanomy=Kingdom, Phylum, Class, Order, Family, Genus, Species
-    ##    OTU   Sample Abundance time  Kingdom  Phylum Class Order Family Genus Species
-    ##    <chr> <chr>      <int> <chr> <chr>    <chr>  <chr> <chr> <chr>  <chr> <chr>  
-    ##  1 OTU_1 F3D0         579 Early k__Bact… p__Ba… c__B… o__B… f__Mu… g__u… s__un_…
-    ##  2 OTU_1 F3D1         405 Early k__Bact… p__Ba… c__B… o__B… f__Mu… g__u… s__un_…
-    ##  3 OTU_2 F3D0         345 Early k__Bact… p__Ba… c__B… o__B… f__Mu… g__u… s__un_…
-    ##  4 OTU_2 F3D1         353 Early k__Bact… p__Ba… c__B… o__B… f__Mu… g__u… s__un_…
-    ##  5 OTU_3 F3D0         449 Early k__Bact… p__Ba… c__B… o__B… f__Mu… g__u… s__un_…
-    ##  6 OTU_3 F3D1         231 Early k__Bact… p__Ba… c__B… o__B… f__Mu… g__u… s__un_…
-    ##  7 OTU_4 F3D0         430 Early k__Bact… p__Ba… c__B… o__B… f__Mu… g__u… s__un_…
-    ##  8 OTU_4 F3D1          69 Early k__Bact… p__Ba… c__B… o__B… f__Mu… g__u… s__un_…
-    ##  9 OTU_5 F3D0         154 Early k__Bact… p__Ba… c__B… o__B… f__Ba… g__B… s__un_…
-    ## 10 OTU_5 F3D1         140 Early k__Bact… p__Ba… c__B… o__B… f__Ba… g__B… s__un_…
+    ##    OTU    Sample Abundance time  Kingdom Phylum Class Order Family Genus Species
+    ##    <chr>  <chr>      <int> <chr> <chr>   <chr>  <chr> <chr> <chr>  <chr> <chr>  
+    ##  1 OTU_1  F3D0         579 Early k__Bac… p__Ba… c__B… o__B… f__Mu… g__u… s__un_…
+    ##  2 OTU_2  F3D0         345 Early k__Bac… p__Ba… c__B… o__B… f__Mu… g__u… s__un_…
+    ##  3 OTU_3  F3D0         449 Early k__Bac… p__Ba… c__B… o__B… f__Mu… g__u… s__un_…
+    ##  4 OTU_4  F3D0         430 Early k__Bac… p__Ba… c__B… o__B… f__Mu… g__u… s__un_…
+    ##  5 OTU_5  F3D0         154 Early k__Bac… p__Ba… c__B… o__B… f__Ba… g__B… s__un_…
+    ##  6 OTU_6  F3D0         470 Early k__Bac… p__Ba… c__B… o__B… f__Mu… g__u… s__un_…
+    ##  7 OTU_7  F3D0         282 Early k__Bac… p__Ba… c__B… o__B… f__Mu… g__u… s__un_…
+    ##  8 OTU_8  F3D0         184 Early k__Bac… p__Ba… c__B… o__B… f__Ri… g__A… s__un_…
+    ##  9 OTU_9  F3D0          45 Early k__Bac… p__Ba… c__B… o__B… f__Mu… g__u… s__un_…
+    ## 10 OTU_10 F3D0         158 Early k__Bac… p__Ba… c__B… o__B… f__Mu… g__u… s__un_…
     ## # … with 4,398 more rows
 
 ### Unified analysis grammar
+
+#### Alpha diversity analysis
 
 ``` r
 # example of the analysis of alpha diversity
@@ -50,37 +52,75 @@ mpse <- mouse.time.mpse %>%
 mpse %>% print(n=5)
 ```
 
-    ## # A MPSE-tibble (MPSE object) abstraction: 4,408 x 18
+    ## # A MPSE-tibble (MPSE object) abstraction: 4,408 × 18
     ## # OTU=232 | Samples=19 | Assays=Abundance, RareAbundance | Taxanomy=Kingdom, Phylum, Class, Order, Family, Genus, Species
     ##   OTU   Sample Abundance RareAbundance time  Observe Chao1   ACE Shannon Simpson
     ##   <chr> <chr>      <int>         <int> <chr>   <dbl> <dbl> <dbl>   <dbl>   <dbl>
     ## 1 OTU_1 F3D0         579           214 Early     104  104.  105.    3.88   0.965
-    ## 2 OTU_1 F3D1         405           202 Early      99  102   101.    3.97   0.971
-    ## 3 OTU_2 F3D0         345           116 Early     104  104.  105.    3.88   0.965
-    ## 4 OTU_2 F3D1         353           183 Early      99  102   101.    3.97   0.971
-    ## 5 OTU_3 F3D0         449           179 Early     104  104.  105.    3.88   0.965
-    ## # … with 4,403 more rows, and 8 more variables: J <dbl>, Kingdom <chr>,
-    ## #   Phylum <chr>, Class <chr>, Order <chr>, Family <chr>, Genus <chr>,
-    ## #   Species <chr>
+    ## 2 OTU_2 F3D0         345           116 Early     104  104.  105.    3.88   0.965
+    ## 3 OTU_3 F3D0         449           179 Early     104  104.  105.    3.88   0.965
+    ## 4 OTU_4 F3D0         430           167 Early     104  104.  105.    3.88   0.965
+    ## 5 OTU_5 F3D0         154            54 Early     104  104.  105.    3.88   0.965
+    ## # … with 4,403 more rows, and 8 more variables: J <dbl>, Kingdom <chr>, Phylum <chr>, Class <chr>,
+    ## #   Order <chr>, Family <chr>, Genus <chr>, Species <chr>
 
 ``` r
+p <- mpse %>% mp_plot_alpha(.group=time, .alpha=c(Observe,Chao1, ACE, Shannon, Simpson, J))
+p <- p + 
+    scale_fill_manual(values=c("#00A087FF", "#3C5488FF"), guide="none") + 
+    scale_color_manual(values=c("#00A087FF", "#3C5488FF"), guide="none") 
+p
+```
+
+<img src="inst/figures/README-plotalpha-1.png" style="display: block; margin: auto;" />
+
+#### PCoa analysis
+
+``` r
+mpse %<>% 
+    mp_decostand(.abundance=Abundance) %>%
+    mp_cal_pcoa(.abundance=hellinger)
+mpse %>% print(n=5)
+```
+
+    ## # A MPSE-tibble (MPSE object) abstraction: 4,408 × 23
+    ## # OTU=232 | Samples=19 | Assays=Abundance, RareAbundance, hellinger | Taxanomy=Kingdom, Phylum, Class, Order, Family, Genus, Species
+    ##   OTU   Sample Abundance RareAbundance hellinger time  Observe Chao1   ACE
+    ##   <chr> <chr>      <int>         <int>     <dbl> <chr>   <dbl> <dbl> <dbl>
+    ## 1 OTU_1 F3D0         579           214     0.298 Early     104  104.  105.
+    ## 2 OTU_2 F3D0         345           116     0.230 Early     104  104.  105.
+    ## 3 OTU_3 F3D0         449           179     0.262 Early     104  104.  105.
+    ## 4 OTU_4 F3D0         430           167     0.257 Early     104  104.  105.
+    ## 5 OTU_5 F3D0         154            54     0.154 Early     104  104.  105.
+    ## # … with 4,403 more rows, and 14 more variables: Shannon <dbl>, Simpson <dbl>, J <dbl>,
+    ## #   bray <I<list>>, PCo1 (46.94%) <dbl>, PCo2 (13.37%) <dbl>,
+    ## #   PCo3 (8.25%) <dbl>, Kingdom <chr>, Phylum <chr>, Class <chr>, Order <chr>,
+    ## #   Family <chr>, Genus <chr>, Species <chr>
+
+``` r
+p2 <- mpse %>% mp_plot_ord(.ord = pcoa, 
+                           .group = time, 
+                           .size = Observe, 
+                           .alpha = Shannon, 
+                           ellipse = TRUE, 
+                           .color = time,
+                           show.legend = FALSE
+                          )
+p2 <- p2 +
+      scale_fill_manual(values=c("#00A087FF", "#3C5488FF")) +
+      scale_color_manual(values=c("#00A087FF", "#3C5488FF")) +
+      scale_size_continuous(range=c(1, 3))
+p2
+```
+
+![](inst/figures/README-pcoa-1.png)<!-- -->
+
+<!--
+
 tbl <- mpse %>%
        mp_extract_sample()
 
 tbl %>% print(n=5)
-```
-
-    ## # A tibble: 19 x 8
-    ##   Sample time  Observe Chao1   ACE Shannon Simpson     J
-    ##   <chr>  <chr>   <dbl> <dbl> <dbl>   <dbl>   <dbl> <dbl>
-    ## 1 F3D0   Early     104  104. 105.     3.88   0.965 0.835
-    ## 2 F3D1   Early      99  102  101.     3.97   0.971 0.864
-    ## 3 F3D141 Late       74   74   74.2    3.41   0.950 0.793
-    ## 4 F3D142 Late       48   48   48      3.12   0.939 0.805
-    ## 5 F3D143 Late       56   56   56      3.29   0.946 0.818
-    ## # … with 14 more rows
-
-``` r
 tbl %<>% tidyr::pivot_longer(
                          cols=!c("Sample", "time"), 
                          names_to="measure", 
@@ -90,19 +130,6 @@ tbl %<>% tidyr::pivot_longer(
                        c("Observe", "Chao1", "ACE", "Simpson", "Shannon", "J"))
                    )
 tbl %>% print(n=5)
-```
-
-    ## # A tibble: 114 x 4
-    ##   Sample time  measure   alpha
-    ##   <chr>  <chr> <fct>     <dbl>
-    ## 1 F3D0   Early Observe 104    
-    ## 2 F3D0   Early Chao1   104.   
-    ## 3 F3D0   Early ACE     105.   
-    ## 4 F3D0   Early Shannon   3.88 
-    ## 5 F3D0   Early Simpson   0.965
-    ## # … with 109 more rows
-
-``` r
 p <- ggplot(data=tbl, aes(x=time, y=alpha, fill=time)) +
      geom_half_violin(color=NA, side="l", trim=FALSE) +
      geom_boxplot(aes(color=time), fill=NA, position=position_nudge(x=.22), width=0.2) +
@@ -116,9 +143,8 @@ p <- ggplot(data=tbl, aes(x=time, y=alpha, fill=time)) +
      scale_color_manual(values=c("#00A087FF", "#3C5488FF"), guide="none") +
      labs(x=NULL, y="alpha diversity index")
 p
-```
 
-<img src="inst/figures/README-plotalpha-1.png" style="display: block; margin: auto;" />
+-->
 
 ## :writing\_hand: Authors
 

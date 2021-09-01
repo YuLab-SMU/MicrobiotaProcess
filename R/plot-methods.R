@@ -912,7 +912,7 @@ setGeneric("mp_plot_ord", function(
 
     p <- ggplot(data=tbl, mapping=maps)
     ggstar <- "ggstar"
-    require(ggstar, character.only=TRUE)
+    require(ggstar, character.only=TRUE) %>% suppressMessages()
     point.layer <- do.call(geom_star, params)
     p <- p + point.layer +
          ggplot2::geom_vline(xintercept=0, color="grey20", linetype=2) +
