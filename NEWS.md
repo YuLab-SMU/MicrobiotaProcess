@@ -1,4 +1,4 @@
-# MicrobiotaProcess 1.5.4.994
+# MicrobiotaProcess 1.5.4.995
 
 + return updated `MPSE` object after the `mp_diff_analysis` is done with `action="add"`. (2021-08-31, Fri)
   - then the `taxtree` and `otutree` with the result of different analysis can be extracted with `mp_extract_tree`.
