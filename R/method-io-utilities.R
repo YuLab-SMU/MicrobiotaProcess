@@ -49,6 +49,9 @@
         if (inherits(treeqza, "treedata")){
             reftree <- treeqza
         }else if (inherits(treeqza, "character") && file.exists(treeqza)){
+            rlang::warn(c("The treeqza is a tree file, it is parsing by read.tree function.",
+                     "It is better to parse it with the function of treeio",
+                     "then the treedata or phylo result all can be supported."))
             reftree <- treeio::read.treeqza(treeqza) %>% 
                        treeio::as.treedata()
         }else if (inherits(treeqza, "phylo")){
@@ -194,7 +197,7 @@
             taxatab <- taxatab[match(flagn, rnm), , drop = FALSE]
             otuda <- otuda[match(flagn, rownm), , drop = FALSE]
             if (!is.null(otu.metada)){
-                otu.metada <- otu.metada[match(rnm, rownames(otu.metada)),,drop=FALSE]
+                otu.metada <- otu.metada[match(flagn, rownames(otu.metada)),,drop=FALSE]
             }
             rownm <- rownames(otuda)
         }
@@ -218,15 +221,13 @@
             otuda <- otuda[match(flagn, rownm), , drop = FALSE]
             rownm <- rownames(otuda)
             if (!is.null(taxatree)){
-                taxatree <- treeio::drop.tip(taxatree, tip=setdiff(rownm, flagn), collapse.singles=FALSE)
+                taxatree <- treeio::drop.tip(taxatree, tip=setdiff(taxatree@phylo$tip.label, flagn), collapse.singles=FALSE)
             }else{
                 taxatree <- NULL
             }
             if (!is.null(otu.metada)){
                 otu.metada <- otu.metada[match(flagn, rownames(otu.metada)),,drop=FALSE]
             }
-        }else{
-            otutree <- NULL
         }
     }
 
@@ -258,6 +259,7 @@
             }
         }
     }
+    
     mpse <- MPSE(
                  assays = list(Abundance=otuda),
                  colData = sampleda,

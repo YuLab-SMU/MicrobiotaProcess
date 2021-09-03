@@ -266,23 +266,13 @@ mp_import_metaphlan <- function(profile, mapfilename=NULL, treefile=NULL, linenu
         rowda <- NULL
     }
 
-    #if (!is.null(otutree)){
-    #    otutree %<>% 
-    #        ape::keep.tip(intersect(rownames(assay), otutree$tip.label)) %>% 
-    #        treeio::as.treedata()
-    #}
-
     res <- list(otutab = assay, 
                 otutree = otutree,
                 sampleda = sampleda, 
-                taxatab = taxatab)
+                taxatab = taxatab,
+                otu.metada = rowda
+               )
     mpse <- .build_mpse(res)
-
-    if (!is.null(rowda)){
-        rowda <- rowda[rownames(rowda) %in% rownames(mpse), ,drop=FALSE] %>% 
-                 S4Vectors::DataFrame()
-        SummarizedExperiment::rowData(mpse) <- rowda
-    }
 
     return(mpse)
 }    
