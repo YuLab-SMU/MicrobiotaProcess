@@ -1,5 +1,7 @@
-# MicrobiotaProcess 1.5.4.993
+# MicrobiotaProcess 1.5.4.994
 
++ return updated `MPSE` object after the `mp_diff_analysis` is done with `action="add"`. (2021-08-31, Fri)
+  - then the `taxtree` and `otutree` with the result of different analysis can be extracted with `mp_extract_tree`.
 + fix issue `print` for one line of `MPSE` and update `mp_plot_ord` to display the side `boxplot`. (2021-08-31, Tue)
 + add `mp_plot_ord` for `MPSE` or `tbl_mpse` object after one of `mp_cal_pca`, `mp_cal_pcoa`, `mp_cal_rda`, 
   `mp_cal_nmds`, `mp_cal_rda`, `mp_cal_cca`, `mp_cal_dca` or `mp_envfit` has been run with `action='add'`. (2021-08-30, Mon)
