@@ -147,9 +147,10 @@ mp_diff_analysis(
 
 \item{.sec.group}{the second group name of the samples to be calculated.}
 
-\item{action}{character, "add" joins the new information to the taxatree and return,
-"only" return a non-redundant tibble with the result of different analysis. "get" return
-'diffAnalysisClass' object.}
+\item{action}{character, "add" joins the new information to the taxatree (if it exists) 
+and otutree (if it exists) or \code{rowData} and return MPSE object,"only" return a 
+non-redundant tibble with the result of different analysis. "get" return 'diffAnalysisClass' 
+object.}
 
 \item{tip.level}{character the taxa level to be as tip level}
 

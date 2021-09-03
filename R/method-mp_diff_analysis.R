@@ -4,9 +4,10 @@
 #' @param .abundance the name of abundance to be calculated
 #' @param .group the group name of the samples to be calculated.
 #' @param .sec.group the second group name of the samples to be calculated.
-#' @param action character, "add" joins the new information to the taxatree and return,
-#' "only" return a non-redundant tibble with the result of different analysis. "get" return
-#' 'diffAnalysisClass' object.
+#' @param action character, "add" joins the new information to the taxatree (if it exists) 
+#' and otutree (if it exists) or \code{rowData} and return MPSE object,"only" return a 
+#' non-redundant tibble with the result of different analysis. "get" return 'diffAnalysisClass' 
+#' object.
 #' @param tip.level character the taxa level to be as tip level
 #' @param force logical whether to calculate the relative abundance forcibly when the abundance
 #' is not be rarefied, default is FALSE.
@@ -303,6 +304,7 @@ setGeneric("mp_diff_analysis", function(.data,
                     fcfun=fc.method, clmin=cl.min, clwilc=cl.test, subclmin=subcl.min, subclwilc=subcl.test)
 
      result <- merge_total_res(kwres=first.res, secondvars=second.test.sig.vars, mlres=ml.res, params=params)
+      
 
      if (action=="get"){
          taxda <- .data %>% 
@@ -317,24 +319,31 @@ setGeneric("mp_diff_analysis", function(.data,
      }else if (action=="only"){
          return(result)
      }else if (action=="add"){
-         if (is.null(taxatree)){
+         newgroup <- paste0("Sign_", rlang::as_name(.group))
+         result %<>% dplyr::rename(label="f", !!newgroup:=!!.group)
+         if (is.null(taxatree) && tip.level=="OTU"){
              otu_tb <- .data %>% 
                        mp_extract_feature() 
-             result %<>% dplyr::rename(label="f")
              #result %<>% dplyr::select(c("label",setdiff(colnames(result), colnames(otu_tb))))
-             otu_tb %<>% dplyr::left_join(result, by="label", suffix=c("", ".y"))
-             return(otu_tb)
+             otu_tb %<>% 
+                 dplyr::left_join(result %<>% dplyr::rename(OTU="label"), by="OTU", suffix=c("", ".y")) %>% 
+                 tibble::column_to_rownames(var="OTU") %>%
+                 S4Vectors::DataFrame(check.names=FALSE)
+             SummarizedExperiment::rowData(.data) <- otu_tb
          }else{
-             newgroup <- paste0("Sign_", rlang::as_name(.group))
-             result %<>% 
-                 dplyr::rename(label="f", !!newgroup:=!!.group) 
              #result %<>% dplyr::select(setdiff(colnames(result), 
              #                          c(colnames(taxatree@data), 
              #                            colnames(taxatree@extraInfo)))
              #                         )
-             taxatree %<>% treeio::full_join(result, by="label")
-             return(taxatree)
+             taxatree %<>% treeio::full_join(result, by="label", suffix=c("", ".y"))
+             taxatree(.data) <- taxatree
          }
+         if (!is.null(.data@otutree) && tip.level=="OTU"){
+             otutree <- .data@otutree
+             otutree %<>% treeio::full_join(result, by="label", suffix=c("", ".y"))
+             otutree(.data) <- otutree
+         }
+         return(.data)
      }
 }
 
