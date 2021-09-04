@@ -13,7 +13,7 @@ This package has many unique features:
     consumption.
   - **MicrobiotaProcess** provides a wide variety of microbiome analysis
     procedures under the unified and common framework (tidy-like
-    framework). This will make the analysis more easier.
+    framework). This will make the related analysis easier.
 
 ## Anatomy of a **MPSE**
 
