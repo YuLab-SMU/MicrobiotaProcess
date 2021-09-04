@@ -18,91 +18,26 @@ conflicted::conflict_prefer("filter", "dplyr")
 knitr::opts_chunk$set(fig.path = "inst/figures/README-")
 ```
 
-```{r comment="", echo=FALSE, results='asis'}
-cat(packageDescription('MicrobiotaProcess')$Description)
+This package has many unique features:
+
++ **MicrobiotaProcess** introduces **MPSE** class, which make this package more interoperable with the existing computing ecosystem.
++ **MicrobiotaProcess** can bridge several common tools of microbiome analysis with several parsing functions.
++ **MicrobiotaProcess** introduces a tidy microbiome data structure paradigm and analysis grammar via formatted output 
+  avoiding memory consumption.
++ **MicrobiotaProcess** provides a wide variety of microbiome analysis procedures under the unified and common framework 
+  (tidy-like framework). This will make the analysis more easier.
+
+## Anatomy of a **MPSE** 
+
+```{r, echo=FALSE, fig.width = 12, dpi=400, fig.align="center", fig.cap= "The structure of the MPSE class."}
+knitr::include_graphics("./inst/figures/mpse.png")
 ```
 
-### tidy microbiome data structure
+## Overview of the design of **MicrobiotaProcess** package
 
-```{r}
-library(MicrobiotaProcess)
-data(mouse.time.mpse)
-mouse.time.mpse
+```{r, echo=FALSE, fig.width = 12, dpi=400, fig.align="center", fig.cap="The Overview of the design of MicrobiotaProcess package"}
+knitr::include_graphics("./inst/figures/mp-design.png")
 ```
-
-### Unified analysis grammar
-
-#### Alpha diversity analysis
-
-```{r, fig.width=7, fig.height=3, fig.align="center", message=FALSE, dpi=300, plotalpha}
-# example of the analysis of alpha diversity
-library(ggplot2)
-library(ggsignif)
-library(gghalves)
-mpse <- mouse.time.mpse %>%
-        mp_rrarefy() %>%
-        mp_cal_alpha(.abundance=RareAbundance)
-
-mpse %>% print(n=5)
-p <- mpse %>% mp_plot_alpha(.group=time, .alpha=c(Observe,Chao1, ACE, Shannon, Simpson, J))
-p <- p + 
-    scale_fill_manual(values=c("#00A087FF", "#3C5488FF"), guide="none") + 
-    scale_color_manual(values=c("#00A087FF", "#3C5488FF"), guide="none") 
-p
-```
-
-#### PCoa analysis
-
-```{r, fig.width=4.8, fig.height=4, message=FALSE, dpi=300, pcoa}
-mpse %<>% 
-    mp_decostand(.abundance=Abundance) %>%
-    mp_cal_pcoa(.abundance=hellinger)
-mpse %>% print(n=5)
-p2 <- mpse %>% mp_plot_ord(.ord = pcoa, 
-                           .group = time, 
-                           .size = Observe, 
-                           .alpha = Shannon, 
-                           ellipse = TRUE, 
-                           .color = time,
-                           show.legend = FALSE
-                          )
-p2 <- p2 +
-      scale_fill_manual(values=c("#00A087FF", "#3C5488FF")) +
-      scale_color_manual(values=c("#00A087FF", "#3C5488FF")) +
-      scale_size_continuous(range=c(1, 3))
-p2
-```
-
-<!--
-
-tbl <- mpse %>%
-       mp_extract_sample()
-
-tbl %>% print(n=5)
-tbl %<>% tidyr::pivot_longer(
-                         cols=!c("Sample", "time"), 
-                         names_to="measure", 
-                         values_to="alpha"
-                       ) %>%
-         dplyr::mutate(measure=forcats::fct_relevel(measure, 
-                       c("Observe", "Chao1", "ACE", "Simpson", "Shannon", "J"))
-                   )
-tbl %>% print(n=5)
-p <- ggplot(data=tbl, aes(x=time, y=alpha, fill=time)) +
-     geom_half_violin(color=NA, side="l", trim=FALSE) +
-     geom_boxplot(aes(color=time), fill=NA, position=position_nudge(x=.22), width=0.2) +
-     geom_half_point(side="r", shape=21, size=1.2) +
-     geom_signif(comparisons=list(c("Early", "Late")), 
-                 margin_top = 0.2,
-                 test="wilcox.test", 
-                 textsize=2) +
-     facet_wrap(facet=vars(measure), scales="free_y", nrow=1) +
-     scale_fill_manual(values=c("#00A087FF", "#3C5488FF"), guide="none") +
-     scale_color_manual(values=c("#00A087FF", "#3C5488FF"), guide="none") +
-     labs(x=NULL, y="alpha diversity index")
-p
-
--->
 
 ## :writing_hand: Authors
 
