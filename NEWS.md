@@ -1,5 +1,6 @@
-# MicrobiotaProcess 1.5.4.995
+# MicrobiotaProcess 1.5.4.996
 
++ update the vignettes of `MicrobiotaProcess`. (2021-09-04, Sat)
 + return updated `MPSE` object after the `mp_diff_analysis` is done with `action="add"`. (2021-08-31, Fri)
   - then the `taxtree` and `otutree` with the result of different analysis can be extracted with `mp_extract_tree`.
 + fix issue `print` for one line of `MPSE` and update `mp_plot_ord` to display the side `boxplot`. (2021-08-31, Tue)
