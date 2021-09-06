@@ -905,11 +905,6 @@ setGeneric("mp_plot_ord", function(
        params <- c(alpha = 1, params)
     }
 
-    #if ("starstroke" %in% names(paramlist)){
-    #   params[["starstroke"]] <- paramlist$starstroke 
-    #   paramlist <- NULL
-    #}
-
     p <- ggplot(data=tbl, mapping=maps)
     ggstar <- "ggstar"
     require(ggstar, character.only=TRUE) %>% suppressMessages()
@@ -996,6 +991,8 @@ setGeneric("mp_plot_ord", function(
                 message("No signature environment factor was found!")
                 return(p) 
             }
+            arrows.multi <- .internal.cal.arrows.multi(arrows=tbl2, data=tbl, dim=.dim)
+            tbl2[, .dim] <- arrows.multi * tbl2[, .dim]
             nms <- colnames(tbl2)
             maps2 <- aes(x=0, y=0, 
                          xend=!!rlang::sym(nms[.dim[1]]), 
@@ -1019,6 +1016,50 @@ setGeneric("mp_plot_ord", function(
             message("Please check whether the 'mp_envfit' has been performed with action='add'!")
             return(p)
         }
+    }else{
+       if (.ord %in% c("RDA", "CCA")){
+           biplot.da <- tbl %>% attr("biplot")
+           centroids.da <- tbl %>% attr("centroids")
+           if (!is.null(biplot.da) && !is.null(centroids.da)){
+               biplot.da %<>% dplyr::filter(!.data$biplot %in% centroids.da[,1])
+           }
+           if (!is.null(biplot.da) && nrow(biplot.da) > 0){
+               nms <- colnames(biplot.da)
+               arrows.multi <- .internal.cal.arrows.multi(arrows=biplot.da, data=tbl, dim=.dim)
+               biplot.da[, .dim] <- arrows.multi * biplot.da[, .dim]
+               maps2 <- aes(x = 0, 
+                            y = 0,
+                            xend = !!rlang::sym(nms[.dim[1]]),
+                            yend = !!rlang::sym(nms[.dim[2]]))
+               maps3 <- aes(x = !!rlang::sym(nms[.dim[1]]),
+                            y = !!rlang::sym(nms[.dim[2]]),
+                            label = !!rlang::sym(nms[1]))
+               biplot.layer <- ggplot2::geom_segment(data=biplot.da, 
+                                                     mapping = maps2, 
+                                                     arrow=ggplot2::arrow(length = unit(0.02, "npc")), 
+                                                     inherit.aes = FALSE)
+               labelparams <- modifyList(labelparams, list(data=biplot.da, mapping=maps3, inherit.aes=FALSE))
+               lab.layer <- do.call(ggrepel::geom_text_repel, labelparams)
+               p <- p + biplot.layer + lab.layer
+           }
+           if (!is.null(centroids.da) && nrow(centroids.da) > 0){
+               nms <- colnames(centroids.da) 
+               maps3 <- aes(x = !!rlang::sym(nms[.dim[1]]), 
+                            y = !!rlang::sym(nms[.dim[2]]), 
+                            label = !!rlang::sym(nms[1])
+                        )
+               labelparams <- modifyList(labelparams, 
+                                         list(data = centroids.da, 
+                                              mapping = maps3, 
+                                              hjust = 0.5, 
+                                              vjust = 0.5, 
+                                              nudge_x = 0, 
+                                              nudge_y = 0,
+                                              inherit.aes = FALSE))
+               lab.layer <- do.call(ggplot2::geom_text, labelparams)
+               p <- p + lab.layer
+           }
+       }
     }
 
     return(p)
@@ -1038,6 +1079,22 @@ setMethod("mp_plot_ord", signature(.data="tbl_mpse"), .internal_plot_ord)
 #' @aliases mp_plot_ord,grouped_df_mpse
 #' @export mp_plot_ord
 setMethod("mp_plot_ord", signature(.data="grouped_df_mpse"), .internal_plot_ord)
+
+# this is refer to the ggvegan
+.internal.cal.arrows.multi <- function(arrows, data, dim, at = c(0, 0), fill = 0.75){
+    u <- c(range(data[, dim[1]], range(data[, dim[2]])))
+    u <- u - rep(at, each = 2)
+    r <- c(range(arrows[, dim[1]], na.rm = TRUE), range(arrows[, dim[2]],
+        na.rm = TRUE))
+    rev <- sign(diff(u))[-2]
+    if (rev[1] < 0)
+        u[1:2] <- u[2:1]
+    if (rev[2] < 0)
+        u[3:4] <- u[4:3]
+    u <- u/r
+    u <- u[is.finite(u) & u > 0]
+    fill * min(u)
+}
 
 
 quo.vect_to_str.vect <- function(quoexpr){

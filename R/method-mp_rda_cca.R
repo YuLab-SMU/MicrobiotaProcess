@@ -24,7 +24,7 @@
 #'                .formula=~Al + P*(K + Baresoil), 
 #'                action="add")
 #' mpse
-#' mpse %>% mp_plot_ord(.ord=CCA, .group=Al, .size=K, show.sample=TRUE)
+#' mpse %>% mp_plot_ord(.ord=CCA, .group=Al, .size=K, show.sample=FALSE, bg.colour="black", colour="white")
 setGeneric("mp_cal_cca", function(.data, .abundance, .formula=NULL, .dim=3, action="add", ...)standardGeneric("mp_cal_cca"))
 
 #' @rdname mp_cal_cca-methods

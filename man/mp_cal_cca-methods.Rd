@@ -52,7 +52,7 @@ mpse \%<>\%
                .formula=~Al + P*(K + Baresoil), 
                action="add")
 mpse
-mpse \%>\% mp_plot_ord(.ord=CCA, .group=Al, .size=K, show.sample=TRUE)
+mpse \%>\% mp_plot_ord(.ord=CCA, .group=Al, .size=K, show.sample=FALSE, bg.colour="black", colour="white")
 }
 \author{
 Shuangbin Xu
