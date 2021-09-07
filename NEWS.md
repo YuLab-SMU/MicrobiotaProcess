@@ -1,6 +1,7 @@
 # MicrobiotaProcess 1.5.5.990
 
-+ update `mp_cal_abundance` use new `tidytree`. (2021-09-07, Thu)
++ update `mp_cal_abundance` use new `tidytree`. (2021-09-07, Tue)
++ introduce `include.lowest` parameter in `mp_filter_taxa`. (2021-09-07, Tue)
 
 # MicrobiotaProcess 1.5.5
 
