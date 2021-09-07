@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.5.5.990
+
++ update `mp_cal_abundance` use new `tidytree`. (2021-09-07, Thu)
+
 # MicrobiotaProcess 1.5.5
 
 + update `mp_plot_ord` to display the `bioplot` for result of `cca`, `rda` and `envfit`. (2021-09-06, Mon)
