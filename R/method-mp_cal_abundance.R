@@ -222,12 +222,13 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     }
     
     if (!is.null(.data@taxatree)){
-        taxada <- taxatree_to_tb(.data@taxatree) %>%
-                  tibble::as_tibble(rownames="OTU")
-        taxada <- taxada[ ,!colnames(taxada) %in% 
-                           c(colnames(.data@taxatree@data), 
-                             colnames(.data@taxatree@extraInfo)),
-                           drop=FALSE]
+        #taxada <- taxatree_to_tb(.data@taxatree) %>%
+        #          tibble::as_tibble(rownames="OTU")
+        #taxada <- taxada[ ,!colnames(taxada) %in% 
+        #                   c(colnames(.data@taxatree@data), 
+        #                     colnames(.data@taxatree@extraInfo)),
+        #                   drop=FALSE]
+        taxada <- .data %>% mp_extract_taxonomy()
         da %<>% dplyr::left_join(taxada, by="OTU", suffix=c("", ".y"))
         taxavar <- colnames(taxada)
     }else{
@@ -272,18 +273,17 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
          rename(label="OTU")
 
     if (!is.null(.data@taxatree)){
-        extranm <- setdiff(colnames(da1), c(colnames(.data@taxatree@data), colnames(.data@taxatree@extraInfo)))
-        da1 %<>% dplyr::select(extranm)
-        .data@taxatree %<>% treeio::full_join(da1, by="label")
+        extranm <- intersect(colnames(da1), c(colnames(.data@taxatree@data), colnames(.data@taxatree@extraInfo)))
+        .data@taxatree %<>% tidytree::select(-c(extranm), keep.td=TRUE) %>%  
+            treeio::full_join(da1, by="label")
     }else{
         .data %<>% left_join(da1, by=c("OTU"="label"))
     }
     otutree <- .data %>% mp_extract_tree(type="otutree")
     if (!is.null(otutree)){
         da1 %<>% dplyr::filter(!!as.symbol("label") %in% otutree@phylo$tip.label)
-        extranm <- setdiff(colnames(da1), c(colnames(otutree@data), colnames(otutree@extraInfo)))
-        da1 %<>% dplyr::select(extranm)
-        otutree(.data) <- otutree %>% treeio::full_join(da1, by="label")
+        extranm <- intersect(colnames(da1), c(colnames(otutree@data), colnames(otutree@extraInfo)))
+        otutree(.data) <- otutree %>% tidytree::select(-c(extranm), keep.td=TRUE) %>% treeio::full_join(da1, by="label")
     }
     
     if (action=="add"){
@@ -431,27 +431,32 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
               left_join(dx1, by=c("OTU", "Sample"), suffix=c("", ".y")) %>%
               select(c("OTU", "Sample", assaysvar, newRelabun, othernm))
     }
-
+    
     da1 %<>%
          dplyr::bind_rows() %>%
+         drop_class("tbl_mpse") %>%
          #nest_internal() %>%
-         rename(label="OTU")
+         dplyr::rename(label="OTU")
 
     taxatree <- .data %>% attr("taxatree")
 
     if (!is.null(taxatree)){
-        dat1 <- da1 %>% select(setdiff(colnames(da1), c(colnames(taxatree@data), colnames(taxatree@extraInfo))))
-        attr(.data, "taxatree") <- taxatree %>% treeio::full_join(dat1, by="label")
+        extranm <- intersect(colnames(da1), c(colnames(taxatree@data), colnames(taxatree@extraInfo)))
+        attr(.data, "taxatree") <- taxatree %>% 
+                                   tidytree::select(-c(extranm), keep.td=TRUE) %>% 
+                                   treeio::full_join(da1, by="label")
     }else{
-        .data %<>% left_join(dat1, by=c("OTU"="label"))
+        .data %<>% left_join(da1, by=c("OTU"="label"))
     }
     
     otutree <- .data %>% attr("otutree")
 
     if (!is.null(otutree)){
-        dat2 <- da1 %>% dplyr::filter(!!as.symbol("label") %in% otutree@phylo$tip.label) %>%
-                 select(setdiff(colnames(da1), c(colnames(otutree@data), colnames(otutree@extraInfo))))
-        attr(.data, "otutree") <- otutree %>% treeio::full_join(dat2, by="label")
+        dat2 <- da1 %>% dplyr::filter(!!as.symbol("label") %in% otutree@phylo$tip.label)
+        extranm <- intersect(colnames(da1), c(colnames(otutree@data), colnames(otutree@extraInfo)))
+        attr(.data, "otutree") <- otutree %>% 
+            tidytree::select(-c(extranm), keep.td=TRUE) %>%
+            treeio::full_join(dat2, by="label")
     }
     
     if (action=="get"){
