@@ -130,31 +130,7 @@ print.alphasample <- function(object){
 #' @rdname show-methods
 #' @exportMethod show
 setMethod("show", "MPSE", function(object){
-    if (isTRUE(x = getOption(x = "restore_MPSE_show", default = FALSE))) {
-        writeLines(formatted_out("The otutree (treedata object) of the MPSE object is: "))
-        if (!is.null(object@otutree)){
-            show(object@otutree)
-        }else{
-            writeLines("NULL")
-        }
-        writeLines(formatted_out("The taxatree (treedata object) of the MPSE object is: "))
-        if (!is.null(object@taxatree)){
-            show(object@taxatree)
-        }else{
-            writeLines(formatted_out("NULL"))
-        }
-        writeLines(formatted_out("The reference sequence (XStringSet object) of the MPSE object is: "))
-        if (!is.null(object@refseq)){
-            show(object@refseq)
-        }else{
-            writeLines("NULL")
-        }
-        writeLines(formatted_out("The abundance and sample data of the MPSE object are: "))
-        f <- methods::getMethod(f="show", signature = "SummarizedExperiment")
-        f(object)
-    }else{
-        object %>% print()
-    }
+    object %>% print()
 })
 
 
@@ -179,7 +155,40 @@ NULL
 #' @rdname print
 #' @method print MPSE
 #' @export
-print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
+print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL){
+    show.mpse <- getOption(x = "MPSE_show_tbl", default = TRUE)
+    if (show.mpse){
+        print2.MPSE(x, ..., n = n, width = width, n_extra = n_extra)
+    }else{
+        print1.MPSE(x, ...)
+    }
+}
+
+print1.MPSE <- function(x, ...){
+    writeLines(formatted_out("The otutree (treedata object) of the MPSE object is: "))
+    if (!is.null(x@otutree)){
+        show(x@otutree)
+    }else{
+        writeLines("NULL")
+    }
+    writeLines(formatted_out("The taxatree (treedata object) of the MPSE object is: "))
+    if (!is.null(x@taxatree)){
+        show(x@taxatree)
+    }else{
+        writeLines(formatted_out("NULL"))
+    }
+    writeLines(formatted_out("The reference sequence (XStringSet object) of the MPSE object is: "))
+    if (!is.null(x@refseq)){
+        show(x@refseq)
+    }else{
+        writeLines("NULL")
+    }
+    writeLines(formatted_out("The abundance and sample data of the MPSE object are: "))
+    f <- methods::getMethod(f="show", signature = "SummarizedExperiment")
+    f(x)
+}
+
+print2.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
     total_nrows <- nrow(x) * ncol(x)
     if (is.null(n)){
         n <- 10
