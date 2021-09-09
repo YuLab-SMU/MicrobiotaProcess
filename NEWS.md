@@ -1,5 +1,7 @@
-# MicrobiotaProcess 1.5.5.990
+# MicrobiotaProcess 1.5.5.991
 
++ convert the type of first element of assays to `matrix` to compatible with `DESeqDataSet` 
+  of `DESeq2`, `test_differential_abundance` of `tidybulk`. (2021-09-09, Thu)
 + update `show` and `print` for format output of `MPSE` class. (2021-09-08, Wed)
 + update `mp_cal_abundance` use new `tidytree`. (2021-09-07, Tue)
 + introduce `include.lowest` parameter in `mp_filter_taxa`. (2021-09-07, Tue)
