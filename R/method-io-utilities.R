@@ -261,7 +261,7 @@
     }
     
     mpse <- MPSE(
-                 assays = list(Abundance=otuda),
+                 assays = list(Abundance=otuda %>% as.matrix()),
                  colData = sampleda,
                  otutree = otutree,
                  taxatree =  taxatree,

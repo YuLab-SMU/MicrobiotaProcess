@@ -173,7 +173,7 @@ setGeneric("mp_diff_analysis", function(.data,
          }
      }
 
-     if (!any(grepl(abundance.nm, assaysvar))){
+     if (!any(grepl(paste0("^", abundance.nm), .data %>% mp_extract_feature() %>% colnames()))){
          .data %<>% mp_cal_abundance(.abundance=!!.abundance, force=force, relative=relative)
      }
 

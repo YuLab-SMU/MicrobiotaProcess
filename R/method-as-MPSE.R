@@ -107,7 +107,7 @@ as.MPSE <- function(.data, ...){
             dplyr::select(c("Sample", "OTU", i)) %>%
             dplyr::distinct() %>%
             tidyr::pivot_wider(names_from="Sample", values_from=i) %>%
-            tibble::column_to_rownames(var="OTU")
+            tibble::column_to_rownames(var="OTU") %>% as.matrix()
         ) %>% stats::setNames(x)
     return(assayda)
 }
