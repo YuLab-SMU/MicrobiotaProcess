@@ -1,4 +1,4 @@
-# MicrobiotaProcess 1.5.5.991
+# MicrobiotaProcess 1.5.6
 
 + convert the type of first element of assays to `matrix` to compatible with `DESeqDataSet` 
   of `DESeq2`, `test_differential_abundance` of `tidybulk`. (2021-09-09, Thu)

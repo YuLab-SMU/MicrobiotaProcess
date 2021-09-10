@@ -423,9 +423,10 @@ taxa.tree <- mouse.time.mpse %>%
                mp_extract_tree(type="taxatree")
 taxa.tree
 # And the result tibble of different analysis can also be extracted 
-# with tidytree (>=0.3.4.992)
-# taxa.tree %>% select(label, LDAupper, LDAmean, LDAlower, Sign_time, pvalue, fdr) %>% dplyr::filter(!is.na(fdr))
-#
+# with tidytree (>=0.3.5)
+taxa.tree %>% select(label, nodeClass, LDAupper, LDAmean, LDAlower, Sign_time, pvalue, fdr) %>% dplyr::filter(!is.na(fdr))
+
+# Since taxa.tree is treedata object, it can be visualized by ggtree and ggtreeExtra
 p1 <- ggtree(
         taxa.tree,
         layout="radial",
