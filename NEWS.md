@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.5.6.990
+
++ fix bug of `mp_plot_upset`. (2021-09-10, Fri)
+
 # MicrobiotaProcess 1.5.6
 
 + convert the type of first element of assays to `matrix` to compatible with `DESeqDataSet` 
