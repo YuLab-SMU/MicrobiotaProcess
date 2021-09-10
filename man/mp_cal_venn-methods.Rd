@@ -75,6 +75,9 @@ mouse.time.mpse \%>\%
 mp_rrarefy() \%>\%
 mp_cal_venn(.abundance=RareAbundance, .group=time, action="add") -> mpse
 mpse
+p <- mpse \%>\% mp_plot_venn(.venn = vennOftime, .group = time)
+\dontrun{
+# visualized by manual
 library(ggplot2)
 mpse \%>\% 
   mp_extract_sample() \%>\% 
@@ -82,6 +85,7 @@ mpse \%>\%
   distinct() \%>\%
   pull(var=vennOftime, name=time) \%>\%
   ggVennDiagram::ggVennDiagram()
+}
 }
 \seealso{
 [mp_plot_venn()]

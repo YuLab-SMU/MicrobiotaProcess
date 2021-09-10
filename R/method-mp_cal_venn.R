@@ -85,6 +85,9 @@ setMethod("get_vennlist", "data.frame", function(obj,
 #' mp_rrarefy() %>%
 #' mp_cal_venn(.abundance=RareAbundance, .group=time, action="add") -> mpse
 #' mpse
+#' p <- mpse %>% mp_plot_venn(.venn = vennOftime, .group = time)
+#' \dontrun{
+#' # visualized by manual
 #' library(ggplot2)
 #' mpse %>% 
 #'   mp_extract_sample() %>% 
@@ -92,6 +95,7 @@ setMethod("get_vennlist", "data.frame", function(obj,
 #'   distinct() %>%
 #'   pull(var=vennOftime, name=time) %>%
 #'   ggVennDiagram::ggVennDiagram()
+#' }
 setGeneric("mp_cal_venn", function(.data, .group, .abundance=NULL, action="add", force=FALSE, ...)standardGeneric("mp_cal_venn"))
 
 #' @rdname mp_cal_venn-methods
@@ -120,9 +124,8 @@ setMethod("mp_cal_venn", signature(.data="MPSE"), function(.data, .group, .abund
         .abundance <- as.symbol("RareAbundance")
     }
 
-    xx <- SummarizedExperiment::assays(.data)@listData
-
-    da <- xx[[rlang::as_name(.abundance)]] %>% 
+    da <- .data %>% 
+          mp_extract_assays(.abundance=!!.abundance) %>%
           tibble::as_tibble(rownames="OTU") %>%
           tidyr::pivot_longer(!as.symbol("OTU"), 
                               names_to="Sample", 
@@ -186,7 +189,7 @@ setMethod("mp_cal_venn", signature(.data="MPSE"), function(.data, .group, .abund
         .data %<>% 
             dplyr::left_join(dat, by=rlang::as_name(.group), suffix=c("", ".y"))
         return(.data)
-    }else if(action == "get"){
+    }else if(action == "only"){
         return (dat)
     }else if(action == "get"){
         return (dat)
