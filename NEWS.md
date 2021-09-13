@@ -1,6 +1,7 @@
 # MicrobiotaProcess 1.5.6.990
 
 + fix bug of `mp_plot_upset`. (2021-09-10, Fri)
++ update the `mp_plot_ord`. (2021-09-13, Mon)
 
 # MicrobiotaProcess 1.5.6
 

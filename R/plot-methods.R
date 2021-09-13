@@ -942,12 +942,14 @@ setGeneric("mp_plot_ord", function(
            side.x <- NULL
        }
 
-       p <- p +
+       p <- suppressMessages(
+            p +
             side.y + 
             ggside::scale_xsidey_discrete() + 
             side.x +
             ggside::scale_ysidex_discrete() + 
             theme(ggside.panel.scale = 0.25)
+            )
     }
 
     if (show.sample){

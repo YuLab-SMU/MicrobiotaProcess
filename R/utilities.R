@@ -145,7 +145,7 @@ fillNAtax <- function(taxdf, type="species"){
 
 #' @keywords internal
 remove_unclassfied <- function(taxdf){
-    taxdf[grepl.data.frame("Unclassified|uncultured|Ambiguous|Unknown|unknown|metagenome", taxdf)] <- NA
+    taxdf[grepl.data.frame("Unclassified|uncultured|Ambiguous|Unknown|unknown|metagenome|Unassig", taxdf, ignore.case=TRUE)] <- NA
     return(taxdf)
 }
 
