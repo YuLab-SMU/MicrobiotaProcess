@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.5.7.990
+
++ add `mp_aggregate` function. (2021-09-26, Sun)
+
 # MicrobiotaProcess 1.5.7
 
 + fix bug of `mp_plot_upset`. (2021-09-10, Fri)

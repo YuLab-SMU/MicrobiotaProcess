@@ -75,12 +75,12 @@ setMethod("mp_aggregate", signature(.data="MPSE"), .internal_mp_aggregate)
 
 check_single_nrow_in_nest <- function(da, columns){
     indnm <- da %>% 
-             apply(., 2, function(x)all(lapply(x, function(i)nrow(i)==1) %>% unlist())) 
+             apply(., 2, function(x)all(lapply(x, function(i)nrow(unique(i))==1) %>% unlist())) 
     indnm <- indnm[indnm] %>% names()
     indnm <- indnm[!indnm %in% columns]
     if (length(indnm)>0){
         for( i in indnm){
-            da %<>% dplyr::mutate(!!rlang::sym(i):=as.vector(rlang::sym(i)))
+            da %<>% dplyr::mutate(!!rlang::sym(i):=as.vector(unlist(lapply(!!rlang::sym(i), function(x)unique(x)))))
         }
     }
     return(da)
