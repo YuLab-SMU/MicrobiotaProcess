@@ -80,7 +80,7 @@ as_tibble.MPSE <- function(x, ...){
         avoid_conflict_names() 
     if (ncol(otumeta)>0){
         otumetavar <- colnames(otumeta)
-        otumeta %<>% tibble::as_tibble(rownames="OTU")
+        otumeta %<>% tibble::as_tibble(rownames="OTU") %>% modify_AsIs_list()
         otuda <- otuda %>% left_join(otumeta, by="OTU", suffix=c("", ".y"))
     }else{
         otumetavar <- NULL

@@ -319,7 +319,8 @@ setMethod("mp_extract_sample", signature(x="MPSE"), function(x, ...){
      da <- x@colData %>%
            data.frame(check.names=FALSE) %>%
            avoid_conflict_names() %>%
-           tibble::as_tibble(rownames="Sample")
+           tibble::as_tibble(rownames="Sample") %>%
+           modify_AsIs_list()
      return(da)
 })
 
@@ -330,6 +331,13 @@ setMethod("mp_extract_sample", signature(x="MPSE"), function(x, ...){
         select(samplevar) %>%
         distinct()
     return(da)
+}
+
+modify_AsIs_list <- function(x, ...){
+    nms <- lapply(x, function(x)inherits(x, "AsIs") && typeof(x)=="list")
+    nms <- names(nms[unlist(nms)])
+    x %<>% dplyr::mutate_at(dplyr::vars(nms), ~unclass(.))
+    x
 }
 
 #' @rdname mp_extract_sample-methods
@@ -373,6 +381,7 @@ setMethod("mp_extract_feature", signature(x="MPSE"), function(x, addtaxa=FALSE, 
         da %<>% dplyr::left_join(trda, by="OTU") 
                 
     }
+    da %<>% modify_AsIs_list()
     return(da)
 })
 

@@ -193,6 +193,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
         if (ncol(da)==1 && da %>% pull(!!.env) %>% rlang::is_list()){
             da %<>%
                 as_tibble(rownames="Sample") %>%
+				modify_AsIs_list() %>%
                 tidyr::unnest() %>%
                 suppressWarnings() %>% 
                 tidyr::pivot_wider(id_cols="Sample", 
