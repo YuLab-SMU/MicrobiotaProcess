@@ -923,20 +923,30 @@ setGeneric("mp_plot_ord", function(
     if (show.side){
        if ("fill" %in% names(maps) && !is.discrete(tbl, maps, "fill")){
            side.y <- do.call(ggside::geom_xsideboxplot, 
-                             list(mapping=aes(y=!!.group), color = "black",orientation = "y"))
+                             list(mapping=aes(y=!!.group), color = "black",orientation = "y")) %>%
+                     suppressMessages()
            
            side.x <- do.call(ggside::geom_ysideboxplot,
-                             list(mapping=aes(x=!!.group), color = "black",orientation = "x"))
+                             list(mapping=aes(x=!!.group), color = "black",orientation = "x")) %>%
+                     suppressMessages()
+
        }else if ("color" %in% names(maps) && !is.discrete(tbl, maps, "color")){
            side.y <- do.call(ggside::geom_xsideboxplot, 
-                             list(mapping=aes(y=!!.color), fill=NA, orientation="y"))
+                             list(mapping=aes(y=!!.color), fill=NA, orientation="y")) %>%
+                     suppressMessages()
+
            side.x <- do.call(ggside::geom_ysideboxplot,
-                             list(mapping=aes(x=!!.color), fill=NA, orientation="x"))
+                             list(mapping=aes(x=!!.color), fill=NA, orientation="x")) %>%
+                     suppressMessages()
+
        }else if ("starshape" %in% names(maps) && !is.discrete(tbl, maps, "starshape")){
            side.y <- do.call(ggside::geom_xsideboxplot, 
-                             list(mapping=aes(y=!!.starshape), orientation="y"))
+                             list(mapping=aes(y=!!.starshape), orientation="y")) %>%
+                     suppressMessages()
+
            side.x <- do.call(ggside::geom_ysideboxplot, 
-                             list(mapping=aes(x=!!.starshape), orientation="x"))
+                             list(mapping=aes(x=!!.starshape), orientation="x")) %>%
+                     suppressMessages()
        }else{
            side.y <- NULL
            side.x <- NULL

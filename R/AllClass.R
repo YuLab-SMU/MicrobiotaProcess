@@ -68,7 +68,9 @@ MPSE <- function(assays,
                  taxatree = NULL, 
                  refseq = NULL, 
                  ...){
-
+    if (inherits(assays, "data.frame") || inherits(assays, "DFrame")){
+        assays <- list(assays)
+    }
     clnm <- names(assays)
 
     if (clnm[1] != "Abundance" || is.null(clnm)){
