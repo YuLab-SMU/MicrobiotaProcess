@@ -1,3 +1,8 @@
+# MicrobiotaProcess 1.5.8.990
+
++ update `MPSE` to allow `assays` supporting `data.frame` or `DFrame` class. (2021-10-08, Fri)
++ update `mp_plot_ord` to suppress the message of the third depend package. (2021-10-08, Fri)
+
 # MicrobiotaProcess 1.5.8
 
 + fix the bug of `AsIs` list class in `unnest` for the `tidyr` (>= 1.1.4). (2021-10-01, Fri)
