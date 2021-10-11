@@ -1,5 +1,7 @@
-# MicrobiotaProcess 1.5.8.990
+# MicrobiotaProcess 1.5.8.991
 
++ introduce `trimSample` in `mp_rrarefy` to check whether to remove the samples that
+  do not have enough abundance. (2021-10-11, Mon)
 + update `MPSE` to allow `assays` supporting `data.frame` or `DFrame` class. (2021-10-08, Fri)
 + update `mp_plot_ord` to suppress the message of the third depend package. (2021-10-08, Fri)
 
