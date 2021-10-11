@@ -16,6 +16,7 @@ mp_rrarefy(
   .abundance = NULL,
   raresize,
   trimOTU = FALSE,
+  trimSample = FALSE,
   seed = 123,
   ...
 )
@@ -25,6 +26,7 @@ mp_rrarefy(
   .abundance = NULL,
   raresize,
   trimOTU = FALSE,
+  trimSample = FALSE,
   seed = 123,
   ...
 )
@@ -34,6 +36,7 @@ mp_rrarefy(
   .abundance = NULL,
   raresize,
   trimOTU = FALSE,
+  trimSample = FALSE,
   seed = 123,
   ...
 )
@@ -43,6 +46,7 @@ mp_rrarefy(
   .abundance = NULL,
   raresize,
   trimOTU = FALSE,
+  trimSample = FALSE,
   seed = 123,
   ...
 )
@@ -57,6 +61,9 @@ default is Abundance.}
 
 \item{trimOTU}{logical Whether to remove the otus that are no 
 longer present in any sample after rarefaction}
+
+\item{trimSample}{logical whether to remove the samples that 
+do not have enough abundance (raresize), default is FALSE.}
 
 \item{seed}{a random seed to make the rrarefy reproducible,
 default is 123.}

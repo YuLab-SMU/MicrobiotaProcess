@@ -8,6 +8,8 @@
 ##' @param raresize integer Subsample size for rarefying community.
 ##' @param trimOTU logical Whether to remove the otus that are no 
 ##' longer present in any sample after rarefaction
+##' @param trimSample logical whether to remove the samples that 
+##' do not have enough abundance (raresize), default is FALSE.
 ##' @param seed a random seed to make the rrarefy reproducible,
 ##' default is 123. 
 ##' @param ... additional parameters, meaningless now.
@@ -18,26 +20,20 @@
 ##' @examples
 ##' data(mouse.time.mpse)
 ##' mouse.time.mpse %>% mp_rrarefy()
-setGeneric("mp_rrarefy", function(.data, .abundance=NULL, raresize, trimOTU=FALSE, seed=123, ...){standardGeneric("mp_rrarefy")}) 
+setGeneric("mp_rrarefy", function(.data, .abundance=NULL, raresize, trimOTU=FALSE, trimSample=FALSE, seed=123, ...){standardGeneric("mp_rrarefy")}) 
 
-# ##' @rdname mp_rrarefy-methods
-# ##' @aliases mp_rrarefy,matrix
-# ##' @exportMethod mp_rrarefy
-# ##' @source 
-# ##' mp_rrarefy for matrix object is a wrapper method of vegan::rrarefy from the vegan 
-# ##' package. 
-# ##' @seealso
-# ##' \link[vegan]{rrarefy}
-# setMethod("mp_rrarefy", signature(.data="matrix"), function(.data, raresize, trimOTU=FALSE, seed=123, ...){
-.internal_mp_rrarefy <- function(.data, raresize, trimOTU=FALSE, seed=123, ...){
-    if (missing(raresize)||is.null(raresize)){
+.internal_mp_rrarefy <- function(.data, raresize, trimOTU=FALSE, trimSample=FALSE, seed=123, ...){
+    if (missing(raresize) || is.null(raresize)){
         raresize <- min(rowSums(.data))
     }
     if (is.na(seed) || is.null(seed)){
         message("To reproduce and it was not be set, the random seed will set to 123 automatically.")
         seed <- 123
     }
-    res <- withr::with_seed(seed, vegan::rrarefy(x=.data, sample=raresize))
+    if (trimSample){
+        .data <- .data[rowSums(.data) >= raresize, ,drop=FALSE]
+    }
+    res <- withr::with_seed(seed, vegan::rrarefy(x=.data, sample=raresize)) %>% suppressWarnings()
     if (trimOTU){
         removeOTU <- colSums(res)==0
         if (sum(removeOTU) > 0){
@@ -49,44 +45,10 @@ setGeneric("mp_rrarefy", function(.data, .abundance=NULL, raresize, trimOTU=FALS
     return(res)
 }
 
-
-# ##' @rdname mp_rrarefy-methods
-# ##' @aliases mp_rrarefy,data.frame
-# ##' @exportMethod mp_rrarefy
-# setMethod("mp_rrarefy", signature(.data="data.frame"), function(.data, raresize, trimOTU=FALSE, seed=123, ...){
-#     .data <- as.matrix(.data)
-#     res <- mp_rrarefy(.data=.data, raresize=raresize, trimOTU=trimOTU, seed=seed)
-#     res <- data.frame(res) 
-#     return(res)
-# })
-
-# ##' @rdname mp_rrarefy-methods
-# ##' @aliases mp_rrarefy,phyloseq
-# ##' @exportMethod mp_rrarefy
-# setMethod("mp_rrarefy", signature(obj="phyloseq"), function(obj, raresize, trimOTU=TRUE, seed=123){
-#     otuda <- get_otudata(obj)
-#     res <- mp_rrarefy(obj=otuda, raresize=raresize, trimOTU=trimOTU, seed=seed)
-#     obj@otu_table <- otu_table(res, taxa_are_rows=FALSE)
-#     if (!is.null(obj@sam_data)){
-#         obj@sam_data <- obj@sam_data[rownames(obj@sam_data) %in% rownames(res),,drop=FALSE]
-#     }
-#     if (!is.null(obj@tax_table)){
-#         obj@tax_table <- obj@tax_table[rownames(obj@tax_table) %in% colnames(res),,drop=FALSE]
-#     }
-#     if (!is.null(obj@phy_tree)){
-#         obj@phy_tree <- ape::keep.tip(obj@phy_tree, tip=colnames(res))
-#     }
-#     if (!is.null(obj@refseq)){
-#         obj@refseq <- obj@refseq[colnames(res)]
-#     }
-#     return (obj)
-# })
-
-
 ##' @rdname mp_rrarefy-methods
 ##' @aliases mp_rrarefy,MPSE
 ##' @exportMethod mp_rrarefy
-setMethod("mp_rrarefy", signature(.data="MPSE"), function(.data, .abundance=NULL, raresize, trimOTU=FALSE, seed=123, ...){
+setMethod("mp_rrarefy", signature(.data="MPSE"), function(.data, .abundance=NULL, raresize, trimOTU=FALSE, trimSample=FALSE, seed=123, ...){
     .abundance <- rlang::enquo(.abundance)
     if (rlang::quo_is_null(.abundance)){
         .abundance <- as.symbol("Abundance")
@@ -96,14 +58,24 @@ setMethod("mp_rrarefy", signature(.data="MPSE"), function(.data, .abundance=NULL
         message("The RareAbundance was in the MPSE object, please check whether it has been rarefied !")
         return(.data)
     }
-    rare <- .internal_mp_rrarefy(.data=t(allassays[[rlang::as_name(.abundance)]]), raresize=raresize, trimOTU=FALSE, seed=123) %>% t()
+    rare <- .internal_mp_rrarefy(.data=t(allassays[[rlang::as_name(.abundance)]]), raresize=raresize, trimOTU=FALSE, trimSample=FALSE, seed=123) %>% t()
     SummarizedExperiment::assays(.data)@listData <- c(allassays, list(RareAbundance=rare))
     if (trimOTU){
         removeOTU <- rowSums(rare)==0
         if (sum(removeOTU) > 0){
             message(sum(removeOTU), " OTUs were removed because they are no longer present in any sample after ",
                     "rarefaction, if you want to keep them you can set 'trimOTU = FALSE' !")
-            .data <- .data[!rownames(.data) %in% rownames(rare[removeOTU,]), ]
+            .data <- .data[!rownames(.data) %in% rownames(rare[removeOTU, , drop=FALSE]), ]
+        }
+    }
+
+    if (trimSample){
+        removeSample <- colSums(rare) < max(colSums(rare))
+        if (sum(removeSample) > 0){
+            message(paste0(sum(removeSample), ifelse(sum(removeSample)>1, " samples were", " samples was"), 
+                           " removed because they do not have enough abundance when raresize = ", raresize,
+                           ", if you want to keep them you can set 'trimSample = FALSE' !"))
+            .data <- .data[, !colnames(.data) %in% colnames(rare[, removeSample, drop=FALSE])]
         }
     }
     return(.data)
@@ -112,7 +84,7 @@ setMethod("mp_rrarefy", signature(.data="MPSE"), function(.data, .abundance=NULL
 ##' @rdname mp_rrarefy-methods
 ##' @aliases mp_rrarefy,tbl_mpse
 ##' @exportMethod mp_rrarefy
-setMethod("mp_rrarefy", signature(.data="tbl_mpse"), function(.data, .abundance=NULL, raresize, trimOTU=FALSE, seed=123, ...){
+setMethod("mp_rrarefy", signature(.data="tbl_mpse"), function(.data, .abundance=NULL, raresize, trimOTU=FALSE, trimSample=FALSE, seed=123, ...){
     .abundance <- rlang::enquo(.abundance)
     if (rlang::quo_is_null(.abundance)){
         .abundance <- as.symbol("Abundance")
@@ -125,13 +97,9 @@ setMethod("mp_rrarefy", signature(.data="tbl_mpse"), function(.data, .abundance=
         return(.data)
     }
     tmpotu <- .data %>% mp_extract_assays(.abundance=!!.abundance, byRow=FALSE)
-              #tibble::as_tibble() %>% 
-              #select(c("OTU", "Sample", "Abundance")) %>%
-              #tidyr::pivot_wider(names_from="OTU", values_from="Abundance") %>% 
-              #tibble::column_to_rownames(var="Sample")
-    rare <- .internal_mp_rrarefy(.data=tmpotu, raresize=raresize, trimOTU=FALSE, seed=seed, ...) %>%
+    rare <- .internal_mp_rrarefy(.data=tmpotu, raresize=raresize, trimOTU=FALSE, trimSample=FALSE, seed=seed, ...) %>%
             t() %>% 
-            tibble::as_tibble(rownames="OTU") %>% 
+            tibble::as_tibble(rownames = "OTU") %>% 
             tidyr::pivot_longer(!"OTU", names_to="Sample", values_to="RareAbundance")
     othernms <- colnames(.data)[!colnames(.data) %in% c("OTU", "Sample", assaysvar)]
     res <- .data %>% left_join(rare, by=c("OTU", "Sample"), suffix=c("", ".y")) %>% 
@@ -149,6 +117,20 @@ setMethod("mp_rrarefy", signature(.data="tbl_mpse"), function(.data, .abundance=
             res %<>% dplyr::filter(!.data$OTU %in% removeOTU)
         }
     }
+    if (trimSample){
+        sampleTotal <- res %>% 
+                       dplyr::group_by(.data$Sample) %>%
+                       dplyr::summarise(Total=sum(.data$RareAbundance)) %>%
+                       dplyr::pull(var=.data$Total, name=.data$Sample)
+
+        removeSample <- sampleTotal < max(sampleTotal)
+        if (sum(removeSample) > 0){
+            message(paste0(sum(removeSample), ifelse(sum(removeSample)>1, " samples were", " samples was"), 
+                           " removed because they do not have enough abundance when raresize = ", raresize,
+                           ", if you want to keep them you can set 'trimSample = FALSE' !"))
+            res %<>% dplyr::filter(!.data$Sample %in% names(removeSample[removeSample]))
+        }
+    }
     res <- add_attr.tbl_mpse(x1 = res, x2 = .data)
     attr(res, "assaysvar") <- c(assaysvar, "RareAbundance")
     return (res)
@@ -157,7 +139,7 @@ setMethod("mp_rrarefy", signature(.data="tbl_mpse"), function(.data, .abundance=
 ##' @rdname mp_rrarefy-methods
 ##' @aliases mp_rrarefy,grouped_df_mpse
 ##' @exportMethod mp_rrarefy
-setMethod("mp_rrarefy", signature(.data="grouped_df_mpse"), function(.data, .abundance=NULL, raresize, trimOTU=FALSE, seed=123, ...){
+setMethod("mp_rrarefy", signature(.data="grouped_df_mpse"), function(.data, .abundance=NULL, raresize, trimOTU=FALSE, trimSample=FALSE, seed=123, ...){
     .abundance <- rlang::enquo(.abundance)
     if (rlang::quo_is_null(.abundance)){
         .abundance <- as.symbol("Abundance")
@@ -166,7 +148,7 @@ setMethod("mp_rrarefy", signature(.data="grouped_df_mpse"), function(.data, .abu
     groupvars <- names(tmpgroups)[names(tmpgroups) != ".rows"]
     groupvars <- lapply(groupvars, function(i) as.symbol(i))
     .data %<>% ungroup
-    res <- mp_rrarefy(.data=.data, .abundance=!!.abundance, raresize=raresize, trimOTU=trimOTU, seed=seed, ...)
+    res <- mp_rrarefy(.data=.data, .abundance=!!.abundance, raresize=raresize, trimOTU=trimOTU, trimSample=trimSample, seed=seed, ...)
     res <- do.call(group_by, c(list(res), groupvars))
     return (res)
 })
