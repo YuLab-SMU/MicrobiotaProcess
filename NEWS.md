@@ -1,5 +1,6 @@
-# MicrobiotaProcess 1.5.8.991
+# MicrobiotaProcess 1.5.8.992
 
++ fix rename bug, rename the taxonomy names can work now. (2021-10-12, Tue)
 + introduce `trimSample` in `mp_rrarefy` to check whether to remove the samples that
   do not have enough abundance. (2021-10-11, Mon)
 + update `MPSE` to allow `assays` supporting `data.frame` or `DFrame` class. (2021-10-08, Fri)
