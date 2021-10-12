@@ -187,7 +187,7 @@ setMethod("mp_plot_abundance", signature(.data="grouped_df_mpse"), .internal_plo
 #' @rdname mp_plot_alpha-methods
 #' @param .data MPSE or tbl_mpse object
 #' @param .group the column name of sample group information
-#' @param .alpha the column name of alpha index after run mp_cal_alpha
+#' @param .alpha the column name of alpha index after run mp_cal_alpha or mp_cal_NRI_NTI.
 #' @param test the name of the statistical test, default is 'wilcox.test'
 #' @param comparisons A list of length-2 vectors. The entries in the vector are
 #' either the names of 2 values on the x-axis or the 2 integers that 
@@ -206,7 +206,7 @@ setMethod("mp_plot_abundance", signature(.data="grouped_df_mpse"), .internal_plo
 #'         mp_cal_alpha(.abundance=RareAbundance)
 #' mpse
 #' p <- mpse %>% 
-#'      mp_plot_alpha(.group=time, .alpha=c(Observe, Shannon, J))
+#'      mp_plot_alpha(.group=time, .alpha=c(Observe, Shannon, Pielou))
 #' p
 #' }
 setGeneric("mp_plot_alpha", 
@@ -238,20 +238,25 @@ setGeneric("mp_plot_alpha",
         #rlang::abort("The .group column name is required for the visualization of alpha diversity")
     }
 
-    tbl <- .data %>% 
-        mp_extract_sample() %>%
-        dplyr::select(!!rlang::sym("Sample"), !!.group, !!.alpha) %>%
-        tidyr::pivot_longer(cols=-c(rlang::sym("Sample"), !!.group), 
-                            names_to="Measure", values_to="Alpha")
-
-    newlevels <- rlang::quo_text(.alpha) %>% 
-        gsub("c\\(", "", .) %>% 
-        gsub("\\)", "", .) %>% 
-        base::strsplit(",") %>% 
-        unlist() %>% 
+    newlevels <- rlang::quo_text(.alpha) %>%
+        gsub("c\\(", "", .) %>%
+        gsub("\\)", "", .) %>%
+        base::strsplit(",") %>%
+        unlist() %>%
         gsub("\\s+", "", .) %>%
         gsub("\"", "", .) %>%
         gsub("\'", "", .)
+
+    if ("J" %in% newlevels){
+        warning("The 'J' exists in the .alpha parameter, it has been deprecated and it will not be supported in the next released version, please use 'Pielou' to replace it.", call. = FALSE)
+        newlevels[newlevels == "J"] <- "Pielou"
+    }
+
+    tbl <- .data %>% 
+        mp_extract_sample() %>%
+        dplyr::select(!!rlang::sym("Sample"), !!newlevels, !!.group) %>%
+        tidyr::pivot_longer(cols=-c(rlang::sym("Sample"), !!.group), 
+                            names_to="Measure", values_to="Alpha")
 
     tbl$Measure <- factor(tbl$Measure, levels=newlevels)
 

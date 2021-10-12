@@ -185,14 +185,14 @@ mouse.time.mpse
 f1 <- mouse.time.mpse %>% 
       mp_plot_alpha(
         .group=time, 
-        .alpha=c(Observe, Chao1, ACE, Shannon, Simpson, J)
+        .alpha=c(Observe, Chao1, ACE, Shannon, Simpson, Pielou)
       ) +
       scale_fill_manual(values=c("#00A087FF", "#3C5488FF"), guide="none") +
       scale_color_manual(values=c("#00A087FF", "#3C5488FF"), guide="none")
 
 f2 <- mouse.time.mpse %>%
       mp_plot_alpha(
-        .alpha=c(Observe, Chao1, ACE, Shannon, Simpson, J)
+        .alpha=c(Observe, Chao1, ACE, Shannon, Simpson, Pielou)
       )
 
 f1 / f2

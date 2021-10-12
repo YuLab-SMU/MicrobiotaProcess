@@ -55,7 +55,7 @@ mp_plot_alpha(
 
 \item{.group}{the column name of sample group information}
 
-\item{.alpha}{the column name of alpha index after run mp_cal_alpha}
+\item{.alpha}{the column name of alpha index after run mp_cal_alpha or mp_cal_NRI_NTI.}
 
 \item{test}{the name of the statistical test, default is 'wilcox.test'}
 
@@ -80,7 +80,7 @@ mpse <- mouse.time.mpse \%>\%
         mp_cal_alpha(.abundance=RareAbundance)
 mpse
 p <- mpse \%>\% 
-     mp_plot_alpha(.group=time, .alpha=c(Observe, Shannon, J))
+     mp_plot_alpha(.group=time, .alpha=c(Observe, Shannon, Pielou))
 p
 }
 }

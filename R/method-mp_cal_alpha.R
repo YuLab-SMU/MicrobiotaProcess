@@ -51,18 +51,18 @@ setMethod("get_alphaindex", "matrix", function(obj, mindepth, sampleda, force=FA
     }
     Shannon <- diversity(obj)
     Simpson <- diversity(obj, index="simpson")
-    J <- Shannon/log(specnumber(obj))
+    Pielou <- Shannon/log(specnumber(obj))
     if (identical(all.equal(obj, round(obj)),TRUE)){
         spn <- estimateR(obj)
         Observe <- spn[1,]
         Chao1 <- spn[2, ] 
         ACE <- spn[4, ]
-        alpha <- data.frame(Observe=Observe, Chao1=Chao1, ACE=ACE, Shannon, Simpson, J)
+        alpha <- data.frame(Observe=Observe, Chao1=Chao1, ACE=ACE, Shannon, Simpson, Pielou)
     }else{
         Observe <- apply(obj, 1, function(x)sum(x>0))
         Chao1 <- NULL
         ACE <- NULL
-        alpha <- data.frame(Observe=Observe, Shannon, Simpson, J)
+        alpha <- data.frame(Observe=Observe, Shannon, Simpson, Pielou)
     }
     if (missing(sampleda)){
         sampleda <- NULL
@@ -136,7 +136,7 @@ setMethod("get_alphaindex", "phyloseq", function(obj, ...){
 #'         mp_rrarefy() %>%
 #'         mp_cal_alpha(.abundance=RareAbundance)
 #' mpse
-#' p <- mpse %>% mp_plot_alpha(.group=time, .alpha=c(Observe, Shannon, J))
+#' p <- mpse %>% mp_plot_alpha(.group=time, .alpha=c(Observe, Shannon, Pielou))
 #' p
 #' # Or you can extract the result and visualize it with ggplot2 and ggplot2-extensions
 #' \dontrun{

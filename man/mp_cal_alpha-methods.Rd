@@ -51,7 +51,7 @@ mpse <- mouse.time.mpse \%>\%
         mp_rrarefy() \%>\%
         mp_cal_alpha(.abundance=RareAbundance)
 mpse
-p <- mpse \%>\% mp_plot_alpha(.group=time, .alpha=c(Observe, Shannon, J))
+p <- mpse \%>\% mp_plot_alpha(.group=time, .alpha=c(Observe, Shannon, Pielou))
 p
 # Or you can extract the result and visualize it with ggplot2 and ggplot2-extensions
 \dontrun{
