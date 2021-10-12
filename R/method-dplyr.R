@@ -531,7 +531,12 @@ check_attr.tbl_mpse <- function(x, recol, type="rename"){
     if (any(renm %in% taxavar) && type=="rename"){
         indx <- match(item2, taxavar)
         indy <- match(item2, renm)
+        indname <- lapply(names(recol[indy]), function(i) i) %>% 
+                   stats::setNames(taxavar[indx])
         taxavar[indx] <- names(recol[indy])
+        taxa.tree <- attr(x, "taxatree")
+        taxa.tree %<>% dplyr::mutate(nodeClass=do.call(dplyr::recode, c(.x=rlang::sym("nodeClass"), indname)))
+        attr(x, "taxatree") <- taxa.tree
     }
 	if (any(renm %in% assaysvar) && type=="rename"){
         indx <- match(item3, assaysvar)
