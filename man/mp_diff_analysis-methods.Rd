@@ -175,7 +175,8 @@ pvalue <= .first.test.alpha will be kept.}
 default is TRUE (strict).}
 
 \item{fc.method}{character the method to check which group has more abundance for the 
-significantly different features, default is "generalizedFC".}
+significantly different features, default is "generalizedFC", options are \code{generalizedFC}, 
+\code{compare_median}, \code{compare_mean}.}
 
 \item{second.test.method}{the method for one-against-one (the second test), default is "wilcox.test" 
 other option is one of 'wilcox_test' of 'coin'; 'glm'; 'glm.nb' of 'MASS'.}

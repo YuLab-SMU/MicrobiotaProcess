@@ -23,7 +23,8 @@
 #' @param strict logical whether to performed in one-against-one when .sec.group is provided, 
 #' default is TRUE (strict).
 #' @param fc.method character the method to check which group has more abundance for the 
-#' significantly different features, default is "generalizedFC".
+#' significantly different features, default is "generalizedFC", options are \code{generalizedFC}, 
+#' \code{compare_median}, \code{compare_mean}.
 #' @param second.test.method the method for one-against-one (the second test), default is "wilcox.test" 
 #' other option is one of 'wilcox_test' of 'coin'; 'glm'; 'glm.nb' of 'MASS'.
 #' @param second.test.alpha numeric the alpha value for the second test, default is 0.05.
@@ -44,7 +45,7 @@
 #' @param sample.prop.boot numeric range from 0 to 1, the proportion of samples for calculating the effect
 #' size of features, default is 0.7.
 #' @param ci numeric, the confidence interval of effect size (LDA or MDA), default is 0.95.
-#' @param seed a random seed to make the adonis analysis reproducible, default is 123.
+#' @param seed a random seed to make the analysis reproducible, default is 123.
 #' @param type character type="species" meaning the abundance matrix is from the species abundance, other 
 #' option is "others", default is "species".
 #' @param ... additional parameters
