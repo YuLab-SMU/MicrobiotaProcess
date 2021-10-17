@@ -13,11 +13,14 @@ recommend they have names, e.g. list(Abundance=xx1, RareAbundance=xx2).}
 
 \item{colData}{An optional DataFrame describing the samples.}
 
-\item{otutree}{A treedata object of tidytree package}
+\item{otutree}{A treedata object of tidytree package, the result parsed by
+the functions of treeio.}
 
-\item{taxatree}{A treedata object of tidytree package}
+\item{taxatree}{A treedata object of tidytree package, the result parsed by
+the functions of treeio.}
 
-\item{refseq}{A XStingSet object of Biostrings package}
+\item{refseq}{A XStingSet object of Biostrings package, the result parsed by
+the readDNAStringSet or readAAStringSet of Biostrings.}
 
 \item{...}{additional parameters, see also the usage 
 of \code{\link[SummarizedExperiment]{SummarizedExperiment}}.}

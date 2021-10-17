@@ -39,7 +39,7 @@ the tsv format, default is NULL.}
 default is NULL.}
 
 \item{treeqza}{character, the file contained the tree file or treedata object, which is the result 
-by parsing function of treeio, default is NULL.}
+parsed by functions of treeio, default is NULL.}
 
 \item{parallel}{logical, whether parsing the column of taxonomy multi-parallel, default is FALSE.}
 

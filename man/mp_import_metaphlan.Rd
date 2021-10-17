@@ -25,11 +25,13 @@ mpa_v30_CHOCOPhlAn_201901_species_tree.nwk), default is NULL.}
 contained the sample information in the first several lines.
 The linenum should be required.
 for example:
-group A A A A B B B B 
-sungroup A1 A1 A2 A2 B1 B1 B2 B2
+\preformatted{
+group A A A A B B B B
+subgroup A1 A1 A2 A2 B1 B1 B2 B2
 subject S1 S2 S3 S4 S5 S6 S7 S8
 Bacteria 99 99 99 99 99 99 99 99
 ...
+}
 linenum should be set to 3.}
 
 \item{...}{additional parameters, meaningless now.}

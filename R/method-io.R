@@ -12,7 +12,7 @@
 #' @param refseqqza character, the file contained reference sequences or the XStringSet object,
 #' default is NULL.
 #' @param treeqza character, the file contained the tree file or treedata object, which is the result 
-#' by parsing function of treeio, default is NULL.
+#' parsed by functions of treeio, default is NULL.
 #' @param parallel logical, whether parsing the column of taxonomy multi-parallel, default is FALSE.
 #' @param ..., additional parameters.
 #' @return MPSE-class or phyloseq-class contained the argument class.
@@ -127,8 +127,9 @@ mp_import_dada2 <- function(seqtab,
 #' @param mapfilename character, the file contained sample information,
 #' the tsv format, default is NULL.
 #' @param otutree treedata, phylo or character, the file contained reference sequences, or
-#' treedata object, which is the result by parsing function of treeio, default is NULL.
-#' @param refseq XStringSet or character, the file contained the tree file or XStringSet, default is NULL.
+#' treedata object, which is the result parsed by functions of treeio, default is NULL.
+#' @param refseq XStringSet or character, the file contained the representation sequence file or 
+#' XStringSet class to store the representation sequence, default is NULL.
 #' @param ..., additional parameters.
 #' @return MPSE-class.
 #' @export
@@ -162,11 +163,13 @@ mp_import_qiime <- function(otufilename,
 #' contained the sample information in the first several lines.
 #' The linenum should be required.
 #' for example:
-#' group A A A A B B B B 
-#' sungroup A1 A1 A2 A2 B1 B1 B2 B2
+#' \preformatted{
+#' group A A A A B B B B
+#' subgroup A1 A1 A2 A2 B1 B1 B2 B2
 #' subject S1 S2 S3 S4 S5 S6 S7 S8
 #' Bacteria 99 99 99 99 99 99 99 99
 #' ...
+#' }
 #' linenum should be set to 3.
 #' @param ... additional parameters, meaningless now.
 #' @details

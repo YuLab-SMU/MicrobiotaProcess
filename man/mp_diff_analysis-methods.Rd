@@ -210,7 +210,7 @@ size of features, default is 0.7.}
 
 \item{ci}{numeric, the confidence interval of effect size (LDA or MDA), default is 0.95.}
 
-\item{seed}{a random seed to make the adonis analysis reproducible, default is 123.}
+\item{seed}{a random seed to make the analysis reproducible, default is 123.}
 
 \item{type}{character type="species" meaning the abundance matrix is from the species abundance, other 
 option is "others", default is "species".}

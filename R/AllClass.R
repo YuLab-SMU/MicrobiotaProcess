@@ -54,9 +54,12 @@ setClass("MPSE",
 #' All elements of the list must have the same dimensions, we also 
 #' recommend they have names, e.g. list(Abundance=xx1, RareAbundance=xx2).
 #' @param colData An optional DataFrame describing the samples.
-#' @param otutree A treedata object of tidytree package
-#' @param taxatree A treedata object of tidytree package
-#' @param refseq A XStingSet object of Biostrings package
+#' @param otutree A treedata object of tidytree package, the result parsed by
+#' the functions of treeio.
+#' @param taxatree A treedata object of tidytree package, the result parsed by
+#' the functions of treeio.
+#' @param refseq A XStingSet object of Biostrings package, the result parsed by
+#' the readDNAStringSet or readAAStringSet of Biostrings.
 #' @param ... additional parameters, see also the usage 
 #' of \code{\link[SummarizedExperiment]{SummarizedExperiment}}.
 #' @return MPSE object

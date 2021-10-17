@@ -19,9 +19,10 @@ mp_import_qiime(
 the tsv format, default is NULL.}
 
 \item{otutree}{treedata, phylo or character, the file contained reference sequences, or
-treedata object, which is the result by parsing function of treeio, default is NULL.}
+treedata object, which is the result parsed by functions of treeio, default is NULL.}
 
-\item{refseq}{XStringSet or character, the file contained the tree file or XStringSet, default is NULL.}
+\item{refseq}{XStringSet or character, the file contained the representation sequence file or 
+XStringSet class to store the representation sequence, default is NULL.}
 
 \item{..., }{additional parameters.}
 }
