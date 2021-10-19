@@ -1,5 +1,7 @@
-# MicrobiotaProcess 1.5.8.992
+# MicrobiotaProcess 1.5.9
 
++ add `include.rownames` to control whether consider the `OTU` as taxonomy feature table in 
+  `diff_analysis` and `get_alltaxadf` or tip labels in `as.treedata`. (2021-10-19, Tue)
 + fix rename bug, rename the taxonomy names can work now. (2021-10-12, Tue)
 + introduce `trimSample` in `mp_rrarefy` to check whether to remove the samples that
   do not have enough abundance. (2021-10-11, Mon)
