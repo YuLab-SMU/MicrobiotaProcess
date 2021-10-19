@@ -4,12 +4,14 @@
 \alias{convert_to_treedata}
 \title{convert dataframe contained hierarchical relationship or other classes to treedata class}
 \usage{
-convert_to_treedata(data, type = "species", ...)
+convert_to_treedata(data, type = "species", include.rownames = FALSE, ...)
 }
 \arguments{
 \item{data}{data.frame, such like the tax_table of phyloseq.}
 
 \item{type}{character, the type of datasets, default is "species", if the dataset is not about species,                                                                                                         #' such as dataset of kegg function, you should set it to "others".}
+
+\item{include.rownames}{logical, whether to set the row names as the tip labels, default is FALSE.}
 
 \item{..., }{additional parameters.}
 }
@@ -23,7 +25,7 @@ convert dataframe contained hierarchical relationship or other classes to treeda
 \dontrun{
   data(hmp_aerobiosis_small)
   head(taxda)
-  treedat <- convert_to_treedata(taxda)
+  treedat <- convert_to_treedata(taxda, include.rownames = FALSE)
 }
 }
 \author{

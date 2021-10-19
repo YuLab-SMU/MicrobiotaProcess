@@ -1,6 +1,7 @@
 #' @title convert dataframe contained hierarchical relationship or other classes to treedata class
 #' @param data data.frame, such like the tax_table of phyloseq.
 #' @param type character, the type of datasets, default is "species", if the dataset is not about species,                                                                                                         #' such as dataset of kegg function, you should set it to "others".
+#' @param include.rownames logical, whether to set the row names as the tip labels, default is FALSE.
 #' @param ..., additional parameters.
 #' @return treedata class.
 #' @author Shuangbin Xu
@@ -11,11 +12,14 @@
 #' \dontrun{
 #'   data(hmp_aerobiosis_small)
 #'   head(taxda)
-#'   treedat <- convert_to_treedata(taxda)
+#'   treedat <- convert_to_treedata(taxda, include.rownames = FALSE)
 #' }
-convert_to_treedata <- function(data, type="species", ...){
+convert_to_treedata <- function(data, type="species", include.rownames=FALSE, ...){
     if (!"fillNAtax" %in% names(attributes(data))){
         data <- fillNAtax(data, type=type)
+    }
+    if (include.rownames && type == "species"){
+        data$OTU <- rownames(data)
     }
     data <- data.frame(Root=rep("r__root", nrow(data)), data)
     datalist <- list()
@@ -63,15 +67,19 @@ convert_to_treedata <- function(data, type="species", ...){
 #' @title as.treedata
 #' @param tree object, This is for taxonomyTable class, 
 #' so it should be a taxonomyTable.
+#' @param include.rownames logical, whether to set the rownames of 
+#' taxonomyTable to tip labels, default is FALSE.
 #' @param ... additional parameters. 
 #' @method as.treedata taxonomyTable
 #' @rdname as.treedata
 #' @export
 #' @examples
-#' data(test_otu_data)
-#' tree <- as.treedata(phyloseq::tax_table(test_otu_data))
-as.treedata.taxonomyTable <- function(tree, ...){
-    convert_to_treedata(data.frame(tree, check.names=FALSE))
+#' \dontrun{
+#'   data(test_otu_data)
+#'   tree <- as.treedata(phyloseq::tax_table(test_otu_data), include.rownames = TRUE)
+#' }
+as.treedata.taxonomyTable <- function(tree, include.rownames = FALSE,...){
+    convert_to_treedata(data.frame(tree, check.names=FALSE), include.rownames = include.rownames)
 }
 
 

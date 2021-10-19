@@ -8,8 +8,10 @@
 #' meaning no subclass compare.
 #' @param taxda data.frame, the classification of the feature in data. 
 #' default is NULL.
-#' @param alltax logical, whether to set all classification as features if taxda is not NULL, 
+#' @param alltax logical, whether to set all classification (taxonomy) as features when \code{taxda} is not NULL, 
 #' default is TRUE.
+#' @param include.rownames logical, whether to consider the OTU of \code{obj} as (all taxonomy) features, when 
+#' \code{taxda} is not NULL, default is FALSE.
 #' @param standard_method character, the method of standardization, 
 #' see also \code{\link[vegan]{decostand}}, default is NULL, 
 #' it represents that the relative abundance of taxonomy will be used. If count was set,
@@ -74,7 +76,7 @@ diff_analysis <- function(obj, ...){
 #' @importFrom tibble column_to_rownames
 #' @importFrom stats p.adjust
 #' @export
-diff_analysis.data.frame <- function(obj, sampleda, classgroup, subclass=NULL, taxda=NULL,alltax=TRUE, standard_method=NULL, mlfun="lda", 
+diff_analysis.data.frame <- function(obj, sampleda, classgroup, subclass=NULL, taxda=NULL,alltax=TRUE, include.rownames=FALSE, standard_method=NULL, mlfun="lda", 
     ratio=0.7, firstcomfun='kruskal.test', padjust="fdr",filtermod="pvalue",
     firstalpha=0.05, strictmod=TRUE, fcfun="generalizedFC", secondcomfun="wilcox.test",
     clmin=5, clwilc=TRUE, secondalpha=0.05, subclmin=3, subclwilc=TRUE,	ldascore=2,
@@ -88,7 +90,12 @@ diff_analysis.data.frame <- function(obj, sampleda, classgroup, subclass=NULL, t
         if (!"fillNAtax" %in% names(attributes(taxda))){
             taxda <- fillNAtax(taxda, type=type)
         }
-        if (alltax){obj <- get_alltaxdf(obj, taxda, method=standard_method)}
+        if (include.rownames){
+            taxda$OTU <- rownames(taxda)
+        }
+        if (alltax){
+            obj <- get_alltaxdf(obj, taxda, method=standard_method)
+        }
     }
     sampleda <- sampleda %>% select(c(classgroup, subclass))
     if (ncol(sampleda)>1){sampleda <- duplicatedtaxcheck(sampleda) %>% column_to_rownames(var="rowname")}
@@ -180,6 +187,8 @@ diff_analysis.phyloseq <- function(obj, ...){
 #' @param taxda data.frame, the taxonomy table.
 #' @param taxa_are_rows logical, if the obj is data.frame, and the features are rownames,
 #' the taxa_are_rows should be set TRUE, default FALSE, meaning the features are colnames. 
+#' @param include.rownames logical whether to calculate the original feature data, 
+#' default is FALSE.
 #' @param ..., additional parameters, see also \code{\link[vegan]{decostand}}.
 #' @return the all taxonomy abundance table
 #' @author Shuangbin Xu
@@ -195,7 +204,7 @@ setGeneric("get_alltaxadf", function(obj, ...){standardGeneric("get_alltaxadf")}
 #' @aliases get_alltaxadf,phyloseq
 #' @rdname get_alltaxadf
 #' @export
-setMethod("get_alltaxadf", "phyloseq",function(obj, method=NULL, type="species", ...){
+setMethod("get_alltaxadf", "phyloseq",function(obj, method=NULL, type="species", include.rownames=FALSE, ...){
     otuda <- checkotu(obj)
     if (is.null(obj@tax_table)){
         stop("The taxaonomy table is empty!")
@@ -205,27 +214,27 @@ setMethod("get_alltaxadf", "phyloseq",function(obj, method=NULL, type="species",
             taxa <- fillNAtax(taxa, type = type)
         }
     }
-    data <- get_alltaxdf(data=otuda, taxda=taxa, taxa_are_rows=FALSE, method=method, ...)
+    data <- get_alltaxdf(data=otuda, taxda=taxa, taxa_are_rows=FALSE, method=method, include.rownames=include.rownames, ...)
     return(data)
 })
 
 #' @aliases get_alltaxadf,data.frame
 #' @rdname get_alltaxadf
 #' @export
-setMethod("get_alltaxadf", "data.frame", function(obj, taxda, taxa_are_rows=FALSE, method=NULL, type="species", ...){
+setMethod("get_alltaxadf", "data.frame", function(obj, taxda, taxa_are_rows=FALSE, method=NULL, type="species", include.rownames=FALSE, ...){
     #if (taxa_are_rows){
     #    obj <- data.frame(t(obj), check.names=FALSE)
     #}
     if (!"fillNAtax" %in% names(attributes(taxda))){
         taxda <- fillNAtax(taxda, type=type)
     }
-    data <- get_alltaxdf(data=obj, taxda=taxda, taxa_are_rows=taxa_are_rows, method=method, ...)
+    data <- get_alltaxdf(data=obj, taxda=taxda, taxa_are_rows=taxa_are_rows, method=method, include.rownames=include.rownames, ...)
     return(data)
 })
 
 #' @importFrom magrittr %>%
 #' @keywords internal
-get_alltaxdf <- function(data, taxda, method=NULL, taxa_are_rows=FALSE, ...){
+get_alltaxdf <- function(data, taxda, method=NULL, taxa_are_rows=FALSE, include.rownames=FALSE, ...){
     if (!taxa_are_rows){
         data <- data.frame(t(data), check.names=FALSE)
     }
@@ -242,6 +251,18 @@ get_alltaxdf <- function(data, taxda, method=NULL, taxa_are_rows=FALSE, ...){
             }
         }
         dt[[i]] <- dat
+    }
+    if (include.rownames){
+        if (is.null(method)){
+            dat0 <- get_ratio(tibble::as_tibble(data, rownames="OTU"))
+        }else{
+            if (method=="count"){
+                dat0 <- data
+            }else{
+                dat0 <- transformdf(data=data, method=method, ...)
+            }
+        }
+        dt <- c(list(dat0), dt)
     }
     dt <- do.call("rbind", dt)
     dt <- data.frame(t(dt), check.names=FALSE)

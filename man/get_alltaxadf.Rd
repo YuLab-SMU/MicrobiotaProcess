@@ -10,7 +10,13 @@
 \usage{
 get_alltaxadf(obj, ...)
 
-\S4method{get_alltaxadf}{phyloseq}(obj, method = NULL, type = "species", ...)
+\S4method{get_alltaxadf}{phyloseq}(
+  obj,
+  method = NULL,
+  type = "species",
+  include.rownames = FALSE,
+  ...
+)
 
 \S4method{get_alltaxadf}{data.frame}(
   obj,
@@ -18,6 +24,7 @@ get_alltaxadf(obj, ...)
   taxa_are_rows = FALSE,
   method = NULL,
   type = "species",
+  include.rownames = FALSE,
   ...
 )
 }
@@ -29,6 +36,9 @@ get_alltaxadf(obj, ...)
 \item{method}{character, the normalization method, 
 see also \code{\link[vegan]{decostand}}, default is NULL, the relative abundance 
 will be return, if it set `count`, the count table will be return.}
+
+\item{include.rownames}{logical whether to calculate the original feature data, 
+default is FALSE.}
 
 \item{taxda}{data.frame, the taxonomy table.}
 

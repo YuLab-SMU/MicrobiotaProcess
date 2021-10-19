@@ -4,11 +4,14 @@
 \alias{as.treedata.taxonomyTable}
 \title{as.treedata}
 \usage{
-\method{as.treedata}{taxonomyTable}(tree, ...)
+\method{as.treedata}{taxonomyTable}(tree, include.rownames = FALSE, ...)
 }
 \arguments{
 \item{tree}{object, This is for taxonomyTable class, 
 so it should be a taxonomyTable.}
+
+\item{include.rownames}{logical, whether to set the rownames of 
+taxonomyTable to tip labels, default is FALSE.}
 
 \item{...}{additional parameters.}
 }
@@ -16,6 +19,8 @@ so it should be a taxonomyTable.}
 convert taxonomyTable to treedata
 }
 \examples{
-data(test_otu_data)
-tree <- as.treedata(phyloseq::tax_table(test_otu_data))
+\dontrun{
+  data(test_otu_data)
+  tree <- as.treedata(phyloseq::tax_table(test_otu_data), include.rownames = TRUE)
+}
 }

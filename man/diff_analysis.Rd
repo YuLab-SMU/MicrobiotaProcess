@@ -15,6 +15,7 @@ diff_analysis(obj, ...)
   subclass = NULL,
   taxda = NULL,
   alltax = TRUE,
+  include.rownames = FALSE,
   standard_method = NULL,
   mlfun = "lda",
   ratio = 0.7,
@@ -57,8 +58,11 @@ meaning no subclass compare.}
 \item{taxda}{data.frame, the classification of the feature in data. 
 default is NULL.}
 
-\item{alltax}{logical, whether to set all classification as features if taxda is not NULL, 
+\item{alltax}{logical, whether to set all classification (taxonomy) as features when \code{taxda} is not NULL, 
 default is TRUE.}
+
+\item{include.rownames}{logical, whether to consider the OTU of \code{obj} as (all taxonomy) features, when 
+\code{taxda} is not NULL, default is FALSE.}
 
 \item{standard_method}{character, the method of standardization, 
 see also \code{\link[vegan]{decostand}}, default is NULL, 
