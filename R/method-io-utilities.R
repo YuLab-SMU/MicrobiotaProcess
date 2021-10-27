@@ -311,6 +311,23 @@ read_qiime_otu <- function(otufilename){
     return(list(otuda=otuda, taxada=taxada))
 }
 
+.internal_parse_biom <- function(biomobj){
+    x <- data.frame(as(biomformat::biom_data(biomobj),"matrix"), check.names=FALSE)
+    taxflag <- all(unlist(lapply(biomobj$rows, function(i){length(i$metadata$taxonomy)}))==0)
+    if (taxflag){
+        taxatab <- NULL
+    }else{
+        taxatab <- lapply(biomobj$rows, function(i)paste0(i$metadata$taxonomy, collapse=";")) %>%
+            unlist() %>%
+            data.frame() %>%
+            split_str_to_list(sep=";") %>%
+            magrittr::set_colnames(taxaclass[seq_len(ncol(.))]) %>%
+            magrittr::set_rownames(rownames(x)) %>%
+            fillNAtax()
+    }
+    return(list(otutab = x, taxatab=taxatab))
+}
+
 taxaclass <- c("Kingdom", 
                "Phylum", 
                "Class", 

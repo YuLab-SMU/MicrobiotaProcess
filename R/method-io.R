@@ -329,21 +329,9 @@ read_qza <- function(qzafile, parallel=FALSE){
 
 #' @keywords internal
 read.featuretab <- function(file){
-    biomobj <- suppressWarnings(biomformat::read_biom(file))
-    x <- data.frame(as(biomformat::biom_data(biomobj),"matrix"), check.names=FALSE)
-    taxflag <- all(unlist(lapply(biomobj$rows, function(i){length(i$metadata$taxonomy)}))==0)
-    if (taxflag){
-        taxatab <- NULL
-    }else{
-        taxatab <- lapply(biomobj$rows, function(i)paste0(i$metadata$taxonomy, collapse=";")) %>% 
-            unlist() %>% 
-            data.frame() %>%
-            split_str_to_list(sep=";") %>%
-            magrittr::set_colnames(taxaclass[seq_len(ncol(.))]) %>%
-            magrittr::set_rownames(rownames(x)) %>%
-            fillNAtax()
-    }
-    return(list(otutab = x, taxatab=taxatab))
+    obj <- suppressWarnings(biomformat::read_biom(file))
+    res <- .internal_parse_biom(biomobj = obj)
+    return(res)
 }
 
 #' @keywords internal

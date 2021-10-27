@@ -924,7 +924,13 @@ setGeneric("mp_plot_ord", function(
     labelparams <- list(mapping=aes_(label=~Sample), size=3, segment.size=0.25)
     labelparams <- extract_params(labelparams,
                                   paramlist,
-                                  ggrepel::GeomTextRepel$default_aes %>% names())
+                                  c(ggrepel::GeomTextRepel$default_aes %>% names(),
+                                    ggrepel::geom_text_repel %>% 
+                                        as.list() %>% 
+                                        names() %>% 
+                                        setdiff(., c("mapping", "data", "", "..."))
+                                  )
+                         )
     if (show.side){
        if ("fill" %in% names(maps) && !is.discrete(tbl, maps, "fill")){
            side.y <- do.call(ggside::geom_xsideboxplot, 

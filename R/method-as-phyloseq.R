@@ -26,13 +26,18 @@ as.phyloseq.MPSE <- function(x, .abundance, ...){
     }
     otuda <- x %>% 
               mp_extract_assays(.abundance=!!.abundance) %>%
-              phyloseq::otu_table(taxa_are_rows=TRUE)     
+              phyloseq::otu_table(., taxa_are_rows=TRUE)
     
     otutree <- x %>% mp_extract_tree(type="otutree")
     sampleda <- x %>% mp_extract_sample()
     taxada <- x %>% 
-              mp_extract_taxonomy() %>% 
-              tibble::column_to_rownames(var="OTU")
+              mp_extract_taxonomy() 
+
+    if (!is.null(taxada)){
+       taxada %<>% tibble::column_to_rownames(var="OTU") %>% 
+                   as.matrix() %>% 
+                   phyloseq::tax_table()
+    }
 
     if (inherits(x, "MPSE")){
         refseq <- x@refseq
@@ -46,14 +51,6 @@ as.phyloseq.MPSE <- function(x, .abundance, ...){
                     phyloseq::sample_data()
     }else{
         sampleda <- NULL
-    }
-
-    if (!is.null(taxada)){
-        taxada <- taxada %>%
-                as.matrix() %>% 
-                phyloseq::tax_table()
-    }else{
-        taxada <- NULL
     }
 
     if (!is.null(otutree)){

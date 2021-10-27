@@ -21,8 +21,10 @@ as.MPSE <- function(.data, ...){
         res <- .as.MPSE.phyloseq(.data, ...)
     }else if (inherits(.data, "SummarizedExperiment")){
         res <- .as.MPSE.TSE(.data, ...)
+    }else if (inherits(.data, "biom")){
+        res <- .as.MPSE.biom(.data, ...)
     }else {
-        message("The as.MPSE now only works for tbl_mpse, grouped_df_mpse, phyloseq, SummarizedExperiment, and TreeSummarizedExperiment class.")
+        message("The as.MPSE now only works for tbl_mpse, grouped_df_mpse, phyloseq, biom, SummarizedExperiment, and TreeSummarizedExperiment class.")
         return()
     }
     return (res)
@@ -267,6 +269,21 @@ as.MPSE <- function(.data, ...){
     if (!is.null(newrowda) && ncol(newrowda)>0){
         SummarizedExperiment::rowData(mpse) <- newrowda
     }
+
+    return(mpse)
+}
+
+.as.MPSE.biom <- function(.data, ...){
+    x <- .internal_parse_biom(.data)
+    if ( !is.null(x$taxatab)){
+        taxa.tree <- convert_to_treedata2(x$taxatab)
+    }else{
+        taxa.tree <- NULL
+    }
+    
+    mpse <- MPSE(assays = list(Abundance=x$otutab),
+                 taxatree = taxa.tree
+            )
 
     return(mpse)
 }
