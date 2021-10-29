@@ -1,3 +1,14 @@
+# MicrobiotaProcess 1.6.0.990
+
++ update 'message' or 'stop error message' when the 'Abundance' cannot be rarefied in some 
+  functions, such as `mp_cal_alpha`, `mp_cal_venn`, `mp_cal_upset`, `mp_cal_abundance`
+  and `mp_cal_NRT_NTI`. (2021-10-29, Fri)
+
+
+# MicrobiotaProcess 1.6.0
+
++ Bioconductor 3.14 release. (2021-10-27, Wed)
+
 # MicrobiotaProcess 1.5.9
 
 + add `include.rownames` to control whether consider the `OTU` as taxonomy feature table in 
