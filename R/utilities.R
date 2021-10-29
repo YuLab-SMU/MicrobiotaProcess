@@ -257,3 +257,19 @@ CI <- function (x, ci = 0.95, na.rm=FALSE){
     return(c(upper = a + error, mean = a, lower = a - error))
 }
 
+.return_wrap <- function(...){
+    msg <- paste(..., collapse = "", sep = "")
+    wrapped <- strwrap(msg, width = getOption("width") - 2) %>%
+               glue::glue_collapse(., "\n", last = "\n")
+    wrapped
+}
+
+message_wrap <- function(...){
+    msg <- .return_wrap(...)
+    message(msg)
+}
+
+stop_wrap <- function(...){
+    msg <- .return_wrap(...)
+    stop(msg, call. = FALSE)
+}

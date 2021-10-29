@@ -193,11 +193,22 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     }    
 
     if (!valid_rare(.data, .abundance=.abundance) && !force){
-        glue::glue("The rarefied abundance of species might not be provided. Rarefaction of all
-                    observations is performed automatically. If you still want to calculate the
-                    alpha index with the '.abundance', you can set 'force=TRUE'. ")
-        .data <- mp_rrarefy(.data=.data, ...)
-        .abundance <- as.symbol("RareAbundance")
+        trash <- try(silent = TRUE,
+                     expr = {
+                         .data <- mp_rrarefy(.data = .data, ...)
+                     }
+                 )
+        if (inherits(trash, "try-error")){
+            stop_wrap("The 'Abundance' column cannot be rarefied, please check whether it is integer (count).
+                       Or you can set 'force=TRUE' to calculate the (relative) abundance without rarefaction.
+                      ")
+        }
+
+        message_wrap("The rarefied abundance of species might not be provided. Rarefaction of all
+                      observations is performed automatically using 'Abundance' column. If you still 
+                      want to calculate the (relative) 'abundance' with the specified '.abundance',
+                      you can set 'force=TRUE'. ")
+        .abundance <- as.symbol("RareAbundance")           
     }
     assaysvar <- .data %>% SummarizedExperiment::assayNames()
     xx <- SummarizedExperiment::assays(.data)@listData
@@ -386,11 +397,22 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     }
 
     if (!valid_rare(.data, .abundance=.abundance) && !force){
-        glue::glue("The rarefied abundance of species might not be provided. Rarefaction of all
-                    observations is performed automatically. If you still want to calculate the
-                    alpha index with the '.abundance', you can set 'force=TRUE'. ")
-        .data <- mp_rrarefy(.data=.data, ...)
-        .abundance <- as.symbol("RareAbundance")
+        trash <- try(silent = TRUE,
+                     expr = {
+                         .data <- mp_rrarefy(.data = .data, ...)
+                     }
+                 )
+        if (inherits(trash, "try-error")){
+            stop_wrap("The 'Abundance' column cannot be rarefied, please check whether it is integer (count).
+                       Or you can set 'force=TRUE' to calculate the (relative) abundance without rarefaction.
+                      ")
+        }
+
+        message_wrap("The rarefied abundance of species might not be provided. Rarefaction of all
+                      observations is performed automatically using 'Abundance' column. If you still
+                      want to calculate the (relative) 'abundance' with the specified '.abundance',
+                      you can set 'force=TRUE'. ")
+        .abundance <- as.symbol("RareAbundance")        
     }
 
     assaysvar <- .data %>% attr("assaysvar")
