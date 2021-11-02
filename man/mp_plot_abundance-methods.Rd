@@ -14,6 +14,7 @@ mp_plot_abundance(
   .data,
   .abundance = NULL,
   .group = NULL,
+  .sec.group = NULL,
   taxa.class = NULL,
   topn = 10,
   relative = TRUE,
@@ -26,6 +27,7 @@ mp_plot_abundance(
   .data,
   .abundance = NULL,
   .group = NULL,
+  .sec.group = NULL,
   taxa.class = NULL,
   topn = 10,
   relative = TRUE,
@@ -38,6 +40,7 @@ mp_plot_abundance(
   .data,
   .abundance = NULL,
   .group = NULL,
+  .sec.group = NULL,
   taxa.class = NULL,
   topn = 10,
   relative = TRUE,
@@ -50,6 +53,7 @@ mp_plot_abundance(
   .data,
   .abundance = NULL,
   .group = NULL,
+  .sec.group = NULL,
   taxa.class = NULL,
   topn = 10,
   relative = TRUE,
@@ -64,6 +68,9 @@ mp_plot_abundance(
 \item{.abundance}{the column name of abundance to be plotted.}
 
 \item{.group}{the column name of group to be calculated and plotted,
+default is NULL.}
+
+\item{.sec.group}{the column name of second group to be plotted with nested facet, 
 default is NULL.}
 
 \item{taxa.class}{name of taxonomy class, default is NULL, meaning the

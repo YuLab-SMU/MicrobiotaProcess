@@ -4,6 +4,8 @@
 #' @param .abundance the column name of abundance to be plotted.
 #' @param .group the column name of group to be calculated and plotted,
 #' default is NULL.
+#' @param .sec.group the column name of second group to be plotted with nested facet, 
+#' default is NULL.
 #' @param taxa.class name of taxonomy class, default is NULL, meaning the
 #' Phylum class will be plotted.
 #' @param topn integer the number of the top most abundant, default is 10.
@@ -60,6 +62,7 @@ setGeneric("mp_plot_abundance",
               .data, 
               .abundance = NULL, 
               .group = NULL, 
+              .sec.group = NULL,
               taxa.class = NULL, 
               topn = 10, 
               relative = TRUE,
@@ -73,6 +76,7 @@ setGeneric("mp_plot_abundance",
 .internal_plot_abundance <- function(.data, 
                                 .abundance, 
                                 .group = NULL, 
+                                .sec.group = NULL,
                                 taxa.class = NULL, 
                                 topn = 10,
                                 relative = TRUE,
@@ -82,6 +86,7 @@ setGeneric("mp_plot_abundance",
                                 ){
     .abundance <- rlang::enquo(.abundance)
     .group <- rlang::enquo(.group)
+    .sec.group <- rlang::enquo(.sec.group)
     taxa.class <- rlang::enquo(taxa.class)
 
     if (rlang::quo_is_null(taxa.class) || 
@@ -159,10 +164,11 @@ setGeneric("mp_plot_abundance",
           ggplot2::labs(x=NULL, y=ylabs) +
           scale_fill_manual(values=get_cols(tbl %>% pull(!!taxa.class) %>% unique() %>% length()))
 
-     if (!rlang::quo_is_null(.group) && !plot.group){
+     if (!rlang::quo_is_null(.group) && !plot.group && rlang::quo_is_null(.sec.group)){
          p <- p + facet_grid(cols=ggplot2::vars(!!.group), scales="free_x", space="free")
+     }else if (!rlang::quo_is_null(.sec.group) &&!plot.group){
+         p <- p + ggh4x::facet_nested(cols=ggplot2::vars(!!.group, !!.sec.group), scales="free_x", space="free")
      }
-
      p <- p + theme_taxbar()
      
      return (p)
