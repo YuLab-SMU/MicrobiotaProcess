@@ -3,7 +3,8 @@
 + update 'message' or 'stop error message' when the 'Abundance' cannot be rarefied in some 
   functions, such as `mp_cal_alpha`, `mp_cal_venn`, `mp_cal_upset`, `mp_cal_abundance`
   and `mp_cal_NRT_NTI`. (2021-10-29, Fri)
-
++ introduce `.sec.group` argument to specify the second group name in `mp_plot_abundance`,
+  if it is provided, the nested facet will be displayed. (2021-11-02, Tue)
 
 # MicrobiotaProcess 1.6.0
 
