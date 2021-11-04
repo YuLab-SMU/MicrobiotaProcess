@@ -1,7 +1,7 @@
 ##' @title as.MPSE method
 ##' @description 
 ##' convert the .data object to MPSE object
-##' @param .data one type of tbl_mpse, phyloseq, SummarizedExperiment or TreeSummarizedExperiment object
+##' @param .data one type of tbl_mpse, phyloseq, biom, SummarizedExperiment or TreeSummarizedExperiment class
 ##' @param ... additional parameters, meaningless now.
 ##' @return MPSE object
 ##' @export

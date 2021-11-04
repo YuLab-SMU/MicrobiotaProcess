@@ -7,7 +7,7 @@
 as.MPSE(.data, ...)
 }
 \arguments{
-\item{.data}{one type of tbl_mpse, phyloseq, SummarizedExperiment or TreeSummarizedExperiment object}
+\item{.data}{one type of tbl_mpse, phyloseq, biom, SummarizedExperiment or TreeSummarizedExperiment class}
 
 \item{...}{additional parameters, meaningless now.}
 }
