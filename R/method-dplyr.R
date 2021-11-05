@@ -475,20 +475,33 @@ slice.MPSE <- function(.data, ..., .preserve = FALSE){
 }
 
 add_attr.tbl_mpse <- function(x1, x2, class="tbl_mpse"){
-    attr(x1, "samplevar") <- attr(x2, "samplevar")
-    attr(x1, "mutatevar") <- attr(x2, "mutatevar")
-    attr(x1, "otumetavar") <- attr(x2, "otumetavar")
-    attr(x1, "assaysvar") <- attr(x2, "assaysvar")
-    attr(x1, "taxavar") <- attr(x2, "taxavar")
-    attr(x1, "fillNAtax") <- attr(x2, "fillNAtax")
-    attr(x1, "internal_attr") <- attr(x2, "internal_attr")
+    #attr(x1, "samplevar") <- attr(x2, "samplevar")
+    #attr(x1, "mutatevar") <- attr(x2, "mutatevar")
+    #attr(x1, "otumetavar") <- attr(x2, "otumetavar")
+    #attr(x1, "assaysvar") <- attr(x2, "assaysvar")
+    #attr(x1, "taxavar") <- attr(x2, "taxavar")
+    #attr(x1, "fillNAtax") <- attr(x2, "fillNAtax")
+    #attr(x1, "internal_attr") <- attr(x2, "internal_attr")
     otutree <- attr(x2, "otutree")
     taxatree <- attr(x2, "taxatree")
     refseq <- attr(x2, "refseq")
+    otumetavar <- attr(x2, "otumetavar")
     if ("OTU" %in% colnames(x1)){
         rmotus <- setdiff(unique(x2$OTU), unique(x1$OTU))
         otutree <- .internal_drop.tip(tree=otutree, rmotus=rmotus)
-        taxatree <- .internal_drop.tip(tree=taxatree, rmotus=rmotus, collapse.singles=FALSE)
+        if (length(unique(x1$OTU))==1){
+            if (!is.null(taxatree)){
+                taxatb <- taxatree %>%
+                          taxatree_to_tb() %>%
+                          tibble::as_tibble(rownames="OTU") %>%
+                          dplyr::filter(! .data$OTU %in% rmotus)
+                taxatree <- NULL
+                x1 <- merge(x1, taxatb, by="OTU")
+                otumetavar <- c(colnames(taxatb)[colnames(taxatb)!="OTU"], otumetavar)
+            }         
+        }else{
+            taxatree <- .internal_drop.tip(tree=taxatree, rmotus=rmotus, collapse.singles=FALSE)
+        }
         if (!is.null(refseq)){
             refseq <- refseq[!names(refseq) %in% rmotus]
         }
@@ -496,6 +509,13 @@ add_attr.tbl_mpse <- function(x1, x2, class="tbl_mpse"){
         attr(x1, "taxatree") <- taxatree
         attr(x1, "refseq") <- refseq
     }
+    attr(x1, "samplevar") <- attr(x2, "samplevar")
+    attr(x1, "mutatevar") <- attr(x2, "mutatevar")
+    attr(x1, "otumetavar") <- otumetavar
+    attr(x1, "assaysvar") <- attr(x2, "assaysvar")
+    attr(x1, "taxavar") <- attr(x2, "taxavar")
+    attr(x1, "fillNAtax") <- attr(x2, "fillNAtax")
+    attr(x1, "internal_attr") <- attr(x2, "internal_attr")
     x1 <- add_class(x=x1, new=class)
     return(x1)   
 }
