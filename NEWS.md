@@ -1,5 +1,6 @@
-# MicrobiotaProcess 1.6.0.992
+# MicrobiotaProcess 1.7.1
 
++ fix the issue when using `filter` only return a `assays` contained one feature (nrow=1). (2021-11-05, Fri)
 + fix the error of `rownames<-` when `rownames` of `MPSE` is NULL. (2021-11-04, Thu)
 + update 'message' or 'stop error message' when the 'Abundance' cannot be rarefied in some 
   functions, such as `mp_cal_alpha`, `mp_cal_venn`, `mp_cal_upset`, `mp_cal_abundance`
