@@ -134,28 +134,32 @@ setMethod("show", "MPSE", function(object){
 })
 
 
-#' @title print some objects
-#' @name print
-#' @param x Object to format or print.
-#' @param ... Other arguments passed on to individual methods.
-#' @param n Number of rows to show. If `NULL`, the default, will print all rows
-#'   if less than option `tibble.print_max`. Otherwise, will print
-#'   `tibble.print_min` rows.
-#' @param width Width of text output to generate. This defaults to `NULL`, which
-#'   means use `getOption("tibble.width")` or (if also `NULL`)
-#'   `getOption("width")`; the latter displays only the columns that fit on one
-#'   screen. You can also set `options(tibble.width = Inf)` to override this
-#'   default and always print all columns.
-#' @param n_extra Number of extra columns to print abbreviated information for,
-#'   if the width is too small for the entire tibble. If `NULL`, the default,
-#'   will print information about at most `tibble.max_extra_cols` extra columns.
-#' @return print information
-NULL
+# #' @title print some objects
+# #' @name print
+# #' @param x Object to format or print.
+# #' @param ... Other arguments passed on to individual methods.
+# #' @param n Number of rows to show. If `NULL`, the default, will print all rows
+# #'   if less than option `tibble.print_max`. Otherwise, will print
+# #'   `tibble.print_min` rows.
+# #' @param width Width of text output to generate. This defaults to `NULL`, which
+# #'   means use `getOption("tibble.width")` or (if also `NULL`)
+# #'   `getOption("width")`; the latter displays only the columns that fit on one
+# #'   screen. You can also set `options(tibble.width = Inf)` to override this
+# #'   default and always print all columns.
+# #' @param n_extra Number of extra columns to print abbreviated information for,
+# #'   if the width is too small for the entire tibble. If `NULL`, the default,
+# #'   will print information about at most `tibble.max_extra_cols` extra columns.
+# #' 
+# #' @return print information
+# NULL
+# 
+# #' @rdname print
 
-#' @rdname print
+#' @title print some objects 
+#' @name print
 #' @method print MPSE
 #' @export
-print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL){
+print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL, max_footer_lines = NULL){
     show.mpse <- getOption(x = "MPSE_show_tbl", default = TRUE)
     if (show.mpse){
         print2.MPSE(x, ..., n = n, width = width, n_extra = n_extra)
@@ -188,7 +192,7 @@ print1.MPSE <- function(x, ...){
     f(x)
 }
 
-print2.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
+print2.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL, max_footer_lines=NULL) {
     total_nrows <- nrow(x) * ncol(x)
     if (is.null(n)){
         n <- 10
@@ -197,95 +201,170 @@ print2.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
     if (total_nrows <= n){
         n <- total_nrows
     }
+    if (!is.null(x@taxatree)){
+        taxonomy <- x@taxatree@data %>% 
+                    select("nodeClass") %>%
+                    dplyr::filter(! .data[["nodeClass"]] %in% c("OTU", "Root")) %>%
+                    pull(.data[["nodeClass"]]) %>%
+                    unique() %>%
+                    paste(collapse=", ")
+    }else{
+        taxonomy <- NULL
+    }
 
     if (n < nrow(x)){
         tmpx <- x[seq_len(n), seq_len(min(1, ncol(x))), drop=FALSE]
     }else{
         tmpx <- x[, seq_len(min(round(n/nrow(x))+1, ncol(x))), drop=FALSE]
     }
-    formatted_tb <- tmpx %>% 
-                    as_tibble() %>% 
-                    format(..., n = n, width = width, n_extra = n_extra)
-    
-    new_head = sprintf(
-      "A MPSE-tibble (MPSE object) abstraction: %s",
-       total_nrows %>% format(format="f", big.mark=",", digits=2)
-    )
-    left_nrows <- total_nrows - n
-    flagtail <- grepl("([0-9,]+ more row)", formatted_tb[n + 4])
-    flagtail2 <- grepl("with [0-9,]+ more variable", formatted_tb[n + 4])
-    if (left_nrows > 0 && flagtail){
-        new_tail <- sprintf("%s more rows", 
-                            left_nrows %>% format(format="f", big.mark=",", digits=2)
-                      )
-        formatted_mpse = 
-          formatted_tb %>%
-          {
-            x = (.);
-            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
-            x[n+4] = gsub("([0-9,]+ more row)", new_tail, x[n + 4]);
-            x
-          }
-    }else if (left_nrows > 0 && !flagtail && !flagtail2){
-        new_tail <- paste0("# ", cli::symbol$ellipsis, 
-                           sprintf(" with %s more ", left_nrows %>% 
-                           format(format="f", big.mark=",", digits=2)),
-                           ifelse(left_nrows>1, "rows", "row")
-                        ) %>% 
-                    pillar::style_subtle()
-        formatted_mpse = 
-          formatted_tb %>%
-          {
-            x = (.);
-            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
-            x = append(x, new_tail)
-            x
-          }
-    }else if (left_nrows > 0 && !flagtail && flagtail2){
-        new_tail <- paste0("# ", cli::symbol$ellipsis, 
-                           sprintf(" with %s more ", left_nrows %>% 
-                           format(format="f", big.mark=",", digits=2)),
-                           ifelse(left_nrows>1, "rows, and", "row, and")
-                    ) 
-        formatted_mpse = 
-          formatted_tb %>%
-          {
-            x = (.);
-            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
-            x[n+4] = gsub(paste0("# ", cli::symbol$ellipsis," with"), new_tail, x[n+4]);
-            x
-          }
-    }else{
-        formatted_mpse =
-            formatted_tb %>%
-          {
-            x = (.);
-            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
-            x
-          }            
-    }
 
-    subtitle <- sprintf(
-        "# OTU=%s | Samples=%s | Assays=%s | Taxanomy=%s",
-        nrow(x),
-        ncol(x),
-        SummarizedExperiment::assayNames(x) %>% paste(collapse=", "),
-        ifelse(is.null(x@taxatree), "NULL",
-               x@taxatree@data %>%
-                   select("nodeClass") %>%
-                   filter(! .data[["nodeClass"]] %in% c("OTU", "Root")) %>%
-                   unlist(use.names=FALSE) %>%
-                   unique %>%
-                   paste(collapse=", "))
-      ) %>% pillar::style_subtle()
+    tmpx %<>% 
+        as_tibble() %>% 
+        drop_class(class=c("tbl_mpse", "grouped_df_mpse")) %>%
+        add_class(new="TBL_MPSE")
 
-    subtitle <- gsub("38;5;246m", "90m", subtitle)
+    formatted_mpse_setup <- tmpx %>%
+                      tbl_format_setup(width = width, ..., totalX = total_nrows,
+                           n = n, max_extra_cols = n_extra, max_footer_lines = max_footer_lines
+                        )
 
-    formatted_mpse %>%
-      append(subtitle, after = 1) %>%
-      writeLines()
+    subtitle <- sprintf("# OTU=%s | Samples=%s | Assays=%s | Taxanomy=%s",
+                      nrow(x),
+                      ncol(x),
+                      SummarizedExperiment::assayNames(x),
+                      ifelse(is.null(taxonomy), "NULL", taxonomy)
+               ) %>% pillar::style_subtle()
+
+    header <- pillar::tbl_format_header(tmpx, formatted_mpse_setup) %>%
+              append(subtitle, after=1)
+    body <- pillar::tbl_format_body(tmpx, formatted_mpse_setup)
+    footer <- pillar::tbl_format_footer(tmpx, formatted_mpse_setup)
+    writeLines(c(header, body, footer))
     invisible(x)
 }
+
+
+#' @importFrom pillar tbl_format_setup
+#' @method tbl_format_setup TBL_MPSE
+#' @export
+tbl_format_setup.TBL_MPSE <- function(x, 
+                                      width = NULL, 
+                                      ..., 
+                                      totalX = NULL,
+                                      n = NULL, 
+                                      max_extra_cols = NULL, 
+                                      max_footer_lines=NULL){
+    xx <- NextMethod()
+    tmpxx <- xx$tbl_sum %>%
+             strsplit(" ") %>%
+             unlist()
+    tmpxx <- paste(totalX, tmpxx[2], tmpxx[3])
+    names(tmpxx) <- c("A MPSE-tibble (MPSE object) abstraction")
+    xx$tbl_sum <- tmpxx
+    xx$rows_total <- totalX
+    xx$rows_missing <- totalX - nrow(xx$df)
+    return(xx)
+}
+
+
+#print2.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
+#    total_nrows <- nrow(x) * ncol(x)
+#    if (is.null(n)){
+#        n <- 10
+#    }
+#
+#    if (total_nrows <= n){
+#        n <- total_nrows
+#    }
+#
+#    if (n < nrow(x)){
+#        tmpx <- x[seq_len(n), seq_len(min(1, ncol(x))), drop=FALSE]
+#    }else{
+#        tmpx <- x[, seq_len(min(round(n/nrow(x))+1, ncol(x))), drop=FALSE]
+#    }
+#    formatted_tb <- tmpx %>% 
+#                    as_tibble() %>% 
+#                    format(..., n = n, width = width, n_extra = n_extra)
+#    
+#    new_head = sprintf(
+#      "A MPSE-tibble (MPSE object) abstraction: %s",
+#       total_nrows %>% format(format="f", big.mark=",", digits=2)
+#    )
+#    left_nrows <- total_nrows - n
+#    flagtail <- grepl("([0-9,]+ more row)", formatted_tb[n + 4])
+#    flagtail2 <- grepl("with [0-9,]+ more variable", formatted_tb[n + 4])
+#    if (left_nrows > 0 && flagtail){
+#        new_tail <- sprintf("%s more rows", 
+#                            left_nrows %>% format(format="f", big.mark=",", digits=2)
+#                      )
+#        formatted_mpse = 
+#          formatted_tb %>%
+#          {
+#            x = (.);
+#            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
+#            x[n+4] = gsub("([0-9,]+ more row)", new_tail, x[n + 4]);
+#            x
+#          }
+#    }else if (left_nrows > 0 && !flagtail && !flagtail2){
+#        new_tail <- paste0("# ", cli::symbol$ellipsis, 
+#                           sprintf(" with %s more ", left_nrows %>% 
+#                           format(format="f", big.mark=",", digits=2)),
+#                           ifelse(left_nrows>1, "rows", "row")
+#                        ) %>% 
+#                    pillar::style_subtle()
+#        formatted_mpse = 
+#          formatted_tb %>%
+#          {
+#            x = (.);
+#            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
+#            x = append(x, new_tail)
+#            x
+#          }
+#    }else if (left_nrows > 0 && !flagtail && flagtail2){
+#        new_tail <- paste0("# ", cli::symbol$ellipsis, 
+#                           sprintf(" with %s more ", left_nrows %>% 
+#                           format(format="f", big.mark=",", digits=2)),
+#                           ifelse(left_nrows>1, "rows, and", "row, and")
+#                    ) 
+#        formatted_mpse = 
+#          formatted_tb %>%
+#          {
+#            x = (.);
+#            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
+#            x[n+4] = gsub(paste0("# ", cli::symbol$ellipsis," with"), new_tail, x[n+4]);
+#            x
+#          }
+#    }else{
+#        formatted_mpse =
+#            formatted_tb %>%
+#          {
+#            x = (.);
+#            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
+#            x
+#          }            
+#    }
+#
+#    subtitle <- sprintf(
+#        "# OTU=%s | Samples=%s | Assays=%s | Taxanomy=%s",
+#        nrow(x),
+#        ncol(x),
+#        SummarizedExperiment::assayNames(x) %>% paste(collapse=", "),
+#        ifelse(is.null(x@taxatree), "NULL",
+#               x@taxatree@data %>%
+#                   select("nodeClass") %>%
+#                   filter(! .data[["nodeClass"]] %in% c("OTU", "Root")) %>%
+#                   unlist(use.names=FALSE) %>%
+#                   unique %>%
+#                   paste(collapse=", "))
+#      ) %>% pillar::style_subtle()
+#
+#    subtitle <- gsub("38;5;246m", "90m", subtitle)
+#
+#    formatted_mpse %>%
+#      append(subtitle, after = 1) %>%
+#      writeLines()
+#    invisible(x)
+#}
 
 #' @method print tbl_mpse
 #' @rdname print
