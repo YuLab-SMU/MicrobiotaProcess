@@ -653,8 +653,9 @@ setGeneric("mp_extract_dist", function(x, distmethod, env.flag=FALSE, .group=NUL
                 suppressWarnings() %>%
                 rename(x="Sample", y=distname, r=distmethod) %>%
                 corrr::retract() %>%
-                tibble::column_to_rownames(var=colnames(.)[1])
-        distobj <- distobj[colnames(distobj), ] 
+                tibble::column_to_rownames(var=colnames(.)[1]) %>%
+                magrittr::extract(,rownames(.))
+        #distobj <- distobj[colnames(distobj), ] 
         distobj[lower.tri(distobj)] <- t(distobj)[lower.tri(t(distobj))]
         distobj %<>% stats::as.dist() %>%
                      add_attr(distmethod, "method")

@@ -859,7 +859,7 @@ setGeneric("mp_plot_ord", function(
            tidydr() %>% 
            dplyr::select(c(1, .dim)) %>%
            dplyr::rename(Sample="sites") %>%
-           dplyr::left_join(sampleda, by="Sample", suffix=c("", ".y"))
+           dplyr::inner_join(sampleda, by="Sample", suffix=c("", ".y"))
 
     maps <- aes(x=!!rlang::sym(colnames(tbl)[2]), 
                 y=!!rlang::sym(colnames(tbl)[3]))

@@ -236,8 +236,9 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
 
     dat <- da %>% 
         as.matrix %>% 
-        corrr::as_cordf(diagonal=0) %>% 
-        corrr::stretch(na.rm=FALSE, remove.dups=TRUE) %>%
+        corrr::as_cordf(diagonal=0) %>%
+        corrr::shave() %>% 
+        corrr::stretch(na.rm=TRUE) %>%
         dplyr::rename(!!distmethod:="r", !!distsampley:="y") %>% 
         tidyr::nest(!!distmethod:=c(!!as.symbol(distsampley), !!as.symbol(distmethod)))
 
@@ -353,7 +354,8 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
     dat <- da %>%
         as.matrix %>%
         corrr::as_cordf(diagonal=0) %>%
-        corrr::stretch(na.rm=FALSE, remove.dups=TRUE) %>%
+        corrr::shave() %>%
+        corrr::stretch(na.rm=TRUE) %>%
         dplyr::rename(!!distmethod:="r", !!distsampley:="y") %>%
         tidyr::nest(!!distmethod:=c(!!as.symbol(distsampley), !!as.symbol(distmethod)))
 
