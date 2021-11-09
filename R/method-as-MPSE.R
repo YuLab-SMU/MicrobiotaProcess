@@ -283,7 +283,8 @@ as.MPSE <- function(.data, ...){
     }
     
     mpse <- MPSE(assays = list(Abundance=x$otutab),
-                 taxatree = taxa.tree
+                 taxatree = taxa.tree,
+                 colData = x$sampleda
             )
 
     return(mpse)

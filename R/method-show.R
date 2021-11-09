@@ -228,7 +228,7 @@ print2.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL, max_foot
     subtitle <- sprintf("# OTU=%s | Samples=%s | Assays=%s | Taxanomy=%s",
                       nrow(x),
                       ncol(x),
-                      SummarizedExperiment::assayNames(x),
+                      SummarizedExperiment::assayNames(x) %>% paste(collapse=", "),
                       ifelse(is.null(taxonomy), "NULL", taxonomy)
                ) %>% pillar::style_subtle()
 
