@@ -21,6 +21,7 @@ filter.MPSE <- function(.data, ..., .preserve = FALSE, keep.mpse = TRUE){
     dots <- quos(...)
     res <- .data %>% filter(!!!dots, .preserve = .preserve)
     res <- add_attr.tbl_mpse(x1=res, x2=.data)
+    if (nrow(res)==0){keep.mpse <- FALSE}
     if (!keep.mpse){
         flag <- valid_names(res, type="tbl_mpse")
         xm <- tbl_mpse_return_message(flag)
@@ -482,8 +483,19 @@ add_attr.tbl_mpse <- function(x1, x2, class="tbl_mpse"){
     #attr(x1, "taxavar") <- attr(x2, "taxavar")
     #attr(x1, "fillNAtax") <- attr(x2, "fillNAtax")
     #attr(x1, "internal_attr") <- attr(x2, "internal_attr")
+    taxavar <- attr(x2, "taxavar")
     otutree <- attr(x2, "otutree")
     taxatree <- attr(x2, "taxatree")
+    if (!is.null(taxatree)){
+        nodeClass <- taxatree %>% 
+                     tidytree::pull("nodeClass") %>% 
+                     unique()
+        if (!all(setdiff(nodeClass, taxavar) %in% c("OTU", "Root")) && length(taxavar) > 0){
+            taxatree %<>% taxatree_to_tb() %>% select(taxavar) %>% convert_to_treedata2() 
+        }else if (length(taxavar)==0){
+            taxatree <- NULL
+        }
+    }
     refseq <- attr(x2, "refseq")
     otumetavar <- attr(x2, "otumetavar")
     if ("OTU" %in% colnames(x1)){
@@ -513,7 +525,7 @@ add_attr.tbl_mpse <- function(x1, x2, class="tbl_mpse"){
     attr(x1, "mutatevar") <- attr(x2, "mutatevar")
     attr(x1, "otumetavar") <- otumetavar
     attr(x1, "assaysvar") <- attr(x2, "assaysvar")
-    attr(x1, "taxavar") <- attr(x2, "taxavar")
+    attr(x1, "taxavar") <- taxavar
     attr(x1, "fillNAtax") <- attr(x2, "fillNAtax")
     attr(x1, "internal_attr") <- attr(x2, "internal_attr")
     x1 <- add_class(x=x1, new=class)
@@ -602,6 +614,6 @@ valid_names <- function(x, type="MPSE"){
    if (!flag && type=="MPSE"){
        rlang::abort("The OTU, Sample and Abundance must be present to convert to MPSE object!")
    }else{
-       return (flag)
+       return (flag && nrow(x)>0)
    }
 }
