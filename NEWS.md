@@ -3,6 +3,8 @@
 + fix the issue when the taxonomy info is removed with `select`. (2021-11-09, Tue)
 + update `print` for `MPSE` class. (2021-11-09, Tue)
 + update `otutree<-` for support `phylo` class. (2021-11-09, Tue)
++ speed up the integration of `mp_cal_dist` result with `action="add"`. (2021-11-09, Tue)
++ update `as.MPSE` for `biom` class to support parsing the metadata of sample. (2021-11-09, Tue)
 
 # MicrobiotaProcess 1.7.1
 
