@@ -1,3 +1,9 @@
+# MicrobiotaProcess 1.7.1.990
+
++ fix the issue when the taxonomy info is removed with `select`. (2021-11-09, Tue)
++ update `print` for `MPSE` class. (2021-11-09, Tue)
++ update `otutree<-` for support `phylo` class. (2021-11-09, Tue)
+
 # MicrobiotaProcess 1.7.1
 
 + fix the issue when using `filter` only return a `assays` contained one feature (nrow=1). (2021-11-05, Fri)
