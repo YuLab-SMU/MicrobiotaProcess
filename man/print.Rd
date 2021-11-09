@@ -8,7 +8,7 @@
 \alias{print.rarecurve}
 \title{print some objects}
 \usage{
-\method{print}{MPSE}(x, ..., n = NULL, width = NULL, n_extra = NULL)
+\method{print}{MPSE}(x, ..., n = NULL, width = NULL, n_extra = NULL, max_footer_lines = NULL)
 
 \method{print}{tbl_mpse}(x, ..., n = NULL, width = NULL, n_extra = NULL)
 
@@ -34,6 +34,8 @@ default and always print all columns.}
 \item{n_extra}{Number of extra columns to print abbreviated information for,
 if the width is too small for the entire tibble. If `NULL`, the default,
 will print information about at most `tibble.max_extra_cols` extra columns.}
+
+\item{max_footer_lines}{integer maximum number of lines for the footer.}
 }
 \value{
 print information

@@ -232,12 +232,13 @@ as.MPSE <- function(.data, ...){
     }
     
     if (!is.null(otu.tree)){
-        if (all(flag>5)){
-            otu.tree$tip.label %<>%
-              base::strsplit("\\|") %>%
-              lapply(., function(x)x[length(x)]) %>%
-              unlist()
-        }
+        #if (all(flag>5)){
+        #    otu.tree$tip.label %<>%
+        #      base::strsplit("\\|") %>%
+        #      lapply(., function(x)x[length(x)]) %>%
+        #      unlist()
+        #}
+        otu.tree$tip.label[!is.na(match(otu.tree$tip.label, .data@rowLinks$nodeLab))] <- rownames(.data@rowLinks)
         keepnms <- intersect(otu.tree$tip.label, rownames(.data))
         otu.tree <- ape::keep.tip(otu.tree, tip=keepnms)
         .data <- .data[rownames(.data) %in% keepnms, , drop=FALSE]

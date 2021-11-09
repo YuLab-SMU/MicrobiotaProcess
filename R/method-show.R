@@ -134,29 +134,26 @@ setMethod("show", "MPSE", function(object){
 })
 
 
-# #' @title print some objects
-# #' @name print
-# #' @param x Object to format or print.
-# #' @param ... Other arguments passed on to individual methods.
-# #' @param n Number of rows to show. If `NULL`, the default, will print all rows
-# #'   if less than option `tibble.print_max`. Otherwise, will print
-# #'   `tibble.print_min` rows.
-# #' @param width Width of text output to generate. This defaults to `NULL`, which
-# #'   means use `getOption("tibble.width")` or (if also `NULL`)
-# #'   `getOption("width")`; the latter displays only the columns that fit on one
-# #'   screen. You can also set `options(tibble.width = Inf)` to override this
-# #'   default and always print all columns.
-# #' @param n_extra Number of extra columns to print abbreviated information for,
-# #'   if the width is too small for the entire tibble. If `NULL`, the default,
-# #'   will print information about at most `tibble.max_extra_cols` extra columns.
-# #' 
-# #' @return print information
-# NULL
-# 
-# #' @rdname print
-
-#' @title print some objects 
+#' @title print some objects
 #' @name print
+#' @param x Object to format or print.
+#' @param ... Other arguments passed on to individual methods.
+#' @param n Number of rows to show. If `NULL`, the default, will print all rows
+#'   if less than option `tibble.print_max`. Otherwise, will print
+#'   `tibble.print_min` rows.
+#' @param width Width of text output to generate. This defaults to `NULL`, which
+#'   means use `getOption("tibble.width")` or (if also `NULL`)
+#'   `getOption("width")`; the latter displays only the columns that fit on one
+#'   screen. You can also set `options(tibble.width = Inf)` to override this
+#'   default and always print all columns.
+#' @param n_extra Number of extra columns to print abbreviated information for,
+#'   if the width is too small for the entire tibble. If `NULL`, the default,
+#'   will print information about at most `tibble.max_extra_cols` extra columns.
+#' @param max_footer_lines integer maximum number of lines for the footer.
+#' @return print information
+NULL
+
+#' @rdname print
 #' @method print MPSE
 #' @export
 print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL, max_footer_lines = NULL){
@@ -258,7 +255,7 @@ tbl_format_setup.TBL_MPSE <- function(x,
     tmpxx <- xx$tbl_sum %>%
              strsplit(" ") %>%
              unlist()
-    tmpxx <- paste(totalX, tmpxx[2], tmpxx[3])
+    tmpxx <- paste(getFromNamespace("big_mark", "pillar")(totalX), tmpxx[2], tmpxx[3])
     names(tmpxx) <- c("A MPSE-tibble (MPSE object) abstraction")
     xx$tbl_sum <- tmpxx
     xx$rows_total <- totalX
