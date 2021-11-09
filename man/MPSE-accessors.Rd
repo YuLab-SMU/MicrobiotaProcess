@@ -11,6 +11,7 @@
 \alias{otutree<-}
 \alias{otutree<-,MPSE,treedata-method}
 \alias{otutree<-,MPSE}
+\alias{otutree<-,MPSE,phylo-method}
 \alias{otutree<-,MPSE,NULL-method}
 \alias{taxatree}
 \alias{taxatree,MPSE-method}
@@ -43,6 +44,8 @@ otutree(x, ...)
 otutree(x, ...) <- value
 
 \S4method{otutree}{MPSE,treedata}(x, ...) <- value
+
+\S4method{otutree}{MPSE,phylo}(x, ...) <- value
 
 \S4method{otutree}{MPSE,`NULL`}(x, ...) <- value
 

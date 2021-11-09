@@ -744,7 +744,7 @@ setMethod("otutree", signature(x="MPSE"),function(x,...){
 
 #' @rdname MPSE-accessors 
 #' @param x MPSE object
-#' @param value treedata object or NULL
+#' @param value treedata class, phylo class or NULL
 #' @export
 setGeneric("otutree<-", function(x, ..., value)standardGeneric("otutree<-"))
 
@@ -753,6 +753,15 @@ setGeneric("otutree<-", function(x, ..., value)standardGeneric("otutree<-"))
 #' @export
 setReplaceMethod("otutree", signature(x="MPSE", value="treedata"), function(x, ..., value){
     x@otutree <- .internal_drop.tip(tree=value, newnm=rownames(x)) 
+    methods::validObject(x)
+    return(x)
+})
+
+#' @rdname MPSE-accessors
+#' @aliases otutree<-,MPSE
+#' @export
+setReplaceMethod("otutree", signature(x="MPSE", value="phylo"), function(x, ..., value){
+    x@otutree <- .internal_drop.tip(tree=value, newnm=rownames(x)) %>% treeio::as.treedata()
     methods::validObject(x)
     return(x)
 })
@@ -949,7 +958,11 @@ rename_tiplab <- function(treedata, oldname, newname){
         return (NULL)
     }
     if (is.null(rmotus)){
-        rmotus <- setdiff(tree@phylo$tip.label, newnm)
+        if (inherits(tree, "treedata")){
+            rmotus <- setdiff(tree@phylo$tip.label, newnm)
+        }else if (inherits(tree, "phylo")){
+            rmotus <- setdiff(tree$tip.label, newnm)
+        }
     }
     if (length(rmotus) > 0 && length(rmotus) != treeio::Ntip(tree)){
         otutree <- treeio::drop.tip(tree, tip=rmotus, collapse.singles=collapse.singles)
