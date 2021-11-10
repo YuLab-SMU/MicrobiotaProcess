@@ -289,7 +289,7 @@ p1
 ```{r, fig.align="center", fig.width= 5, fig.height = 4.4, fig.cap = "The distance between samples with group information"}
 # when .group is provided, the dot plot with group information will be return.
 p2 <- mouse.time.mpse %>% mp_plot_dist(.distmethod = bray, .group = time)
-p2
+p2 %>% set_scale_theme(x=scale_fill_manual(values=c("orange", "deepskyblue")), aes_var = time)
 ```
 
 ```{r, fig.align="center", fig.width=2, fig.height=4, fig.cap = "The comparison of distance among the groups"}

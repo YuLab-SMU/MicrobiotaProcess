@@ -642,15 +642,15 @@ setGeneric("mp_plot_dist",
                      dplyr::select(!!rlang::sym("Sample"), !!.group)
          gp <- quo.vect_to_str.vect(.group) %>% unique()
          tbl %<>% dplyr::left_join(sampleda, by="Sample", suffix = c("", ".y"))
+         gh.layers <- list()
          for (i in seq_len(length(gp))){
-             gh.layers <- list(ggplot2::geom_tile(data=sampleda, 
-                                        mapping=aes(x=!!rlang::sym("Sample"), fill=!!rlang::sym(gp[i]), y=gp[i])))
-             if (i < length(gp)){
-                 gh.layers<- list(gh.layers, new_scale("fill"))
-             }
+             gh.layers[[i]] <- ggplot2::geom_tile(data=sampleda, 
+                                      mapping=aes(x=!!rlang::sym("Sample"), y=gp[i], fill=!!rlang::sym(gp[i])))
+                                    #ggplot2::scale_y_discrete(position="right", expand = c(0, 0), labels=gp[i])
+                               
          }
+         #gh.layers <- unlist(gh.layers, recursive=FALSE)
      }
-     
   }
 
   p <- ggplot(data=tbl, mapping=mapps)
@@ -686,24 +686,27 @@ setGeneric("mp_plot_dist",
            theme(axis.text = element_text(size=8),
                  axis.text.x=element_text(angle=-45, hjust = 0),
            )
-
+      indexname <- c(p$labels$colour)
       if (!rlang::quo_is_null(.group)){
-          f <- ggplot() + gh.layers + xylabs
-          f.left <- f + 
-                    ggplot2::coord_flip() + 
-                    theme(axis.text=element_blank(), axis.ticks=element_blank())
+          for (i in seq_len(length(gh.layers))){
+              f <- ggplot() + gh.layers[i] + xylabs 
+              f.left <- f + 
+                        ggplot2::coord_flip(expand= FALSE) + 
+                        theme(axis.text=element_blank(), axis.ticks=element_blank())
 
-          f.top <- f + 
-                   ggplot2::scale_y_discrete(position="right") + 
-                   theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
-
-          p %<>% insert_top(f.top, height=0.06)
-          p %<>% insert_left(f.left, width=0.06)
+              f.top <- f +
+                       ggplot2::scale_y_discrete(position="right", expand = c(0, 0), labels=gp[i]) + 
+                       theme(axis.text.x=element_blank(), axis.ticks.x=element_blank())
+              p %<>% insert_top(f.top, height = 0.04 + 0.0025 * (i - 1))
+              p %<>% insert_left(f.left, width = 0.04 + 0.0025 * (i - 1))
+          }
+          indexname <- c(indexname, rep(gp, each = 2))
       }
-
       p2 <- ggtree(sample.hclust, branch.length="none")
       p <- p %>% insert_left(p2, width=0.12)
       p <- p %>% insert_top(p2 + ggtree::layout_dendrogram(), height=0.12)
+      p$index <- c(indexname, paste0("tree", seq_len(2)))
+      class(p) <- c("aplot_dist", "aplot")
   }
   return(p)
 }
@@ -1109,6 +1112,27 @@ setMethod("mp_plot_ord", signature(.data="tbl_mpse"), .internal_plot_ord)
 #' @aliases mp_plot_ord,grouped_df_mpse
 #' @export mp_plot_ord
 setMethod("mp_plot_ord", signature(.data="grouped_df_mpse"), .internal_plot_ord)
+
+#' @title adjust the color of heatmap of mp_plot_dist
+#' @param .data the plot of heatmap of mp_plot_dist
+#' @param x the scale or theme
+#' @param aes_var character the variable (column) name of color or size.
+#' @export
+set_scale_theme <- function(.data, x, aes_var){
+    aes_var <- rlang::enquo(aes_var)
+    if (inherits(.data, "aplot_dist")){
+       index <- which(.data$index %in% rlang::as_name(aes_var))
+       if (length(index)==0){
+           return(.data)
+       }else{
+           for (i in index){
+               .data$plotlist[[i]] <- .data$plotlist[[i]] + x
+           }
+       }
+    }
+    return(.data)
+}
+
 
 # this is refer to the ggvegan
 .internal.cal.arrows.multi <- function(arrows, data, dim, at = c(0, 0), fill = 0.75){
