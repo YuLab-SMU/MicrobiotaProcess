@@ -1,5 +1,8 @@
-# MicrobiotaProcess 1.7.1.990
+# MicrobiotaProcess 1.7.1.991
 
++ support multiple annotation rows or cols of `heatmap` of mp_plot_dist with 
+  `.group=c(group1, group2)`, and add `set_scale_theme` to adjust the `scale` 
+  or `theme` of subplot of `heatmap`. (2021-11-10, Wed)
 + fix the issue when the taxonomy info is removed with `select`. (2021-11-09, Tue)
 + update `print` for `MPSE` class. (2021-11-09, Tue)
 + update `otutree<-` for support `phylo` class. (2021-11-09, Tue)
