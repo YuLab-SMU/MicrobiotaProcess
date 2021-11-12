@@ -146,7 +146,7 @@ setMethod("show", "MPSE", function(object){
 #'   `getOption("width")`; the latter displays only the columns that fit on one
 #'   screen. You can also set `options(tibble.width = Inf)` to override this
 #'   default and always print all columns.
-#' @param n_extra Number of extra columns to print abbreviated information for,
+#' @param max_extra_cols Number of extra columns to print abbreviated information for,
 #'   if the width is too small for the entire tibble. If `NULL`, the default,
 #'   will print information about at most `tibble.max_extra_cols` extra columns.
 #' @param max_footer_lines integer maximum number of lines for the footer.
@@ -156,10 +156,10 @@ NULL
 #' @rdname print
 #' @method print MPSE
 #' @export
-print.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL, max_footer_lines = NULL){
+print.MPSE <- function(x, ..., n = NULL, width = NULL, max_extra_cols = NULL, max_footer_lines = NULL){
     show.mpse <- getOption(x = "MPSE_show_tbl", default = TRUE)
     if (show.mpse){
-        print2.MPSE(x, ..., n = n, width = width, n_extra = n_extra)
+        print2.MPSE(x, ..., n = n, width = width, max_extra_cols = max_extra_cols)
     }else{
         print1.MPSE(x, ...)
     }
@@ -189,7 +189,7 @@ print1.MPSE <- function(x, ...){
     f(x)
 }
 
-print2.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL, max_footer_lines=NULL) {
+print2.MPSE <- function(x, ..., n = NULL, width = NULL, max_extra_cols = NULL, max_footer_lines=NULL) {
     total_nrows <- nrow(x) * ncol(x)
     if (is.null(n)){
         n <- 10
@@ -222,15 +222,17 @@ print2.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL, max_foot
 
     formatted_mpse_setup <- tmpx %>%
                       tbl_format_setup(width = width, ..., totalX = total_nrows,
-                           n = n, max_extra_cols = n_extra, max_footer_lines = max_footer_lines
+                           n = n, max_extra_cols = max_extra_cols, max_footer_lines = max_footer_lines
                         )
-
-    subtitle <- sprintf("# OTU=%s | Samples=%s | Assays=%s | Taxanomy=%s",
+    format_comment <- getFromNamespace("format_comment", "pillar")
+    subtitle <- sprintf(" OTU=%s | Samples=%s | Assays=%s | Taxanomy=%s",
                       nrow(x),
                       ncol(x),
                       SummarizedExperiment::assayNames(x) %>% paste(collapse=", "),
                       ifelse(is.null(taxonomy), "NULL", taxonomy)
-               ) %>% pillar::style_subtle()
+                ) %>% 
+                format_comment(width=nchar(.) + 5) %>% 
+                pillar::style_subtle()
 
     header <- pillar::tbl_format_header(tmpx, formatted_mpse_setup) %>%
               append(subtitle, after=1)
@@ -264,110 +266,11 @@ tbl_format_setup.TBL_MPSE <- function(x,
 }
 
 
-#print2.MPSE <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
-#    total_nrows <- nrow(x) * ncol(x)
-#    if (is.null(n)){
-#        n <- 10
-#    }
-#
-#    if (total_nrows <= n){
-#        n <- total_nrows
-#    }
-#
-#    if (n < nrow(x)){
-#        tmpx <- x[seq_len(n), seq_len(min(1, ncol(x))), drop=FALSE]
-#    }else{
-#        tmpx <- x[, seq_len(min(round(n/nrow(x))+1, ncol(x))), drop=FALSE]
-#    }
-#    formatted_tb <- tmpx %>% 
-#                    as_tibble() %>% 
-#                    format(..., n = n, width = width, n_extra = n_extra)
-#    
-#    new_head = sprintf(
-#      "A MPSE-tibble (MPSE object) abstraction: %s",
-#       total_nrows %>% format(format="f", big.mark=",", digits=2)
-#    )
-#    left_nrows <- total_nrows - n
-#    flagtail <- grepl("([0-9,]+ more row)", formatted_tb[n + 4])
-#    flagtail2 <- grepl("with [0-9,]+ more variable", formatted_tb[n + 4])
-#    if (left_nrows > 0 && flagtail){
-#        new_tail <- sprintf("%s more rows", 
-#                            left_nrows %>% format(format="f", big.mark=",", digits=2)
-#                      )
-#        formatted_mpse = 
-#          formatted_tb %>%
-#          {
-#            x = (.);
-#            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
-#            x[n+4] = gsub("([0-9,]+ more row)", new_tail, x[n + 4]);
-#            x
-#          }
-#    }else if (left_nrows > 0 && !flagtail && !flagtail2){
-#        new_tail <- paste0("# ", cli::symbol$ellipsis, 
-#                           sprintf(" with %s more ", left_nrows %>% 
-#                           format(format="f", big.mark=",", digits=2)),
-#                           ifelse(left_nrows>1, "rows", "row")
-#                        ) %>% 
-#                    pillar::style_subtle()
-#        formatted_mpse = 
-#          formatted_tb %>%
-#          {
-#            x = (.);
-#            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
-#            x = append(x, new_tail)
-#            x
-#          }
-#    }else if (left_nrows > 0 && !flagtail && flagtail2){
-#        new_tail <- paste0("# ", cli::symbol$ellipsis, 
-#                           sprintf(" with %s more ", left_nrows %>% 
-#                           format(format="f", big.mark=",", digits=2)),
-#                           ifelse(left_nrows>1, "rows, and", "row, and")
-#                    ) 
-#        formatted_mpse = 
-#          formatted_tb %>%
-#          {
-#            x = (.);
-#            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
-#            x[n+4] = gsub(paste0("# ", cli::symbol$ellipsis," with"), new_tail, x[n+4]);
-#            x
-#          }
-#    }else{
-#        formatted_mpse =
-#            formatted_tb %>%
-#          {
-#            x = (.);
-#            x[1] = gsub("(A tibble: [0-9,]+)", new_head, x[1]);
-#            x
-#          }            
-#    }
-#
-#    subtitle <- sprintf(
-#        "# OTU=%s | Samples=%s | Assays=%s | Taxanomy=%s",
-#        nrow(x),
-#        ncol(x),
-#        SummarizedExperiment::assayNames(x) %>% paste(collapse=", "),
-#        ifelse(is.null(x@taxatree), "NULL",
-#               x@taxatree@data %>%
-#                   select("nodeClass") %>%
-#                   filter(! .data[["nodeClass"]] %in% c("OTU", "Root")) %>%
-#                   unlist(use.names=FALSE) %>%
-#                   unique %>%
-#                   paste(collapse=", "))
-#      ) %>% pillar::style_subtle()
-#
-#    subtitle <- gsub("38;5;246m", "90m", subtitle)
-#
-#    formatted_mpse %>%
-#      append(subtitle, after = 1) %>%
-#      writeLines()
-#    invisible(x)
-#}
-
 #' @method print tbl_mpse
 #' @rdname print
 #' @export
-print.tbl_mpse <- function(x, ..., n = NULL, width = NULL, n_extra = NULL){
-    formatted_tb <- x %>% format(..., n = n, width = width, n_extra = n_extra)
+print.tbl_mpse <- function(x, ..., n = NULL, width = NULL, max_extra_cols = NULL){
+    formatted_tb <- x %>% format(..., n = n, width = width, max_extra_cols = max_extra_cols)
     if (valid_names(x, type="tbl_mpse")){
         new_head = "A tbl_mpse (which can be converted to MPSE via as.MPSE) abstraction:"
         formatted_tb_mpse <-
@@ -387,8 +290,8 @@ print.tbl_mpse <- function(x, ..., n = NULL, width = NULL, n_extra = NULL){
 #' @method print grouped_df_mpse
 #' @rdname print
 #' @export
-print.grouped_df_mpse <- function(x, ..., n = NULL, width = NULL, n_extra = NULL){
-    formatted_tb <- x %>% format(..., n = n, width = width, n_extra = n_extra)
+print.grouped_df_mpse <- function(x, ..., n = NULL, width = NULL, max_extra_cols = NULL){
+    formatted_tb <- x %>% format(..., n = n, width = width, max_extra_cols = max_extra_cols)
     if (valid_names(x, type="grouped_df_mpse")){
         new_head = "A grouped_df_mpse (which can be converted to MPSE via as.MPSE) abstraction:"
         formatted_grouped <- 
@@ -408,8 +311,8 @@ print.grouped_df_mpse <- function(x, ..., n = NULL, width = NULL, n_extra = NULL
 #' @method print rarecurve
 #' @rdname print
 #' @export
-print.rarecurve <- function(x, ..., n = NULL, width = NULL, n_extra = NULL){
-    formatted_tb <- x$data %>% format(..., n =  n, width = width, n_extra = n_extra)
+print.rarecurve <- function(x, ..., n = NULL, width = NULL, max_extra_cols = NULL){
+    formatted_tb <- x$data %>% format(..., n =  n, width = width, max_extra_cols = max_extra_cols)
     new_head = "A rarecurve (which can be visualized via ggrarecurve) abstraction:"
 
     format_rare <- 

@@ -195,7 +195,8 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
                 as_tibble(rownames="Sample") %>%
 				modify_AsIs_list() %>%
                 tidyr::unnest() %>%
-                suppressWarnings() %>% 
+                suppressWarnings() %>%
+                dplyr::mutate_if(is.factor, as.character) %>% 
                 tidyr::pivot_wider(id_cols="Sample", 
                                    names_from=vapply(., is.character, logical(1)) %>% 
                                               select_true_nm(rm="Sample"), 
