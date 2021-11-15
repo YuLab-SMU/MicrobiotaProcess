@@ -314,15 +314,26 @@ read_qiime_otu <- function(otufilename){
 
 .internal_parse_biom <- function(biomobj){
     x <- data.frame(as(biomformat::biom_data(biomobj),"matrix"), check.names=FALSE)
-    taxflag <- all(unlist(lapply(biomobj$rows, function(i){length(i$metadata$taxonomy)}))==0)
+    taxflag <- unlist(lapply(biomobj$rows, function(i){length(i$metadata$taxonomy)}))
     sampleda <- lapply(biomobj$columns, function(i)c(Sample=i$id, i$metadata)) %>% 
                 dplyr::bind_rows() %>% 
                 tibble::column_to_rownames(var=colnames(.)[1])
     if (ncol(sampleda)==1){
         sampleda <- NULL
     }
-    if (taxflag){
+    if (all(taxflag==0)){
         taxatab <- NULL
+    }else if(all(taxflag == 1)){
+        taxatab <- lapply(biomobj$rows, function(i)i$metadata$taxonomy) %>%
+                   gsub(";\\s+", "@@",.) %>%
+                   unlist() %>%
+                   data.frame() %>%
+                   split_str_to_list(sep="@@") %>%
+                   apply(., 2, function(x)gsub("\\s+$", "", gsub("^\\s+", "", x))) %>%
+                   data.frame() %>%
+                   magrittr::set_colnames(taxaclass[seq_len(ncol(.))]) %>%
+                   magrittr::set_rownames(rownames(x)) %>%
+                   fillNAtax()
     }else{
         taxatab <- lapply(biomobj$rows, function(i)paste0(i$metadata$taxonomy, collapse="@@")) %>%
             unlist() %>%

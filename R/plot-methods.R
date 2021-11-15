@@ -144,7 +144,8 @@ setGeneric("mp_plot_abundance",
      tbl <- .data %>% 
             mp_extract_abundance(taxa.class=!!taxa.class, topn = topn) %>%
             tidyr::unnest(cols=AbundBy) %>% 
-            dplyr::rename(!!taxa.class:="label") %>%
+            dplyr::mutate(label=forcats::fct_rev(.data$label)) %>%
+            dplyr::rename(!!taxa.class:="label") %>% 
             suppressMessages()
      
      if (!plot.group && ((force && !relative) || (!force && !relative))){
@@ -162,7 +163,10 @@ setGeneric("mp_plot_abundance",
           ggalluvial::geom_flow(stat="alluvium", lode.guidance = "frontback", color = "darkgray") +
           ggalluvial::geom_stratum(stat="alluvium") +
           ggplot2::labs(x=NULL, y=ylabs) +
-          scale_fill_manual(values=get_cols(tbl %>% pull(!!taxa.class) %>% unique() %>% length()))
+          scale_fill_manual(
+              values = rev(get_cols(tbl %>% pull(!!taxa.class) %>% unique() %>% length())),
+              guide = guide_legend(reverse=TRUE)
+          )
 
      if (!rlang::quo_is_null(.group) && !plot.group && rlang::quo_is_null(.sec.group)){
          p <- p + facet_grid(cols=ggplot2::vars(!!.group), scales="free_x", space="free")
@@ -977,7 +981,7 @@ setGeneric("mp_plot_ord", function(
             side.y + 
             ggside::scale_xsidey_discrete() + 
             side.x +
-            ggside::scale_ysidex_discrete() + 
+            ggside::scale_ysidex_discrete(guide = ggplot2::guide_axis(angle=-45)) + 
             theme(ggside.panel.scale = 0.25)
             )
     }
