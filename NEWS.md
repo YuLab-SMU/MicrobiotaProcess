@@ -1,5 +1,8 @@
-# MicrobiotaProcess 1.7.1.991
+# MicrobiotaProcess 1.7.1.992
 
++ update the guide of x axis of `ggside` in `mp_plot_ord`. (2021-11-15, Mon)
++ update `mp_plot_abundance` to visualize the abundance of taxonomy from high 
+  (bottom) to low (top). (2021-11-15, Mon)
 + support multiple annotation rows or cols of `heatmap` of mp_plot_dist with 
   `.group=c(group1, group2)`, and add `set_scale_theme` to adjust the `scale` 
   or `theme` of subplot of `heatmap`. (2021-11-10, Wed)
