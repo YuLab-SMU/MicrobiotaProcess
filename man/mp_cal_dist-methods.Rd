@@ -99,12 +99,36 @@ mouse.time.mpse \%<>\%
     mp_cal_dist(.abundance=hellinger, distmethod="bray")
 mouse.time.mpse
 p1 <- mouse.time.mpse \%>\%
-        mp_plot_dist(.distmethod=bray)
+        mp_plot_dist(.distmethod = bray)
 p2 <- mouse.time.mpse \%>\%
-        mp_plot_dist(.distmethod=bray, .group=time, group.test=TRUE)
+        mp_plot_dist(.distmethod = bray, .group = time, group.test = TRUE)
 p3 <- mouse.time.mpse \%>\%
-        mp_plot_dist(.distmethod=bray, .group=time)
-
+        mp_plot_dist(.distmethod = bray, .group = time)
+# adjust the legend of heatmap of distance between the samples.
+# the p3 is a aplot object, we define set_scale_theme to adjust the 
+# character (color, size or legend size) of figure with specified 
+# 'aes_var' according to legend title. 
+library(ggplot2)
+p3 \%>\% 
+   set_scale_theme(
+     x = scale_size_continuous(
+       range = c(0.1, 4), 
+       guide = guide_legend(keywidth = 0.5, keyheight = 1)), 
+     aes_var = bray
+   ) \%>\% 
+   set_scale_theme(
+     x = scale_colour_gradient(
+       guide = guide_legend(keywidth = 0.5, keyheight = 1)), 
+     aes_var = bray
+   ) \%>\% 
+   set_scale_theme(
+     x = scale_fill_manual(values = c("orangered", "deepskyblue"), 
+       guide = guide_legend(keywidth = 0.5, keyheight = 0.5, label.theme = element_text(size=6))), 
+     aes_var = time) \%>\% 
+   set_scale_theme(
+     x = theme(axis.text=element_text(size=6), panel.background=element_blank()), 
+     aes_var = bray
+   )
 \dontrun{
 # Visualization manual
 library(ggplot2)

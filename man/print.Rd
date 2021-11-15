@@ -8,13 +8,20 @@
 \alias{print.rarecurve}
 \title{print some objects}
 \usage{
-\method{print}{MPSE}(x, ..., n = NULL, width = NULL, n_extra = NULL, max_footer_lines = NULL)
+\method{print}{MPSE}(
+  x,
+  ...,
+  n = NULL,
+  width = NULL,
+  max_extra_cols = NULL,
+  max_footer_lines = NULL
+)
 
-\method{print}{tbl_mpse}(x, ..., n = NULL, width = NULL, n_extra = NULL)
+\method{print}{tbl_mpse}(x, ..., n = NULL, width = NULL, max_extra_cols = NULL)
 
-\method{print}{grouped_df_mpse}(x, ..., n = NULL, width = NULL, n_extra = NULL)
+\method{print}{grouped_df_mpse}(x, ..., n = NULL, width = NULL, max_extra_cols = NULL)
 
-\method{print}{rarecurve}(x, ..., n = NULL, width = NULL, n_extra = NULL)
+\method{print}{rarecurve}(x, ..., n = NULL, width = NULL, max_extra_cols = NULL)
 }
 \arguments{
 \item{x}{Object to format or print.}
@@ -31,7 +38,7 @@ means use `getOption("tibble.width")` or (if also `NULL`)
 screen. You can also set `options(tibble.width = Inf)` to override this
 default and always print all columns.}
 
-\item{n_extra}{Number of extra columns to print abbreviated information for,
+\item{max_extra_cols}{Number of extra columns to print abbreviated information for,
 if the width is too small for the entire tibble. If `NULL`, the default,
 will print information about at most `tibble.max_extra_cols` extra columns.}
 
