@@ -271,7 +271,7 @@ setGeneric("mp_diff_analysis", function(.data,
                                           classlevels=leaveclasslevels) 
      second.test.sig.vars.vectors <- second.test.sig.vars %>% get_secondvarlist()
      if (!is.null(normalization)){
-         f_tb <- f_tb * normalization
+         f_tb <- f_tb * normalization / 100
      }
      dameta <- merge(f_tb, sampleda, by=0) %>% 
                tibble::column_to_rownames(var="Row.names") %>%

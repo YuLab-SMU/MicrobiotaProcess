@@ -90,6 +90,9 @@ MPSE <- function(assays,
     names(assays) <- clnm
 
     se <- SummarizedExperiment::SummarizedExperiment(assays=assays, colData=colData, ...)
+    if (!is.null(otutree) && inherits(otutree, "phylo")){
+        otutree <- treeio::as.treedata(otutree)
+    }
     mpse <- new("MPSE",
                 se,
                 otutree = otutree,

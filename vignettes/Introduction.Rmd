@@ -281,15 +281,40 @@ mouse.time.mpse
 mouse.time.mpse %<>% mp_cal_dist(.abundance=hellinger, distmethod="bray")
 mouse.time.mpse
 # mp_plot_dist provides there methods to visualize the distance between the samples or groups
-# when .group is not provided, the dot plot will be return
+# when .group is not provided, the dot heatmap plot will be return
 p1 <- mouse.time.mpse %>% mp_plot_dist(.distmethod = bray)
 p1
 ```
 
 ```{r, fig.align="center", fig.width= 5, fig.height = 4.4, fig.cap = "The distance between samples with group information"}
-# when .group is provided, the dot plot with group information will be return.
+# when .group is provided, the dot heatmap plot with group information will be return.
 p2 <- mouse.time.mpse %>% mp_plot_dist(.distmethod = bray, .group = time)
-p2 %>% set_scale_theme(x=scale_fill_manual(values=c("orange", "deepskyblue")), aes_var = time)
+# The scale or theme of dot heatmap plot can be adjusted using set_scale_theme function.
+p2 %>% set_scale_theme(
+          x = scale_fill_manual(
+                 values=c("orange", "deepskyblue"), 
+                 guide = guide_legend(
+                             keywidth = 1, 
+                             keyheight = 0.5, 
+                             title.theme = element_text(size=8),
+                             label.theme = element_text(size=6)
+                 )
+              ), 
+          aes_var = time # specific the name of variable 
+       ) %>%
+       set_scale_theme(
+          x = scale_color_gradient(
+                 guide = guide_legend(keywidth = 0.5, keyheight = 0.5)
+              ),
+          aes_var = bray
+       ) %>%
+       set_scale_theme(
+          x = scale_size_continuous(
+                 range = c(0.1, 3),
+                 guide = guide_legend(keywidth = 0.5, keyheight = 0.5)
+              ),
+          aes_var = bray
+       )
 ```
 
 ```{r, fig.align="center", fig.width=2, fig.height=4, fig.cap = "The comparison of distance among the groups"}
@@ -337,9 +362,18 @@ p2 <- mouse.time.mpse %>%
           ellipse = TRUE,
           show.legend = FALSE # don't display the legend of stat_ellipse 
         ) +
-        scale_fill_manual(values=c("#00A087FF", "#3C5488FF")) +
-        scale_color_manual(values=c("#00A087FF", "#3C5488FF")) +
-        scale_size_continuous(range=c(1, 3))
+        scale_fill_manual(
+          values = c("#00A087FF", "#3C5488FF"), 
+          guide = guide_legend(keywidth=0.6, keyheight=0.6, label.theme=element_text(size=6.5))
+        ) +
+        scale_color_manual(
+          values=c("#00A087FF", "#3C5488FF"),
+          guide = guide_legend(keywidth=0.6, keyheight=0.6, label.theme=element_text(size=6.5))
+        ) +
+        scale_size_continuous(
+          range=c(0.5, 3),
+          guide = guide_legend(keywidth=0.6, keyheight=0.6, label.theme=element_text(size=6.5))
+        )
 p1 + p2
 ```
 
@@ -364,8 +398,9 @@ sample.clust
 library(ggtree)
 p <- ggtree(sample.clust) + 
        geom_tippoint(aes(color=time)) +
-       geom_tiplab()
-p + xlim(c(0, 0.25))
+       geom_tiplab(as_ylab = TRUE) +
+       ggplot2::scale_x_continuous(expand=c(0, 0.01))
+p
 ```
 
 Since the result of hierarchical cluster is treedata object, so it is very easy to display the result with associated data. For example, we can display the result of hierarchical cluster and the abundance of specific taxonomy level to check whether some biological pattern can be found.
@@ -387,7 +422,7 @@ p1 <- p +
                        fill = Phyla
                  ),
          orientation = "y",
-         offset = 0.4,
+         #offset = 0.4,
          pwidth = 3, 
          axis.params = list(axis = "x", 
                             title = "The relative abundance of phyla (%)",
