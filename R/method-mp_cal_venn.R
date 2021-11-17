@@ -140,21 +140,25 @@ setMethod("mp_cal_venn", signature(.data="MPSE"), function(.data, .group, .abund
           tibble::as_tibble(rownames="OTU") %>%
           tidyr::pivot_longer(!as.symbol("OTU"), 
                               names_to="Sample", 
-                              values_to=rlang::as_name(.abundance))
+                              values_to=rlang::as_name(.abundance)) %>%
+          dtplyr::lazy_dt()
 
     sampleda <- .data %>%
                 mp_extract_sample()
 
-    if (ncol(sampleda)>1){
-        da %<>% left_join(sampleda, by="Sample", suffix=c("", ".y"))
+    if (ncol(sampleda)==1){
+        sampleda %<>% dplyr::mutate(.DTPLYREXTRA=0)
+    }
+    da %<>% left_join(sampleda, by="Sample", suffix=c("", ".y"))
+    if (".DTPLYREXTRA" %in% colnames(sampleda)){
+        sampleda %<>% dplyr::select(-".DTPLYREXTRA")
     }
 
     dat <- da %>% 
            .internal_cal_venn(.abundance=.abundance, .group=.group)
 
     if (action == "add"){
-        .data@colData <- 
-             sampleda %>%
+        .data@colData <- sampleda %>%
              dplyr::left_join(dat, by=rlang::as_name(.group), suffix=c("", ".y")) %>%
              tibble::column_to_rownames(var="Sample") %>%
              S4Vectors::DataFrame(check.names=FALSE)
@@ -205,8 +209,15 @@ setMethod("mp_cal_venn", signature(.data="MPSE"), function(.data, .group, .abund
     dat <- .data %>% 
           dplyr::ungroup() %>%
           dplyr::select(!!as.symbol("OTU"), !!.group, !!.abundance) %>%
-          .internal_cal_venn(.abundance=.abundance, .group=.group) 
-    
+          dtplyr::lazy_dt() #%>%
+    EXTRA <- .data %>%
+             dplyr::ungroup() %>%
+             dplyr::select(!!.group) %>%
+             dplyr::mutate(.DTPLYREXTRA=0)
+    dat %<>%
+          dplyr::left_join(EXTRA, by=rlang::as_name(.group)) %>%
+          .internal_cal_venn(.abundance=.abundance, .group=.group)
+
     if (action=="add"){
         .data %<>% 
             dplyr::left_join(dat, by=rlang::as_name(.group), suffix=c("", ".y"))
@@ -229,7 +240,8 @@ setMethod("mp_cal_venn", signature(.data="MPSE"), function(.data, .group, .abund
         dplyr::filter(!!as.symbol("AbundanceBy")>0) %>%
         dplyr::select(- !!as.symbol("AbundanceBy")) %>%
         group_by(!!.group) %>% 
-        dplyr::summarize(across(!!as.symbol("OTU"), list, .names=vennnm))
+        dplyr::summarize(across(!!as.symbol("OTU"), list, .names=vennnm)) %>%
+        tibble::as_tibble()
     return(dat)
 }
 

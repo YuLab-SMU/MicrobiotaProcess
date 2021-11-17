@@ -929,15 +929,10 @@ setReplaceMethod("rownames", signature(x="MPSE"), function(x, value){
     }
 
     if (!is.null(value) && !is.null(oldnm)){
-        old2new <- x %>%
-                   avoid_conflict_names() %>%
-                   tibble::as_tibble(rownames="OTU") %>%
-                   dplyr::left_join(
-                     data.frame(new=value, oldrowname=oldnm), 
-                     by=c("OTU"="new"), 
-                     suffix=c("", ".y")
-                   ) %>% 
-                   tibble::column_to_rownames(var="OTU")
+        old2new <- data.frame(.NEW=value, .OLDROWNAMES=oldnm) 
+        old2new %<>% dplyr::left_join(x %>% mp_extract_feature(), by=c(.OLDROWNAMES="OTU")) %>%
+                   tibble::column_to_rownames(var=".NEW")
+        
         SummarizedExperiment::rowData(nx) <- old2new
     }
     methods::validObject(nx)

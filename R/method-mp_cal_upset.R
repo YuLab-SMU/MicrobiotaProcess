@@ -155,14 +155,16 @@ setMethod("mp_cal_upset", signature(.data="MPSE"), function(.data, .group, .abun
           tibble::as_tibble(rownames="OTU") %>%
           tidyr::pivot_longer(!as.symbol("OTU"), 
                               names_to="Sample", 
-                              values_to=rlang::as_name(.abundance))
+                              values_to=rlang::as_name(.abundance)) %>%
+          dtplyr::lazy_dt()
 
     sampleda <- .data %>%
-                mp_extract_sample() 
-
-    if (ncol(sampleda)>1){
-        da %<>% left_join(sampleda, by="Sample", suffix=c("", ".y"))
+                mp_extract_sample()
+    if (ncol(sampleda)==1){
+        sampleda %<>% dplyr::mutate(.DTPLYREXTRA=0)
     }
+
+    da %<>% left_join(sampleda, by="Sample", suffix=c("", ".y"))
 
     dat <- da %>% 
            .internal_cal_upset(.abundance=.abundance, .group=.group)
@@ -200,21 +202,41 @@ setMethod("mp_cal_upset", signature(.data="MPSE"), function(.data, .group, .abun
     }
 
     if (!valid_rare(.data, .abundance=.abundance) && !force){
-        glue::glue("The rarefied abundance of species might not be provided. Rarefaction of all
-                    observations is performed automatically. If you still want to calculate the
-                    alpha index with the '.abundance', you can set 'force=TRUE'. ")
-        .data <- mp_rrarefy(.data=.data, ...)
-        .abundance <- as.symbol("RareAbundance")
+        trash <- try(silent = TRUE,
+                     expr = {
+                         .data <- mp_rrarefy(.data = .data, ...)
+                     }
+                 )
+        if (inherits(trash, "try-error")){
+            stop_wrap("The 'Abundance' column cannot be rarefied, please check whether it is integer (count).
+                       Or you can set 'force=TRUE' to calculate the result of 'upset' without rarefaction.
+                      ")
+        }
+
+        message_wrap("The rarefied abundance of species might not be provided. Rarefaction of all
+                      observations is performed automatically using 'Abundance' column.
+                      If you still want to calculate the result of 'upset' with the specified '.abundance',
+                      you can set 'force=TRUE'. ")
+        .abundance <- as.symbol("RareAbundance")        
     }
 
     dat <- .data %>% 
-          dplyr::ungroup() %>%
-          dplyr::select(!!as.symbol("OTU"), !!.group, !!.abundance) %>%
+           dplyr::ungroup() %>%
+           dplyr::select(!!as.symbol("OTU"), !!.group, !!.abundance) %>%
+           dtplyr::lazy_dt() # %>%
+    EXTRA <- .data %>% 
+             dplyr::ungroup() %>%
+             dplyr::select("OTU") %>%
+             dplyr::mutate(.DTPLYREXTRA=0)
+    dat %<>% 
+          dplyr::left_join(EXTRA, by="OTU") %>%
           .internal_cal_upset(.abundance=.abundance, .group=.group) 
-    
+
     if (action=="add"){
         .data %<>% 
             dplyr::left_join(dat, by="OTU", suffix=c("", ".y"))
+        attr(.data, "otumetavar") <- union(attr(.data, "otumetavar"), colnames(dat)[[2]])
+        attr(.data, "samplevar") <- setdiff(attr(.data, "samplevar"), colnames(dat)[[2]])
         return(.data)
     }else if(action == "only"){
         return (dat)
@@ -235,7 +257,8 @@ setMethod("mp_cal_upset", signature(.data="MPSE"), function(.data, .group, .abun
         dplyr::filter(!!as.symbol("AbundanceBy")>0) %>%
         dplyr::select(- !!as.symbol("AbundanceBy")) %>%
         group_by(!!as.symbol("OTU")) %>% 
-        dplyr::summarize(across(!!.group, list, .names=upsetnm))
+        dplyr::summarize(across(!!.group, list, .names=upsetnm)) %>%
+        tibble::as_tibble()
     return(dat)
 }
 
