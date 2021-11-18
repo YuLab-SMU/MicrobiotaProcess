@@ -275,9 +275,9 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
         otuRelabun <- da1[[1]] %>% 
 				      tidyr::unnest(cols=paste0(rlang::as_name(.abundance),"BySample")) %>%
                       select(-!!.abundance) %>%
-                      tidyr::pivot_wider(id_cols="OTU", names_from="Sample", values_from=as.symbol(newRelabun)) %>%
+                      tidyr::pivot_wider(id_cols="OTU", names_from="Sample", values_from=newRelabun) %>%
                       tibble::column_to_rownames(var="OTU")
-        SummarizedExperiment::assays(.data)@listData <- c(xx, list(otuRelabun)) %>% 
+        SummarizedExperiment::assays(.data) <- c(xx, list(otuRelabun)) %>% 
             setNames(c(assaysvar, newRelabun))
     }
     
@@ -400,11 +400,17 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     }else{
         taxavar <- "OTU"    
     }
-    
+    dat <- .data %>% as_tibble %>% dtplyr::lazy_dt()
+    if (ncol(sampleda)==1){
+        sampleda %<>% dplyr::mutate(.DTPLYREXTRA=0)
+        dat %<>% left_join(sampleda, by="Sample", suffix=c("", ".y"))
+        sampleda %<>% select(-".DTPLYREXTRA")
+    }
+
     if (!rlang::quo_is_null(.group)){
         da1 <- lapply(rlang::syms(taxavar), 
                       .internal_cal_feature_abun,
-                                         da = dtplyr::lazy_dt(.data),
+                                         da = dat,
                                          .abundance = .abundance,
                                          byID = .group,
                                          relative = relative,
@@ -414,7 +420,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
         sampledat <- sampleda[, !vapply(sampleda, function(x)is.list(x)||is.numeric(x), logical(1))]
         da1 <- lapply(rlang::syms(taxavar), 
                       .internal_cal_feature_abun,
-                                         da = dtplyr::lazy_dt(.data),
+                                         da = dat,
                                          .abundance = .abundance,
                                          byID = as.symbol("Sample"),
                                          relative = relative,
