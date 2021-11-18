@@ -101,10 +101,11 @@ sample.file <- system.file("extdata/MetaPhlAn", "sample_test.txt", package="Micr
 mpse3 <- mp_import_metaphlan(profile=file1, mapfilename=sample.file)
 mpse3
 # convert phyloseq object to mpse
-data(test_otu_data)
-test_otu_data
-mpse4 <- test_otu_data %>% as.MPSE() 
-mpse4
+#library(phyloseq)
+#data(esophagus)
+#esophagus
+#mpse4 <- esophagus %>% as.MPSE() 
+#mpse4
 # convert TreeSummarizedExperiment object to mpse
 # library(curatedMetagenomicData)
 # tse <- curatedMetagenomicData::curatedMetagenomicData("ZhuF_2020.relative_abundance", dryrun=F)

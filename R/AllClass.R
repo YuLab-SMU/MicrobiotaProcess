@@ -66,7 +66,7 @@ setClass("MPSE",
 #' @importFrom methods new
 #' @export
 MPSE <- function(assays,
-                 colData,
+                 colData = NULL,
                  otutree = NULL, 
                  taxatree = NULL, 
                  refseq = NULL, 
@@ -88,6 +88,10 @@ MPSE <- function(assays,
     }
 
     names(assays) <- clnm
+
+    if (!is.null(colData)){
+        colData %<>% avoid_conflict_names()
+    }
 
     se <- SummarizedExperiment::SummarizedExperiment(assays=assays, colData=colData, ...)
     if (!is.null(otutree) && inherits(otutree, "phylo")){

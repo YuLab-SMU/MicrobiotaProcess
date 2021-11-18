@@ -30,6 +30,10 @@ as.MPSE <- function(.data, ...){
     return (res)
 }
 
+#' @rdname as.MPSE
+#' @export
+as.mpse <- as.MPSE
+
 .as.MPSE.tbl_mpse <- function(.data, ...){
 
         otutree <- attr(.data, "otutree")

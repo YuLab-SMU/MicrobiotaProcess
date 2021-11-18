@@ -1224,7 +1224,6 @@ extract_params <- function(originparam, inputparam, defaultparam){
 }
 
 starshapes <- getFromNamespace("starshape_table", "ggstar")
-new_scale <- getFromNamespace("new_scale", "ggnewscale")
 insert_top <- getFromNamespace("insert_top", "aplot")
 insert_left <- getFromNamespace("insert_left", "aplot")
 

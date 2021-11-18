@@ -158,12 +158,10 @@ setGeneric("mp_cal_clust", function(.data, .abundance, distmethod="bray", hclust
     res <- distobj %>%
            hclust(method=hclustmethod, ...) %>%
            ape::as.phylo() %>%
-           treeio::full_join(
+           tidytree::left_join(
                y = .data %>% 
-                    mp_extract_sample() %>%
-                    avoid_conflict_names(spename="label") %>%
-                    rename(label="Sample"),
-               by="label"
+                    mp_extract_sample(),
+               by=c("label"="Sample")
            )
     if (action %in% c("get", "only")){
         return(res)

@@ -4,7 +4,14 @@
 \alias{MPSE}
 \title{Construct a MPSE object}
 \usage{
-MPSE(assays, colData, otutree = NULL, taxatree = NULL, refseq = NULL, ...)
+MPSE(
+  assays,
+  colData = NULL,
+  otutree = NULL,
+  taxatree = NULL,
+  refseq = NULL,
+  ...
+)
 }
 \arguments{
 \item{assays}{A 'list' or 'SimpleList' of matrix-like elements

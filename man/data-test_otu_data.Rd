@@ -6,7 +6,7 @@
 \alias{test_otu_data}
 \title{(Data) simulated dataset.}
 \description{
-This dataset was simulated. And it also was phyloseq class, 
+This dataset was simulated. And it also was MPSE class, 
 contained otu_table and sample_data
 }
 \examples{

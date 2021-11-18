@@ -10,7 +10,7 @@
 This dataset was from the a study on colorectal cancer, 
 publised in Genome Research (2012). This dataset had been removed samples 
 with less than 500 reads, contained 91 Control and 86 Tumors. And It is 
-belong to phyloseq class, contained otu_table and sample_data.
+belong to MPSE class, contained otu_table and sample_data.
 }
 \examples{
 data(kostic2012crc)

@@ -22,7 +22,7 @@ as_tibble.phyloseq <- function(x, ...){
         taxavar <- colnames(taxada)
         taxada %<>% fillNAtax() 
         taxatree <- convert_to_treedata2(taxada)
-        taxada <- avoid_conflict_names() %>% 
+        taxada %<>% avoid_conflict_names() %>% 
                     tibble::as_tibble(rownames="OTU")
         otuda <- otuda %>% left_join(taxada, by="OTU", suffix=c("", ".y"))
         fillNAtaxflag <- TRUE
@@ -119,16 +119,16 @@ as_tibble.MPSE <- function(x, ...){
     return(otuda)
 }
 
-avoid_conflict_names <- function(.data, spename=NULL){
-    cls <- colnames(.data)
-    cls <- gsub("^OTU$", "OTU.x", cls)
-    cls <- gsub("^Sample$", "Sample.x", cls)
-    cls <- gsub("^Abundance$", "Abundance.x", cls)
+avoid_conflict_names <- function(dat, spename=NULL){
+    cls <- colnames(dat) %>% 
+           gsub("^OTU$", "OTU.x", .) %>%
+           gsub("^Sample$", "Sample.x", .) %>%
+           gsub("^Abundance$", "Abundance.x", .)
     if(!is.null(spename)){
         cls <- gsub(paste0("^", spename, "$"), paste0(spename, ".x"), cls)
     }
-    stats::setNames(.data, cls)
-    return(.data)
+    colnames(dat) <- cls
+    return(dat)
 }
 
 extract_count_data <- function(SE_object){

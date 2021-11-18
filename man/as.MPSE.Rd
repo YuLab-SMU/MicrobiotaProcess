@@ -2,9 +2,12 @@
 % Please edit documentation in R/method-as-MPSE.R
 \name{as.MPSE}
 \alias{as.MPSE}
+\alias{as.mpse}
 \title{as.MPSE method}
 \usage{
 as.MPSE(.data, ...)
+
+as.mpse(.data, ...)
 }
 \arguments{
 \item{.data}{one type of tbl_mpse, phyloseq, biom, SummarizedExperiment or TreeSummarizedExperiment class}
