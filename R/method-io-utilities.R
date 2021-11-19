@@ -313,7 +313,7 @@ read_qiime_otu <- function(otufilename){
 }
 
 .internal_parse_biom <- function(biomobj){
-    x <- data.frame(as(biomformat::biom_data(biomobj),"matrix"), check.names=FALSE)
+    x <- data.frame(as.matrix(biomformat::biom_data(biomobj)), check.names=FALSE)
     taxflag <- unlist(lapply(biomobj$rows, function(i){length(i$metadata$taxonomy)}))
     sampleda <- lapply(biomobj$columns, function(i)c(Sample=i$id, i$metadata)) %>% 
                 dplyr::bind_rows() %>% 

@@ -30,6 +30,7 @@
 #' otudat <- drop_taxa(otuda, minocc=0.1, minabu=1)
 #' dim(otudat)
 #' data(test_otu_data)
+#' test_otu_data %<>% as.phyloseq()
 #' keepps <- drop_taxa(test_otu_data, minocc=0.1, minabu=0)
 #' }
 setGeneric("drop_taxa",function(obj, ...){standardGeneric("drop_taxa")})

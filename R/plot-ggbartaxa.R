@@ -29,6 +29,7 @@
 #' \dontrun{
 #'     library(ggplot2)
 #'     data(test_otu_data)
+#'     test_otu_data %<>% as.phyloseq()
 #'     otubar <- ggbartax(test_otu_data) + 
 #'               xlab(NULL) + ylab("relative abundance(%)")
 #' }
@@ -201,6 +202,7 @@ mappingtaxda <- function(data, topn=30, count=FALSE, sampleda=NULL,
 #' \dontrun{
 #'     library(ggplot2)
 #'     data(test_otu_data)
+#'     test_otu_data %<>% as.phyloseq()
 #'     otubar <- ggbartax(test_otu_data, settheme=FALSE) + 
 #'         xlab(NULL) + ylab("relative abundance(%)") + 
 #'         theme_taxbar()

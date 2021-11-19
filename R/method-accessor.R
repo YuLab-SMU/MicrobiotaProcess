@@ -839,12 +839,12 @@ setReplaceMethod("taxatree", signature(x="MPSE", value="NULL"), function(x, ...,
 #' @rdname MPSE-accessors
 #' @param x MPSE object
 #' @export
-setGeneric("refseq", function(x, ...)standardGeneric("refseq"))
+setGeneric("refsequence", function(x, ...)standardGeneric("refsequence"))
 
 #' @rdname MPSE-accessors
-#' @aliases refseq,MPSE
+#' @aliases refsequence,MPSE
 #' @export
-setMethod("refseq", signature(x="MPSE"), function(x, ...){
+setMethod("refsequence", signature(x="MPSE"), function(x, ...){
     refseq <- x@refseq
     if (is.null(refseq)){
         message("The representative sequence is empty")
@@ -856,21 +856,21 @@ setMethod("refseq", signature(x="MPSE"), function(x, ...){
 #' @param x MPSE object
 #' @param value XStringSet object or NULL
 #' @export
-setGeneric("refseq<-", function(x, ..., value)standardGeneric("refseq<-"))
+setGeneric("refsequence<-", function(x, ..., value)standardGeneric("refsequence<-"))
 
 #' @rdname MPSE-accessors
-#' @aliases refseq<-,MPSE
+#' @aliases refsequence<-,MPSE
 #' @export
-setReplaceMethod("refseq", signature(x="MPSE", value="XStringSet"), function(x, ..., value){
+setReplaceMethod("refsequence", signature(x="MPSE", value="XStringSet"), function(x, ..., value){
     x@refseq <- value[rownames(x)]
     methods::validObject(x)
     return(x)
 })
 
 #' @rdname MPSE-accessors
-#' @aliases refseq<-,MPSE
+#' @aliases refsequence<-,MPSE
 #' @export
-setReplaceMethod("refseq", signature(x="MPSE", value="NULL"), function(x, ..., value){
+setReplaceMethod("refsequence", signature(x="MPSE", value="NULL"), function(x, ..., value){
     x@refseq <- NULL
     methods::validObject(x)
     return(x)

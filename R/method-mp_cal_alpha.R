@@ -29,6 +29,8 @@
 #' head(as.data.frame(alphatab))
 #' data(test_otu_data)
 #' class(test_otu_data)
+#' test_otu_data %<>% as.phyloseq()
+#' class(test_otu_data)
 #' set.seed(1024)
 #' alphatab2 <- get_alphaindex(test_otu_data)
 #' head(as.data.frame(alphatab2))

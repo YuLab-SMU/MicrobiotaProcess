@@ -24,6 +24,7 @@
 #' @examples
 #' \dontrun{
 #' data(test_otu_data)
+#' test_otu_data %<>% as.phyloseq()
 #' library(ggplot2)
 #' prare <- ggrarecurve(test_otu_data,
 #'                indexNames=c("Observe","Chao1","ACE"),

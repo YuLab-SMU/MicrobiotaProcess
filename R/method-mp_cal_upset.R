@@ -13,6 +13,7 @@
 #' @examples
 #' \dontrun{
 #' data(test_otu_data)
+#' test_otu_data %<>% as.phyloseq()
 #' upsetda <- get_upset(test_otu_data, factorNames="group")
 #' otudafile <- system.file("extdata", "otu_tax_table.txt",
 #'                          package="MicrobiotaProcess")

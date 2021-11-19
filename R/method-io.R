@@ -383,7 +383,7 @@ setGeneric("build_tree", function(seqs, ...){standardGeneric("build_tree")})
 #' @export
 setMethod("build_tree", "DNAStringSet", function(seqs, ...){
     alignment <- DECIPHER::AlignSeqs(seqs, anchor=NA, ...)
-    phalign <- phangorn::phyDat(as(alignment, "matrix"), type="DNA")
+    phalign <- phangorn::phyDat(as.matrix(alignment), type="DNA")
     dm <- phangorn::dist.ml(phalign)
     treeNJ <- phangorn::NJ(dm)
     fit <- phangorn::pml(treeNJ, data=phalign)

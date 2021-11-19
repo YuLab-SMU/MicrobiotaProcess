@@ -76,6 +76,7 @@ convert_to_treedata <- function(data, type="species", include.rownames=FALSE, ..
 #' @examples
 #' \dontrun{
 #'   data(test_otu_data)
+#'   test_otu_data %<>% as.phyloseq()
 #'   tree <- as.treedata(phyloseq::tax_table(test_otu_data), include.rownames = TRUE)
 #' }
 as.treedata.taxonomyTable <- function(tree, include.rownames = FALSE,...){

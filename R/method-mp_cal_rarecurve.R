@@ -18,6 +18,7 @@
 ##' @examples
 ##' \dontrun{
 ##'     data(test_otu_data)
+##'     test_otu_data %<>% as.phyloseq()
 ##'     set.seed(1024)
 ##'     res <- get_rarecurve(test_otu_data, chunks=200)
 ##'     p <- ggrarecurve(obj=res, 

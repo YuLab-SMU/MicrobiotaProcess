@@ -43,7 +43,7 @@ setGeneric("mp_aggregate", function(.data, .abundance, .group, fun=sum, keep_col
     newda <- MPSE(assays=list(Abundance=assayda))
     taxatree(newda) <- taxatree(.data)
     otutree(newda) <- otutree(.data)
-    refseq(newda) <- refseq(.data)
+    refsequence(newda) <- refsequence(.data)
     SummarizedExperiment::rowData(newda) <- SummarizedExperiment::rowData(.data)
 
     if (keep_colData){

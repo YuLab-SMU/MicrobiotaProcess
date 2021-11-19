@@ -13,6 +13,7 @@
 #' @examples
 #' \dontrun{
 #' data(test_otu_data)
+#' test_otu_data %<>% as.phyloseq()
 #' vennlist <- get_vennlist(test_otu_data, 
 #'                  factorNames="group")
 #' vennlist

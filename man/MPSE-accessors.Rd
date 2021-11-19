@@ -20,13 +20,13 @@
 \alias{taxatree<-,MPSE,treedata-method}
 \alias{taxatree<-,MPSE}
 \alias{taxatree<-,MPSE,NULL-method}
-\alias{refseq}
-\alias{refseq,MPSE-method}
-\alias{refseq,MPSE}
-\alias{refseq<-}
-\alias{refseq<-,MPSE,XStringSet-method}
-\alias{refseq<-,MPSE}
-\alias{refseq<-,MPSE,NULL-method}
+\alias{refsequence}
+\alias{refsequence,MPSE-method}
+\alias{refsequence,MPSE}
+\alias{refsequence<-}
+\alias{refsequence<-,MPSE,XStringSet-method}
+\alias{refsequence<-,MPSE}
+\alias{refsequence<-,MPSE,NULL-method}
 \alias{rownames<-,MPSE-method}
 \alias{rownames<-,MPSE}
 \title{MPSE accessors}
@@ -59,15 +59,15 @@ taxatree(x, ...) <- value
 
 \S4method{taxatree}{MPSE,`NULL`}(x, ...) <- value
 
-refseq(x, ...)
+refsequence(x, ...)
 
-\S4method{refseq}{MPSE}(x, ...)
+\S4method{refsequence}{MPSE}(x, ...)
 
-refseq(x, ...) <- value
+refsequence(x, ...) <- value
 
-\S4method{refseq}{MPSE,XStringSet}(x, ...) <- value
+\S4method{refsequence}{MPSE,XStringSet}(x, ...) <- value
 
-\S4method{refseq}{MPSE,`NULL`}(x, ...) <- value
+\S4method{refsequence}{MPSE,`NULL`}(x, ...) <- value
 
 \S4method{rownames}{MPSE}(x) <- value
 }
