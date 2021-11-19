@@ -21,6 +21,7 @@ convert taxonomyTable to treedata
 \examples{
 \dontrun{
   data(test_otu_data)
+  test_otu_data \%<>\% as.phyloseq()
   tree <- as.treedata(phyloseq::tax_table(test_otu_data), include.rownames = TRUE)
 }
 }

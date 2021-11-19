@@ -78,6 +78,7 @@ taxonomy barplot
 \dontrun{
     library(ggplot2)
     data(test_otu_data)
+    test_otu_data \%<>\% as.phyloseq()
     otubar <- ggbartax(test_otu_data) + 
               xlab(NULL) + ylab("relative abundance(\%)")
 }

@@ -55,6 +55,7 @@ get the data of specified taxonomy
 \dontrun{
 library(ggplot2)
 data(test_otu_data)
+test_otu_data \%<>\% as.phyloseq()
 phytax <- get_taxadf(test_otu_data, taxlevel=2)
 phytax
 head(phyloseq::otu_table(phytax))

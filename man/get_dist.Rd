@@ -47,6 +47,7 @@ calculate distance
 \examples{
 \dontrun{
 data(test_otu_data)
+test_otu_data \%<>\% as.phyloseq()
 distclass <- get_dist(test_otu_data)
 hcsample <- get_clust(distclass)
 }

@@ -20,11 +20,6 @@ MPSE object
 \description{
 convert the .data object to MPSE object
 }
-\examples{
-data(test_otu_data)
-test_otu_data \%>\% as.MPSE -> mpse
-mpse
-}
 \author{
 Shuangbin Xu
 }
