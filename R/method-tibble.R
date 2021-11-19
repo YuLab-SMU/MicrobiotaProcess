@@ -20,8 +20,7 @@ as_tibble.phyloseq <- function(x, ...){
     taxada <- as.data.frame(x@tax_table)
     if (!all(dim(taxada)==0)){
         taxavar <- colnames(taxada)
-        taxada %<>% fillNAtax() 
-        taxatree <- convert_to_treedata2(taxada)
+        taxatree <- try_convert_taxa(taxada)
         taxada %<>% avoid_conflict_names() %>% 
                     tibble::as_tibble(rownames="OTU")
         otuda <- otuda %>% left_join(taxada, by="OTU", suffix=c("", ".y"))

@@ -37,7 +37,7 @@ setGeneric("mp_rrarefy", function(.data, .abundance=NULL, raresize, trimOTU=FALS
     if (trimOTU){
         removeOTU <- colSums(res)==0
         if (sum(removeOTU) > 0){
-            message(sum(removeOTU), " OTUs were removed because they are no longer present in any sample after ",
+            message_wrap(sum(removeOTU), " OTUs were removed because they are no longer present in any sample after ",
                     "rarefaction, if you want to keep them you can set 'trimOTU = FALSE' !")
         }
         res <- res[, !removeOTU]
@@ -63,8 +63,8 @@ setMethod("mp_rrarefy", signature(.data="MPSE"), function(.data, .abundance=NULL
     if (trimOTU){
         removeOTU <- rowSums(rare)==0
         if (sum(removeOTU) > 0){
-            message(sum(removeOTU), " OTUs were removed because they are no longer present in any sample after ",
-                    "rarefaction, if you want to keep them you can set 'trimOTU = FALSE' !")
+            message_wrap(paste0(sum(removeOTU), " OTUs were removed because they are no longer present in any sample after ",
+                    "rarefaction, if you want to keep them you can set 'trimOTU = FALSE' !"))
             .data <- .data[!rownames(.data) %in% rownames(rare[removeOTU, , drop=FALSE]), ]
         }
     }
@@ -72,7 +72,7 @@ setMethod("mp_rrarefy", signature(.data="MPSE"), function(.data, .abundance=NULL
     if (trimSample){
         removeSample <- colSums(rare) < max(colSums(rare))
         if (sum(removeSample) > 0){
-            message(paste0(sum(removeSample), ifelse(sum(removeSample)>1, " samples were", " samples was"), 
+            message_wrap(paste0(sum(removeSample), ifelse(sum(removeSample)>1, " samples were", " samples was"), 
                            " removed because they do not have enough abundance when raresize = ", raresize,
                            ", if you want to keep them you can set 'trimSample = FALSE' !"))
             .data <- .data[, !colnames(.data) %in% colnames(rare[, removeSample, drop=FALSE])]
@@ -112,8 +112,8 @@ setMethod("mp_rrarefy", signature(.data="tbl_mpse"), function(.data, .abundance=
                      pull("OTU") %>%
                      unique()
         if (length(removeOTU) > 0){
-            message(length(removeOTU), " OTUs were removed because they are no longer present in any sample after ",
-                    "rarefaction, if you want to keep them you can set 'trimOTU = FALSE' !")
+            message_wrap(paste0(length(removeOTU), " OTUs were removed because they are no longer present in any sample after ",
+                    "rarefaction, if you want to keep them you can set 'trimOTU = FALSE' !"))
             res %<>% dplyr::filter(!.data$OTU %in% removeOTU)
         }
     }
@@ -125,7 +125,7 @@ setMethod("mp_rrarefy", signature(.data="tbl_mpse"), function(.data, .abundance=
 
         removeSample <- sampleTotal < max(sampleTotal)
         if (sum(removeSample) > 0){
-            message(paste0(sum(removeSample), ifelse(sum(removeSample)>1, " samples were", " samples was"), 
+            message_wrap(paste0(sum(removeSample), ifelse(sum(removeSample)>1, " samples were", " samples was"), 
                            " removed because they do not have enough abundance when raresize = ", raresize,
                            ", if you want to keep them you can set 'trimSample = FALSE' !"))
             res %<>% dplyr::filter(!.data$Sample %in% names(removeSample[removeSample]))

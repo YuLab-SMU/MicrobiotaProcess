@@ -202,7 +202,7 @@
             }
             rownm <- rownames(otuda)
         }
-        taxatree <- convert_to_treedata2(x=data.frame(taxatab))
+        taxatree <- try_convert_taxa(data.frame(taxatab))
     }else{
         taxatree <- NULL
     }

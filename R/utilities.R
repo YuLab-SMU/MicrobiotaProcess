@@ -273,3 +273,8 @@ stop_wrap <- function(...){
     msg <- .return_wrap(...)
     stop(msg, call. = FALSE)
 }
+
+warning_wrap <- function(...){
+    msg <- .return_wrap(...)
+    warning(msg, call. = FALSE)
+}

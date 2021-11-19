@@ -488,8 +488,8 @@ setGeneric("mp_extract_abundance", function(x, taxa.class="all", topn=NULL, ...)
               dplyr::rename(label="OTU") %>% 
               dplyr::mutate(nodeClass="OTU") 
         if (ncol(da)==1){
-            message("Please make sure the mp_cal_abundance(..., action='add') has been run.")
-            message("Or you can extract the assay via mp_extract_assays since the taxonomy is NULL")
+            message_wrap("Please make sure the mp_cal_abundance(..., action='add') has been run.
+                          Or you can extract the assay via mp_extract_assays since the taxonomy is NULL")
             return(NULL)
         }
         #return(da)

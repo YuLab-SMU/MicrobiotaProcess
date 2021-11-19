@@ -258,7 +258,8 @@ setGeneric("mp_plot_alpha",
         gsub("\'", "", .)
 
     if ("J" %in% newlevels){
-        warning("The 'J' exists in the .alpha parameter, it has been deprecated and it will not be supported in the next released version, please use 'Pielou' to replace it.", call. = FALSE)
+        warning_wrap("The 'J' exists in the .alpha parameter, it has been deprecated and it will not be supported 
+                     in the next released version, please use 'Pielou' to replace it.", call. = FALSE)
         newlevels[newlevels == "J"] <- "Pielou"
     }
 
@@ -293,11 +294,12 @@ setGeneric("mp_plot_alpha",
     if (!is.null(.group)){
         p <- p +
            gghalves::geom_half_violin(color=NA, side="l", trim=FALSE) +
-           ggplot2::geom_boxplot(aes_string(color=rlang::as_name(.group)), 
-                                 fill=NA, 
-                                 position=ggplot2::position_nudge(x=.22), 
+           gghalves::geom_half_point(side="r", shape=21, alpha=0.8) +
+           ggplot2::geom_boxplot(aes_string(color=rlang::as_name(.group)),
+                                 fill = NA,
+                                 position=ggplot2::position_nudge(x=.22),
+                                 size = 0.6,
                                  width=0.2) +
-           gghalves::geom_half_point(side="r", shape=21) +
            ggsignif::geom_signif(comparisons=comparisons, test=test, step_increase=step_increase, ...) +
            ggplot2::facet_wrap(facets=ggplot2::vars(!!rlang::sym("Measure")), scales="free_y", nrow=1) +
            ggplot2::scale_fill_manual(values=get_cols(tbl %>% pull(!!.group) %>% unique() %>% length())) +
@@ -671,8 +673,7 @@ setGeneric("mp_plot_dist",
           color <- "black"
       }
       p <- p + 
-           labs(x=NULL) + 
-           ggplot2::geom_boxplot() 
+           labs(x=NULL)  
       signlayer <- do.call(geom_signif, 
                            c(list(comparisons=comparisons), 
                              test=test, 
@@ -680,7 +681,14 @@ setGeneric("mp_plot_dist",
                              color=color, 
                              params))
       p <- p + signlayer +
-           ggplot2::geom_jitter(position=ggplot2::position_jitter(width=0.1, seed=123)) +
+           ggplot2::geom_jitter(
+               mapping = aes_string(fill="GroupsComparison"),
+               position = ggplot2::position_jitter(seed=123), 
+               shape = 21,
+               color = "black",
+               alpha = 0.8
+           ) +
+           ggplot2::geom_boxplot(fill=NA) +
            theme_taxbar(legend.position="none")
   }else{
 

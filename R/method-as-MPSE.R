@@ -167,8 +167,7 @@ as.mpse <- as.MPSE
         taxatree <- NULL
 
         if (ncol(taxada)!=0){
-            taxada %<>% fillNAtax()
-            taxatree <- convert_to_treedata2(x=taxada)
+            taxatree <- try_convert_taxa(taxada)
         }
 
         if (!is.null(.data@phy_tree)){
@@ -187,9 +186,6 @@ as.mpse <- as.MPSE
                    refseq   = .data@refseq
                 )
 
-        #if (ncol(taxada)!=0){
-        #    SummarizedExperiment::rowData(mpse) <- taxada
-        #}
         methods::validObject(mpse)
         return(mpse)
 }
@@ -252,7 +248,7 @@ as.mpse <- as.MPSE
     }
 
     if (!is.null(taxatab) && ncol(taxatab)>0){
-        taxa.tree <- convert_to_treedata2(x=data.frame(taxatab))
+        taxa.tree <- try_convert_taxa(taxada=data.frame(taxatab))
     }else{
         taxa.tree <- NULL
     }
@@ -281,7 +277,7 @@ as.mpse <- as.MPSE
 .as.MPSE.biom <- function(.data, ...){
     x <- .internal_parse_biom(.data)
     if ( !is.null(x$taxatab)){
-        taxa.tree <- convert_to_treedata2(x$taxatab)
+        taxa.tree <- try_convert_taxa(x$taxatab)
     }else{
         taxa.tree <- NULL
     }
@@ -322,4 +318,23 @@ as.mpse <- as.MPSE
     }
     newrowda <- x[, !seq_len(ncol(x)) %in% col.ind, drop=FALSE]
     return(list(taxatab=taxatab, newrowda=newrowda))
+}
+
+try_convert_taxa <- function(taxada){
+    trash <- try(silent = TRUE,
+                 expr = {
+                     taxa.tree <- taxada %>%
+                                  convert_to_treedata(include.rownames=TRUE)
+                 }
+             )
+    if (inherits(trash, "try-error")){
+        warning_wrap("The taxonomy class can not be converted to treedata class.
+                   Please check format of taxonomy class is corrected, for example, whether the order
+                   is from Kingdom, Phylum, Class, Order, Family, Genus, Species. Or you can convert it
+                   to treedata using 'convert_to_treedata' with 'include.rownames=TRUE'. Then using
+                   taxatree(mpse) <- your.taxa.tree to assign it.
+                  ")
+        taxa.tree <- NULL
+    }
+    return (taxa.tree)
 }
