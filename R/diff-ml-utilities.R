@@ -50,7 +50,7 @@ rfimportance <- function(datalist, classgroup, bootnums, effsize=2, ci=0.95){
         classindex <- match(classgroup, colnames(df))
         X <- df[,-classindex]
         X <- apply(X, 2, function(x)(x-min(x))/(max(x)-min(x)))
-        Y <- df[, classindex]
+        Y <- df[, classindex, drop = TRUE]
         dfres <- randomForest::randomForest(x=X, y=Y, importance=TRUE, proximity=TRUE)
         imres <- randomForest::importance(dfres, type=1)
         rfres[[i]] <- imres
