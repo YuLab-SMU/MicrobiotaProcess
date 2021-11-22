@@ -1,4 +1,4 @@
-# MicrobiotaProcess 1.7.1.993
+# MicrobiotaProcess 1.7.2
 
 + speed up the `mp_cal_abundance`, `mp_cal_venn` and `mp_cal_upset` with `dtplyr`. (2021-11-18, Thu)
 + update the guide of x axis of `ggside` in `mp_plot_ord`. (2021-11-15, Mon)
