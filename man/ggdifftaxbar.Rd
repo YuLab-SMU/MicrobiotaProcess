@@ -84,7 +84,7 @@ significantly discriminative feature barplot
 \examples{
 \dontrun{
 data(kostic2012crc)
-kostic2012crc
+kostic2012crc \%<>\% as.phyloseq()
 head(phyloseq::sample_data(kostic2012crc),3)
 kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,
                               rngseed=1024)

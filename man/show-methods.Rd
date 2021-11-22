@@ -24,7 +24,7 @@ method extensions to show for diffAnalysisClass or alphasample objects.
 \examples{
 \dontrun{
 data(kostic2012crc)
-kostic2012crc
+kostic2012crc \%<>\% as.phyloseq()
 head(phyloseq::sample_data(kostic2012crc),3)
 kostic2012crc <- phyloseq::rarefy_even_depth(kostic2012crc,rngseed=1024)
 table(phyloseq::sample_data(kostic2012crc)$DIAGNOSIS)
