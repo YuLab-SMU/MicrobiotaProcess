@@ -39,7 +39,8 @@ Imports:
   foreach,
   treeio (>= 1.17.2),
   pillar,
-  dtplyr
+  dtplyr,
+  ggtreeExtra
 Suggests:
   rmarkdown,
   prettydoc,
@@ -70,7 +71,6 @@ Suggests:
   aplot,
   ggnewscale,
   ggside,
-  ggtreeExtra,
   ggh4x
 License: GPL (>= 3.0)
 URL: https://github.com/YuLab-SMU/MicrobiotaProcess/

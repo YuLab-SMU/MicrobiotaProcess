@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.7.2.990
+
++ add `mp_plot_diff_res` to visualize the result of mp_diff_analysis. (2021-11-22, Mon)
+
 # MicrobiotaProcess 1.7.2
 
 + speed up the `mp_cal_abundance`, `mp_cal_venn` and `mp_cal_upset` with `dtplyr`. (2021-11-18, Thu)
