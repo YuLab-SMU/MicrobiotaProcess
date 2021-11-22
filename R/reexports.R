@@ -70,6 +70,10 @@ magrittr::`%<>%`
 #' @export
 ggtree::td_filter
 
+#' @importFrom ggtree td_unnest
+#' @export
+ggtree::td_unnest
+
 #' @importFrom SummarizedExperiment colData<-
 #' @export
 SummarizedExperiment::`colData<-`
@@ -77,3 +81,4 @@ SummarizedExperiment::`colData<-`
 #' @importFrom ggplot2 remove_missing
 #' @export
 ggplot2::remove_missing
+

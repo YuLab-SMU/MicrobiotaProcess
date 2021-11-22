@@ -57,12 +57,13 @@
 #' mouse.time.mpse %<>%
 #'   mp_rrarefy() 
 #' mouse.time.mpse
-#' mouse.time.mpse %>%
+#' mouse.time.mpse %<>%
 #'   mp_diff_analysis(.abundance=RareAbundance, 
 #'                    .group=time, 
 #'                    first.test.alpha=0.01,
-#'                    action="get") %>%
-#' ggdiffclade(linewd=0.1)
+#'                    action="add") 
+#' library(ggplot2)
+#' mouse.time.mpse %>% mp_plot_diff_res()
 setGeneric("mp_diff_analysis", function(.data, 
                                         .abundance, 
                                         .group, 
@@ -160,8 +161,8 @@ setGeneric("mp_diff_analysis", function(.data,
          .sec.group <- NULL
      }
      
-     if (relative){ 
-         if(force){
+     if (relative){
+         if (force){
              abundance.nm <- paste0("Rel", rlang::as_name(.abundance), "BySample")
          }else{
              abundance.nm <- "RelRareAbundanceBySample"
@@ -174,7 +175,8 @@ setGeneric("mp_diff_analysis", function(.data,
          }
      }
 
-     if (!any(grepl(paste0("^", abundance.nm), .data %>% mp_extract_feature() %>% colnames()))){
+     AbundBy <- abundance.nm %>% gsub("^Rel", "", .)
+     if (!any(grepl(paste0("^", AbundBy), .data %>% mp_extract_feature() %>% colnames()))){
          .data %<>% mp_cal_abundance(.abundance=!!.abundance, force=force, relative=relative)
      }
 
@@ -271,7 +273,8 @@ setGeneric("mp_diff_analysis", function(.data,
                                           classlevels=leaveclasslevels) 
      second.test.sig.vars.vectors <- second.test.sig.vars %>% get_secondvarlist()
      if (!is.null(normalization)){
-         f_tb <- f_tb * normalization / 100
+         normalization <- normalization / 100
+         f_tb <- f_tb * normalization 
      }
      dameta <- merge(f_tb, sampleda, by=0) %>% 
                tibble::column_to_rownames(var="Row.names") %>%
@@ -362,3 +365,170 @@ setMethod("mp_diff_analysis", signature(.data="tbl_mpse"), .internal_mp_diff_ana
 #' @aliases mp_diff_analysis,grouped_df_mpse
 #' @exportMethod mp_diff_analysis
 setMethod("mp_diff_analysis", signature(.data="grouped_df_mpse"), .internal_mp_diff_analysis)
+
+
+#' The visualization of result of mp_diff_analysis
+#' @rdname mp_plot_diff_res-methods
+#' @param .data MPSE or tbl_mpse after run mp_diff_analysis with \code{action="add"}
+#' @param ... additional parameters.
+#' @export
+setGeneric("mp_plot_diff_res", function(.data, ...) standardGeneric("mp_plot_diff_res"))
+
+
+#' @importFrom ggplot2 geom_col
+#' @importFrom ggtreeExtra geom_fruit
+.internal_mp_plot_diff_res <- function(.data,
+                                       ...
+                                      ){
+    nsample <- ncol(.data)                                   
+    taxa.tree <- .data %>% mp_extract_tree()
+    field.da.nm <- tidytree::get.fields(taxa.tree)
+    if ("LDAmean" %in% field.da.nm){
+        x.bar <- 'LDAmean'
+        x.bar.title <- "log10(LDA)"
+    }else{
+        x.bar <- "MDAmean"
+        x.bar.title <- "MDA"
+    }
+
+    sign.field <- field.da.nm[grep("^Sign_", field.da.nm)][1]
+
+    group.nm <- gsub("^Sign_", "", sign.field)
+    flag <- grepl(paste0("By", group.nm), field.da.nm)
+    if (nsample > 50 && any(flag)){
+        abun.col <- field.da.nm[flag]
+    }else{
+        abun.col <- field.da.nm[grepl("BySample", field.da.nm)]
+    }
+    abun.col <- abun.col[1]
+    x.abun.col <- taxa.tree %>% 
+                  dplyr::select(!!rlang::sym(abun.col)) %>% 
+                  tidyr::unnest(!!rlang::sym(abun.col)) %>%
+                  colnames()
+    x.abun.col <- x.abun.col[grepl("^Rel", x.abun.col)]
+
+    p1 <- ggtree(
+            taxa.tree,
+            layout = "radial",
+            size = 0.3
+            ) +
+          geom_point(
+            data = td_filter(!.data$isTip),
+            fill = "white",
+            size = 1,
+            shape = 21
+          )
+    
+    p2 <- suppressWarnings(
+            p1 +
+            ggtree::geom_hilight(
+              mapping = aes(node = !!rlang::sym("node"), 
+                            fill = !!rlang::sym("label"),
+                            subset = !!rlang::sym("nodeClass") == "Phylum"
+                        )
+            )
+          )
+
+    if (nsample > 50 && any(flag)){
+         mapping <- aes(x=!!rlang::sym(group.nm), size = !!rlang::sym(x.abun.col), 
+                        fill = !!rlang::sym(group.nm), subset = !!rlang::sym(x.abun.col) > 0) 
+         n.pwidth <- .data %>%
+                      mp_extract_sample() %>%
+                      dplyr::pull(!!rlang::sym(group.nm)) %>%
+                      unique() %>% length()    
+    }else{
+         mapping <- aes(x=forcats::fct_reorder(!!rlang::sym("Sample"), !!rlang::sym(group.nm), .fun=min),
+                        size = !!rlang::sym(x.abun.col), fill = !!rlang::sym(group.nm), 
+                        fill = !!rlang::sym(group.nm), subset = !!rlang::sym(x.abun.col) > 0
+                    )
+         n.pwidth <- ncol(.data)
+    }
+    p3 <- suppressWarnings(
+            p2 + 
+            ggnewscale::new_scale_fill() +
+            geom_fruit(
+               data = td_unnest(!!rlang::sym(abun.col)),
+               geom = geom_star,
+               mapping = mapping,
+               starshape = 13,
+               starstroke = 0.25,
+               offset = 0.04,
+               pwidth = 0.8 / 19 * n.pwidth,
+               grid.params = list(linetype=2)
+            ) +  
+            scale_size_continuous(
+               name="Relative Abundance (%)",
+               range = c(1, 3)
+            )
+          )
+      p4 <- suppressWarnings(
+              p3 + 
+              geom_tiplab(size=2, offset = max(p3$data$xmaxtmp, na.rm=TRUE) - 0.95 *max(p3$data$x, na.rm=TRUE))
+            )
+      # display the LDA of significant OTU.
+      n.char <- max(nchar(p4$data[p4$data$isTip, "label", drop=TRUE]), na.rm=TRUE)
+      p5 <- suppressWarnings(
+              p4 +
+              ggnewscale::new_scale_fill() +
+              geom_fruit(
+                 data = td_filter(!is.na(!!rlang::sym(x.bar))),
+                 geom = geom_col,
+                 mapping = aes(
+                               x = !!rlang::sym(x.bar),
+                               fill = !!rlang::sym(sign.field)
+                               ),
+                 orientation = "y",
+                 offset = 0.32 / 7 * n.char,
+                 pwidth = 0.5,
+                 axis.params = list(axis = "x",
+                                    title = x.bar.title,
+                                    title.height = 0.01,
+                                    title.size = 2,
+                                    text.size = 1.8,
+                                    vjust = 1),
+                 grid.params = list(linetype = 2)
+                )
+            )
+
+      # display the significant (FDR) taxonomy after kruskal.test (default)
+      p6 <- suppressWarnings(
+              p5 +
+              ggnewscale::new_scale("size") +
+              geom_point(
+                 data=td_filter(!is.na(!!rlang::sym("fdr"))),
+                 mapping = aes(size = -log10(!!rlang::sym("fdr")),
+                                fill = !!rlang::sym(sign.field),
+                               ),
+                 shape = 21
+              ) +
+              scale_size_continuous(range=c(1, 3)) #+
+              #scale_fill_manual(values=c("#1B9E77", "#D95F02"))
+            )
+      
+      p7 <- suppressWarnings(
+              p6 + theme(
+                 legend.key.height = unit(0.3, "cm"),
+                 legend.key.width = unit(0.3, "cm"),
+                 legend.spacing.y = unit(0.02, "cm"),
+                 legend.text = element_text(size = 7),
+                 legend.title = element_text(size = 9),
+                )
+            )
+
+      return (p7)
+}
+
+#' @rdname mp_plot_diff_res-methods
+#' @aliases mp_plot_diff_res,MPSE
+#' @export mp_plot_diff_res
+setMethod("mp_plot_diff_res", signature(.data='MPSE'), .internal_mp_plot_diff_res)
+
+#' @rdname mp_plot_diff_res-methods
+#' @aliases mp_plot_diff_res,tbl_mpse
+#' @export mp_plot_diff_res
+setMethod("mp_plot_diff_res", signature(.data="tbl_mpse"), .internal_mp_plot_diff_res)
+
+#' @rdname mp_plot_diff_res-methods
+#' @aliases mp_plot_diff_res,grouped_df_mpse
+#' @export mp_plot_diff_res
+setMethod("mp_plot_diff_res", signature(.data="grouped_df_mpse"), .internal_mp_plot_diff_res)

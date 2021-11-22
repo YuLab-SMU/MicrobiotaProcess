@@ -228,12 +228,13 @@ data(mouse.time.mpse)
 mouse.time.mpse \%<>\%
   mp_rrarefy() 
 mouse.time.mpse
-mouse.time.mpse \%>\%
+mouse.time.mpse \%<>\%
   mp_diff_analysis(.abundance=RareAbundance, 
                    .group=time, 
                    first.test.alpha=0.01,
-                   action="get") \%>\%
-ggdiffclade(linewd=0.1)
+                   action="add") 
+library(ggplot2)
+mouse.time.mpse \%>\% mp_plot_diff_res()
 }
 \author{
 Shuangbin Xu

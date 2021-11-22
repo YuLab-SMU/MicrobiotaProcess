@@ -21,6 +21,7 @@
 \alias{\%>\%}
 \alias{\%<>\%}
 \alias{td_filter}
+\alias{td_unnest}
 \alias{colData<-}
 \alias{remove_missing}
 \title{Objects exported from other packages}
@@ -34,7 +35,7 @@ below to see their documentation.
 
   \item{ggplot2}{\code{\link[ggplot2]{remove_missing}}}
 
-  \item{ggtree}{\code{\link[ggtree]{td_filter}}}
+  \item{ggtree}{\code{\link[ggtree]{td_filter}}, \code{\link[ggtree]{td_unnest}}}
 
   \item{magrittr}{\code{\link[magrittr:compound]{\%<>\%}}, \code{\link[magrittr:pipe]{\%>\%}}}
 
