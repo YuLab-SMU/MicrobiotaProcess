@@ -1,5 +1,13 @@
-# MicrobiotaProcess 1.7.2.990
+# MicrobiotaProcess 1.7.2.991
 
++ update `mp_plot_diff_res` (2021-11-23, Tue)
+  - support `otutree` and `taxatree` class by setting `tree.type`.
+  - support multiple layout types of tree by setting `layout`.
+  - support adjusting the gap between panel and width of panel by setting
+    `offset.abun`, `pwidth.abun`, `offset.effsize`, `pwidth.effsize`
+  - support whether display the relative abundance of `group` 
+    instead of `sample` by setting `group.abun=TRUE` or 
+    sample number > 50
 + add `mp_plot_diff_res` to visualize the result of mp_diff_analysis. (2021-11-22, Mon)
 
 # MicrobiotaProcess 1.7.2
