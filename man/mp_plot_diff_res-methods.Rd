@@ -10,18 +10,99 @@
 \alias{mp_plot_diff_res,grouped_df_mpse}
 \title{The visualization of result of mp_diff_analysis}
 \usage{
-mp_plot_diff_res(.data, ...)
+mp_plot_diff_res(
+  .data,
+  layout = "radial",
+  tree.type = "taxatree",
+  .taxa.class = NULL,
+  tiplab.size = 2,
+  offset.abun = 0.04,
+  pwidth.abun = 0.8,
+  offset.effsize = 0.3,
+  pwidth.effsize = 0.5,
+  group.abun = FALSE,
+  tiplab.linetype = 3,
+  ...
+)
 
-\S4method{mp_plot_diff_res}{MPSE}(.data, ...)
+\S4method{mp_plot_diff_res}{MPSE}(
+  .data,
+  layout = "radial",
+  tree.type = "taxatree",
+  .taxa.class = NULL,
+  tiplab.size = 2,
+  offset.abun = 0.04,
+  pwidth.abun = 0.8,
+  offset.effsize = 0.3,
+  pwidth.effsize = 0.5,
+  group.abun = FALSE,
+  tiplab.linetype = 3,
+  ...
+)
 
-\S4method{mp_plot_diff_res}{tbl_mpse}(.data, ...)
+\S4method{mp_plot_diff_res}{tbl_mpse}(
+  .data,
+  layout = "radial",
+  tree.type = "taxatree",
+  .taxa.class = NULL,
+  tiplab.size = 2,
+  offset.abun = 0.04,
+  pwidth.abun = 0.8,
+  offset.effsize = 0.3,
+  pwidth.effsize = 0.5,
+  group.abun = FALSE,
+  tiplab.linetype = 3,
+  ...
+)
 
-\S4method{mp_plot_diff_res}{grouped_df_mpse}(.data, ...)
+\S4method{mp_plot_diff_res}{grouped_df_mpse}(
+  .data,
+  layout = "radial",
+  tree.type = "taxatree",
+  .taxa.class = NULL,
+  tiplab.size = 2,
+  offset.abun = 0.04,
+  pwidth.abun = 0.8,
+  offset.effsize = 0.3,
+  pwidth.effsize = 0.5,
+  group.abun = FALSE,
+  tiplab.linetype = 3,
+  ...
+)
 }
 \arguments{
 \item{.data}{MPSE or tbl_mpse after run mp_diff_analysis with \code{action="add"}}
 
-\item{...}{additional parameters.}
+\item{layout}{the type of tree layout, should be one of "rectangular", "roundrect", "ellipse", 
+"circular", "slanted", "radial", "inward_circular".}
+
+\item{tree.type}{one of 'taxatree' and 'otutree', taxatree is the taxonomy class tree
+'otutree' is the phylogenetic tree built with the representative sequences.}
+
+\item{.taxa.class}{character the name of taxonomy class level, default is NULL, meaning it will
+extract the phylum annotation automatically.}
+
+\item{tiplab.size}{numeric the size of tiplab, default is 2.}
+
+\item{offset.abun}{numeric the gap (width) (relative width to tree) between the tree and abundance 
+panel, default is 0.04.}
+
+\item{pwidth.abun}{numeric the panel width (relative width to tree) of abundance panel, 
+default is 0.3 .}
+
+\item{offset.effsize}{numeric the gap (width) (relative width to tree) between the tree and 
+effect size panel, default is 0.3 .}
+
+\item{pwidth.effsize}{numeric the panel width (relative width to tree) of effect size panel, 
+default is 0.5 .}
+
+\item{group.abun}{logical whether to display the relative abundance of group instead of sample,
+default is FALSE.}
+
+\item{tiplab.linetype}{numeric the type of line for adding line if 'tree.type' is 'otutree',
+default is 3 .}
+
+\item{...}{additional parameters, meaningless now.}
 }
 \description{
 The visualization of result of mp_diff_analysis
