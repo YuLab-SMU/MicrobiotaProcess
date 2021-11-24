@@ -1,5 +1,10 @@
-# MicrobiotaProcess 1.7.2.991
+# MicrobiotaProcess 1.7.3
 
++ update 'mp_plot_abundance' (2021-11-24, Wed)
+  - support `heatmap` by setting `geom`.
+  - `.group` supports multiple characters
+    and `.sec.group` will be removed in 
+    the next version.
 + update `mp_plot_diff_res` (2021-11-23, Tue)
   - support `otutree` and `taxatree` class by setting `tree.type`.
   - support multiple layout types of tree by setting `layout`.
