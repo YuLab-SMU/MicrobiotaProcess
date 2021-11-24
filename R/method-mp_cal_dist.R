@@ -74,7 +74,7 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 }
 
 
-#' Calculate the distances between the samples with specified abundance.
+#' Calculate the distances between the samples or features with specified abundance.
 #'
 #' @rdname mp_cal_dist-methods
 #' @param .data MPSE or tbl_mpse object
@@ -94,6 +94,8 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #' @param scale logical whether scale the metric of environment (.env is provided) before
 #' the distance was calculated, default is FALSE. The environment matrix can be processed
 #' when it was joined to the MPSE or tbl_mpse object.
+#' @param cal.feature.dist logical whether to calculate the distance between the features.
+#' default is FALSE, meaning calculate the distance between the samples.
 #' @param ... additional parameters.
 #'
 #' some dot arguments if \code{distmethod} is \code{unifrac} or \code{weighted unifrac}:
@@ -159,13 +161,19 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #'   xlab(NULL) + 
 #'   theme(legend.position="none")
 #' }
-setGeneric("mp_cal_dist", function(.data, .abundance, .env=NULL, distmethod="bray", action="add", scale=FALSE, ...)standardGeneric("mp_cal_dist"))
+setGeneric("mp_cal_dist", function(.data, .abundance, .env=NULL, distmethod="bray", action="add", scale=FALSE, cal.feature.dist=FALSE, ...)standardGeneric("mp_cal_dist"))
 
 #' @rdname mp_cal_dist-methods
 #' @aliases mp_cal_dist,MPSE
 #' @importFrom rlang :=
 #' @exportMethod mp_cal_dist
-setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .env=NULL, distmethod="bray", action="add", scale=FALSE, ...){
+setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .env=NULL, distmethod="bray", action="add", scale=FALSE, cal.feature.dist=FALSE, ...){
+    if (cal.feature.dist){
+        action="get"
+        byRow = TRUE
+    }else{
+        byRow = FALSE
+    }
     
     action %<>% match.arg(c("add", "get", "only"))
 
@@ -237,7 +245,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
     }else{
 
         da <- .data %>% 
-              mp_extract_assays(.abundance=!!.abundance, byRow=FALSE)
+              mp_extract_assays(.abundance=!!.abundance, byRow=byRow)
         distsampley <- paste0(distmethod, "Sampley")
     }
 
@@ -285,7 +293,13 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
 })
 
 
-.internal_cal_dist <- function(.data, .abundance, .env=NULL, distmethod="bray", action="add", scale=FALSE, ...){
+.internal_cal_dist <- function(.data, .abundance, .env=NULL, distmethod="bray", action="add", scale=FALSE, cal.feature.dist=FALSE, ...){
+    if (cal.feature.dist){
+        action = "get"
+        byRow = TRUE
+    }else{
+        byRow = FALSE
+    }
     action %<>% match.arg(c("add", "get", "only"))
 
     .abundance <- rlang::enquo(.abundance)
@@ -354,7 +368,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
     }else{
 
         da <- .data %>%
-              mp_extract_assays(.abundance=!!.abundance, byRow=FALSE)
+              mp_extract_assays(.abundance=!!.abundance, byRow=byRow)
         distsampley <- paste0(distmethod, "Sampley")
     }    
 

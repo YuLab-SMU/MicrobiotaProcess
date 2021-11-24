@@ -286,6 +286,25 @@ as.mpse <- as.MPSE
     return(mpse)
 }
 
+
+as.tbl_mpse <- function(.data, .OTU, .Sample, .Abundance, ...){
+    UseMethod("as.tbl_mpse")
+}
+
+
+as.tbl_mpse.data.frame <- function(.data, .OTU, .Sample, .Abundance, ...){
+    .OTU <- rlang::enquo(.OTU)
+    .Sample <- rlang::enquo(.Sample)
+    .Abundance <- rlang::enquo(.Abundance)
+    .data %<>% dplyr::select(!!.OTU, !!.Sample, !!.Abundance) %>% 
+               dplyr::rename(OTU=!!.OTU, Sample=!!.Sample, Abundance=!!.Abundance)
+    attr(.data, "assaysvar") <- "Abundance"
+    attr(.data, "samplevar") <- "Sample"
+    .data %<>% add_class(new="tbl_mpse")
+    return(.data)
+}
+
+
 .internal_check_taxonomy <- function(x, flag){
     #flag <- rownames(x) %>% strsplit("\\|") %>% lapply(length) %>% unlist 
     #col.ind <- colnames(x) %in% c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")

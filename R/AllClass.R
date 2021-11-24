@@ -65,6 +65,13 @@ setClass("MPSE",
 #' @return MPSE object
 #' @importFrom methods new
 #' @export
+#' @examples
+#' set.seed(123)
+#' xx <- matrix(abs(round(rnorm(100, sd=4), 0)), 10)
+#' xx <- data.frame(xx)
+#' rownames(xx) <- paste0("row", seq_len(10))
+#' mpse <- MPSE(assays=xx)
+#' mpse
 MPSE <- function(assays,
                  colData = NULL,
                  otutree = NULL, 
@@ -91,9 +98,11 @@ MPSE <- function(assays,
 
     if (!is.null(colData)){
         colData %<>% avoid_conflict_names()
+        se <- SummarizedExperiment::SummarizedExperiment(assays=assays, colData=colData, ...)
+    }else{
+        se <- SummarizedExperiment::SummarizedExperiment(assays=assays, ...)
     }
 
-    se <- SummarizedExperiment::SummarizedExperiment(assays=assays, colData=colData, ...)
     if (!is.null(otutree) && inherits(otutree, "phylo")){
         otutree <- treeio::as.treedata(otutree)
     }

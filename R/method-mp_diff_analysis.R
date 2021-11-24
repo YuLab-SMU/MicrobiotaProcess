@@ -544,7 +544,7 @@ setGeneric("mp_plot_diff_res",
               )
     }
 
-    if (nsample > 50 && any(flag)){
+    if (nsample > 50 || group.abun){
          mapping <- aes(x=!!rlang::sym(group.nm), size = !!rlang::sym(x.abun.col), 
                         fill = !!rlang::sym(group.nm), subset = !!rlang::sym(x.abun.col) > 0) 
          n.pwidth <- .data %>%

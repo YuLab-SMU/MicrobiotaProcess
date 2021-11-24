@@ -8,7 +8,7 @@
 \alias{mp_cal_dist,tbl_mpse}
 \alias{mp_cal_dist,grouped_df_mpse-method}
 \alias{mp_cal_dist,grouped_df_mpse}
-\title{Calculate the distances between the samples with specified abundance.}
+\title{Calculate the distances between the samples or features with specified abundance.}
 \usage{
 mp_cal_dist(
   .data,
@@ -17,6 +17,7 @@ mp_cal_dist(
   distmethod = "bray",
   action = "add",
   scale = FALSE,
+  cal.feature.dist = FALSE,
   ...
 )
 
@@ -27,6 +28,7 @@ mp_cal_dist(
   distmethod = "bray",
   action = "add",
   scale = FALSE,
+  cal.feature.dist = FALSE,
   ...
 )
 
@@ -37,6 +39,7 @@ mp_cal_dist(
   distmethod = "bray",
   action = "add",
   scale = FALSE,
+  cal.feature.dist = FALSE,
   ...
 )
 
@@ -47,6 +50,7 @@ mp_cal_dist(
   distmethod = "bray",
   action = "add",
   scale = FALSE,
+  cal.feature.dist = FALSE,
   ...
 )
 }
@@ -74,6 +78,9 @@ a non-redundant tibble with the distance information. "get" return 'dist' object
 the distance was calculated, default is FALSE. The environment matrix can be processed
 when it was joined to the MPSE or tbl_mpse object.}
 
+\item{cal.feature.dist}{logical whether to calculate the distance between the features.
+default is FALSE, meaning calculate the distance between the samples.}
+
 \item{...}{additional parameters.
 
 some dot arguments if \code{distmethod} is \code{unifrac} or \code{weighted unifrac}:
@@ -90,7 +97,7 @@ some dot arguments if \code{distmethod} is \code{unifrac} or \code{weighted unif
 update object or tibble according the 'action'
 }
 \description{
-Calculate the distances between the samples with specified abundance.
+Calculate the distances between the samples or features with specified abundance.
 }
 \examples{
 data(mouse.time.mpse)

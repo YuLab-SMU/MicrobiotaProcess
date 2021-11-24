@@ -124,6 +124,22 @@ setMethod("get_taxadf", "data.frame",
 #'   mp_cal_abundance(.abundance=RareAbundance, action="add") %>% 
 #'   mp_cal_abundance(.abundance=RareAbundance, .group=time, action="add") 
 #' mouse.time.mpse
+#' library(ggplot2)
+#' f <- mouse.time.mpse %>%
+#'      mp_plot_abundance(
+#'         .abundance=RelRareAbundanceBySample,
+#'         .group = time,
+#'         taxa.class = "Phylum",
+#'         topn = 20,
+#'         geom = "heatmap",
+#'         feature.dist = "manhattan",
+#'         feature.hclust = "average"
+#'      ) %>%
+#'      set_scale_theme(
+#'         x = scale_fill_manual(values=c("orange", "deepskyblue")),
+#'         aes_var = time
+#'      )
+#' f
 #' p1 <- mouse.time.mpse %>% 
 #'       mp_plot_abundance(.abundance=RelRareAbundanceBySample, 
 #'                         .group=time, taxa.class="Phylum", topn=20)
@@ -209,7 +225,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
                       observations is performed automatically using 'Abundance' column. If you still 
                       want to calculate the (relative) 'abundance' with the specified '.abundance',
                       you can set 'force=TRUE'. ")
-        .abundance <- as.symbol("RareAbundance")           
+        .abundance <- as.symbol("RareAbundance")
     }
     assaysvar <- .data %>% SummarizedExperiment::assayNames()
     xx <- SummarizedExperiment::assays(.data)@listData
@@ -238,12 +254,6 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     }
     
     if (!is.null(.data@taxatree)){
-        #taxada <- taxatree_to_tb(.data@taxatree) %>%
-        #          tibble::as_tibble(rownames="OTU")
-        #taxada <- taxada[ ,!colnames(taxada) %in% 
-        #                   c(colnames(.data@taxatree@data), 
-        #                     colnames(.data@taxatree@extraInfo)),
-        #                   drop=FALSE]
         taxada <- .data %>% mp_extract_taxonomy()
         da %<>% dplyr::left_join(taxada, by="OTU", suffix=c("", ".y"))
         taxavar <- colnames(taxada)

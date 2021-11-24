@@ -205,7 +205,7 @@ Users can extract the result with mp_extract_sample() to extract the result of m
 
 `MicrobiotaProcess` provides the `mp_cal_abundance`, `mp_plot_abundance` to calculate and plot the composition of species communities. And the `mp_extract_abundance` can extract the abundance of specific taxonomy level. User can also extract the abundance table to perform external analysis such as visualize manually (see the example of `mp_cal_abundance`).
 
-```{r, fig.align="center", fig.width=8, fig.height=8, fig.cap="The relative abundance and abundance of top 20 phyla of all samples "}
+```{r, fig.align="center", fig.width=8, fig.height=8, fig.cap="The relative abundance and abundance of phyla of all samples "}
 mouse.time.mpse 
 mouse.time.mpse %<>%
     mp_cal_abundance( # for each samples
@@ -237,7 +237,41 @@ p2 <- mouse.time.mpse %>%
 p1 / p2
 ```
 
-```{r, fig.align="center", fig.width=8, fig.height=8, fig.cap="The relative abundance and abundance of top 20 phyla of groups "}
+The abundance of features also can be visualized by `mp_plot_abundance` with `heatmap` plot by setting `geom='heatmap'`.
+
+```{r, fig.align="center", fig.width=12, fig.height=4, fig.cap="The relative abundance and abundance of phyla of all samples "}
+h1 <- mouse.time.mpse %>%
+         mp_plot_abundance(
+           .abundance = RelRareAbundanceBySample,
+           .group = time,
+           taxa.class = Phylum,
+           topn = 20,
+           geom = 'heatmap',
+           features.dist = 'euclidean',
+           features.hclust = 'average',
+           sample.dist = 'bray',
+           sample.hclust = 'average'
+         )
+
+h2 <- mouse.time.mpse %>%
+          mp_plot_abundance(
+            .abundance = RelRareAbundanceBySample,
+            .group = time,
+            taxa.class = Phylum,
+            relative = FALSE,
+            topn = 20,
+            geom = 'heatmap',
+            features.dist = 'euclidean',
+            features.hclust = 'average',
+            sample.dist = 'bray',
+            sample.hclust = 'average'
+          )
+# the character (scale or theme) of figure can be adjusted by set_scale_theme
+# refer to the mp_plot_dist
+aplot::plot_list(gglist=list(h1, h2), tag_levels="A")
+```
+
+```{r, fig.align="center", fig.width=8, fig.height=8, fig.cap="The relative abundance and abundance of phyla of groups "}
 # visualize the relative abundance of top 20 phyla for each .group (time)
 p3 <- mouse.time.mpse %>%
          mp_plot_abundance(
@@ -549,9 +583,18 @@ p6 + theme(
           )
 ```
 
-The visualization methods of result can be various, you can refer to the article or book of `ggtree`[@yu2017ggtree; @yu2018two] and the article of `ggtreeExtra`[@ggtreeExtra].
+The visualization methods of result can be various, you can refer to the article or book of `ggtree`[@yu2017ggtree; @yu2018two] and the article of `ggtreeExtra`[@ggtreeExtra]. In addition, we also developed `mp_plot_diff_res` to display the result of `mp_diff_analysis`, it can decreases coding burden.
 
-
+```{r, fig.width=9, fig.height=9, fig.align="center", fig.cap="The different species and the abundance of group"}
+# this object has contained the result of mp_diff_analysis
+mouse.time.mpse
+p <- mouse.time.mpse %>%
+       mp_plot_diff_res(
+         group.abun = TRUE,
+         pwidth.abun=0.1
+       )
+p
+```
 
 # 4. Need helps?
 

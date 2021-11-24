@@ -85,6 +85,22 @@ mouse.time.mpse \%<>\%
   mp_cal_abundance(.abundance=RareAbundance, action="add") \%>\% 
   mp_cal_abundance(.abundance=RareAbundance, .group=time, action="add") 
 mouse.time.mpse
+library(ggplot2)
+f <- mouse.time.mpse \%>\%
+     mp_plot_abundance(
+        .abundance=RelRareAbundanceBySample,
+        .group = time,
+        taxa.class = "Phylum",
+        topn = 20,
+        geom = "heatmap",
+        feature.dist = "manhattan",
+        feature.hclust = "average"
+     ) \%>\%
+     set_scale_theme(
+        x = scale_fill_manual(values=c("orange", "deepskyblue")),
+        aes_var = time
+     )
+f
 p1 <- mouse.time.mpse \%>\% 
       mp_plot_abundance(.abundance=RelRareAbundanceBySample, 
                         .group=time, taxa.class="Phylum", topn=20)

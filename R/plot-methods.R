@@ -4,8 +4,6 @@
 #' @param .abundance the column name of abundance to be plotted.
 #' @param .group the column name of group to be calculated and plotted,
 #' default is NULL.
-#' @param .sec.group the column name of second group to be plotted with nested facet, 
-#' default is NULL.
 #' @param taxa.class name of taxonomy class, default is NULL, meaning the
 #' Phylum class will be plotted.
 #' @param topn integer the number of the top most abundant, default is 10.
@@ -14,6 +12,22 @@
 #'  when the abundance is not be rarefied, default is FALSE.
 #' @param plot.group logical whether plotting the abundance of specified taxa.class 
 #' taxonomy with group not sample level, default is FALSE.
+#' @param geom character which type plot, options is 'bar' and 'heatmap', default is
+#' 'bar'.
+#' @param feature.dist character the method to calculate the distance between the features,
+#' based on the '.abundance' of 'taxa.class', default is 'euclidean', options refer to
+#' the 'distmethod' of [mp_cal_dist()] (except unifrac related).
+#' @param feature.hclust character the agglomeration method for the features, default is
+#' 'average', options are 'single', 'complete', 'average', 'ward.D', 'ward.D2', 'centroid'
+#' 'median' and 'mcquitty'.
+#' @param sample.dist character the method to calculate the distance between the samples
+#' based on the '.abundance' of 'taxa.class', default is 'bray', options refer to the 
+#' 'distmethod' of [mp_cal_dist()] (except unifrac related).
+#' @param sample.hclust character the agglomeration method for the samples, default is
+#' 'average', options are 'single', 'complete', 'average', 'ward.D', 'ward.D2', 'centroid'
+#' 'median' and 'mcquitty'.
+#' @param .sec.group the column name of second group to be plotted with nested facet,
+#' default is NULL, this argument will be deprecated in the next version.
 #' @param ... additional parameters, meaningless now.
 #' @author Shuangbin Xu
 #' @export
@@ -62,12 +76,17 @@ setGeneric("mp_plot_abundance",
               .data, 
               .abundance = NULL, 
               .group = NULL, 
-              .sec.group = NULL,
               taxa.class = NULL, 
               topn = 10, 
               relative = TRUE,
               force = FALSE,
               plot.group = FALSE,
+              geom = "bar",
+              feature.dist = "euclidean",
+              feature.hclust = "average",
+              sample.dist = "bray",
+              sample.hclust = "average",
+              .sec.group = NULL,
               ...
            )
            standardGeneric("mp_plot_abundance")
@@ -76,18 +95,27 @@ setGeneric("mp_plot_abundance",
 .internal_plot_abundance <- function(.data, 
                                 .abundance, 
                                 .group = NULL, 
-                                .sec.group = NULL,
                                 taxa.class = NULL, 
                                 topn = 10,
                                 relative = TRUE,
                                 force = FALSE,
                                 plot.group = FALSE,
+                                geom = "bar",
+                                feature.dist = "euclidean",
+                                feature.hclust = "average",
+                                sample.dist = "bray",
+                                sample.hclust = "average",
+                                .sec.group = NULL,
                                 ...
                                 ){
     .abundance <- rlang::enquo(.abundance)
     .group <- rlang::enquo(.group)
     .sec.group <- rlang::enquo(.sec.group)
     taxa.class <- rlang::enquo(taxa.class)
+    geom %<>% match.arg(c("bar", "heatmap"))
+    if (geom=="bar"){
+        plot.group = FALSE
+    }
 
     if (rlang::quo_is_null(taxa.class) || 
         (.data %>% mp_extract_tree() %>% is.null() %>% suppressMessages())){
@@ -116,8 +144,9 @@ setGeneric("mp_plot_abundance",
      }
 
      if (!rlang::quo_is_null(.group) && plot.group){
-         prefixBy <- paste0("By", rlang::as_name(.group))
-         axis.x <- rlang::as_name(.group)
+         gp <- quo.vect_to_str.vect(.group)
+         prefixBy <- paste0("By", gp[1])
+         axis.x <- rlang::as_name(gp[1])
      }else{
          if (force){
              prefixBy <- ""
@@ -135,11 +164,12 @@ setGeneric("mp_plot_abundance",
 
      if (!any(grepl(paste0("^", AbundBy), .data %>% mp_extract_feature() %>% colnames()))){
          if (!rlang::quo_is_null(.group) && plot.group){
-             .data %<>% mp_cal_abundance(.abundance=!!.abundance, .group=!!.group, force=force, relative=relative)
+             .data %<>% mp_cal_abundance(.abundance=!!.abundance, .group=!!rlang::sym(gp[1]), force=force, relative=relative)
          }else{
              .data %<>% mp_cal_abundance(.abundance=!!.abundance, force=force, relative=relative)
          }
      }
+
 
      tbl <- .data %>% 
             mp_extract_abundance(taxa.class=!!taxa.class, topn = topn) %>%
@@ -154,26 +184,122 @@ setGeneric("mp_plot_abundance",
          abundance.nm %<>% paste0("BySample")
      }
 
-     p <- ggplot(data=tbl,
-                 mapping=aes_string(x=axis.x,
-                                    y=abundance.nm,
-                                    alluvium=rlang::as_name(taxa.class),
-                                    fill=rlang::as_name(taxa.class))
-          ) +
-          ggalluvial::geom_flow(stat="alluvium", lode.guidance = "frontback", color = "darkgray") +
-          ggalluvial::geom_stratum(stat="alluvium") +
-          ggplot2::labs(x=NULL, y=ylabs) +
-          scale_fill_manual(
-              values = rev(get_cols(tbl %>% pull(!!taxa.class) %>% unique() %>% length())),
-              guide = guide_legend(reverse=TRUE)
-          )
+     if(geom=="bar"){
+         p <- ggplot(data=tbl,
+                     mapping=aes_string(x=axis.x,
+                                        y=abundance.nm,
+                                        alluvium=rlang::as_name(taxa.class),
+                                        fill=rlang::as_name(taxa.class))
+              ) +
+              ggalluvial::geom_flow(stat="alluvium", lode.guidance = "frontback", color = "darkgray") +
+              ggalluvial::geom_stratum(stat="alluvium") +
+              ggplot2::labs(x=NULL, y=ylabs) +
+              scale_fill_manual(
+                  values = rev(get_cols(tbl %>% pull(!!taxa.class) %>% unique() %>% length())),
+                  guide = guide_legend(reverse=TRUE)
+              )
+         if (!plot.group){
+             if (!rlang::quo_is_null(.group)){
+                 gp <- quo.vect_to_str.vect(.group)
+                 if (!rlang::quo_is_null(.sec.group)){
+                     warning_wrap("The .sec.group will be depcrecated, please use .group argument, which
+                                  supports multiple groups.")
+                     gp2 <- quo.vect_to_str.vect(.sec.group)
+                     gp <- append(gp, gp2, after=1)
+                 }
+                 gp %<>% unique()
+                 if (length(gp)==1){
+                     p <- p + 
+                         facet_grid(cols=ggplot2::vars(!!rlang::sym(gp[1])), 
+                                    scales="free_x", space="free")
+                 }else{
+                     p <- p + 
+                          ggh4x::facet_nested(cols=ggplot2::vars(!!rlang::sym(gp[1]), !!rlang::sym(gp[2])), 
+                                              scales="free_x", space="free")
+                 }
+             }
+         }
+         
+         p <- p + theme_taxbar()
 
-     if (!rlang::quo_is_null(.group) && !plot.group && rlang::quo_is_null(.sec.group)){
-         p <- p + facet_grid(cols=ggplot2::vars(!!.group), scales="free_x", space="free")
-     }else if (!rlang::quo_is_null(.sec.group) &&!plot.group){
-         p <- p + ggh4x::facet_nested(cols=ggplot2::vars(!!.group, !!.sec.group), scales="free_x", space="free")
+     }else if(geom=="heatmap"){
+         lab.sty <- list(xlab(NULL),ylab(NULL))
+         tbl %<>% dplyr::mutate_if(is.factor, as.character)
+         leg.tl <- abundance.nm %>% gsub("BySample", "", .)
+         p <- ggplot(data=tbl,
+                     mapping = aes_string(
+                                          x = axis.x,
+                                          y = rlang::as_name(taxa.class),
+                                          fill = abundance.nm
+                     )
+               ) +
+               ggplot2::geom_tile(
+                   data = td_filter(!!rlang::sym(abundance.nm)!=0)
+               ) +
+               theme(axis.text.x=element_text(angle=-45, hjust=0), 
+                     panel.background=element_blank(), 
+                     panel.border=element_rect(size=1, fill=NA)) + 
+               ggplot2::scale_y_discrete(position="right") +
+               ggplot2::guides(fill=ggplot2::guide_colourbar(title=leg.tl)) +
+               lab.sty
+
+         tbl2 <- tbl %>% 
+                 as.tbl_mpse(.OTU = !!taxa.class, 
+                             .Sample = !!rlang::sym(axis.x), 
+                             .Abundance = !!rlang::sym(abundance.nm)
+                 )
+
+         sample.dist <- mp_cal_dist(tbl2, 
+                                    .abundance = !!rlang::sym("Abundance"), 
+                                    distmethod = sample.dist, 
+                                    action = "get"
+                        )
+
+         feature.dist <- mp_cal_dist(tbl2, 
+                                     .abundance = !!rlang::sym("Abundance"),
+                                     distmethod = feature.dist, 
+                                     action = "get", 
+                                     cal.feature.dist = TRUE
+                         )
+
+         indexname <- leg.tl
+
+         sample.hclust <- hclust(sample.dist, method = sample.hclust)
+         feature.hclust <- hclust(feature.dist, method = feature.hclust)
+
+         if (!rlang::quo_is_null(.group)){
+             gp <- quo.vect_to_str.vect(.group)
+             if (!rlang::quo_is_null(.sec.group)){
+                 warning_wrap("The .sec.group will be depcrecated, please use .group argument, which
+                              supports multiple groups.")
+                 gp2 <- quo.vect_to_str.vect(.sec.group)
+                 gp <- append(gp, gp2, after=1)
+             }
+             gp %<>% unique()
+             for (i in seq_len(length(gp))){
+                 sampleda <- .data %>% mp_extract_sample()
+                 f <- ggplot() +
+                      ggplot2::geom_tile(
+                         data = sampleda,
+                         mapping = aes(x=!!rlang::sym("Sample"), y=gp[i], fill=!!rlang::sym(gp[i]))
+                      ) +
+                      ggplot2::scale_y_discrete(position="right", expand = c(0, 0), labels=gp[i]) +
+                      theme(axis.text.x=element_blank(), 
+                            axis.ticks.x=element_blank(), 
+                            panel.background=element_blank()
+                      ) +
+                      lab.sty 
+                 p %<>% insert_top(f, height = 0.04 + 0.0025 * (i - 1))
+             }
+             indexname <- c(indexname, gp)
+         }
+         p2 <- ggtree(feature.hclust, branch.length = "none")
+         p3 <- ggtree(sample.hclust, branch.length = "none", layout = "dendrogram")
+         p %<>% insert_left(p2, width = 0.1)
+         p %<>% insert_top(p3, height = 0.1)
+         p$index <- c(indexname, paste0("tree", seq_len(2)))
+         p %<>% add_class("aplot.heatmap")
      }
-     p <- p + theme_taxbar()
      
      return (p)
 }
@@ -248,14 +374,7 @@ setGeneric("mp_plot_alpha",
         #rlang::abort("The .group column name is required for the visualization of alpha diversity")
     }
 
-    newlevels <- rlang::quo_text(.alpha) %>%
-        gsub("c\\(", "", .) %>%
-        gsub("\\)", "", .) %>%
-        base::strsplit(",") %>%
-        unlist() %>%
-        gsub("\\s+", "", .) %>%
-        gsub("\"", "", .) %>%
-        gsub("\'", "", .)
+    newlevels <- quo.vect_to_str.vect(.alpha)
 
     if ("J" %in% newlevels){
         warning_wrap("The 'J' exists in the .alpha parameter, it has been deprecated and it will not be supported 
@@ -718,7 +837,7 @@ setGeneric("mp_plot_dist",
       p <- p %>% insert_left(p2, width=0.12)
       p <- p %>% insert_top(p2 + ggtree::layout_dendrogram(), height=0.12)
       p$index <- c(indexname, paste0("tree", seq_len(2)))
-      class(p) <- c("aplot_dist", "aplot")
+      p %<>% add_class("aplot.heatmap")
   }
   return(p)
 }
@@ -1132,7 +1251,7 @@ setMethod("mp_plot_ord", signature(.data="grouped_df_mpse"), .internal_plot_ord)
 #' @export
 set_scale_theme <- function(.data, x, aes_var){
     aes_var <- rlang::enquo(aes_var)
-    if (inherits(.data, "aplot_dist")){
+    if (inherits(.data, "aplot.heatmap")){
        index <- which(.data$index %in% rlang::as_name(aes_var))
        if (length(index)==0){
            return(.data)

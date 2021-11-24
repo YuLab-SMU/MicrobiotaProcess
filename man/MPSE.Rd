@@ -38,3 +38,11 @@ MPSE object
 \description{
 Construct a MPSE object
 }
+\examples{
+set.seed(123)
+xx <- matrix(abs(round(rnorm(100, sd=4), 0)), 10)
+xx <- data.frame(xx)
+rownames(xx) <- paste0("row", seq_len(10))
+mpse <- MPSE(assays=xx)
+mpse
+}
