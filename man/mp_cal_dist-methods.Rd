@@ -65,8 +65,8 @@ default is NULL.}
 \item{distmethod}{character the method to calculate distance.
 option is "manhattan", "euclidean", "canberra", "bray", "kulczynski", 
 "jaccard", "gower", "altGower", "morisita", "horn", "mountford", "raup",
-"binomial", "chao", "cao" (implemented in vegdist of vegan), and
-"w", "-1", "c", "wb", "r", "I", "e", "t", "me", "j", "sor", "m", "-2", "co"
+"binomial", "chao", "cao", "mahalanobis", "chisq", "chord" (implemented in vegdist of 
+vegan), and "w", "-1", "c", "wb", "r", "I", "e", "t", "me", "j", "sor", "m", "-2", "co"
 "cc", "g", "-3", "l", "19", "hk", "rlb", "sim", "gl", "z" (implemented in 
 betadiver of vegan), "maximum", "binary", "minkowski" (implemented in dist 
 of stats), "unifrac", "weighted unifrac" (implemented in phyloseq),}
