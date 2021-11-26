@@ -93,7 +93,7 @@ f <- mouse.time.mpse \%>\%
         taxa.class = "Phylum",
         topn = 20,
         geom = "heatmap",
-        feature.dist = "manhattan",
+        feature.dist = "bray",
         feature.hclust = "average"
      ) \%>\%
      set_scale_theme(

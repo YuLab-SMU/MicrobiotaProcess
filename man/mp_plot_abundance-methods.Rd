@@ -20,7 +20,7 @@ mp_plot_abundance(
   force = FALSE,
   plot.group = FALSE,
   geom = "bar",
-  feature.dist = "euclidean",
+  feature.dist = "bray",
   feature.hclust = "average",
   sample.dist = "bray",
   sample.hclust = "average",
@@ -38,7 +38,7 @@ mp_plot_abundance(
   force = FALSE,
   plot.group = FALSE,
   geom = "bar",
-  feature.dist = "euclidean",
+  feature.dist = "bray",
   feature.hclust = "average",
   sample.dist = "bray",
   sample.hclust = "average",
@@ -56,7 +56,7 @@ mp_plot_abundance(
   force = FALSE,
   plot.group = FALSE,
   geom = "bar",
-  feature.dist = "euclidean",
+  feature.dist = "bray",
   feature.hclust = "average",
   sample.dist = "bray",
   sample.hclust = "average",
@@ -74,7 +74,7 @@ mp_plot_abundance(
   force = FALSE,
   plot.group = FALSE,
   geom = "bar",
-  feature.dist = "euclidean",
+  feature.dist = "bray",
   feature.hclust = "average",
   sample.dist = "bray",
   sample.hclust = "average",
@@ -107,7 +107,7 @@ taxonomy with group not sample level, default is FALSE.}
 'bar'.}
 
 \item{feature.dist}{character the method to calculate the distance between the features,
-based on the '.abundance' of 'taxa.class', default is 'euclidean', options refer to
+based on the '.abundance' of 'taxa.class', default is 'bray', options refer to
 the 'distmethod' of [mp_cal_dist()] (except unifrac related).}
 
 \item{feature.hclust}{character the agglomeration method for the features, default is

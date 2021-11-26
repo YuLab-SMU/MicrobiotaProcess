@@ -132,7 +132,7 @@ setMethod("get_taxadf", "data.frame",
 #'         taxa.class = "Phylum",
 #'         topn = 20,
 #'         geom = "heatmap",
-#'         feature.dist = "manhattan",
+#'         feature.dist = "bray",
 #'         feature.hclust = "average"
 #'      ) %>%
 #'      set_scale_theme(

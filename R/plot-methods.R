@@ -15,7 +15,7 @@
 #' @param geom character which type plot, options is 'bar' and 'heatmap', default is
 #' 'bar'.
 #' @param feature.dist character the method to calculate the distance between the features,
-#' based on the '.abundance' of 'taxa.class', default is 'euclidean', options refer to
+#' based on the '.abundance' of 'taxa.class', default is 'bray', options refer to
 #' the 'distmethod' of [mp_cal_dist()] (except unifrac related).
 #' @param feature.hclust character the agglomeration method for the features, default is
 #' 'average', options are 'single', 'complete', 'average', 'ward.D', 'ward.D2', 'centroid'
@@ -82,7 +82,7 @@ setGeneric("mp_plot_abundance",
               force = FALSE,
               plot.group = FALSE,
               geom = "bar",
-              feature.dist = "euclidean",
+              feature.dist = "bray",
               feature.hclust = "average",
               sample.dist = "bray",
               sample.hclust = "average",
@@ -101,7 +101,7 @@ setGeneric("mp_plot_abundance",
                                 force = FALSE,
                                 plot.group = FALSE,
                                 geom = "bar",
-                                feature.dist = "euclidean",
+                                feature.dist = "bray",
                                 feature.hclust = "average",
                                 sample.dist = "bray",
                                 sample.hclust = "average",
@@ -170,7 +170,6 @@ setGeneric("mp_plot_abundance",
          }
      }
 
-
      tbl <- .data %>% 
             mp_extract_abundance(taxa.class=!!taxa.class, topn = topn) %>%
             tidyr::unnest(cols=AbundBy) %>% 
@@ -186,10 +185,11 @@ setGeneric("mp_plot_abundance",
 
      if(geom=="bar"){
          p <- ggplot(data=tbl,
-                     mapping=aes_string(x=axis.x,
-                                        y=abundance.nm,
-                                        alluvium=rlang::as_name(taxa.class),
-                                        fill=rlang::as_name(taxa.class))
+                     mapping=aes_string(
+                        x = axis.x,
+                        y = abundance.nm,
+                        alluvium = rlang::as_name(taxa.class),
+                        fill = rlang::as_name(taxa.class))
               ) +
               ggalluvial::geom_flow(stat="alluvium", lode.guidance = "frontback", color = "darkgray") +
               ggalluvial::geom_stratum(stat="alluvium") +
@@ -228,9 +228,9 @@ setGeneric("mp_plot_abundance",
          leg.tl <- abundance.nm %>% gsub("BySample", "", .)
          p <- ggplot(data=tbl,
                      mapping = aes_string(
-                                          x = axis.x,
-                                          y = rlang::as_name(taxa.class),
-                                          fill = abundance.nm
+                         x = axis.x,
+                         y = rlang::as_name(taxa.class),
+                         fill = abundance.nm
                      )
                ) +
                ggplot2::geom_tile(
@@ -293,10 +293,14 @@ setGeneric("mp_plot_abundance",
              }
              indexname <- c(indexname, gp)
          }
-         p2 <- ggtree(feature.hclust, branch.length = "none")
-         p3 <- ggtree(sample.hclust, branch.length = "none", layout = "dendrogram")
+         p2 <- ggtree(feature.hclust, branch.length = "none", size = 1)
+         p3 <- ggtree(sample.hclust, branch.length = "none", size = 1, layout = "dendrogram")
          p %<>% insert_left(p2, width = 0.1)
-         p %<>% insert_top(p3, height = 0.1)
+         if (!rlang::quo_is_null(.group)){
+             p %<>% insert_top(p3, height = 0.1 + 0.01 * length(gp))
+         }else{
+             p %<>% insert_top(p3, height = 0.1)
+         }
          p$index <- c(indexname, paste0("tree", seq_len(2)))
          p %<>% add_class("aplot.heatmap")
      }
@@ -833,7 +837,7 @@ setGeneric("mp_plot_dist",
           }
           indexname <- c(indexname, rep(gp, each = 2))
       }
-      p2 <- ggtree(sample.hclust, branch.length="none")
+      p2 <- ggtree(sample.hclust, branch.length="none", size=1)
       p <- p %>% insert_left(p2, width=0.12)
       p <- p %>% insert_top(p2 + ggtree::layout_dendrogram(), height=0.12)
       p$index <- c(indexname, paste0("tree", seq_len(2)))
