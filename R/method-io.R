@@ -170,13 +170,19 @@ mp_import_qiime <- function(otufilename,
 #' Bacteria 99 99 99 99 99 99 99 99
 #' ...
 #' }
-#' linenum should be set to 3.
+#' the \code{linenum} should be set to 3.
+#' \preformatted{
+#' sampleid A1 A2 A3 A4 A5
+#' Bacteria 99 99 99 99 99
+#' ...
+#' }
+#' The \code{linenum} should be set to 1.
 #' @param ... additional parameters, meaningless now.
 #' @details
 #' When the output abundance of MetaPhlAn is relative abundance, the \code{force} of \code{mp_cal_abundance}
 #' should be set to TRUE, and the \code{relative} of \code{mp_cal_abundance} should be set to FALSE.
-#' Because the abundance profile will be rarefied in the default (force=FALSE), then the 
-#' relative abundance will be calculated in the default (relative=TRUE).
+#' Because the abundance profile will be rarefied in the default (force=FALSE), which requires the integer (count) 
+#' abundance, then the relative abundance will be calculated in the default (relative=TRUE).
 #' @author Shuangbin Xu
 #' @export
 #' @examples
@@ -188,7 +194,9 @@ mp_import_qiime <- function(otufilename,
 mp_import_metaphlan <- function(profile, mapfilename=NULL, treefile=NULL, linenum=NULL, ...){
     skipnrow <- guess_skip_nrow(profile)
     if (!is.null(linenum)){
-        sampleda <- utils::read.table(profile, sep="\t", row.names=1, skip=skipnrow, nrow=linenum, comment.char="", quote="") %>%
+        sampleda <- utils::read.table(profile, sep="\t", skip=skipnrow, nrow=linenum, comment.char="", quote="") %>%
+                    dplyr::mutate(V1=tidyr::replace_na(.data$V1, paste0("unknown", seq_len(sum(is.na(.data$V1)))))) %>%
+                    tibble::column_to_rownames(var="V1") %>%
                     t() %>% as.data.frame()
         da <- utils::read.table(profile, sep="\t", skip=linenum + skipnrow, comment.char="", quote="")
         sampleindx <- da %>%

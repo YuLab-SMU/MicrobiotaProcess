@@ -113,7 +113,7 @@ setGeneric("mp_plot_abundance",
     .sec.group <- rlang::enquo(.sec.group)
     taxa.class <- rlang::enquo(taxa.class)
     geom %<>% match.arg(c("bar", "heatmap"))
-    if (geom=="bar"){
+    if (geom=="heatmap"){
         plot.group = FALSE
     }
 

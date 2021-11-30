@@ -18,7 +18,7 @@ convert_to_treedata <- function(data, type="species", include.rownames=FALSE, ..
     if (!"fillNAtax" %in% names(attributes(data))){
         data <- fillNAtax(data, type=type)
     }
-    if (include.rownames && type == "species"){
+    if (include.rownames){
         data$OTU <- rownames(data)
     }
     data <- data.frame(Root=rep("r__root", nrow(data)), data)
@@ -38,28 +38,26 @@ convert_to_treedata <- function(data, type="species", include.rownames=FALSE, ..
     index[isTip] <- seq(1,sum(isTip))
     index[!isTip] <- seq(sum(isTip)+2,length(isTip)+1)
     mapping <- data.frame(node=index, labelnames=as.vector(datalist$child), isTip)
-    #mapping$nodeClass <- unlist(lapply(as.vector(mapping$labelnames),
-    #		   		       function(x)(unlist(strsplit(x,"__"))[1])))
     indxx <- match(mapping$labelnames, datalist$child)
     mapping$nodeClass <- datalist[indxx, "nodeClass"]
     mapping$nodeDepth <- datalist[indxx, "nodeDepth"]
-    #mapping$nodeSize <- 1
     parentnode <- mapping[match(as.vector(datalist$parent), as.vector(mapping$labelnames)),]$node 
     childnode <- mapping[match(as.vector(datalist$child), as.vector(mapping$labelnames)),]$node
     edges <- cbind(parentnode, childnode) 
     colnames(edges) <- NULL
     edges[is.na(edges)] <- sum(isTip) + 1
     root <- data.frame(node=sum(isTip)+1,labelnames="r__root",
-    		       isTip=FALSE, nodeClass="Root", nodeDepth=0)#, nodeSize=1)
+    		       isTip=FALSE, nodeClass="Root", nodeDepth=0)
     mapping <- rbind(root, mapping)
     mapping <- mapping[order(mapping$node),]
     node.label <- as.vector(mapping$labelnames)[!mapping$isTip]
     tip.label <- as.vector(mapping$labelnames)[mapping$isTip]
-    mapping <- mapping[,colnames(mapping) %in% c("node", "nodeClass", "nodeDepth")]#, "nodeSize")]
+    mapping <- mapping[,colnames(mapping) %in% c("node", "nodeClass", "nodeDepth")]
     taxphylo <- structure(list(edge=edges, node.label=node.label,
-                               tip.label=tip.label, #edge.length=rep(0.5, nrow(edges)),
+                               tip.label=tip.label,
                                Nnode = length(node.label)), class="phylo")
     res <- treedata(phylo=taxphylo, data=as_tibble(mapping))
+    return(res)
 }
 
 #' convert taxonomyTable to treedata
