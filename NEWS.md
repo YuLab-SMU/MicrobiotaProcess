@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.7.3.990
+
++ update `mp_import_metaphlan` to better parse the output of `MetaPhlAn2`. (2021-11-30, Tue)
+
 # MicrobiotaProcess 1.7.3
 
 + update 'mp_plot_abundance' (2021-11-24, Wed)
