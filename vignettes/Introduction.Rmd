@@ -220,15 +220,16 @@ mouse.time.mpse
 # visualize the relative abundance of top 20 phyla for each sample.
 p1 <- mouse.time.mpse %>%
          mp_plot_abundance(
-           .abundance=RelRareAbundanceBySample,
+           .abundance=RareAbundance,
            .group=time, 
            taxa.class = Phylum, 
-           topn = 20
+           topn = 20,
+           relative = TRUE
          )
 # visualize the abundance (rarefied) of top 20 phyla for each sample.
 p2 <- mouse.time.mpse %>%
           mp_plot_abundance(
-            .abundance=RelRareAbundanceBySample,
+            .abundance=RareAbundance,
             .group=time,
             taxa.class = Phylum,
             topn = 20,
@@ -242,9 +243,10 @@ The abundance of features also can be visualized by `mp_plot_abundance` with `he
 ```{r, fig.align="center", fig.width=12, fig.height=4, fig.cap="The relative abundance and abundance of phyla of all samples "}
 h1 <- mouse.time.mpse %>%
          mp_plot_abundance(
-           .abundance = RelRareAbundanceBySample,
+           .abundance = RareAbundance,
            .group = time,
            taxa.class = Phylum,
+           relative = TRUE,
            topn = 20,
            geom = 'heatmap',
            features.dist = 'euclidean',
@@ -255,7 +257,7 @@ h1 <- mouse.time.mpse %>%
 
 h2 <- mouse.time.mpse %>%
           mp_plot_abundance(
-            .abundance = RelRareAbundanceBySample,
+            .abundance = RareAbundance,
             .group = time,
             taxa.class = Phylum,
             relative = FALSE,

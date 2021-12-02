@@ -566,14 +566,15 @@ setGeneric("mp_plot_diff_res",
                geom = geom_star,
                mapping = mapping,
                starshape = 13,
-               starstroke = 0.25,
+               starstroke = 0.05,
                offset = offset.abun,
                pwidth = pwidth.abun,
                grid.params = list(linetype=2)
             ) +  
             scale_size_continuous(
                name="Relative Abundance (%)",
-               range = c(1, 3)
+               range = c(.5, 3),
+               guide = guide_legend(override.aes = list(fill="black"))
             )
           )
 
@@ -591,13 +592,12 @@ setGeneric("mp_plot_diff_res",
               )
     }
     # display the LDA of significant OTU.
-    n.char <- max(nchar(p3$data[p3$data$isTip, "label", drop=TRUE]), na.rm=TRUE)
     title.height <- 4.4e-06 * sum(p3$data$isTip) 
     p4 <- suppressWarnings(
             p3 +
             ggnewscale::new_scale_fill() +
             geom_fruit(
-               data = td_filter(!is.na(!!rlang::sym(x.bar))),
+               #data = td_filter(!is.na(!!rlang::sym(x.bar))),
                geom = geom_col,
                mapping = aes(
                              x = !!rlang::sym(x.bar),
