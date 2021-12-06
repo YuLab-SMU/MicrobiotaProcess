@@ -125,7 +125,9 @@ based on the '.abundance' of 'taxa.class', default is 'bray', options refer to t
 \item{.sec.group}{the column name of second group to be plotted with nested facet,
 default is NULL, this argument will be deprecated in the next version.}
 
-\item{...}{additional parameters, meaningless now.}
+\item{...}{additional parameters, when the geom = "bar", it can specify the parameters of 
+'geom_stratum' of 'ggalluvial', when the geom = "heatmap", it can specify the parameter of
+'geom_tile' of 'ggplot2'.}
 }
 \description{
 plotting the abundance of taxa via specified taxonomy class
