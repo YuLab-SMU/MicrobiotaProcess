@@ -1,5 +1,10 @@
-# MicrobiotaProcess 1.7.3.990
+# MicrobiotaProcess 1.7.4
 
++ update `taxatree<-` and `otutree<-` which will extract the intersection between the 
+  tip labels of input treedata and the rownames of `MPSE`. (2021-12-14, Tue)
++ add `taxonomy<-` for `MPSE` to assign the taxonomy information, which will be
+  converted to `taxatree` automatically. (2021-12-14, Tue) 
++ add `tax_table` for `MPSE` and return `taxonomyTable` defined in `phyloseq`. (2021-12-14, Tue)
 + update `mp_import_metaphlan` to better parse the output of `MetaPhlAn2`. (2021-11-30, Tue)
 
 # MicrobiotaProcess 1.7.3

@@ -923,7 +923,7 @@ setGeneric("taxonomy<-", function(x, ..., value)standardGeneric("taxonomy<-"))
     if (is.null(value)){
         taxa.tree <- NULL
     }else{
-        taxa.tree <- value %>% convert_to_treedata(include.rownames=TRUE)
+        taxa.tree <- value %>% convert_to_treedata(include.rownames = TRUE, ...)
     }
     taxatree(x) <- taxa.tree
     return(x)
