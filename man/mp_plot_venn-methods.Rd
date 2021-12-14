@@ -25,7 +25,8 @@ mp_plot_venn(.data, .group, .venn = NULL, ...)
 
 \item{.venn}{the column names of result after run \code{mp_cal_venn}.}
 
-\item{...}{additional parameters, meaningless now.}
+\item{...}{additional parameters, such as 'size', 'label_size', 'edge_size' etc, 
+see also 'ggVennDiagram'.}
 }
 \description{
 Plotting the different number of OTU between groups with Venn Diagram.

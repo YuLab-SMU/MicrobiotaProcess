@@ -462,7 +462,8 @@ setMethod("mp_plot_alpha", signature(.data="grouped_df_mpse"), .internal_plot_al
 #' @param .data MPSE object or tbl_mpse object
 #' @param .group the column names of group to be visualized
 #' @param .venn the column names of result after run \code{mp_cal_venn}.
-#' @param ... additional parameters, meaningless now.
+#' @param ... additional parameters, such as 'size', 'label_size', 'edge_size' etc, 
+#' see also 'ggVennDiagram'.
 #' @author Shuangbin Xu
 #' @examples
 #' \dontrun{
@@ -487,7 +488,7 @@ setGeneric("mp_plot_venn", function(.data, .group, .venn=NULL, ...) standardGene
         dplyr::select(!!.group, !!.venn) %>% 
         dplyr::distinct() %>%
         pull(var=!!.venn, name=!!.group) %>%
-        ggVennDiagram::ggVennDiagram()
+        ggVennDiagram::ggVennDiagram(., ...)
     return(p)
 }
 
@@ -511,7 +512,7 @@ setMethod("mp_plot_venn", signature(.data="grouped_df_mpse"), .internal_plot_ven
 #' @param .data MPSE obejct or tbl_mpse object
 #' @param .group the column name of group
 #' @param .upset the column name of result after run \code{mp_cal_upset}
-#' @param ... additional parameters, meaningless now.
+#' @param ... additional parameters, see also 'scale_x_upset' of 'ggupset'.
 #' @export
 #' @author Shuangbin Xu
 #' @examples
@@ -540,7 +541,7 @@ setGeneric("mp_plot_upset", function(.data, .group, .upset=NULL, ...) standardGe
          dplyr::filter(vapply(!!.upset, length, numeric(1))>0) %>%
          ggplot(mapping=aes(x=!!.upset)) +
          geom_bar() +
-         ggupset::scale_x_upset() +
+         ggupset::scale_x_upset(...) +
          ggupset::theme_combmatrix(combmatrix.label.extra_spacing=30) +
          ggplot2::labs(y=rlang::as_name(.group))
 

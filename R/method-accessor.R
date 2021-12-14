@@ -52,7 +52,7 @@ head.alphasample <- function(x, n=6L, ...){
 }
 
 #' MPSE accessors
-#' @param x MPSE object
+#' @param x R object, MPSE class in here
 #' @param i,j,... Indices specifying elements to extract or replace.
 #' Indices are 'numeric' or 'character' vectors or empty (missing) or
 #' NULL.  Numeric values are coerced to integer as by 'as.integer' 
@@ -63,6 +63,7 @@ head.alphasample <- function(x, n=6L, ...){
 #' elements, not for the replacement.
 #' @param value character vector, Either ‘NULL’ or a character vector equal 
 #' of length equal to the appropriate dimension.
+#' @param object parameter of tax_table, R object, MPSE class in here.
 #' @name MPSE-accessors
 NULL
 
@@ -264,6 +265,37 @@ setMethod("mp_extract_tree", signature(x="grouped_df_mpse"),function(x, type="ta
     .internal_tree(x=x, type=type, tip.level=tip.level)
 })
 
+#' @rdname mp_extract_taxonomy-methods
+#' @param x MPSE object
+#' @param ... additional parameters, now is meaningless.
+#' @return data.frame contained taxonomy information
+#' @export
+setGeneric("taxonomy", function(x, ...){standardGeneric("taxonomy")})
+
+.internal_taxonomy <- function(x, ...){
+    x <- x %>% mp_extract_taxonomy(...)
+         tibble::column_to_rownames(var="OTU")
+    return(x)
+}
+
+#' @rdname mp_extract_taxonomy-methods
+#' @aliases taxonomy,MPSE
+#' @exportMethod taxonomy
+setMethod("taxonomy", signature(x = "MPSE"), .internal_taxonomy)
+
+#' @rdname mp_extract_taxonomy-methods
+#' @aliases taxonomy,tbl_mpse
+#' @exportMethod taxonomy
+setMethod("taxonomy", signature(x = "tbl_mpse"), .internal_taxonomy)
+
+#' @rdname mp_extract_taxonomy-methods
+#' @aliases taxonomy,grouped_df_mpse
+#' @export
+setMethod("taxonomy", signature(x = "grouped_df_mpse"), .internal_taxonomy)
+
+
+
+
 #' @title extract the taxonomy annotation in MPSE object
 #' @docType methods
 #' @rdname mp_extract_taxonomy-methods
@@ -277,31 +309,51 @@ setGeneric("mp_extract_taxonomy", function(x, ...)standardGeneric("mp_extract_ta
 #' @aliases mp_extract_taxonomy,MPSE
 #' @exportMethod mp_extract_taxonomy
 setMethod("mp_extract_taxonomy", signature(x="MPSE"), function(x, ...){
-    da <- .internal_extract_taxonomy(taxatree=x@taxatree, classnm=class(x)[1])
-    return(da)
+da <- .internal_extract_taxonomy(taxatree=x@taxatree, classnm=class(x)[1])
+return(da)
 })
+
+.internal_extract_taxonomy_ <- function(x, ...){
+taxatree <- x %>% attr("taxatree")
+classnm <- class(x)[1]
+da <- .internal_extract_taxonomy(taxatree = taxatree,
+                                 classnm = classnm)
+return(da)
+}
 
 #' @rdname mp_extract_taxonomy-methods
 #' @aliases mp_extract_taxonomy,tbl_mpse
 #' @exportMethod mp_extract_taxonomy
-setMethod("mp_extract_taxonomy", signature(x="tbl_mpse"), function(x, ...){
-    taxatree <- x %>% attr("taxatree")
-    classnm <- class(x)[1]
-    da <- .internal_extract_taxonomy(taxatree = taxatree, 
-                                     classnm = classnm)
-    return(da)
-})
+setMethod("mp_extract_taxonomy", signature(x="tbl_mpse"), .internal_extract_taxonomy_)
 
 #' @rdname mp_extract_taxonomy-methods
 #' @aliases mp_extract_taxonomy,grouped_df_mpse
 #' @exportMethod mp_extract_taxonomy
-setMethod("mp_extract_taxonomy", signature(x="grouped_df_mpse"), function(x, ...){
-    taxatree <- x %>% attr("taxatree")
-    classnm <- class(x)[1]
-    da <- .internal_extract_taxonomy(taxatree = taxatree,
-                                     classnm = classnm)
-    return (da)
-})
+setMethod("mp_extract_taxonomy", signature(x="grouped_df_mpse"), .internal_extract_taxonomy_)
+
+tax_table <- getFromNamespace("tax_table", "phyloseq")
+
+.internal_tax_table <- function(object){
+da <- mp_extract_taxonomy(object) %>%
+      tibble::column_to_rownames(var="OTU") %>% 
+      as.matrix()
+phyloseq::tax_table(da)
+}
+
+#' @rdname MPSE-accessors
+#' @aliases tax_table,MPSE
+#' @exportMethod tax_table
+setMethod("tax_table", signature(object = "MPSE"), .internal_tax_table)
+
+#' @rdname MPSE-accessors
+#' @aliases tax_table,tbl_mpse
+#' @exportMethod tax_table
+setMethod("tax_table", signature(object = "tbl_mpse"), .internal_tax_table)
+
+#' @rdname MPSE-accessors
+#' @aliases tax_table,grouped_df_mpse 
+#' @exportMethod tax_table
+setMethod("tax_table", signature(object = "grouped_df_mpse"), .internal_tax_table)
 
 #' @title extract the sample information in MPSE object
 #' @docType methods
@@ -316,28 +368,28 @@ setGeneric("mp_extract_sample", function(x, ...)standardGeneric("mp_extract_samp
 #' @aliases mp_extract_sample,MPSE
 #' @exportMethod mp_extract_sample
 setMethod("mp_extract_sample", signature(x="MPSE"), function(x, ...){
-     da <- x@colData %>%
-           data.frame(check.names=FALSE) %>%
-           avoid_conflict_names() %>%
-           tibble::as_tibble(rownames="Sample") %>%
-           modify_AsIs_list()
-     return(da)
+ da <- x@colData %>%
+       data.frame(check.names=FALSE) %>%
+       avoid_conflict_names() %>%
+       tibble::as_tibble(rownames="Sample") %>%
+       modify_AsIs_list()
+ return(da)
 })
 
 .internal_extract_sample <- function(x, ...){
-    samplevar <- x %>% attr("samplevar")
-    da <- x %>%
-        dplyr::ungroup() %>%
-        select(samplevar) %>%
-        distinct()
-    return(da)
+samplevar <- x %>% attr("samplevar")
+da <- x %>%
+    dplyr::ungroup() %>%
+    select(samplevar) %>%
+    distinct()
+return(da)
 }
 
 modify_AsIs_list <- function(x, ...){
-    nms <- lapply(x, function(x)inherits(x, "AsIs") && typeof(x)=="list")
-    nms <- names(nms[unlist(nms)])
-    x %<>% dplyr::mutate_at(dplyr::vars(nms), ~unclass(.))
-    x
+nms <- lapply(x, function(x)inherits(x, "AsIs") && typeof(x)=="list")
+nms <- names(nms[unlist(nms)])
+x %<>% dplyr::mutate_at(dplyr::vars(nms), ~unclass(.))
+x
 }
 
 #' @rdname mp_extract_sample-methods
@@ -365,46 +417,46 @@ setGeneric("mp_extract_feature", function(x, addtaxa=FALSE, ...)standardGeneric(
 #' @aliases mp_extract_feature,MPSE
 #' @exportMethod mp_extract_feature
 setMethod("mp_extract_feature", signature(x="MPSE"), function(x, addtaxa=FALSE, ...){
-    da <- SummarizedExperiment::rowData(x) %>%
-          avoid_conflict_names() %>%
-          tibble::as_tibble(rownames="OTU")
-    if (!is.null(x@taxatree)){
-        taxanm <- x@taxatree@data %>%
-                  dplyr::filter(!.data$nodeClass %in% c("OTU", "Root")) %>%
-                  dplyr::pull(.data$nodeClass) %>% unique
-        trda <- x@taxatree %>%
-                taxatree_to_tb() %>%
-                tibble::as_tibble(rownames="OTU")
-        if (!addtaxa){
-            trda %<>% dplyr::select(-taxanm)
-        }
-        da %<>% dplyr::left_join(trda, by="OTU") 
-                
+da <- SummarizedExperiment::rowData(x) %>%
+      avoid_conflict_names() %>%
+      tibble::as_tibble(rownames="OTU")
+if (!is.null(x@taxatree)){
+    taxanm <- x@taxatree@data %>%
+              dplyr::filter(!.data$nodeClass %in% c("OTU", "Root")) %>%
+              dplyr::pull(.data$nodeClass) %>% unique
+    trda <- x@taxatree %>%
+            taxatree_to_tb() %>%
+            tibble::as_tibble(rownames="OTU")
+    if (!addtaxa){
+        trda %<>% dplyr::select(-taxanm)
     }
-    da %<>% modify_AsIs_list()
-    return(da)
+    da %<>% dplyr::left_join(trda, by="OTU") 
+            
+}
+da %<>% modify_AsIs_list()
+return(da)
 })
 
 .internal_extract_feature <- function(x, addtaxa=FALSE, ...){
-    otumetavar <- x %>% attr("otumetavar")
-    taxatree <- x %>% attr("taxatree")
-    da <- x %>%
-        dplyr::ungroup() %>%
-        select(c("OTU", otumetavar)) %>%
-        distinct()
-    if (!is.null(taxatree)){
-        taxanm <- taxatree@data %>%
-                  dplyr::filter(!.data$nodeClass %in% c("OTU", "Root")) %>%
-                  dplyr::pull(.data$nodeClass) %>% unique
-        trda <- taxatree %>%
-                taxatree_to_tb() %>%
-                tibble::as_tibble(rownames="OTU")
-        if (!addtaxa){
-            trda %<>% dplyr::select(-taxanm)
-        }
-        da %<>% dplyr::left_join(trda, by="OTU")
+otumetavar <- x %>% attr("otumetavar")
+taxatree <- x %>% attr("taxatree")
+da <- x %>%
+    dplyr::ungroup() %>%
+    select(c("OTU", otumetavar)) %>%
+    distinct()
+if (!is.null(taxatree)){
+    taxanm <- taxatree@data %>%
+              dplyr::filter(!.data$nodeClass %in% c("OTU", "Root")) %>%
+              dplyr::pull(.data$nodeClass) %>% unique
+    trda <- taxatree %>%
+            taxatree_to_tb() %>%
+            tibble::as_tibble(rownames="OTU")
+    if (!addtaxa){
+        trda %<>% dplyr::select(-taxanm)
     }
-    return(da)
+    da %<>% dplyr::left_join(trda, by="OTU")
+}
+return(da)
 }
 
 #' @rdname mp_extract_feature-methods
@@ -427,17 +479,17 @@ setMethod("mp_extract_feature", signature(x="grouped_df_mpse"), .internal_extrac
 setGeneric("mp_extract_rarecurve", function(x, .rarecurve, ...)standardGeneric("mp_extract_rarecurve"))
 
 .internal_extract_rarecurve <- function(x, .rarecurve, ...){
-    .rarecurve <- rlang::enquo(.rarecurve)
-    if (rlang::quo_is_missing(.rarecurve)){
-        .rarecurve <- as.symbol("RareAbundanceRarecurve")
-    }
-    dat <- x %>% 
-        mp_extract_sample() %>%
-        dplyr::select("Sample", !!.rarecurve) %>% 
-        dplyr::rename(sample="Sample") %>%
-        tidyr::unnest() %>% 
-        suppressWarnings()
-    return(structure(list(data=dat), class="rarecurve"))
+.rarecurve <- rlang::enquo(.rarecurve)
+if (rlang::quo_is_missing(.rarecurve)){
+    .rarecurve <- as.symbol("RareAbundanceRarecurve")
+}
+dat <- x %>% 
+    mp_extract_sample() %>%
+    dplyr::select("Sample", !!.rarecurve) %>% 
+    dplyr::rename(sample="Sample") %>%
+    tidyr::unnest() %>% 
+    suppressWarnings()
+return(structure(list(data=dat), class="rarecurve"))
 }
 
 #' @rdname mp_extract_rarecurve-methods
@@ -472,86 +524,86 @@ setGeneric("mp_extract_abundance", function(x, taxa.class="all", topn=NULL, ...)
 
 #' @importFrom dplyr all_of
 .internal_extract_abundance <- function(x, taxa.class="all", topn, ...){
-    taxa.class <- rlang::enquo(taxa.class)
+taxa.class <- rlang::enquo(taxa.class)
 
-    taxatree <-  x %>% 
-                 mp_extract_tree()
-    if (inherits(x, "MPSE")){
-        assaysvar <- x %>% SummarizedExperiment::assayNames()
-    }else{
-        assaysvar <- x %>% attr("assaysvar")
-	}
-    
-    if (is.null(taxatree)){
-        taxa.class <- rlang::sym("OTU")
-        da <- x %>% mp_extract_feature() %>% 
-              dplyr::rename(label="OTU") %>% 
-              dplyr::mutate(nodeClass="OTU") 
-        if (ncol(da)==1){
-            message_wrap("Please make sure the mp_cal_abundance(..., action='add') has been run.
-                          Or you can extract the assay via mp_extract_assays since the taxonomy is NULL")
-            return(NULL)
-        }
-        #return(da)
-    }else{
-        flag <-c(colnames(taxatree@data), colnames(taxatree@extraInfo)) %>% 
-               unique() %in% c("node", "nodeClass", "nodeDepth")
-        if (length(flag)==3 && all(flag)){
-            message("Please make sure the mp_cal_abundance(..., action='add') has been run.")
-            return(NULL)        
-        }
-        da <- taxatree %>% 
-              as_tibble %>%    
-              dplyr::select(-c("parent", "node", "nodeDepth")) %>%
-              dplyr::filter(.data$nodeClass != "Root")
-        taxa.class <- rlang::as_name(taxa.class)
-        if (taxa.class!="all"){
-            da <- da %>% 
-                  dplyr::filter(.data$nodeClass == taxa.class)
-        }
+taxatree <-  x %>% 
+             mp_extract_tree()
+if (inherits(x, "MPSE")){
+    assaysvar <- x %>% SummarizedExperiment::assayNames()
+}else{
+    assaysvar <- x %>% attr("assaysvar")
+}
+
+if (is.null(taxatree)){
+    taxa.class <- rlang::sym("OTU")
+    da <- x %>% mp_extract_feature() %>% 
+          dplyr::rename(label="OTU") %>% 
+          dplyr::mutate(nodeClass="OTU") 
+    if (ncol(da)==1){
+        message_wrap("Please make sure the mp_cal_abundance(..., action='add') has been run.
+                      Or you can extract the assay via mp_extract_assays since the taxonomy is NULL")
+        return(NULL)
     }
-
+    #return(da)
+}else{
+    flag <-c(colnames(taxatree@data), colnames(taxatree@extraInfo)) %>% 
+           unique() %in% c("node", "nodeClass", "nodeDepth")
+    if (length(flag)==3 && all(flag)){
+        message("Please make sure the mp_cal_abundance(..., action='add') has been run.")
+        return(NULL)        
+    }
+    da <- taxatree %>% 
+          as_tibble %>%    
+          dplyr::select(-c("parent", "node", "nodeDepth")) %>%
+          dplyr::filter(.data$nodeClass != "Root")
+    taxa.class <- rlang::as_name(taxa.class)
     if (taxa.class!="all"){
-        AbundBy <- colnames(da)[vapply(da, is.list, logical(1))]
-        dat <- da %>% tidyr::unnest(cols=AbundBy[1])
-        clnm <- colnames(dat)[vapply(dat, is.numeric, logical(1))]
-        totallabel <- dat %>%
-              dplyr::group_by(.data$label) %>%
-              dplyr::summarize(TotalByLabel=sum(!!as.symbol(clnm[1]))) %>%
-              dplyr::arrange(dplyr::desc(.data$TotalByLabel)) %>% 
-              dplyr::pull(.data$label)
-        if (is.null(topn)){topn <- length(totallabel)}
-        keepn <- min(topn, length(totallabel))
-        if (keepn < length(totallabel)){
-            keeplabel <- totallabel[seq_len(keepn)]
-		}else{
-            keeplabel <- totallabel
-        }
-        dtf <- list()
-        for (i in AbundBy){
-            df <- da %>% 
-                  select(c("label", "nodeClass", i)) %>%
-                  tidyr::unnest(cols=i)
-            nms <- colnames(df)
-            abunnm <- nms[vapply(df, is.numeric, logical(1))]
-            gpnm <- nms[!nms %in% c("label", "nodeClass", abunnm)][1]
-            df1 <- df %>% 
-                   dplyr::filter(.data$label %in% keeplabel)
-            df2 <- df %>%
-                   dplyr::filter(!.data$label %in% keeplabel) %>%
-                   dplyr::mutate(label="Others") %>% 
-                   dplyr::group_by(!!as.symbol(gpnm)) %>%
-                   dplyr::mutate(across(all_of(abunnm), sum)) %>%
-				   dplyr::ungroup() %>%
-                   distinct() 
-            dtf[[i]] <- dplyr::bind_rows(df1, df2) %>%
-                  dplyr::mutate(label=factor(.data$label, levels=c(keeplabel, "Others"))) %>%
-                  tidyr::nest(!!i:=nms[!nms %in% c("label", "nodeClass")])
-
-        }
-        da <- dtf %>% purrr::reduce(left_join, by=c("label", "nodeClass"))
+        da <- da %>% 
+              dplyr::filter(.data$nodeClass == taxa.class)
     }
-	return(da)
+}
+
+if (taxa.class!="all"){
+    AbundBy <- colnames(da)[vapply(da, is.list, logical(1))]
+    dat <- da %>% tidyr::unnest(cols=AbundBy[1])
+    clnm <- colnames(dat)[vapply(dat, is.numeric, logical(1))]
+    totallabel <- dat %>%
+          dplyr::group_by(.data$label) %>%
+          dplyr::summarize(TotalByLabel=sum(!!as.symbol(clnm[1]))) %>%
+          dplyr::arrange(dplyr::desc(.data$TotalByLabel)) %>% 
+          dplyr::pull(.data$label)
+    if (is.null(topn)){topn <- length(totallabel)}
+    keepn <- min(topn, length(totallabel))
+    if (keepn < length(totallabel)){
+        keeplabel <- totallabel[seq_len(keepn)]
+    }else{
+        keeplabel <- totallabel
+    }
+    dtf <- list()
+    for (i in AbundBy){
+        df <- da %>% 
+              select(c("label", "nodeClass", i)) %>%
+              tidyr::unnest(cols=i)
+        nms <- colnames(df)
+        abunnm <- nms[vapply(df, is.numeric, logical(1))]
+        gpnm <- nms[!nms %in% c("label", "nodeClass", abunnm)][1]
+        df1 <- df %>% 
+               dplyr::filter(.data$label %in% keeplabel)
+        df2 <- df %>%
+               dplyr::filter(!.data$label %in% keeplabel) %>%
+               dplyr::mutate(label="Others") %>% 
+               dplyr::group_by(!!as.symbol(gpnm)) %>%
+               dplyr::mutate(across(all_of(abunnm), sum)) %>%
+               dplyr::ungroup() %>%
+               distinct() 
+        dtf[[i]] <- dplyr::bind_rows(df1, df2) %>%
+              dplyr::mutate(label=factor(.data$label, levels=c(keeplabel, "Others"))) %>%
+              tidyr::nest(!!i:=nms[!nms %in% c("label", "nodeClass")])
+
+    }
+    da <- dtf %>% purrr::reduce(left_join, by=c("label", "nodeClass"))
+}
+return(da)
 }
 
 #' @rdname mp_extract_abundance-methods
@@ -571,18 +623,18 @@ setMethod("mp_extract_abundance", signature(x="grouped_df_mpse"), .internal_extr
 
 
 .internal_extract_taxonomy <- function(taxatree, classnm){
-    if (is.null(taxatree)){
-        message(paste0("The taxonomy annotation is empty in the ", classnm," object"))
-        return(NULL)
-    }
-    taxanm <- taxatree@data %>%
-              dplyr::filter(.data$nodeClass != "Root") %>%
-              dplyr::pull(.data$nodeClass) %>% unique
-    taxada <- taxatree_to_tb(taxatree) %>%
-              tibble::as_tibble(rownames="OTU") %>%
-              dplyr::select(taxanm) #%>%
-              #tibble::column_to_rownames(var="OTU")
-    return(taxada)
+if (is.null(taxatree)){
+    message(paste0("The taxonomy annotation is empty in the ", classnm," object"))
+    return(NULL)
+}
+taxanm <- taxatree@data %>%
+          dplyr::filter(.data$nodeClass != "Root") %>%
+          dplyr::pull(.data$nodeClass) %>% unique
+taxada <- taxatree_to_tb(taxatree) %>%
+          tibble::as_tibble(rownames="OTU") %>%
+          dplyr::select(taxanm) #%>%
+          #tibble::column_to_rownames(var="OTU")
+return(taxada)
 
 }
 
@@ -596,11 +648,11 @@ setMethod("mp_extract_abundance", signature(x="grouped_df_mpse"), .internal_extr
 setGeneric("mp_extract_internal_attr", function(x, name, ...)standardGeneric("mp_extract_internal_attr"))
 
 .internal_extract_internal_attr <- function(x, name, ...){
-    name <- rlang::enquo(name) %>% rlang::as_name()
-    dat <- x %>% attr("internal_attr")
-    message(paste0("The object contained internal attribute: ",paste0(names(dat), collapse=" ")))
-    indx <- grep(paste0(name, "$"), names(dat), ignore.case=TRUE)
-    return(dat[[indx]])
+name <- rlang::enquo(name) %>% rlang::as_name()
+dat <- x %>% attr("internal_attr")
+message(paste0("The object contained internal attribute: ",paste0(names(dat), collapse=" ")))
+indx <- grep(paste0(name, "$"), names(dat), ignore.case=TRUE)
+return(dat[[indx]])
 }
 
 #' @rdname mp_extract_internal_attr-methods
@@ -632,48 +684,48 @@ setMethod("mp_extract_internal_attr", signature(x="grouped_df_mpse"), .internal_
 setGeneric("mp_extract_dist", function(x, distmethod, env.flag=FALSE, .group=NULL)standardGeneric("mp_extract_dist"))
 
 .internal_extract_dist <- function(x, distmethod, env.flag=FALSE, .group=NULL){
-    .group <- rlang::enquo(.group)
-    data <- x %>% mp_extract_sample()
-    distmethod <- switch(as.character(env.flag),
-                         "TRUE" = paste0("Env_", distmethod),
-                         "FALSE" = distmethod)
+.group <- rlang::enquo(.group)
+data <- x %>% mp_extract_sample()
+distmethod <- switch(as.character(env.flag),
+                     "TRUE" = paste0("Env_", distmethod),
+                     "FALSE" = distmethod)
 
-    if (!distmethod %in% colnames(data)){
-        rlang::abort(paste0("There is not ", distmethod, 
-                            " distance in the object, please check whether the mp_cal_dist has been performed!"))
-    }
-    
-    distname <- paste0(distmethod, "Sampley") %>% as.symbol()
+if (!distmethod %in% colnames(data)){
+    rlang::abort(paste0("There is not ", distmethod, 
+                        " distance in the object, please check whether the mp_cal_dist has been performed!"))
+}
 
-    if (rlang::quo_is_null(.group)){
-        distobj <- data %>%
-                select(c("Sample", distmethod)) %>%
-                distinct() %>%
-                tidyr::unnest() %>%
-                suppressWarnings() %>%
-                rename(x="Sample", y=distname, r=distmethod) %>%
-                corrr::retract() %>%
-                tibble::column_to_rownames(var=colnames(.)[1]) %>%
-                magrittr::extract(,rownames(.))
-        #distobj <- distobj[colnames(distobj), ] 
-        distobj[lower.tri(distobj)] <- t(distobj)[lower.tri(t(distobj))]
-        distobj %<>% stats::as.dist() %>%
-                     add_attr(distmethod, "method")
-        return(distobj)
-    }else{
-        group.y <- paste0(rlang::as_name(.group),".tmp") %>% as.symbol()
-        dist.tb <- data %>%
-                   dplyr::select(c("Sample", distmethod, !!.group)) %>%
-                   tidyr::unnest(cols=distmethod) %>%
-                   dplyr::mutate(dplyr::across(!!.group, 
-                                               ~.x[match(!!as.symbol(distname), !!as.symbol("Sample"))], 
-                                               .names=rlang::as_name(group.y))) %>% 
-                   dplyr::rowwise() %>% 
-                   dplyr::mutate(GroupsComparison=paste0(sort(c(!!.group, !!group.y)),collapse="-vs-")) %>%
-                   dplyr::filter(.data$Sample != !!as.symbol(distname)) %>%
-                   dplyr::select(c("Sample", distmethod, "GroupsComparison", distname))
-        return(dist.tb)
-    }
+distname <- paste0(distmethod, "Sampley") %>% as.symbol()
+
+if (rlang::quo_is_null(.group)){
+    distobj <- data %>%
+            select(c("Sample", distmethod)) %>%
+            distinct() %>%
+            tidyr::unnest() %>%
+            suppressWarnings() %>%
+            rename(x="Sample", y=distname, r=distmethod) %>%
+            corrr::retract() %>%
+            tibble::column_to_rownames(var=colnames(.)[1]) %>%
+            magrittr::extract(,rownames(.))
+    #distobj <- distobj[colnames(distobj), ] 
+    distobj[lower.tri(distobj)] <- t(distobj)[lower.tri(t(distobj))]
+    distobj %<>% stats::as.dist() %>%
+                 add_attr(distmethod, "method")
+    return(distobj)
+}else{
+    group.y <- paste0(rlang::as_name(.group),".tmp") %>% as.symbol()
+    dist.tb <- data %>%
+               dplyr::select(c("Sample", distmethod, !!.group)) %>%
+               tidyr::unnest(cols=distmethod) %>%
+               dplyr::mutate(dplyr::across(!!.group, 
+                                           ~.x[match(!!as.symbol(distname), !!as.symbol("Sample"))], 
+                                           .names=rlang::as_name(group.y))) %>% 
+               dplyr::rowwise() %>% 
+               dplyr::mutate(GroupsComparison=paste0(sort(c(!!.group, !!group.y)),collapse="-vs-")) %>%
+               dplyr::filter(.data$Sample != !!as.symbol(distname)) %>%
+               dplyr::select(c("Sample", distmethod, "GroupsComparison", distname))
+    return(dist.tb)
+}
 }
 
 #' @rdname mp_extract_dist-methods
@@ -693,41 +745,41 @@ setMethod("mp_extract_dist", signature(x="grouped_df_mpse"), .internal_extract_d
 
 
 .internal_tree <- function(x, type, tip.level){
-    type %<>% match.arg(c("taxatree", "otutree"))
-    tree <- x %>% attr(type)
-    if (!is.null(tree)){
-        if (type == "taxatree"){
-            tree <- .extract_tree_at_tiplevel(tree, tip.level=tip.level)
-        }
-        return(tree)
-    }else{
-        message(tree_empty(type=type))
+type %<>% match.arg(c("taxatree", "otutree"))
+tree <- x %>% attr(type)
+if (!is.null(tree)){
+    if (type == "taxatree"){
+        tree <- .extract_tree_at_tiplevel(tree, tip.level=tip.level)
     }
+    return(tree)
+}else{
+    message(tree_empty(type=type))
+}
 }
 
 #' @importFrom treeio drop.tip
 .extract_tree_at_tiplevel <- function(tree, tip.level){
-    if (tip.level=="OTU"){
-        return(tree)
-    }
-    rmnms <- tree %>% as_tibble %>% 
-             dplyr::filter(.data$nodeDepth > .data$nodeDepth[match(tip.level, .data$nodeClass)]) %>%
-             select(.data$label, .data$nodeDepth) %>% 
-             group_by(.data$nodeDepth) %>% 
-             dplyr::summarize(label=list(.data$label)) %>% 
-             arrange(dplyr::desc(.data$nodeDepth)) %>% 
-             pull(.data$label) 
-    if (length(rmnms) > 0){
-        for ( i in rmnms){
-            tree <- drop.tip(tree, tip=i, collapse.singles=FALSE, trim.internal=FALSE)
-        }
-    }
+if (tip.level=="OTU"){
     return(tree)
+}
+rmnms <- tree %>% as_tibble %>% 
+         dplyr::filter(.data$nodeDepth > .data$nodeDepth[match(tip.level, .data$nodeClass)]) %>%
+         select(.data$label, .data$nodeDepth) %>% 
+         group_by(.data$nodeDepth) %>% 
+         dplyr::summarize(label=list(.data$label)) %>% 
+         arrange(dplyr::desc(.data$nodeDepth)) %>% 
+         pull(.data$label) 
+if (length(rmnms) > 0){
+    for ( i in rmnms){
+        tree <- drop.tip(tree, tip=i, collapse.singles=FALSE, trim.internal=FALSE)
+    }
+}
+return(tree)
 }
 
 tree_empty <- function(type){
-    x <- paste0("The ", type," is empty in the MPSE object!")
-    return(x)
+x <- paste0("The ", type," is empty in the MPSE object!")
+return(x)
 }
 
 #' @rdname MPSE-accessors
@@ -739,8 +791,8 @@ setGeneric("otutree", function(x, ...)standardGeneric("otutree"))
 #' @aliases otutree,MPSE
 #' @export
 setMethod("otutree", signature(x="MPSE"),function(x,...){
-    tree <- x %>% mp_extract_tree(type="otutree")
-    return(tree)
+tree <- x %>% mp_extract_tree(type="otutree")
+return(tree)
 })
 
 #' @rdname MPSE-accessors 
@@ -749,23 +801,37 @@ setMethod("otutree", signature(x="MPSE"),function(x,...){
 #' @export
 setGeneric("otutree<-", function(x, ..., value)standardGeneric("otutree<-"))
 
-#' @rdname MPSE-accessors
-#' @aliases otutree<-,MPSE
-#' @export
-setReplaceMethod("otutree", signature(x="MPSE", value="treedata"), function(x, ..., value){
-    x@otutree <- .internal_drop.tip(tree=value, newnm=rownames(x)) 
+.internal_otutree_replace <- function(x, ..., value){
+    if (inherits(value, "treedata")){
+        newnms <- intersect(rownames(x), value@phylo$tip.label)
+    }else if(inherits(value, "phylo")){
+        newnms <- intersect(rownames(x), value$tip.label)
+    }
+    if (length(newnms)==0){
+        stop_wrap("There are not the same labels between tip labels of the tree 
+                   and the rownames of mpse, please check the tree is correct")
+    }
+    if (length(newnms) != nrow(x)){
+        dropnms <- setdiff(rownames(x), newnms)
+        message_wrap("droping rows without the input tree matches:")
+        message_wrap(paste0(dropnms, collapse="\n"))
+        x <- x[rownames(x) %in% newnms,]
+    }
+    x@otutree <- .internal_drop.tip(tree=value, newnm=rownames(x), collapse.singles=FALSE) %>%
+                 as.treedata() 
     methods::validObject(x)
     return(x)
-})
+}
 
 #' @rdname MPSE-accessors
 #' @aliases otutree<-,MPSE
 #' @export
-setReplaceMethod("otutree", signature(x="MPSE", value="phylo"), function(x, ..., value){
-    x@otutree <- .internal_drop.tip(tree=value, newnm=rownames(x)) %>% treeio::as.treedata()
-    methods::validObject(x)
-    return(x)
-})
+setReplaceMethod("otutree", signature(x="MPSE", value="treedata"), .internal_otutree_replace)
+
+#' @rdname MPSE-accessors
+#' @aliases otutree<-,MPSE
+#' @export
+setReplaceMethod("otutree", signature(x="MPSE", value="phylo"), .internal_otutree_replace)
 
 #' @rdname MPSE-accessors
 #' @aliases otutree<-,MPSE
@@ -808,8 +874,8 @@ setGeneric("taxatree", function(x, ...)standardGeneric("taxatree"))
 #' @aliases taxatree,MPSE
 #' @export
 setMethod("taxatree", signature(x="MPSE"),function(x, ...){
-    tree <- x %>% mp_extract_tree()
-    return(tree)
+tree <- x %>% mp_extract_tree()
+return(tree)
 })
 
 #' @rdname MPSE-accessors
@@ -822,6 +888,17 @@ setGeneric("taxatree<-", function(x, ..., value)standardGeneric("taxatree<-"))
 #' @aliases taxatree<-,MPSE
 #' @export
 setReplaceMethod("taxatree", signature(x="MPSE", value="treedata"), function(x, ..., value){
+    newnms <- intersect(rownames(x), value@phylo$tip.label)
+    if (length(newnms) != nrow(x)){
+        dropnms <- setdiff(rownames(x), newnms)
+        message_wrap("droping rows without the input taxonomy matches:")
+        message_wrap(paste0(dropnms, collapse="\n"))
+        x <- x[rownames(x) %in% newnms,]
+    }
+    if (length(newnms)==0){
+        stop_wrap("There are not the same labels between rownames of the taxonomy information 
+                   and the rownames of mpse, please check the taxonomy is correct.")
+    }
     x@taxatree <- .internal_drop.tip(tree=value, newnm=rownames(x), collapse.singles=FALSE)
     methods::validObject(x)
     return(x)
@@ -835,6 +912,42 @@ setReplaceMethod("taxatree", signature(x="MPSE", value="NULL"), function(x, ...,
     methods::validObject(x)
     return(x)
 })
+
+#' @rdname MPSE-accessors
+#' @param x MPSE object
+#' @param value data.frame, matrix, taxonomyTable or NULL
+#' @export
+setGeneric("taxonomy<-", function(x, ..., value)standardGeneric("taxonomy<-"))
+
+.internal_taxonomy_replace <- function(x, ..., value){
+    if (is.null(value)){
+        taxa.tree <- NULL
+    }else{
+        taxa.tree <- value %>% convert_to_treedata(include.rownames=TRUE)
+    }
+    taxatree(x) <- taxa.tree
+    return(x)
+}
+
+#' @rdname MPSE-accessors
+#' @aliases taxonomy<-,MPSE
+#' @export
+setReplaceMethod("taxonomy", signature(x = "MPSE", value = "data.frame"), .internal_taxonomy_replace)
+
+#' @rdname MPSE-accessors
+#' @aliases taxonomy<-,MPSE
+#' @export
+setReplaceMethod("taxonomy", signature(x = "MPSE", value = "matrix"), .internal_taxonomy_replace)
+
+#' @rdname MPSE-accessors
+#' @aliases taxonomy<-,MPSE
+#' @export
+setReplaceMethod("taxonomy", signature(x = "MPSE", value = "taxonomyTable"), .internal_taxonomy_replace)
+
+#' @rdname MPSE-accessors
+#' @aliases taxonomy<-,MPSE
+#' @export
+setReplaceMethod("taxonomy", signature(x = "MPSE", value = "NULL"), .internal_taxonomy_replace)
 
 #' @rdname MPSE-accessors
 #' @param x MPSE object

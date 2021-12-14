@@ -82,3 +82,6 @@ SummarizedExperiment::`colData<-`
 #' @export
 ggplot2::remove_missing
 
+#' @importFrom magrittr extract
+#' @export
+magrittr::extract

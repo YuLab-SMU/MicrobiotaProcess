@@ -5,6 +5,12 @@
 \alias{[,MPSE,ANY,ANY,ANY-method}
 \alias{colData<-,MPSE,DataFrame-method}
 \alias{colData<-,MPSE,NULL-method}
+\alias{tax_table,MPSE-method}
+\alias{tax_table,MPSE}
+\alias{tax_table,tbl_mpse-method}
+\alias{tax_table,tbl_mpse}
+\alias{tax_table,grouped_df_mpse-method}
+\alias{tax_table,grouped_df_mpse}
 \alias{otutree}
 \alias{otutree,MPSE-method}
 \alias{otutree,MPSE}
@@ -20,6 +26,12 @@
 \alias{taxatree<-,MPSE,treedata-method}
 \alias{taxatree<-,MPSE}
 \alias{taxatree<-,MPSE,NULL-method}
+\alias{taxonomy<-}
+\alias{taxonomy<-,MPSE,data.frame-method}
+\alias{taxonomy<-,MPSE}
+\alias{taxonomy<-,MPSE,matrix-method}
+\alias{taxonomy<-,MPSE,taxonomyTable-method}
+\alias{taxonomy<-,MPSE,NULL-method}
 \alias{refsequence}
 \alias{refsequence,MPSE-method}
 \alias{refsequence,MPSE}
@@ -36,6 +48,12 @@
 \S4method{colData}{MPSE,DataFrame}(x, ...) <- value
 
 \S4method{colData}{MPSE,`NULL`}(x, ...) <- value
+
+\S4method{tax_table}{MPSE}(object)
+
+\S4method{tax_table}{tbl_mpse}(object)
+
+\S4method{tax_table}{grouped_df_mpse}(object)
 
 otutree(x, ...)
 
@@ -58,6 +76,16 @@ taxatree(x, ...) <- value
 \S4method{taxatree}{MPSE,treedata}(x, ...) <- value
 
 \S4method{taxatree}{MPSE,`NULL`}(x, ...) <- value
+
+taxonomy(x, ...) <- value
+
+\S4method{taxonomy}{MPSE,data.frame}(x, ...) <- value
+
+\S4method{taxonomy}{MPSE,matrix}(x, ...) <- value
+
+\S4method{taxonomy}{MPSE,taxonomyTable}(x, ...) <- value
+
+\S4method{taxonomy}{MPSE,`NULL`}(x, ...) <- value
 
 refsequence(x, ...)
 
@@ -85,6 +113,8 @@ possible dimension (see the examples).  This only works for extracting
 elements, not for the replacement.}
 
 \item{value}{XStringSet object or NULL}
+
+\item{object}{parameter of tax_table, R object, MPSE class in here.}
 }
 \description{
 MPSE accessors

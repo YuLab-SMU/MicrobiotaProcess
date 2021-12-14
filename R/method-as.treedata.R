@@ -81,6 +81,11 @@ as.treedata.taxonomyTable <- function(tree, include.rownames = FALSE,...){
     convert_to_treedata(data.frame(tree, check.names=FALSE), include.rownames = include.rownames)
 }
 
+#' @method as.treedata treedata
+#' @export
+as.treedata.treedata <- function(tree, ...){
+    return(tree)
+}
 
 # #' @method as.treedata tbl_mpse
 # #' @importFrom dplyr left_join

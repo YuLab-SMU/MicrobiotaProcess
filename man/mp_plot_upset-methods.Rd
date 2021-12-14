@@ -25,7 +25,7 @@ mp_plot_upset(.data, .group, .upset = NULL, ...)
 
 \item{.upset}{the column name of result after run \code{mp_cal_upset}}
 
-\item{...}{additional parameters, meaningless now.}
+\item{...}{additional parameters, see also 'scale_x_upset' of 'ggupset'.}
 }
 \description{
 Plotting the different number of OTU between group via UpSet plot

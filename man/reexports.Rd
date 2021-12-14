@@ -24,6 +24,7 @@
 \alias{td_unnest}
 \alias{colData<-}
 \alias{remove_missing}
+\alias{extract}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -37,7 +38,7 @@ below to see their documentation.
 
   \item{ggtree}{\code{\link[ggtree]{td_filter}}, \code{\link[ggtree]{td_unnest}}}
 
-  \item{magrittr}{\code{\link[magrittr:compound]{\%<>\%}}, \code{\link[magrittr:pipe]{\%>\%}}}
+  \item{magrittr}{\code{\link[magrittr:compound]{\%<>\%}}, \code{\link[magrittr:pipe]{\%>\%}}, \code{\link[magrittr:aliases]{extract}}}
 
   \item{SummarizedExperiment}{\code{\link[SummarizedExperiment:SummarizedExperiment-class]{colData<-}}}
 
