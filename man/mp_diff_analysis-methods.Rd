@@ -234,7 +234,24 @@ mouse.time.mpse \%<>\%
                    first.test.alpha=0.01,
                    action="add") 
 library(ggplot2)
-mouse.time.mpse \%>\% mp_plot_diff_res()
+p <- mouse.time.mpse \%>\% mp_plot_diff_res()
+p <- p + 
+     scale_fill_manual(
+       aesthetics = "fill_new", # The fill aes was renamed to "fill_new" for the abundance dotplot layer
+       values = c("skyblue", "orange")
+     )  + 
+     scale_fill_manual(
+       values=c("skyblue", "orange") # The LDA barplot layer
+     )
+### and the fill aes for hight light layer of tree was renamed to 'fill_new_new'
+p <- p + 
+     scale_fill_manual(
+       aesthetics = "fill_new_new",
+       values = c("#E41A1C", "#377EB8", "#4DAF4A", 
+                  "#984EA3", "#FF7F00", "#FFFF33", 
+                  "#A65628", "#F781BF", "#999999")
+     )
+p
 }
 \author{
 Shuangbin Xu

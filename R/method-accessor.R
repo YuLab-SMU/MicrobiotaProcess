@@ -295,7 +295,6 @@ setMethod("taxonomy", signature(x = "grouped_df_mpse"), .internal_taxonomy)
 
 
 
-
 #' @title extract the taxonomy annotation in MPSE object
 #' @docType methods
 #' @rdname mp_extract_taxonomy-methods
@@ -331,7 +330,10 @@ setMethod("mp_extract_taxonomy", signature(x="tbl_mpse"), .internal_extract_taxo
 #' @exportMethod mp_extract_taxonomy
 setMethod("mp_extract_taxonomy", signature(x="grouped_df_mpse"), .internal_extract_taxonomy_)
 
-tax_table <- getFromNamespace("tax_table", "phyloseq")
+#' @rdname MPSE-accessors
+#' @return taxonomyTable class
+#' @export
+setGeneric("tax_table", function(object)standardGeneric("tax_table"))
 
 .internal_tax_table <- function(object){
 da <- mp_extract_taxonomy(object) %>%

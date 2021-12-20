@@ -5,6 +5,7 @@
 \alias{[,MPSE,ANY,ANY,ANY-method}
 \alias{colData<-,MPSE,DataFrame-method}
 \alias{colData<-,MPSE,NULL-method}
+\alias{tax_table}
 \alias{tax_table,MPSE-method}
 \alias{tax_table,MPSE}
 \alias{tax_table,tbl_mpse-method}
@@ -48,6 +49,8 @@
 \S4method{colData}{MPSE,DataFrame}(x, ...) <- value
 
 \S4method{colData}{MPSE,`NULL`}(x, ...) <- value
+
+tax_table(object)
 
 \S4method{tax_table}{MPSE}(object)
 
@@ -115,6 +118,9 @@ elements, not for the replacement.}
 \item{value}{XStringSet object or NULL}
 
 \item{object}{parameter of tax_table, R object, MPSE class in here.}
+}
+\value{
+taxonomyTable class
 }
 \description{
 MPSE accessors
