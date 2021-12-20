@@ -1,3 +1,8 @@
+# MicrobiotaProcess 1.7.4.990
+
++ update `tax_table` without required `phyloseq`. (2021-12-20, Mon)
++ update `mp_diff_analysis` to support the factor type group (`.group` specified). (2021-12-20, Mon)
+
 # MicrobiotaProcess 1.7.4
 
 + update `taxatree<-` and `otutree<-` which will extract the intersection between the 
