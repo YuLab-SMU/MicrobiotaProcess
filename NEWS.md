@@ -1,4 +1,4 @@
-# MicrobiotaProcess 1.7.4.990
+# MicrobiotaProcess 1.7.5
 
 + update `tax_table` without required `phyloseq`. (2021-12-20, Mon)
 + update `mp_diff_analysis` to support the factor type group (`.group` specified). (2021-12-20, Mon)
