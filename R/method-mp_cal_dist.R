@@ -88,7 +88,8 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #' vegan), and "w", "-1", "c", "wb", "r", "I", "e", "t", "me", "j", "sor", "m", "-2", "co"
 #' "cc", "g", "-3", "l", "19", "hk", "rlb", "sim", "gl", "z" (implemented in 
 #' betadiver of vegan), "maximum", "binary", "minkowski" (implemented in dist 
-#' of stats), "unifrac", "weighted unifrac" (implemented in phyloseq),
+#' of stats), "unifrac", "weighted unifrac" (implemented in phyloseq), "cor", "abscor", 
+#' "cosangle", "abscosangle" (implemented in hopach).
 #' @param action character, "add" joins the distance data to the object, "only" return
 #' a non-redundant tibble with the distance information. "get" return 'dist' object.
 #' @param scale logical whether scale the metric of environment (.env is provided) before
@@ -198,6 +199,8 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
         distfun <- vegan::betadiver
     }else if (distmethod %in% distMethods$dist){
         distfun <- stats::dist
+    }else if (distmethod %in% distMethods$hopach){
+        distfun <- cal_dist_hopach
     }else if (distmethod %in% distMethods$UniFrac){
         distfun <- cal_Unifrac_dist
         if (is.null(otutree)){
@@ -323,6 +326,8 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
         distfun <- vegan::betadiver
     }else if (distmethod %in% distMethods$dist){
         distfun <- stats::dist
+    }else if (distmethod %in% distMethods$hopach){
+        distfun <- cal_dist_hopach
     }else if (distmethod %in% distMethods$UniFrac){
         distfun <- cal_Unifrac_dist
         if (is.null(otutree)){
@@ -380,7 +385,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
     }else{
         params <- c(list(da, method=distmethod), dotargs)
     }
-
+    
     da <- do.call(distfun, params)
     
     if (action=="get"){
@@ -570,8 +575,17 @@ distMethods <- list(
     dist       = c("maximum", "binary", "minkowski"),
     UniFrac    = c("unifrac", "wunifrac"),
     JSD        = "jsd",
+    hopach     = c("cosangle", "abscosangle", "cor", "abscor"),
     designdist = "ANY"
 )
+
+cal_dist_hopach <- function(x, method, na.rm = TRUE){
+    x %<>% dplyr::mutate_if(is.integer, as.numeric)
+    res <- hopach::distancematrix(x, d = method, na.rm = na.rm)
+    res <- hopach::as.matrix(res) 
+    rownames(res) <- colnames(res) <- rownames(x)
+    return(as.dist(res))
+}
 
 select_true_nm <- function(x, rm=NULL){
     dat <- x[x] %>% names()

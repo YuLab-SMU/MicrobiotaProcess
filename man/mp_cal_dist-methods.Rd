@@ -69,7 +69,8 @@ option is "manhattan", "euclidean", "canberra", "bray", "kulczynski",
 vegan), and "w", "-1", "c", "wb", "r", "I", "e", "t", "me", "j", "sor", "m", "-2", "co"
 "cc", "g", "-3", "l", "19", "hk", "rlb", "sim", "gl", "z" (implemented in 
 betadiver of vegan), "maximum", "binary", "minkowski" (implemented in dist 
-of stats), "unifrac", "weighted unifrac" (implemented in phyloseq),}
+of stats), "unifrac", "weighted unifrac" (implemented in phyloseq), "cor", "abscor", 
+"cosangle", "abscosangle" (implemented in hopach).}
 
 \item{action}{character, "add" joins the distance data to the object, "only" return
 a non-redundant tibble with the distance information. "get" return 'dist' object.}

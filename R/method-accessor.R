@@ -686,48 +686,48 @@ setMethod("mp_extract_internal_attr", signature(x="grouped_df_mpse"), .internal_
 setGeneric("mp_extract_dist", function(x, distmethod, env.flag=FALSE, .group=NULL)standardGeneric("mp_extract_dist"))
 
 .internal_extract_dist <- function(x, distmethod, env.flag=FALSE, .group=NULL){
-.group <- rlang::enquo(.group)
-data <- x %>% mp_extract_sample()
-distmethod <- switch(as.character(env.flag),
-                     "TRUE" = paste0("Env_", distmethod),
-                     "FALSE" = distmethod)
-
-if (!distmethod %in% colnames(data)){
-    rlang::abort(paste0("There is not ", distmethod, 
-                        " distance in the object, please check whether the mp_cal_dist has been performed!"))
-}
-
-distname <- paste0(distmethod, "Sampley") %>% as.symbol()
-
-if (rlang::quo_is_null(.group)){
-    distobj <- data %>%
-            select(c("Sample", distmethod)) %>%
-            distinct() %>%
-            tidyr::unnest() %>%
-            suppressWarnings() %>%
-            rename(x="Sample", y=distname, r=distmethod) %>%
-            corrr::retract() %>%
-            tibble::column_to_rownames(var=colnames(.)[1]) %>%
-            magrittr::extract(,rownames(.))
-    #distobj <- distobj[colnames(distobj), ] 
-    distobj[lower.tri(distobj)] <- t(distobj)[lower.tri(t(distobj))]
-    distobj %<>% stats::as.dist() %>%
-                 add_attr(distmethod, "method")
-    return(distobj)
-}else{
-    group.y <- paste0(rlang::as_name(.group),".tmp") %>% as.symbol()
-    dist.tb <- data %>%
-               dplyr::select(c("Sample", distmethod, !!.group)) %>%
-               tidyr::unnest(cols=distmethod) %>%
-               dplyr::mutate(dplyr::across(!!.group, 
-                                           ~.x[match(!!as.symbol(distname), !!as.symbol("Sample"))], 
-                                           .names=rlang::as_name(group.y))) %>% 
-               dplyr::rowwise() %>% 
-               dplyr::mutate(GroupsComparison=paste0(sort(c(!!.group, !!group.y)),collapse="-vs-")) %>%
-               dplyr::filter(.data$Sample != !!as.symbol(distname)) %>%
-               dplyr::select(c("Sample", distmethod, "GroupsComparison", distname))
-    return(dist.tb)
-}
+    .group <- rlang::enquo(.group)
+    data <- x %>% mp_extract_sample()
+    distmethod <- switch(as.character(env.flag),
+                         "TRUE" = paste0("Env_", distmethod),
+                         "FALSE" = distmethod)
+    
+    if (!distmethod %in% colnames(data)){
+        rlang::abort(paste0("There is not ", distmethod, 
+                            " distance in the object, please check whether the mp_cal_dist has been performed!"))
+    }
+    
+    distname <- paste0(distmethod, "Sampley") %>% as.symbol()
+    
+    if (rlang::quo_is_null(.group)){
+        distobj <- data %>%
+                select(c("Sample", distmethod)) %>%
+                distinct() %>%
+                tidyr::unnest() %>%
+                suppressWarnings() %>%
+                rename(x="Sample", y=distname, r=distmethod) %>%
+                corrr::retract() %>%
+                tibble::column_to_rownames(var=colnames(.)[1]) %>%
+                magrittr::extract(,rownames(.))
+        #distobj <- distobj[colnames(distobj), ] 
+        distobj[lower.tri(distobj)] <- t(distobj)[lower.tri(t(distobj))]
+        distobj %<>% stats::as.dist() %>%
+                     add_attr(distmethod, "method")
+        return(distobj)
+    }else{
+        group.y <- paste0(rlang::as_name(.group),".tmp") %>% as.symbol()
+        dist.tb <- data %>%
+                   dplyr::select(c("Sample", distmethod, !!.group)) %>%
+                   tidyr::unnest(cols=distmethod) %>%
+                   dplyr::mutate(dplyr::across(!!.group, 
+                                               ~.x[match(!!as.symbol(distname), !!as.symbol("Sample"))], 
+                                               .names=rlang::as_name(group.y))) %>% 
+                   dplyr::rowwise() %>% 
+                   dplyr::mutate(GroupsComparison=paste0(sort(c(!!.group, !!group.y)),collapse="-vs-")) %>%
+                   dplyr::filter(.data$Sample != !!as.symbol(distname)) %>%
+                   dplyr::select(c("Sample", distmethod, "GroupsComparison", distname))
+        return(dist.tb)
+    }
 }
 
 #' @rdname mp_extract_dist-methods

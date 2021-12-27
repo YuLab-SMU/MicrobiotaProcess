@@ -59,8 +59,12 @@ tidydr.princomp <- tidydr.prcomp
 #' @rdname tidydr
 #' @noRd
 tidydr.pcoa <- function(x, digits=2, ...){
-    vars <- (100 * x$values$Relative_eig[seq_len(ncol(x$vectors))]) %>% 
-             round(digits=digits) %>% 
+    if ("Rel_corr_eig" %in% names(x$values)){
+       vars <- 100 * x$values$Rel_corr_eig[seq_len(ncol(x$vectors))]
+    }else{
+       vars <- 100 * x$values$Relative_eig[seq_len(ncol(x$vectors))]
+    }
+    vars %<>% round(digits=digits) %>% 
              paste0("(", ., "%)")
 
     da <- x$vectors %>%
