@@ -1,5 +1,7 @@
-# MicrobiotaProcess 1.7.5
+# MicrobiotaProcess 1.7.4.991
 
++ use corrected relative eigenvalues when the eigenvalues has negative values. (2021-12-27, Mon)
++ add new distmethod from `hopach`. (2021-12-27, Mon)
 + update `tax_table` without required `phyloseq`. (2021-12-20, Mon)
 + update `mp_diff_analysis` to support the factor type group (`.group` specified). (2021-12-20, Mon)
 
