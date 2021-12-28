@@ -1,5 +1,7 @@
 # MicrobiotaProcess 1.7.4.991
 
++ remove the features which variance of their abundance is zero before identify different taxa. (2021-12-28, Tue)
++ add `bar` option in `mp_plot_abundance`, default is `flowbar`, the other options are `bar` and `heatmap`
 + use corrected relative eigenvalues when the eigenvalues has negative values. (2021-12-27, Mon)
 + add new distmethod from `hopach`. (2021-12-27, Mon)
 + update `tax_table` without required `phyloseq`. (2021-12-20, Mon)
