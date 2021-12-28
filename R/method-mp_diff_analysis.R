@@ -216,7 +216,7 @@ setGeneric("mp_diff_analysis", function(.data,
                  tidyr::pivot_wider(id_cols="Sample", names_from="label", values_from=abundance.nm) %>%
                  tibble::column_to_rownames(var="Sample")
      }
-
+     f_tb <- f_tb[, !apply(f_tb, 2, function(x)var(x)==0), drop = FALSE]
      vars <- f_tb %>% colnames()
 
      datameta <- merge(f_tb, sampleda, by=0) 

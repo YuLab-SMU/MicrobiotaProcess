@@ -584,7 +584,7 @@ cal_dist_hopach <- function(x, method, na.rm = TRUE){
     res <- hopach::distancematrix(x, d = method, na.rm = na.rm)
     res <- hopach::as.matrix(res) 
     rownames(res) <- colnames(res) <- rownames(x)
-    return(as.dist(res))
+    return(stats::as.dist(res))
 }
 
 select_true_nm <- function(x, rm=NULL){

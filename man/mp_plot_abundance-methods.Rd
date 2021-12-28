@@ -19,7 +19,7 @@ mp_plot_abundance(
   relative = TRUE,
   force = FALSE,
   plot.group = FALSE,
-  geom = "bar",
+  geom = "flowbar",
   feature.dist = "bray",
   feature.hclust = "average",
   sample.dist = "bray",
@@ -37,7 +37,7 @@ mp_plot_abundance(
   relative = TRUE,
   force = FALSE,
   plot.group = FALSE,
-  geom = "bar",
+  geom = "flowbar",
   feature.dist = "bray",
   feature.hclust = "average",
   sample.dist = "bray",
@@ -55,7 +55,7 @@ mp_plot_abundance(
   relative = TRUE,
   force = FALSE,
   plot.group = FALSE,
-  geom = "bar",
+  geom = "flowbar",
   feature.dist = "bray",
   feature.hclust = "average",
   sample.dist = "bray",
@@ -73,7 +73,7 @@ mp_plot_abundance(
   relative = TRUE,
   force = FALSE,
   plot.group = FALSE,
-  geom = "bar",
+  geom = "flowbar",
   feature.dist = "bray",
   feature.hclust = "average",
   sample.dist = "bray",
@@ -103,8 +103,8 @@ when the abundance is not be rarefied, default is FALSE.}
 \item{plot.group}{logical whether plotting the abundance of specified taxa.class 
 taxonomy with group not sample level, default is FALSE.}
 
-\item{geom}{character which type plot, options is 'bar' and 'heatmap', default is
-'bar'.}
+\item{geom}{character which type plot, options is 'flowbar' 'bar' and 'heatmap', default is
+'flowbar'.}
 
 \item{feature.dist}{character the method to calculate the distance between the features,
 based on the '.abundance' of 'taxa.class', default is 'bray', options refer to
@@ -125,8 +125,9 @@ based on the '.abundance' of 'taxa.class', default is 'bray', options refer to t
 \item{.sec.group}{the column name of second group to be plotted with nested facet,
 default is NULL, this argument will be deprecated in the next version.}
 
-\item{...}{additional parameters, when the geom = "bar", it can specify the parameters of 
-'geom_stratum' of 'ggalluvial', when the geom = "heatmap", it can specify the parameter of
+\item{...}{additional parameters, when the geom = "flowbar", it can specify the parameters of 
+'geom_stratum' of 'ggalluvial', when the geom = 'bar', it can specify the parameters of 
+'geom_bar' of 'ggplot2', when the geom = "heatmap", it can specify the parameter of
 'geom_tile' of 'ggplot2'.}
 }
 \description{

@@ -12,8 +12,8 @@
 #'  when the abundance is not be rarefied, default is FALSE.
 #' @param plot.group logical whether plotting the abundance of specified taxa.class 
 #' taxonomy with group not sample level, default is FALSE.
-#' @param geom character which type plot, options is 'bar' and 'heatmap', default is
-#' 'bar'.
+#' @param geom character which type plot, options is 'flowbar' 'bar' and 'heatmap', default is
+#' 'flowbar'.
 #' @param feature.dist character the method to calculate the distance between the features,
 #' based on the '.abundance' of 'taxa.class', default is 'bray', options refer to
 #' the 'distmethod' of [mp_cal_dist()] (except unifrac related).
@@ -28,8 +28,9 @@
 #' 'median' and 'mcquitty'.
 #' @param .sec.group the column name of second group to be plotted with nested facet,
 #' default is NULL, this argument will be deprecated in the next version.
-#' @param ... additional parameters, when the geom = "bar", it can specify the parameters of 
-#' 'geom_stratum' of 'ggalluvial', when the geom = "heatmap", it can specify the parameter of
+#' @param ... additional parameters, when the geom = "flowbar", it can specify the parameters of 
+#' 'geom_stratum' of 'ggalluvial', when the geom = 'bar', it can specify the parameters of 
+#' 'geom_bar' of 'ggplot2', when the geom = "heatmap", it can specify the parameter of
 #' 'geom_tile' of 'ggplot2'.
 #' @author Shuangbin Xu
 #' @export
@@ -83,7 +84,7 @@ setGeneric("mp_plot_abundance",
               relative = TRUE,
               force = FALSE,
               plot.group = FALSE,
-              geom = "bar",
+              geom = "flowbar",
               feature.dist = "bray",
               feature.hclust = "average",
               sample.dist = "bray",
@@ -102,7 +103,7 @@ setGeneric("mp_plot_abundance",
                                 relative = TRUE,
                                 force = FALSE,
                                 plot.group = FALSE,
-                                geom = "bar",
+                                geom = "flowbar",
                                 feature.dist = "bray",
                                 feature.hclust = "average",
                                 sample.dist = "bray",
@@ -114,7 +115,7 @@ setGeneric("mp_plot_abundance",
     .group <- rlang::enquo(.group)
     .sec.group <- rlang::enquo(.sec.group)
     taxa.class <- rlang::enquo(taxa.class)
-    geom %<>% match.arg(c("bar", "heatmap"))
+    geom %<>% match.arg(c("flowbar", "bar", "heatmap"))
     if (geom=="heatmap"){
         plot.group = FALSE
     }
@@ -185,16 +186,28 @@ setGeneric("mp_plot_abundance",
          abundance.nm %<>% paste0("BySample")
      }
 
-     if(geom=="bar"){
-         p <- ggplot(data=tbl,
-                     mapping=aes_string(
-                        x = axis.x,
-                        y = abundance.nm,
-                        alluvium = rlang::as_name(taxa.class),
-                        fill = rlang::as_name(taxa.class))
-              ) +
-              ggalluvial::geom_flow(stat="alluvium", lode.guidance = "frontback", color = "darkgray") +
-              ggalluvial::geom_stratum(stat="alluvium", ...) +
+     if(geom %in% c("bar", 'flowbar')){
+         if (geom == "flowbar"){
+            p <- ggplot(data = tbl,
+                        mapping = aes_string(
+                           x = axis.x,
+                           y = abundance.nm,
+                           alluvium = rlang::as_name(taxa.class),
+                           fill = rlang::as_name(taxa.class))
+                 ) +
+                 ggalluvial::geom_flow(stat="alluvium", lode.guidance = "frontback", color = "darkgray") +
+                 ggalluvial::geom_stratum(stat="alluvium", ...) 
+         }else if (geom == "bar"){
+            p <- ggplot(data = tbl,
+                        mapping = aes_string(
+                           x = axis.x,
+                           y = abundance.nm,
+                           fill = rlang::as_name(taxa.class)
+                        )
+                 ) +
+                 geom_bar(stat = 'identity', ...)
+         }
+         p <- p + 
               ggplot2::labs(x=NULL, y=ylabs) +
               scale_fill_manual(
                   values = rev(get_cols(tbl %>% pull(!!taxa.class) %>% unique() %>% length())),
@@ -1087,29 +1100,29 @@ setGeneric("mp_plot_ord", function(
     if (show.side){
        if ("fill" %in% names(maps) && !is.discrete(tbl, maps, "fill")){
            side.y <- do.call(ggside::geom_xsideboxplot, 
-                             list(mapping=aes(y=!!.group), color = "black",orientation = "y")) %>%
+                             list(mapping=aes(y=!!.group), color = "black", orientation = "y", show.legend = FALSE)) %>%
                      suppressMessages()
            
            side.x <- do.call(ggside::geom_ysideboxplot,
-                             list(mapping=aes(x=!!.group), color = "black",orientation = "x")) %>%
+                             list(mapping=aes(x=!!.group), color = "black",orientation = "x", show.legend = FALSE)) %>%
                      suppressMessages()
 
        }else if ("color" %in% names(maps) && !is.discrete(tbl, maps, "color")){
            side.y <- do.call(ggside::geom_xsideboxplot, 
-                             list(mapping=aes(y=!!.color), fill=NA, orientation="y")) %>%
+                             list(mapping=aes(y=!!.color), fill=NA, orientation="y", show.legend = FALSE)) %>%
                      suppressMessages()
 
            side.x <- do.call(ggside::geom_ysideboxplot,
-                             list(mapping=aes(x=!!.color), fill=NA, orientation="x")) %>%
+                             list(mapping=aes(x=!!.color), fill=NA, orientation="x", show.legend = FALSE)) %>%
                      suppressMessages()
 
        }else if ("starshape" %in% names(maps) && !is.discrete(tbl, maps, "starshape")){
            side.y <- do.call(ggside::geom_xsideboxplot, 
-                             list(mapping=aes(y=!!.starshape), orientation="y")) %>%
+                             list(mapping=aes(y=!!.starshape), orientation="y", show.legend = FALSE)) %>%
                      suppressMessages()
 
            side.x <- do.call(ggside::geom_ysideboxplot, 
-                             list(mapping=aes(x=!!.starshape), orientation="x")) %>%
+                             list(mapping=aes(x=!!.starshape), orientation="x", show.legend = FALSE)) %>%
                      suppressMessages()
        }else{
            side.y <- NULL
