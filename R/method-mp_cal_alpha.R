@@ -61,6 +61,8 @@ setMethod("get_alphaindex", "matrix", function(obj, mindepth, sampleda, force=FA
         ACE <- spn[4, ]
         alpha <- data.frame(Observe=Observe, Chao1=Chao1, ACE=ACE, Shannon, Simpson, Pielou)
     }else{
+        message_wrap("Note: The Chao1 and ACE accept only integers (counts), but the input 
+                     is not integer, so the two metrics cannot be calculated.")
         Observe <- apply(obj, 1, function(x)sum(x>0))
         Chao1 <- NULL
         ACE <- NULL
