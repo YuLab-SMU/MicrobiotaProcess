@@ -1,5 +1,6 @@
-# MicrobiotaProcess 1.7.4.991
+# MicrobiotaProcess 1.7.5
 
++ add the message for the not integers in `mp_cal_alpha`. (2021-12-31, Fri) 
 + remove the features which variance of their abundance is zero before identify different taxa. (2021-12-28, Tue)
 + add `bar` option in `mp_plot_abundance`, default is `flowbar`, the other options are `bar` and `heatmap`
 + use corrected relative eigenvalues when the eigenvalues has negative values. (2021-12-27, Mon)
