@@ -4,7 +4,7 @@
 \alias{ImportDada2}
 \alias{import_dada2}
 \alias{mp_import_dada2}
-\title{Import function to load the feature table and taxanomy table of dada2}
+\title{Import function to load the feature table and taxonomy table of dada2}
 \usage{
 import_dada2(seqtab, taxatab = NULL, reftree = NULL, sampleda = NULL, ...)
 

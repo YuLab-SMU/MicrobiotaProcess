@@ -57,7 +57,7 @@ mp_import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
     return(mpse)
 }
 
-#' @title Import function to load the feature table and taxanomy table of dada2
+#' @title Import function to load the feature table and taxonomy table of dada2
 #'
 #' @description
 #' the function can import the ouput of dada2, and generated the phyloseq obj contained the

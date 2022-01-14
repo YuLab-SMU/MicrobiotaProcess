@@ -225,7 +225,7 @@ print2.MPSE <- function(x, ..., n = NULL, width = NULL, max_extra_cols = NULL, m
                            n = n, max_extra_cols = max_extra_cols, max_footer_lines = max_footer_lines
                         )
     format_comment <- getFromNamespace("format_comment", "pillar")
-    subtitle <- sprintf(" OTU=%s | Samples=%s | Assays=%s | Taxanomy=%s",
+    subtitle <- sprintf(" OTU=%s | Samples=%s | Assays=%s | Taxonomy=%s",
                       nrow(x),
                       ncol(x),
                       SummarizedExperiment::assayNames(x) %>% paste(collapse=", "),
