@@ -1,3 +1,9 @@
+# MicrobiotaProcess 1.7.5.990
+
++ fix the [issue](https://github.com/YuLab-SMU/MicrobiotaProcess/issues/40), that `kingdom` level of taxonomy 
+  information contains `k__` or `K__`, which is unknown annotation in `kingdom`. (2021-01-14, Fri)
++ add `mp_extract_taxatree` and `mp_extract_otutree` (alias of `mp_extract_tree`). (2022-01-14, Fri)
+
 # MicrobiotaProcess 1.7.5
 
 + add the message for the not integers in `mp_cal_alpha`. (2021-12-31, Fri) 
