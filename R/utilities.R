@@ -78,15 +78,18 @@ newtaxname <- function(x, y){
 
 #' @importFrom zoo na.locf
 #' @keywords internal
-filltaxname <- function(taxdf){#, type="species"){
-   # if (type != "species"){
-   #     taxlevelchar <- paste0("d", seq_len(ncol(taxdf)))
-   # }else{
-   #     taxlevelchar <- taxlevelchar[seq_len(ncol(taxdf))]
-   # }
+filltaxname <- function(taxdf, type="species"){
     tmprownames <- rownames(taxdf)
     indexmark <- apply(taxdf, 2, function(x){nchar(x, keepNA = TRUE)})<=4
     taxdf[indexmark] <- NA
+    if (any(is.na(taxdf[,1]))){
+        if (type == "species"){
+            prefix <- "k__"
+        }else{
+            prefix <- "d1__"
+        }
+        taxdf[is.na(taxdf[,1]), 1] <- paste0(prefix, "Unknown")
+    }    
     indextmp <- apply(is.na(taxdf), 1, which)
     if(length(indextmp)==0){
         taxdf <- data.frame(taxdf, check.names=FALSE)
@@ -94,11 +97,6 @@ filltaxname <- function(taxdf){#, type="species"){
     }
     taxdf <- apply(taxdf, 1, na.locf)
     taxdf <- lapply(seq_len(ncol(taxdf)), function(i) taxdf[,i])
-    #newtaxname <- function(x, y){
-    #    y <- as.vector(y)
-    #    x[y] <- paste(taxlevelchar[y], x[y], sep="__un_")
-    #    x
-    #}
     taxdf <- data.frame(t(mapply(newtaxname, taxdf, indextmp)), 
                         stringsAsFactors=FALSE)
     rownames(taxdf) <- tmprownames
@@ -126,7 +124,14 @@ fillNAtax <- function(taxdf, type="species"){
     }else{
         assign("taxlevelchar", c("k", "p", "c", "o", "f", "g", "s", "st"), envir = .GlobalEnv)
     }
-    if (any(is.na(taxdf[,1]))){taxdf[is.na(taxdf[,1]),1] <- "Unknown"}
+#    if (any(is.na(taxdf[,1]))){
+#        if (type == "species"){
+#            prefix <- "k__"
+#        }else{
+#            prefix <- "d1__"
+#        }
+#        taxdf[is.na(taxdf[,1]), 1] <- paste0(prefix, "Unknown")
+#    }
     if (!(grepl("^k__", taxdf[1,1]) || grepl("^d1__", taxdf[1,1]))){
     	tmprownames <- rownames(taxdf)
     	tmpcolnames <- colnames(taxdf)
@@ -137,7 +142,7 @@ fillNAtax <- function(taxdf, type="species"){
     	rownames(taxdf) <- tmprownames
     	colnames(taxdf) <- tmpcolnames
     }
-    taxdf <- filltaxname(taxdf)
+    taxdf <- filltaxname(taxdf, type = type)
     taxdf <- repduplicatedtaxcheck(taxdf) #%>% column_to_rownames(var="rowname")
     attr(taxdf, "fillNAtax") <- TRUE 
     return(taxdf)
