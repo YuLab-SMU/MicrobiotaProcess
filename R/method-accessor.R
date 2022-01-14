@@ -265,6 +265,20 @@ setMethod("mp_extract_tree", signature(x="grouped_df_mpse"),function(x, type="ta
     .internal_tree(x=x, type=type, tip.level=tip.level)
 })
 
+#' @rdname mp_extract_tree-methods
+#' @export
+mp_extract_taxatree <- function(x, tip.level = "OTU", ...){
+    x <- mp_extract_tree(x = x, type="taxatree", tip.level = tip.level, ...)
+    return(x)
+}
+
+#' @rdname mp_extract_tree-methods
+#' @export
+mp_extract_otutree <- function(x, ...){
+    x <- mp_extract_tree(x = x, type = 'otutree', ...)
+    return(x)
+}
+
 #' @rdname mp_extract_taxonomy-methods
 #' @param x MPSE object
 #' @param ... additional parameters, now is meaningless.
@@ -273,7 +287,7 @@ setMethod("mp_extract_tree", signature(x="grouped_df_mpse"),function(x, type="ta
 setGeneric("taxonomy", function(x, ...){standardGeneric("taxonomy")})
 
 .internal_taxonomy <- function(x, ...){
-    x <- x %>% mp_extract_taxonomy(...)
+    x <- x %>% mp_extract_taxonomy(...) %>%
          tibble::column_to_rownames(var="OTU")
     return(x)
 }

@@ -9,6 +9,8 @@
 \alias{mp_extract_tree,tbl_mpse}
 \alias{mp_extract_tree,grouped_df_mpse-method}
 \alias{mp_extract_tree,grouped_df_mpse}
+\alias{mp_extract_taxatree}
+\alias{mp_extract_otutree}
 \title{extract the taxonomy tree in MPSE object}
 \usage{
 mp_extract_tree(x, type = "taxatree", tip.level = "OTU", ...)
@@ -18,6 +20,10 @@ mp_extract_tree(x, type = "taxatree", tip.level = "OTU", ...)
 \S4method{mp_extract_tree}{tbl_mpse}(x, type = "taxatree", tip.level = "OTU", ...)
 
 \S4method{mp_extract_tree}{grouped_df_mpse}(x, type = "taxatree", tip.level = "OTU", ...)
+
+mp_extract_taxatree(x, tip.level = "OTU", ...)
+
+mp_extract_otutree(x, ...)
 }
 \arguments{
 \item{x}{MPSE object}
