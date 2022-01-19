@@ -1,4 +1,4 @@
-# MicrobiotaProcess 1.7.5.990
+# MicrobiotaProcess 1.7.6
 
 + fix the [issue](https://github.com/YuLab-SMU/MicrobiotaProcess/issues/40), that `kingdom` level of taxonomy 
   information contains `k__` or `K__`, which is unknown annotation in `kingdom`. (2021-01-14, Fri)
