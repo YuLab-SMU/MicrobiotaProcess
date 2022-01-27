@@ -100,8 +100,15 @@ remove_constant <- function(dflist){
     factornames <- colnames(dflist[[1]][!vapply(dflist[[1]],
 					is.numeric,logical(1))])
     for (i in seq_len(length(dflist))){
-        tmpdata <- dflist[[i]][vapply(dflist[[i]],is.numeric,logical(1))]
-        noconstant[[i]] <- colnames(tmpdata[,apply(tmpdata, 2, var, na.rm=TRUE) != 0])
+        tmpdata <- dflist[[i]] %>%
+                   dplyr::group_split(!!rlang::sym(factornames)) %>%
+                   as.list() %>%
+                   lapply(., function(x)x[,vapply(x, is.numeric, logical(1))]) %>%
+                   lapply(., function(x)apply(x,2,var,na.rm=T)==0) 
+        tmpdata2 <- tmpdata %>%
+                    dplyr::bind_rows() %>% 
+                    colSums()
+        noconstant[[i]] <- names(tmpdata2[tmpdata2 != length(tmpdata)])
     }
     noconstant <- Reduce(intersect,noconstant)
     for (i in seq_len(length(dflist))){
@@ -110,6 +117,8 @@ remove_constant <- function(dflist){
     }
     return(dflist)
 }
+
+
 
 #' @importFrom tibble rownames_to_column
 cal_ci <- function(x, classgroup, ci=0.95, method){
