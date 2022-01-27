@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.7.7
+
++ fix the bug about the constant variables within groups in `lda` of `MASS` (2022-01-27, Thu) 
+
 # MicrobiotaProcess 1.7.6
 
 + fix the [issue](https://github.com/YuLab-SMU/MicrobiotaProcess/issues/40), that `kingdom` level of taxonomy 
