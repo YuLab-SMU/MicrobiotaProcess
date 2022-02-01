@@ -195,7 +195,7 @@ setGeneric("mp_plot_abundance",
                            alluvium = rlang::as_name(taxa.class),
                            fill = rlang::as_name(taxa.class))
                  ) +
-                 ggalluvial::geom_flow(stat="alluvium", lode.guidance = "frontback", color = "darkgray") +
+                 ggalluvial::geom_flow(stat="alluvium", lode.guidance = "frontback", color = "darkgray", ...) +
                  ggalluvial::geom_stratum(stat="alluvium", ...) 
          }else if (geom == "bar"){
             p <- ggplot(data = tbl,
