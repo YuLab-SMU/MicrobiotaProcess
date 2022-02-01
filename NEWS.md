@@ -1,3 +1,8 @@
+# MicrobiotaProcess 1.7.7.990
+
++ fix the `width` of `mp_plot_abundance` with `geom="flowbar". (2022-02-01, Tue)`
+ - related [issue](https://github.com/YuLab-SMU/MicrobiotaProcess/issues/41)
+
 # MicrobiotaProcess 1.7.7
 
 + fix the bug about the constant variables within groups in `lda` of `MASS` (2022-01-27, Thu) 
