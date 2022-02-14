@@ -533,13 +533,15 @@ setMethod("mp_extract_rarecurve", signature(x="grouped_df_mpse"), .internal_extr
 #' class level what you want to extract
 #' @param topn integer the number of the top most abundant, default
 #' is NULL.
+#' @param rmun logical whether to remove the unknown taxa, such as "g__un_xxx",
+#' default is FALSE (the unknown taxa class will be considered as 'Others').
 #' @param ... additional parameters
 #' @author Shuangbin Xu
 #' @export
-setGeneric("mp_extract_abundance", function(x, taxa.class="all", topn=NULL, ...)standardGeneric("mp_extract_abundance"))
+setGeneric("mp_extract_abundance", function(x, taxa.class="all", topn=NULL, rmun=FALSE, ...)standardGeneric("mp_extract_abundance"))
 
 #' @importFrom dplyr all_of
-.internal_extract_abundance <- function(x, taxa.class="all", topn, ...){
+.internal_extract_abundance <- function(x, taxa.class="all", topn = NULL, rmun = FALSE, ...){
 taxa.class <- rlang::enquo(taxa.class)
 
 taxatree <-  x %>% 
@@ -583,10 +585,14 @@ if (taxa.class!="all"){
     AbundBy <- colnames(da)[vapply(da, is.list, logical(1))]
     dat <- da %>% tidyr::unnest(cols=AbundBy[1])
     clnm <- colnames(dat)[vapply(dat, is.numeric, logical(1))]
+    if (rmun){
+        dat %<>% dplyr::mutate(label=ifelse(grepl("__un_", .data$label), "Others", .data$label))
+    }
     totallabel <- dat %>%
           dplyr::group_by(.data$label) %>%
           dplyr::summarize(TotalByLabel=sum(!!as.symbol(clnm[1]))) %>%
           dplyr::arrange(dplyr::desc(.data$TotalByLabel)) %>% 
+          dplyr::filter(.data$label != "Others") %>%
           dplyr::pull(.data$label)
     if (is.null(topn)){topn <- length(totallabel)}
     keepn <- min(topn, length(totallabel))
@@ -602,13 +608,18 @@ if (taxa.class!="all"){
               tidyr::unnest(cols=i)
         nms <- colnames(df)
         abunnm <- nms[vapply(df, is.numeric, logical(1))]
-        gpnm <- nms[!nms %in% c("label", "nodeClass", abunnm)][1]
+        gpnm <- nms[!nms %in% c("label", "nodeClass", abunnm)]
+        if (gpnm[1]=="Sample"){
+            gpnm <- "Sample"
+        }else{
+            gpnm <- gpnm
+        }
         df1 <- df %>% 
                dplyr::filter(.data$label %in% keeplabel)
         df2 <- df %>%
                dplyr::filter(!.data$label %in% keeplabel) %>%
                dplyr::mutate(label="Others") %>% 
-               dplyr::group_by(!!as.symbol(gpnm)) %>%
+               dplyr::group_by(across(all_of(gpnm))) %>%
                dplyr::mutate(across(all_of(abunnm), sum)) %>%
                dplyr::ungroup() %>%
                distinct() 

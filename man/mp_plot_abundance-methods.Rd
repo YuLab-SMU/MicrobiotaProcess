@@ -25,6 +25,7 @@ mp_plot_abundance(
   sample.dist = "bray",
   sample.hclust = "average",
   .sec.group = NULL,
+  rmun = FALSE,
   ...
 )
 
@@ -43,6 +44,7 @@ mp_plot_abundance(
   sample.dist = "bray",
   sample.hclust = "average",
   .sec.group = NULL,
+  rmun = FALSE,
   ...
 )
 
@@ -61,6 +63,7 @@ mp_plot_abundance(
   sample.dist = "bray",
   sample.hclust = "average",
   .sec.group = NULL,
+  rmun = FALSE,
   ...
 )
 
@@ -79,6 +82,7 @@ mp_plot_abundance(
   sample.dist = "bray",
   sample.hclust = "average",
   .sec.group = NULL,
+  rmun = FALSE,
   ...
 )
 }
@@ -124,6 +128,9 @@ based on the '.abundance' of 'taxa.class', default is 'bray', options refer to t
 
 \item{.sec.group}{the column name of second group to be plotted with nested facet,
 default is NULL, this argument will be deprecated in the next version.}
+
+\item{rmun}{logical whether to remove the unknown taxa, such as "g__un_xxx",
+default is FALSE (the unknown taxa class will be considered as 'Others').}
 
 \item{...}{additional parameters, when the geom = "flowbar", it can specify the parameters of 
 'geom_stratum' of 'ggalluvial', when the geom = 'bar', it can specify the parameters of 

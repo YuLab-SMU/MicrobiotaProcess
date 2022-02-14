@@ -32,6 +32,8 @@
 #' 'geom_stratum' of 'ggalluvial', when the geom = 'bar', it can specify the parameters of 
 #' 'geom_bar' of 'ggplot2', when the geom = "heatmap", it can specify the parameter of
 #' 'geom_tile' of 'ggplot2'.
+#' @param rmun logical whether to remove the unknown taxa, such as "g__un_xxx",
+#' default is FALSE (the unknown taxa class will be considered as 'Others').
 #' @author Shuangbin Xu
 #' @export
 #' @examples
@@ -90,6 +92,7 @@ setGeneric("mp_plot_abundance",
               sample.dist = "bray",
               sample.hclust = "average",
               .sec.group = NULL,
+              rmun = FALSE,
               ...
            )
            standardGeneric("mp_plot_abundance")
@@ -109,6 +112,7 @@ setGeneric("mp_plot_abundance",
                                 sample.dist = "bray",
                                 sample.hclust = "average",
                                 .sec.group = NULL,
+                                rmun = FALSE,
                                 ...
                                 ){
     .abundance <- rlang::enquo(.abundance)
@@ -148,7 +152,7 @@ setGeneric("mp_plot_abundance",
 
      if (!rlang::quo_is_null(.group) && plot.group){
          gp <- quo.vect_to_str.vect(.group)
-         prefixBy <- paste0("By", gp[1])
+         prefixBy <- paste0("By", paste0(gp, collapse="And"))
          axis.x <- rlang::as_name(gp[1])
      }else{
          if (force){
@@ -167,14 +171,14 @@ setGeneric("mp_plot_abundance",
 
      if (!any(grepl(paste0("^", AbundBy), .data %>% mp_extract_feature() %>% colnames()))){
          if (!rlang::quo_is_null(.group) && plot.group){
-             .data %<>% mp_cal_abundance(.abundance=!!.abundance, .group=!!rlang::sym(gp[1]), force=force, relative=relative)
+             .data %<>% mp_cal_abundance(.abundance=!!.abundance, .group=!!.group, force=force, relative=relative)
          }else{
              .data %<>% mp_cal_abundance(.abundance=!!.abundance, force=force, relative=relative)
          }
      }
 
      tbl <- .data %>% 
-            mp_extract_abundance(taxa.class=!!taxa.class, topn = topn) %>%
+            mp_extract_abundance(taxa.class=!!taxa.class, topn = topn, rmun = rmun) %>%
             tidyr::unnest(cols=AbundBy) %>% 
             dplyr::mutate(label=forcats::fct_rev(.data$label)) %>%
             dplyr::rename(!!taxa.class:="label") %>% 
@@ -233,6 +237,20 @@ setGeneric("mp_plot_abundance",
                           ggh4x::facet_nested(cols=ggplot2::vars(!!rlang::sym(gp[1]), !!rlang::sym(gp[2])), 
                                               scales="free_x", space="free")
                  }
+             }
+         }else{
+             gp <- quo.vect_to_str.vect(.group)
+             if (!rlang::quo_is_null(.sec.group)){
+                 warning_wrap("The .sec.group will be depcrecated, please use .group argument, which
+                              supports multiple groups.")
+                 gp2 <- quo.vect_to_str.vect(.sec.group)
+                 gp <- append(gp, gp2, after=1)
+             }
+             gp %<>% unique()
+             if (length(gp)==2){
+                 p <- p + facet_grid(cols = ggplot2::vars(!!rlang::sym(gp[2])), scales="free_x", space="free")
+             }else if (length(gp)==3){
+                 p <- p+ ggh4x::facet_nested(cols=ggplot2::vars(!!rlang::sym(gp[2]), !!rlang::sym(gp[3])),scales="free_x", space="free")
              }
          }
          

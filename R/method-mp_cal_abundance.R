@@ -292,7 +292,6 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
             setNames(c(assaysvar, newRelabun))
     }
     
-    	
     da1 %<>% 
          dplyr::bind_rows() %>%
          #nest_internal() 
@@ -341,22 +340,30 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
 })
 
 .internal_cal_feature_abun <- function(feature, da, .abundance, byID, relative, sampleda){
-    Totalnm <- paste0("TotalNumsBy", rlang::as_name(byID))
-    if(rlang::as_name(byID)=="Sample"){
+    #feature <- rlang::enquo(feature)
+    #.abundance <- rlang::enquo(.abundance)
+    #byID <- rlang::enquo(byID)
+    byID2 <- quo.vect_to_str.vect(byID)
+    if (length(byID2) > 1){
+        Totalnm <- paste0("TotalNumsBy", paste0(byID2, collapse="And"))
+    }else{
+        Totalnm <- paste0("TotalNumsBy", rlang::as_name(byID2))
+    }
+    if(length(byID2)==1 && byID2=="Sample"){
         newabun <- rlang::as_name(.abundance)
         bygroup <- paste0(newabun, "BySample")
     }else{
-        newabun <- paste0(rlang::as_name(.abundance), "By", rlang::as_name(byID))
+        newabun <- paste0(rlang::as_name(.abundance), "By", paste0(byID2, collapse="And"))
         bygroup <- newabun
     }
-    da %<>%
-        dplyr::group_by(!!byID) %>%
+
+    da %<>% dplyr::group_by(across(!!byID)) %>%
         dplyr::mutate(across(!!.abundance, sum, .names=Totalnm)) %>%
         dplyr::group_by(!!feature, .add = TRUE) %>%
         dplyr::mutate(across(!!.abundance, sum, .names=newabun))
 
     if (relative){
-        newRelabun <- paste0(c("Rel", rlang::as_name(.abundance), "By", rlang::as_name(byID)), collapse="")
+        newRelabun <- paste0(c("Rel", rlang::as_name(.abundance), "By", paste0(byID2, collapse="And")), collapse="")
         da %<>%
             dplyr::mutate(across(!!as.symbol(newabun), ~ .x/!!as.symbol(Totalnm) * 100, .names=newRelabun)) %>%
             select(!!feature, !!byID, !!as.symbol(newabun), !!as.symbol(newRelabun))
