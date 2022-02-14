@@ -1,5 +1,6 @@
-# MicrobiotaProcess 1.7.7.990
+# MicrobiotaProcess 1.7.7.991
 
++ supporting multiple group names for `.group` of `mp_plot_abundance` when `plot.group=TRUE`. (2022-02-14, Mon)
 + fix the `width` of `mp_plot_abundance` with `geom="flowbar". (2022-02-01, Tue)`
  - related [issue](https://github.com/YuLab-SMU/MicrobiotaProcess/issues/41)
 
