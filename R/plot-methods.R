@@ -218,41 +218,30 @@ setGeneric("mp_plot_abundance",
                   guide = guide_legend(reverse=TRUE)
               ) + 
               scale_y_continuous(expand = c(0, 0, 0, 0.5))
-         if (!plot.group){
-             if (!rlang::quo_is_null(.group)){
-                 gp <- quo.vect_to_str.vect(.group)
-                 if (!rlang::quo_is_null(.sec.group)){
-                     warning_wrap("The .sec.group will be depcrecated, please use .group argument, which
-                                  supports multiple groups.")
-                     gp2 <- quo.vect_to_str.vect(.sec.group)
-                     gp <- append(gp, gp2, after=1)
-                 }
-                 gp %<>% unique()
-                 if (length(gp)==1){
-                     p <- p + 
-                         facet_grid(cols=ggplot2::vars(!!rlang::sym(gp[1])), 
-                                    scales="free_x", space="free")
-                 }else{
-                     p <- p + 
-                          ggh4x::facet_nested(cols=ggplot2::vars(!!rlang::sym(gp[1]), !!rlang::sym(gp[2])), 
-                                              scales="free_x", space="free")
-                 }
-             }
-         }else{
+          
+         if (!rlang::quo_is_null(.group)){
              gp <- quo.vect_to_str.vect(.group)
              if (!rlang::quo_is_null(.sec.group)){
                  warning_wrap("The .sec.group will be depcrecated, please use .group argument, which
                               supports multiple groups.")
                  gp2 <- quo.vect_to_str.vect(.sec.group)
-                 gp <- append(gp, gp2, after=1)
+                 if (!gp2 %in% gp){
+                     gp <- append(gp, gp2, after=1)
+                 }
              }
-             gp %<>% unique()
-             if (length(gp)==2){
-                 p <- p + facet_grid(cols = ggplot2::vars(!!rlang::sym(gp[2])), scales="free_x", space="free")
-             }else if (length(gp)==3){
-                 p <- p+ ggh4x::facet_nested(cols=ggplot2::vars(!!rlang::sym(gp[2]), !!rlang::sym(gp[3])),scales="free_x", space="free")
+             if (plot.group && length(gp)>1 ){
+                 gpformula <- as.formula(paste0(". ~ ", paste0(gp[-1], collapse="+")))
+             }else if (!plot.group){
+                 gpformula <- as.formula(paste0(". ~ ", paste0(gp, collapse="+")))
+             }else{
+                 gpformula <- NULL
              }
+         }else{
+             gpformula <- NULL
          }
+         if (!is.null(gpformula)){
+             p <- p + ggh4x::facet_nested(gpformula, scales="free_x", space="free")
+         }   
          
          p <- p + theme_taxbar()
 
@@ -430,18 +419,20 @@ setGeneric("mp_plot_alpha",
     tbl$Measure <- factor(tbl$Measure, levels=newlevels)
 
     if (!is.null(.group)){
+        gp <- quo.vect_to_str.vect(.group)
         if (is.null(comparisons)){
            comparisons <- tbl %>% 
-                          pull(!!.group) %>% 
+                          pull(!!rlang::sym(gp[1])) %>% 
                           unique() %>% 
                           utils::combn(2) %>% 
                           apply(2, list) %>% 
                           unlist(recursive = FALSE)
         }
-        mapping <- aes_string(x = rlang::as_name(.group), 
+        mapping <- aes_string(x = gp[1], 
                               y = "Alpha", 
-                              fill = rlang::as_name(.group))
+                              fill = gp[1])
     }else{
+        gp <- NULL
         mapping <- aes_string(x = "Sample", 
                               y = "Alpha"
                    )
@@ -449,26 +440,53 @@ setGeneric("mp_plot_alpha",
 
     p <- ggplot(data=tbl, mapping = mapping)
 
-    if (!is.null(.group)){
-        p <- p +
-           gghalves::geom_half_violin(color=NA, side="l", trim=FALSE) +
-           gghalves::geom_half_point(side="r", shape=21, alpha=0.8) +
-           ggplot2::geom_boxplot(aes_string(color=rlang::as_name(.group)),
-                                 fill = NA,
-                                 position=ggplot2::position_nudge(x=.22),
-                                 size = 0.6,
-                                 width=0.2) +
-           ggsignif::geom_signif(comparisons=comparisons, test=test, step_increase=step_increase, ...) +
-           ggplot2::facet_wrap(facets=ggplot2::vars(!!rlang::sym("Measure")), scales="free_y", nrow=1) +
-           ggplot2::scale_fill_manual(values=get_cols(tbl %>% pull(!!.group) %>% unique() %>% length())) +
-           ggplot2::scale_color_manual(values=get_cols(tbl %>% pull(!!.group) %>% unique() %>% length()))
+    if (!is.null(gp)){
+        if (is.numeric(tbl[[gp[1]]])){
+           if (length(gp) > 1 ){
+               mapping <- modifyList(mapping, aes_string(color=gp[2]))
+               gp <- gp[-c(1, 2)]
+           }else{
+               mapping <- modifyList(mapping, aes_string(fill=NULL))
+               gp <- gp[-1]
+           }
+           p <- ggplot(data = tbl, mapping = mapping)
+           smoothparam <- modifyList(list(method="lm", se=TRUE), list(...))
+           p <- p + 
+                geom_point()
+           p <- p +
+                do.call(ggplot2::geom_smooth, smoothparam) 
+        }else{
+           p <- p +
+              gghalves::geom_half_violin(color=NA, side="l", trim=FALSE) +
+              gghalves::geom_half_point(side="r", shape=21, alpha=0.8) +
+              ggplot2::geom_boxplot(aes_string(color=gp[1]),
+                                    fill = NA,
+                                    position=ggplot2::position_nudge(x=.22),
+                                    size = 0.6,
+                                    width=0.2) +
+              ggsignif::geom_signif(comparisons=comparisons, test=test, step_increase=step_increase, ...) +
+              ggplot2::scale_fill_manual(values=get_cols(tbl %>% pull(!!rlang::sym(gp[1])) %>% unique() %>% length())) +
+              ggplot2::scale_color_manual(values=get_cols(tbl %>% pull(!!rlang::sym(gp[1])) %>% unique() %>% length()))
+           gp <- gp[-1]
+        }
+        if (length(gp) > 0){
+           gpformula <- as.formula(paste0("Measure ~ ", paste0(gp, collapse="+")))
+           p <- p + ggh4x::facet_nested(gpformula, scales="free", space="free_x")
+        }else{
+           p <- p + ggplot2::facet_wrap(facets=ggplot2::vars(!!rlang::sym("Measure")), scales="free_y", nrow=1)
+        }
     }else{
         p <- p +
              ggplot2::geom_col() +
              ggplot2::facet_wrap(facets=ggplot2::vars(!!rlang::sym("Measure")), scales="free_y")
     }
 
-    p <- p + labs(x=NULL, y="Alpha Index Value") + theme_taxbar(legend.position="right")
+    p <- p + 
+         labs(x=NULL, y="Alpha Index Value") + 
+         theme_taxbar(
+           legend.position="right", 
+           strip.text.y = ggplot2::element_text(size = 12, face = "bold")
+         )
     return (p)
 }
 
