@@ -1,3 +1,4 @@
+#' @importFrom utils packageDescription
 .onAttach <- function(libname, pkgname) {
     options(layout.radial.linetype="curved")
     pkgVersion <- packageDescription(pkgname, fields="Version")
