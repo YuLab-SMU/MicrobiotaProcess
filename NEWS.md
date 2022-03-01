@@ -1,4 +1,4 @@
-# MicrobiotaProcess 1.7.7.992
+# MicrobiotaProcess 1.7.8
 
 + supporting multiple group names and supporting numeric type for `.group` of `mp_plot_alpha`. (2022-02-15, Tue)
 + supporting multiple group names for `.group` of `mp_plot_abundance` when `plot.group=TRUE`. (2022-02-14, Mon)
