@@ -150,6 +150,7 @@ setGeneric("mp_diff_analysis", function(.data,
      .abundance <- rlang::enquo(.abundance)
      .group <- rlang::enquo(.group)
      .sec.group <- rlang::enquo(.sec.group)
+     tip.level <- rlang::enquo(tip.level)
 
      if (rlang::quo_is_missing(.group)){
          rlang::abort("The .group is required, please provide it!")
@@ -159,7 +160,7 @@ setGeneric("mp_diff_analysis", function(.data,
      }else{
          assaysvar <- .data %>% attr("assaysvar")
      }
-
+     .data %<>% mp_select_as_tip(tip.level = !!tip.level)
      sampleda <- .data %>%
                  mp_extract_sample() %>%
                  select(!!as.symbol("Sample"), !!.group, !!.sec.group) %>%
@@ -197,7 +198,7 @@ setGeneric("mp_diff_analysis", function(.data,
          .data %<>% mp_cal_abundance(.abundance=!!.abundance, force=force, relative=relative)
      }
 
-     taxatree <- .data %>% mp_extract_tree(tip.level=tip.level)
+     taxatree <- .data %>% mp_extract_tree()
 
      if (is.null(taxatree)){
          f_tb <- .data %>% mp_extract_assays(.abundance=!!abundance.nm, byRow=FALSE)
@@ -331,8 +332,8 @@ setGeneric("mp_diff_analysis", function(.data,
          taxda <- .data %>% 
                   mp_extract_taxonomy() %>%
                   tibble::column_to_rownames(var="OTU")
-         taxda$OTU <- rownames(taxda)
-         indx <- match(tip.level, colnames(taxda))
+         taxda[[rlang::as_name(tip.level)]] <- rownames(taxda)
+         indx <- match(rlang::as_name(tip.level), colnames(taxda))
          taxda %<>% select(seq_len(indx))
          res <- new("diffAnalysisClass", originalD=f_tb, sampleda=sampleda, taxda=taxda, result=result, kwres=first.res,
                    secondvars=second.test.sig.vars, mlres=ml.res, someparams=params)
@@ -342,7 +343,7 @@ setGeneric("mp_diff_analysis", function(.data,
      }else if (action=="add"){
          newgroup <- paste0("Sign_", rlang::as_name(.group))
          result %<>% dplyr::rename(label="f", !!newgroup:=!!.group)
-         if (is.null(taxatree) && tip.level=="OTU"){
+         if (is.null(taxatree)){
              otu_tb <- .data %>% 
                        mp_extract_feature() 
              #result %<>% dplyr::select(c("label",setdiff(colnames(result), colnames(otu_tb))))
@@ -359,7 +360,7 @@ setGeneric("mp_diff_analysis", function(.data,
              taxatree %<>% treeio::full_join(result, by="label", suffix=c("", ".y"))
              taxatree(.data) <- taxatree
          }
-         if (!is.null(.data@otutree) && tip.level=="OTU"){
+         if (!is.null(.data@otutree)){
              otutree <- .data@otutree
              otutree %<>% treeio::full_join(result, by="label", suffix=c("", ".y"))
              otutree(.data) <- otutree

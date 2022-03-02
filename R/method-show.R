@@ -199,10 +199,10 @@ print2.MPSE <- function(x, ..., n = NULL, width = NULL, max_extra_cols = NULL, m
         n <- total_nrows
     }
     if (!is.null(x@taxatree)){
-        taxonomy <- x@taxatree@data %>% 
-                    select("nodeClass") %>%
-                    dplyr::filter(! .data[["nodeClass"]] %in% c("OTU", "Root")) %>%
-                    pull(.data[["nodeClass"]]) %>%
+        taxonomy <- x@taxatree %>% 
+                    #select("nodeClass") %>%
+                    dplyr::filter(! .data$nodeClass %in% c("Root") & !.data$isTip, keep.td=FALSE) %>%
+                    pull(.data$nodeClass) %>%
                     unique() %>%
                     paste(collapse=", ")
     }else{

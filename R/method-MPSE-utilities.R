@@ -42,8 +42,13 @@ convert_to_treedata2 <- function(x){
 
 taxatree_to_tb <- function(x){
     x %<>% as_tibble(x)
-    extrada <- x %>% select(-c("parent", "node", "nodeDepth")) %>%
-               dplyr::filter(.data$nodeClass=="OTU") %>% select(-c("nodeClass"))
+    extrada <- x %>%
+               dplyr::mutate(isTip = ! .data$node %in% .data$parent) %>%
+               dplyr::select(-c("parent", "node", "nodeDepth")) %>%
+               dplyr::filter(.data$isTip) #%>% 
+    tip.level <- extrada %>% pull(.data$nodeClass) %>% unique()
+    
+    extrada %<>% dplyr::select(-c("nodeClass", "isTip"))
     clnm <- x %>% dplyr::select("nodeClass", "nodeDepth") %>%
             dplyr::distinct() %>% dplyr::arrange(.data$nodeDepth) %>%
             dplyr::select("nodeClass") %>% unlist(use.names=FALSE)
@@ -62,8 +67,10 @@ taxatree_to_tb <- function(x){
         suppressMessages() %>%
         select(-c("Root")) 
     if (ncol(extrada)>1){
-        d %<>% dplyr::left_join(extrada, by=c("OTU"="label"), suffix=c("", ".y"))
+        index <- 'label'
+        names(index) <- tip.level
+        d %<>% dplyr::left_join(extrada, by = index, suffix = c("", ".y"))
     }    
-    d %<>% column_to_rownames(var="OTU")
+    d %<>% column_to_rownames(var = tip.level)
     return (d)   
 }

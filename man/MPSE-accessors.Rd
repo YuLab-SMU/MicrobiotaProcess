@@ -23,6 +23,10 @@
 \alias{taxatree}
 \alias{taxatree,MPSE-method}
 \alias{taxatree,MPSE}
+\alias{taxatree,tbl_mpse-method}
+\alias{taxatree,tbl_mpse}
+\alias{taxatree,grouped_df_mpse-method}
+\alias{taxatree,grouped_df_mpse}
 \alias{taxatree<-}
 \alias{taxatree<-,MPSE,treedata-method}
 \alias{taxatree<-,MPSE}
@@ -73,6 +77,10 @@ otutree(x, ...) <- value
 taxatree(x, ...)
 
 \S4method{taxatree}{MPSE}(x, ...)
+
+\S4method{taxatree}{tbl_mpse}(x, ...)
+
+\S4method{taxatree}{grouped_df_mpse}(x, ...)
 
 taxatree(x, ...) <- value
 
