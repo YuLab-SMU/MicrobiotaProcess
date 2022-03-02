@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.7.8.990
+
++ add `mp_select_as_tip` and fix the bug of `mp_diff_analysis` with specific `tip.level` (not `OTU`) argument. (2022-03-02, Mon)
+
 # MicrobiotaProcess 1.7.8
 
 + supporting multiple group names and supporting numeric type for `.group` of `mp_plot_alpha`. (2022-02-15, Tue)
