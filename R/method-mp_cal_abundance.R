@@ -304,7 +304,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     }else{
         .data %<>% left_join(da1, by=c("OTU"="label"))
     }
-    otutree <- .data %>% mp_extract_tree(type="otutree")
+    otutree <- .data %>% mp_extract_tree(type="otutree") %>% suppressMessages()
     if (!is.null(otutree)){
         da1 %<>% dplyr::filter(!!as.symbol("label") %in% otutree@phylo$tip.label)
         extranm <- intersect(colnames(da1), c(colnames(otutree@data), colnames(otutree@extraInfo)))

@@ -28,7 +28,7 @@ as.phyloseq.MPSE <- function(x, .abundance, ...){
               mp_extract_assays(.abundance=!!.abundance) %>%
               phyloseq::otu_table(., taxa_are_rows=TRUE)
     
-    otutree <- x %>% mp_extract_tree(type="otutree")
+    otutree <- x %>% mp_extract_tree(type="otutree") %>% suppressMessages()
     sampleda <- x %>% mp_extract_sample()
     taxada <- x %>% 
               mp_extract_taxonomy() 

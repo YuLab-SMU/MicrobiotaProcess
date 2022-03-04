@@ -195,6 +195,7 @@ mp_import_metaphlan <- function(profile, mapfilename=NULL, treefile=NULL, linenu
     skipnrow <- guess_skip_nrow(profile)
     if (!is.null(linenum)){
         sampleda <- utils::read.table(profile, sep="\t", skip=skipnrow, nrow=linenum, comment.char="", quote="") %>%
+                    dplyr::mutate_at("V1", as.character) %>%
                     dplyr::mutate(V1=tidyr::replace_na(.data$V1, paste0("unknown", seq_len(sum(is.na(.data$V1)))))) %>%
                     tibble::column_to_rownames(var="V1") %>%
                     t() %>% as.data.frame()

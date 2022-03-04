@@ -148,7 +148,8 @@ setMethod("mp_cal_NRI_NTI", signature(.data="MPSE"), function(.data, .abundance,
     }
 
     otutree <- .data %>%
-               mp_extract_tree(type="otutree")
+               mp_extract_tree(type="otutree") %>%
+               suppressMessages()
 
     if (is.null(otutree)){
         rlang::abort("The otutree is required to calculate the NRI and NTI !")
