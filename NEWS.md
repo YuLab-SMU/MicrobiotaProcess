@@ -2,6 +2,8 @@
 
 + add `mp_select_as_tip` and fix the bug of `mp_diff_analysis` with specific `tip.level` (not `OTU`) argument. (2022-03-02, Mon)
 + fix the `replace_na` bug of new `tidyr`. (2022-03-04, Fri)
++ update `mp_import_metaphlan` to better parse the output of `MetaPhlAn2`. (2022-03-11, Fri)
++ update the `mp_cal_abundance` to return the `tbl_df` contained numeric type sample metadata. (2022-03-11, Fri)
 
 # MicrobiotaProcess 1.7.8
 
