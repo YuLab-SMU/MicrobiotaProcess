@@ -249,21 +249,30 @@ mp_import_metaphlan <- function(profile, mapfilename=NULL, treefile=NULL, linenu
                          unlist %>%
                          magrittr::equals(max.sep))
 
+    dat %<>% magrittr::set_rownames(paste0('row', seq_len(nrow(dat))))
+
     taxatab <- dat %>%
                  dplyr::select(1) %>%
                  split_str_to_list(sep="\\|") %>%
                  magrittr::set_colnames(c(taxaclass[seq_len(max.sep)], "OTU")) %>%
-                 magrittr::set_rownames(paste0("row", seq_len(nrow(dat)))) %>%
-                 fillNAtax() %>% 
-                 magrittr::extract(paste0("row", seq_len(nrow(dat))), ) %>%
-                 magrittr::set_rownames(NULL) %>%
-                 tibble::column_to_rownames(var="OTU") 
+                 fillNAtax()  
     
     assay <- dat %>%
              dplyr::mutate(!!as.symbol(clnm[1]):=strsplit(!!as.symbol(clnm[1]), split="\\|") %>%
                            lapply(function(x) x %>% magrittr::extract2(max.sep+1))) %>%
-             tibble::column_to_rownames(var=clnm[1])
-    rownames(assay) <- rownames(taxatab)
+             dplyr::select(-1)
+    
+    featureIndex <- intersect(rownames(assay), rownames(taxatab))
+    taxatab %<>% 
+        magrittr::extract(featureIndex,) %>%
+        magrittr::set_rownames(NULL) %>%
+        tibble::column_to_rownames(var="OTU")
+
+    assay %<>% 
+        magrittr::extract(featureIndex,) %>%
+        magrittr::set_rownames(rownames(taxatab))
+
+    #rownames(assay) <- rownames(taxatab)
 
     rowdaindx <- assay %>%
                  vapply(.,function(x)!is.numeric(x), logical(1)) %>%
