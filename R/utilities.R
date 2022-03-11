@@ -283,3 +283,16 @@ warning_wrap <- function(...){
     msg <- .return_wrap(...)
     warning(msg, call. = FALSE)
 }
+
+remove_MP_internal_res <- function(x){
+    x <- x[,!vapply(x, function(i)is.list(i), logical(1))]
+    index <- lapply(MP_internal_res, function(i)which(grepl(paste0("^",i), colnames(x)))) %>%
+             unlist() %>%
+             unique()
+    if (length(index) > 0) x <- x[-index]
+    return(x)
+}
+
+MP_internal_res <- c("Observe", "Chao1", "ACE", "Shannon", 
+                     "Simpson", "Pielou", 'PC', 'PCo', 
+                     'CA', 'NMDS', 'RDA', 'CCA')

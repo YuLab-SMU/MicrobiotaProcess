@@ -270,7 +270,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
                                          sampleda = NULL
                )
     }else{
-        sampledat <- sampleda[, !vapply(sampleda, function(x)is.list(x)||is.numeric(x), logical(1))]
+        sampledat <- remove_MP_internal_res(x=sampleda)
         da1 <- lapply(rlang::syms(taxavar),
                       .internal_cal_feature_abun,
                                          da = da,
@@ -435,7 +435,7 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
                                          sampleda = NULL
                       )
     }else{
-        sampledat <- sampleda[, !vapply(sampleda, function(x)is.list(x)||is.numeric(x), logical(1))]
+        sampledat <- remove_MP_internal_res(x=sampleda)
         da1 <- lapply(rlang::syms(taxavar), 
                       .internal_cal_feature_abun,
                                          da = dat,
