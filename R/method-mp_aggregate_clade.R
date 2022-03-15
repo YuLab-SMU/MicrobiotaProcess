@@ -1,5 +1,5 @@
 #' calculate the mean/median (relative) abundance of internal nodes according to their children tips.
-#' @rdname mp_aggregate_internal_node-methods
+#' @rdname mp_aggregate_clade-methods
 #' @param .data MPSE object which must contain otutree slot, required
 #' @param .abundance the column names of abundance.
 #' @param force logical whether calculate the (relative) abundance forcibly when the abundance
@@ -19,7 +19,7 @@
 #'   xx <- curatedMetagenomicData('ZellerG_2014.relative_abundance', dryrun=F)
 #'   xx[[1]] %>% as.mpse -> mpse
 #'   otu.tree <- mpse %>% 
-#'     mp_aggregate_internal_node(
+#'     mp_aggregate_clade(
 #'       .abundance = Abundance, 
 #'       force = TRUE, 
 #'       relative = FALSE,
@@ -27,15 +27,16 @@
 #'     )
 #'   otu.tree
 #' }
-setGeneric("mp_aggregate_internal_node", 
+setGeneric("mp_aggregate_clade", 
            function(.data, .abundance = NULL, force = FALSE, relative = TRUE, aggregate_fun = mean, action='get', ...)
-               standardGeneric("mp_aggregate_internal_node")
+               standardGeneric("mp_aggregate_clade")
 )
 
-.aggregate_internal_node <- function(.data, .abundance = NULL, force = FALSE, relative = TRUE, aggregate_fun = mean, action = 'get', ...){
-    otu.tree <- .data %>% mp_extract_otutree()
+.aggregate_clade <- function(.data, .abundance = NULL, force = FALSE, relative = TRUE, aggregate_fun = mean, action = 'get', ...){
+    otu.tree <- .data %>% mp_extract_otutree() %>% suppressMessages()
     if (is.null(otu.tree)){
-        stop_wrap("The object did not contain otutree slot.")
+        warning_wrap("The object did not contain otutree slot.")
+        return (NULL)
     }
     action %<>% match.arg(c("add", "get", "only"))
 
@@ -83,7 +84,9 @@ setGeneric("mp_aggregate_internal_node",
     if (is.null(otu.tree@phylo$node.label)){
         otu.tree@phylo <- ape::makeNodeLabel(otu.tree@phylo)
     }
-    
+    if (is.character(aggregate_fun)){
+        aggregate_fun <- rlang::as_function(aggregate_fun)
+    }
     sample.da <- .data %>% mp_extract_sample() %>% remove_MP_internal_res()
     index.name <- paste0(rlang::as_name(.abundance), 'BySample')
     inode.da <- treeio::offspring(
@@ -136,17 +139,17 @@ setGeneric("mp_aggregate_internal_node",
     return(x)
 }
 
-#' @rdname mp_aggregate_internal_node-methods
-#' @aliases mp_aggregate_internal_node,MPSE
-#' @exportMethod mp_aggregate_internal_node
-setMethod("mp_aggregate_internal_node", signature(.data = "MPSE"), .aggregate_internal_node)
+#' @rdname mp_aggregate_clade-methods
+#' @aliases mp_aggregate_clade,MPSE
+#' @exportMethod mp_aggregate_clade
+setMethod("mp_aggregate_clade", signature(.data = "MPSE"), .aggregate_clade)
 
-#' @rdname mp_aggregate_internal_node-methods
-#' @aliases mp_aggregate_internal_node,tbl_mpse
-#' @exportMethod mp_aggregate_internal_node
-setMethod("mp_aggregate_internal_node", signature(.data = 'tbl_mpse'), .aggregate_internal_node)
+#' @rdname mp_aggregate_clade-methods
+#' @aliases mp_aggregate_clade,tbl_mpse
+#' @exportMethod mp_aggregate_clade
+setMethod("mp_aggregate_clade", signature(.data = 'tbl_mpse'), .aggregate_clade)
 
-#' @rdname mp_aggregate_internal_node-methods
-#' @aliases mp_aggregate_internal_node,grouped_df_mpse
-#' @exportMethod mp_aggregate_internal_node
-setMethod("mp_aggregate_internal_node", signature(.data = 'grouped_df_mpse'), .aggregate_internal_node)
+#' @rdname mp_aggregate_clade-methods
+#' @aliases mp_aggregate_clade,grouped_df_mpse
+#' @exportMethod mp_aggregate_clade
+setMethod("mp_aggregate_clade", signature(.data = 'grouped_df_mpse'), .aggregate_clade)

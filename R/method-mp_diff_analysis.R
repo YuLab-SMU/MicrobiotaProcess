@@ -5,7 +5,7 @@
 #' @param .group the group name of the samples to be calculated.
 #' @param .sec.group the second group name of the samples to be calculated.
 #' @param action character, "add" joins the new information to the taxatree (if it exists) 
-#' and otutree (if it exists) or \code{rowData} and return MPSE object,"only" return a 
+#' or \code{rowData} and return MPSE object,"only" return a 
 #' non-redundant tibble with the result of different analysis. "get" return 'diffAnalysisClass' 
 #' object.
 #' @param tip.level character the taxa level to be as tip level
@@ -360,11 +360,11 @@ setGeneric("mp_diff_analysis", function(.data,
              taxatree %<>% treeio::full_join(result, by="label", suffix=c("", ".y"))
              taxatree(.data) <- taxatree
          }
-         if (!is.null(.data@otutree)){
-             otutree <- .data@otutree
-             otutree %<>% treeio::full_join(result, by="label", suffix=c("", ".y"))
-             otutree(.data) <- otutree
-         }
+         #if (!is.null(.data@otutree)){
+         #    otutree <- .data@otutree
+         #    otutree %<>% treeio::full_join(result, by="label", suffix=c("", ".y"))
+         #    otutree(.data) <- otutree
+         #}
          return(.data)
      }
 }
@@ -576,6 +576,8 @@ setGeneric("mp_plot_diff_res",
                     )
          n.pwidth <- ncol(.data)
     }
+    ggstar <- "ggstar"
+    require(ggstar, character.only=TRUE) %>% suppressMessages()
     p2 <- suppressWarnings(
             p1 + 
             ggnewscale::new_scale_fill() +

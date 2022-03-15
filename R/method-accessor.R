@@ -838,8 +838,25 @@ setGeneric("otutree", function(x, ...)standardGeneric("otutree"))
 #' @rdname MPSE-accessors
 #' @aliases otutree,MPSE
 #' @export
-setMethod("otutree", signature(x="MPSE"),function(x,...){
-    tree <- x %>% mp_extract_tree(type="otutree")
+setMethod("otutree", signature(x="MPSE"), function(x,...){
+    tree <- x %>% mp_extract_otutree(...)
+    return(tree)
+})
+
+
+#' @rdname MPSE-accessors
+#' @aliases otutree,tbl_mpse
+#' @export
+setMethod("otutree", signature(x="tbl_mpse"), function(x,...){
+    tree <- x %>% mp_extract_otutree(...)
+    return(tree)
+})
+
+#' @rdname MPSE-accessors
+#' @aliases otutree,group_df_mpse
+#' @export
+setMethod("otutree", signature(x="MPSE"), function(x,...){
+    tree <- x %>% mp_extract_otutree(...)
     return(tree)
 })
 
@@ -890,28 +907,33 @@ setReplaceMethod("otutree", signature(x="MPSE", value="NULL"), function(x, ..., 
     return(x)
 })
 
-# #' @rdname MPSE-accessors
-# #' @aliases otutree<-,tbl_mpse
-# #' @export
-# setReplaceMethod("otutree", signature(x="tbl_mpse", value="treedata"), function(x, ..., value){
-#     nms <- x %>% dplyr::pull(.data$OTU) %>% unique()
-#     value <- .internal_drop.tip(tree=value, newnm=nms)
-#     x %<>%
-#           add_attr(value, name="otutree") 
-#     return(x)
-# })
-# 
-# #' @rdname MPSE-accessors
-# #' @aliases otutree<-,grouped_df_mpse
-# #' @export
-# setReplaceMethod("otutree", signature(x="grouped_df_mpse", value="treedata"), function(x, ..., value){
-#     nms <- x %>% dplyr::pull(.data$OTU) %>% unique()
-#     value <- .internal_drop.tip(tree=value, newnm=nms)
-#     x %<>%
-#           add_attr(value, name="otutree")
-#     return(x)
-# })
+.internal_replace_otutree2 <- function(x, ..., value){
+    nms <- x %>% dplyr::pull(.data$OTU) %>% unique()
+    value <- .internal_drop.tip(tree = value, newnm = nms, collapse.singles = FALSE)
+    x %<>%
+          add_attr(value, name="otutree")
+    return(x)
+}
 
+#' @rdname MPSE-accessors
+#' @aliases otutree<-,tbl_mpse
+#' @export
+setReplaceMethod("otutree", signature(x="tbl_mpse", value="treedata"), .internal_replace_otutree2)
+
+#' @rdname MPSE-accessors
+#' @aliases otutree<-,grouped_df_mpse
+#' @export
+setReplaceMethod("otutree", signature(x="grouped_df_mpse", value="treedata"), .internal_replace_otutree2)
+
+#' @rdname MPSE-accessors
+#' @aliases otutree<-,tbl_mpse
+#' @export
+setReplaceMethod("otutree", signature(x="tbl_mpse", value="NULL"), .internal_replace_otutree2)
+
+#' @rdname MPSE-accessors
+#' @aliases otutree<-,grouped_df_mpse
+#' @export
+setReplaceMethod("otutree", signature(x="grouped_df_mpse", value="NULL"), .internal_replace_otutree2)
 
 #' @rdname MPSE-accessors
 #' @param x MPSE object
@@ -974,6 +996,32 @@ setReplaceMethod("taxatree", signature(x="MPSE", value="NULL"), function(x, ...,
     methods::validObject(x)
     return(x)
 })
+
+.internal_replace_taxatree <- function(x, ..., value){
+    attr(x, 'taxatree') <- value
+    return(x)
+}
+
+#' @rdname MPSE-accessors
+#' @aliases taxatree<-,tbl_mpse
+#' @export
+setReplaceMethod('taxatree', signature(x = 'tbl_mpse', value = 'treedata'), .internal_replace_taxatree)
+
+#' @rdname MPSE-accessors
+#' @aliases taxatree<-,tbl_mpse
+#' @export
+setReplaceMethod('taxatree', signature(x = 'tbl_mpse', value = 'NULL'), .internal_replace_taxatree)
+
+#' @rdname MPSE-accessors
+#' @aliases taxatree<-,grouped_df_mpse
+#' @export
+setReplaceMethod('taxatree', signature(x = 'grouped_df_mpse', value = 'treedata'), .internal_replace_taxatree)
+
+#' @rdname MPSE-accessors
+#' @aliases taxatree<-,grouped_df_mpse
+#' @export 
+setReplaceMethod('taxatree', signature(x = 'grouped_df_mpse', value = 'NULL'), .internal_replace_taxatree)
+
 
 #' @rdname MPSE-accessors
 #' @param x MPSE object

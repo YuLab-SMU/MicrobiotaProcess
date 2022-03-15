@@ -15,11 +15,20 @@
 \alias{otutree}
 \alias{otutree,MPSE-method}
 \alias{otutree,MPSE}
+\alias{otutree,tbl_mpse-method}
+\alias{otutree,tbl_mpse}
+\alias{otutree,group_df_mpse}
 \alias{otutree<-}
 \alias{otutree<-,MPSE,treedata-method}
 \alias{otutree<-,MPSE}
 \alias{otutree<-,MPSE,phylo-method}
 \alias{otutree<-,MPSE,NULL-method}
+\alias{otutree<-,tbl_mpse,treedata-method}
+\alias{otutree<-,tbl_mpse}
+\alias{otutree<-,grouped_df_mpse,treedata-method}
+\alias{otutree<-,grouped_df_mpse}
+\alias{otutree<-,tbl_mpse,NULL-method}
+\alias{otutree<-,grouped_df_mpse,NULL-method}
 \alias{taxatree}
 \alias{taxatree,MPSE-method}
 \alias{taxatree,MPSE}
@@ -31,6 +40,12 @@
 \alias{taxatree<-,MPSE,treedata-method}
 \alias{taxatree<-,MPSE}
 \alias{taxatree<-,MPSE,NULL-method}
+\alias{taxatree<-,tbl_mpse,treedata-method}
+\alias{taxatree<-,tbl_mpse}
+\alias{taxatree<-,tbl_mpse,NULL-method}
+\alias{taxatree<-,grouped_df_mpse,treedata-method}
+\alias{taxatree<-,grouped_df_mpse}
+\alias{taxatree<-,grouped_df_mpse,NULL-method}
 \alias{taxonomy<-}
 \alias{taxonomy<-,MPSE,data.frame-method}
 \alias{taxonomy<-,MPSE}
@@ -66,6 +81,10 @@ otutree(x, ...)
 
 \S4method{otutree}{MPSE}(x, ...)
 
+\S4method{otutree}{tbl_mpse}(x, ...)
+
+\S4method{otutree}{MPSE}(x, ...)
+
 otutree(x, ...) <- value
 
 \S4method{otutree}{MPSE,treedata}(x, ...) <- value
@@ -73,6 +92,14 @@ otutree(x, ...) <- value
 \S4method{otutree}{MPSE,phylo}(x, ...) <- value
 
 \S4method{otutree}{MPSE,`NULL`}(x, ...) <- value
+
+\S4method{otutree}{tbl_mpse,treedata}(x, ...) <- value
+
+\S4method{otutree}{grouped_df_mpse,treedata}(x, ...) <- value
+
+\S4method{otutree}{tbl_mpse,`NULL`}(x, ...) <- value
+
+\S4method{otutree}{grouped_df_mpse,`NULL`}(x, ...) <- value
 
 taxatree(x, ...)
 
@@ -87,6 +114,14 @@ taxatree(x, ...) <- value
 \S4method{taxatree}{MPSE,treedata}(x, ...) <- value
 
 \S4method{taxatree}{MPSE,`NULL`}(x, ...) <- value
+
+\S4method{taxatree}{tbl_mpse,treedata}(x, ...) <- value
+
+\S4method{taxatree}{tbl_mpse,`NULL`}(x, ...) <- value
+
+\S4method{taxatree}{grouped_df_mpse,treedata}(x, ...) <- value
+
+\S4method{taxatree}{grouped_df_mpse,`NULL`}(x, ...) <- value
 
 taxonomy(x, ...) <- value
 
