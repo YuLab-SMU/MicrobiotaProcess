@@ -89,24 +89,39 @@ setGeneric("mp_aggregate_clade",
     }
     sample.da <- .data %>% mp_extract_sample() %>% remove_MP_internal_res()
     index.name <- paste0(rlang::as_name(.abundance), 'BySample')
-    inode.da <- treeio::offspring(
-                   otu.tree, 
-                   .node = otu.tree %>% 
-                           dplyr::filter(!.data$isTip, keep.td = FALSE) %>% 
-                           pull(.data$node), 
-                   type='tips'
-                ) %>%
-                lapply(
-                   .internal_cal_inode, 
-                   x = da, 
-                   tree = otu.tree, 
-                   fun = aggregate_fun,
-                   abundance = rlang::as_name(.abundance)
-                ) %>% 
-                dplyr::bind_rows(.id = 'node') %>%
-                dplyr::left_join(sample.da, by = "Sample") %>%
-                tidyr::nest(!!rlang::sym(index.name) := - .data$node) %>%
-                dplyr::mutate_at("node", as.integer)
+    inodes <- otu.tree %>% 
+                   dplyr::filter(!.data$isTip, keep.td = FALSE) %>% 
+                   pull(.data$node)
+
+    if (utils::packageVersion("treeio") > '1.18.1'){
+        inode.da <- treeio::offspring(
+                       otu.tree, 
+                       .node = inodes,
+                       type = 'tips'
+                    )
+    }else{
+        inode.da <- lapply(inodes, function(i)
+           treeio::offspring(
+             otu.tree,
+             .node = i,
+             tiponly = TRUE
+           ) 
+        )%>% 
+        suppressMessages() %>%
+        stats::setNames(nm = inodes)
+    }
+    inode.da %<>%
+      lapply(
+         .internal_cal_inode, 
+         x = da, 
+         tree = otu.tree, 
+         fun = aggregate_fun,
+         abundance = rlang::as_name(.abundance)
+      ) %>% 
+      dplyr::bind_rows(.id = 'node') %>%
+      dplyr::left_join(sample.da, by = "Sample") %>%
+      tidyr::nest(!!rlang::sym(index.name) := - .data$node) %>%
+      dplyr::mutate_at("node", as.integer)
     da %<>% 
         dplyr::left_join(sample.da, by = 'Sample') %>%
         tidyr::nest(!!rlang::sym(index.name) := - .data$node) %>%
