@@ -32,11 +32,15 @@ setMethod("get_NRI_NTI", "matrix", function(obj, mindepth, sampleda, tree, abund
         obj <- vegan::rrarefy(obj, mindepth)
     }
     treedist <- cal_treedist(tree=tree)
-    resnri <- withr::with_seed(seed, picante::ses.mpd(samp=obj, dis=treedist, abundance.weighted=abundance.weighted, ...))
-    resnti <- withr::with_seed(seed, picante::ses.mntd(samp=obj, dis=treedist, abundance.weighted=abundance.weighted, ...))
-    resda <- data.frame(NRI = abs(resnri$mpd.obs.z),
-                      NTI = abs(resnti$mntd.obs.z)
-                      ) %>% magrittr::set_rownames(rownames(resnri))
+    resnri <- withr::with_seed(seed, picante::ses.mpd(samp = obj, dis = treedist, abundance.weighted = abundance.weighted, ...))
+    resnti <- withr::with_seed(seed, picante::ses.mntd(samp = obj, dis = treedist, abundance.weighted = abundance.weighted, ...))
+    respd <- picante::pd(samp = obj, tree = tree)
+
+    resda <- data.frame(
+                 NRI = resnri$mpd.obs.z * -1,
+                 NTI = resnti$mntd.obs.z * -1,
+                 PD = respd$PD
+               ) %>% magrittr::set_rownames(rownames(resnri))
     
     if (missing(sampleda)){
         sampleda <- NULL
