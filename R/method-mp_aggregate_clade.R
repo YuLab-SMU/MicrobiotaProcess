@@ -89,9 +89,9 @@ setGeneric("mp_aggregate_clade",
     }
     sample.da <- .data %>% mp_extract_sample() %>% remove_MP_internal_res()
     index.name <- paste0(rlang::as_name(.abundance), 'BySample')
-    inodes <- otu.tree %>% 
-                   dplyr::filter(!.data$isTip, keep.td = FALSE) %>% 
-                   pull(.data$node)
+    inodes <- otu.tree %>% .extract_nodes()
+                   #dplyr::filter(!.data$isTip, keep.td = FALSE) %>% 
+                   #pull(.data$node)
 
     if (utils::packageVersion("treeio") > '1.18.1'){
         inode.da <- treeio::offspring(
@@ -116,7 +116,7 @@ setGeneric("mp_aggregate_clade",
          x = da, 
          tree = otu.tree, 
          fun = aggregate_fun,
-         abundance = rlang::as_name(.abundance)
+         abundance = index.name
       ) %>% 
       dplyr::bind_rows(.id = 'node') %>%
       dplyr::left_join(sample.da, by = "Sample") %>%
@@ -168,3 +168,19 @@ setMethod("mp_aggregate_clade", signature(.data = 'tbl_mpse'), .aggregate_clade)
 #' @aliases mp_aggregate_clade,grouped_df_mpse
 #' @exportMethod mp_aggregate_clade
 setMethod("mp_aggregate_clade", signature(.data = 'grouped_df_mpse'), .aggregate_clade)
+
+.extract_nodes <- function(da, node = 'internal'){
+    if (inherits(da, 'treedata')){
+        da <- da@phylo
+    }
+    edge <- da$edge 
+    alltips <- edge[,2][! edge[,2] %in% edge[,1]]
+    if (node == 'tips'){
+        return(alltips)
+    }else{
+        edge <- as.vector(edge) %>% unique()
+        return(edge[!edge %in% alltips])
+    }
+}
+
+
