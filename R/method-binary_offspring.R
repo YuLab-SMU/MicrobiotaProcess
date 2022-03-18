@@ -7,7 +7,7 @@
 #' is not be rarefied, default is FALSE.
 #' @param relative logical whether calculate the relative abundance.
 #' @param aggregate_fun function the method to calculate the (relative) abundance of internal nodes
-#' according to their children tips, default is mean.
+#' according to their children tips, default is 'mean', other options are 'median' and 'geometric.mean'.
 #' @param pseudonum numeric add a pseudo numeric to avoid the error of division in calculation, default 
 #' is 0.001 .
 #' @param action character, "add" joins the new information to the otutree slot if it exists (default).
@@ -17,11 +17,23 @@
 #' @return a object according to 'action' argument.
 #' @export
 setGeneric("mp_balance_clade",
-           function(.data, .abundance = NULL, force = FALSE, relative = TRUE, aggregate_fun = mean, pseudonum = .001, action='get', ...)
+           function(.data, 
+                    .abundance = NULL, 
+                    force = FALSE, 
+                    relative = TRUE, 
+                    aggregate_fun = c('mean', 'median', 'geometric.mean'), 
+                    pseudonum = .001, 
+                    action='get', ...)
                standardGeneric("mp_balance_clade")
 )
 
-.balance_clade <- function(.data, .abundance = NULL, force = FALSE, relative = TRUE, aggregate_fun = mean, pseudonum = .001, action = 'get', ...){
+.balance_clade <- function(.data,
+                           .abundance = NULL,
+                           force = FALSE, 
+                           relative = TRUE, 
+                           aggregate_fun = c('mean', 'median', 'geometric.mean'), 
+                           pseudonum = .001, action = 'get', ...){
+    aggregate_fun %<>% match.arg(c('mean', 'median', 'geometric.mean'))
     otu.tree <- .data %>% mp_extract_otutree() %>% suppressMessages()
     if (is.null(otu.tree)){
         warning_wrap("The object did not contain otutree slot.")
@@ -74,9 +86,9 @@ setGeneric("mp_balance_clade",
     if (is.null(otu.tree@phylo$node.label)){
         otu.tree@phylo <- ape::makeNodeLabel(otu.tree@phylo)
     }
-    if (is.character(aggregate_fun)){
-        aggregate_fun <- rlang::as_function(aggregate_fun)
-    }
+    #if (is.character(aggregate_fun)){
+    #    aggregate_fun <- rlang::as_function(aggregate_fun)
+    #}
     sample.da <- .data %>% mp_extract_sample() %>% remove_MP_internal_res()
     index.name <- paste0('BalanceBy', rlang::as_name(.abundance), 'BySample')
     inodes <- otu.tree %>% .extract_nodes()
@@ -100,7 +112,10 @@ setGeneric("mp_balance_clade",
       dplyr::mutate_at("node", as.integer)
 
     if (action == 'only'){
-        da <- otu.tree %>% select('node', 'label') %>% dplyr::left_join(da, by='node')
+        da <- otu.tree %>% 
+              dplyr::filter(!.data$isTip, keep.td = FALSE) %>%
+              select('node', 'label') %>%
+              dplyr::left_join(da, by='node')
         return (da)
     }
     if (index.name %in% treeio::get.fields(otu.tree)){
@@ -179,23 +194,39 @@ extract_binary_offspring.treedata <- function(.data, .node, type = 'all', ...) {
 
 .internal_balance_clade <- function(node2binary, x, fun, abundance, pseudonum=.001){
     newnm <- paste0('BalanceBy', abundance)
-    binary1 <- x %>%
-          dplyr::filter(.data$node %in% unname(node2binary[[1]])) %>%
-          dplyr::group_by(.data$Sample) %>%
-          dplyr::summarize(dplyr::across(abundance, fun, .name=abundance))
-
-    binary2 <- x %>%
-          dplyr::filter(.data$node %in% unname(node2binary[[2]])) %>%
-          dplyr::group_by(.data$Sample) %>%
-          dplyr::summarize(dplyr::across(abundance, fun, .name=abundance))
-
-    res <- binary1 %>% 
-           left_join(binary2, by='Sample')
-    res[[newnm]] <- log((res[[paste0(abundance, ".x")]] + pseudonum)/(res[[paste0(abundance, ".y")]] + pseudonum))
-    res %<>% select('Sample', newnm)
-    return(res)
+    res <- lapply(node2binary, function(i){
+            x %>% 
+            dplyr::filter(.data$node %in% i) %>%
+            dplyr::group_by(.data$Sample) %>%
+            dplyr::summarize(Abun = .internal.aggregate(
+                   x = .data[[abundance]],
+                   fun = fun, 
+                   pseudonum = pseudonum 
+              )
+            )
+         }
+    )
+    
+    res2 <- data.frame(Sample=res[[1]][,1,drop=TRUE]) 
+    res2[[newnm]] <- log((res[[1]][,2,drop=TRUE] + pseudonum) / (res[[2]][,2,drop=TRUE] + pseudonum))
+    res2 %<>% select('Sample', newnm)
+    return(res2)
 }
 
 is_binary_tree <- function(x){
     all(lapply(x, length) == 2)
+}
+
+geometric.mean <- function(x, pseudonum, na.rm = TRUE){
+    y <- exp(mean(log(x + pseudonum), na.rm = na.rm)) - pseudonum
+    return(y)
+}
+
+.internal.aggregate <- function(x, fun, pseudonum = 0.01){
+    xx <- switch(fun,
+        mean = mean(x, na.rm=TRUE),
+        median = median(x, na.rm=TRUE),
+        geometric.mean = geometric.mean(x, pseudonum=pseudonum)
+    )
+    return(xx)
 }

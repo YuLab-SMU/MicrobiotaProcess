@@ -338,7 +338,9 @@ setGeneric("mp_diff_analysis", function(.data,
          res <- new("diffAnalysisClass", originalD=f_tb, sampleda=sampleda, taxda=taxda, result=result, kwres=first.res,
                    secondvars=second.test.sig.vars, mlres=ml.res, someparams=params)
          return(res)
-     }else if (action=="only"){
+     }
+     result <- .combine_others(result, first.res)
+     if (action=="only"){
          return(result)
      }else if (action=="add"){
          newgroup <- paste0("Sign_", rlang::as_name(.group))

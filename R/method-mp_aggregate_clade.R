@@ -66,7 +66,7 @@ setGeneric("mp_aggregate_clade",
     da <- .data %>% mp_extract_assays(.abundance = !!.abundance)
     if (relative){
         da <- apply(da, 2, function(x)x/sum(x) * 100)
-        .abundance <- as.symbol(paste0("Rel", rlang::as_name(.abundance)))
+        .abundance <- as.symbol(paste0("Rel", rlang::as_name(.abundance), 'BySample'))
     }
     da %<>% 
         tibble::as_tibble(rownames='OTU') %>% 
@@ -88,7 +88,7 @@ setGeneric("mp_aggregate_clade",
         aggregate_fun <- rlang::as_function(aggregate_fun)
     }
     sample.da <- .data %>% mp_extract_sample() %>% remove_MP_internal_res()
-    index.name <- paste0(rlang::as_name(.abundance), 'BySample')
+    index.name <- rlang::as_name(.abundance)
     inodes <- otu.tree %>% .extract_nodes()
                    #dplyr::filter(!.data$isTip, keep.td = FALSE) %>% 
                    #pull(.data$node)

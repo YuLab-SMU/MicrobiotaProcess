@@ -164,9 +164,8 @@ setGeneric("mp_diff_clade", function(.data,
          }
      }
 
-     AbundBy <- abundance.nm %>% gsub("^Rel", "", .)
-
-     if (!any(grepl(paste0("^", AbundBy), otu.tree %>% treeio::get.fields()))){
+     #AbundBy <- abundance.nm %>% gsub("^Rel", "", .)
+     if (! abundance.nm %in% c(otu.tree %>% treeio::get.fields())){
          aggregate_fun <- getOption(x = "aggregate_fun", default = "mean")
          .data %<>% mp_aggregate_clade(
             .abundance = !!.abundance, 
@@ -179,11 +178,11 @@ setGeneric("mp_diff_clade", function(.data,
 
      otu.tree <- .data %>% mp_extract_otutree()
 
-     AbundBySample <- abundance.nm %>% 
-                      gsub("^Rel", "", .) %>%
-                      gsub("BySample", "", .) %>%
-                      paste0("BySample")
-     
+     AbundBySample <- abundance.nm #%>% 
+                      #gsub("^Rel", "", .) %>%
+                      #gsub("BySample", "", .) %>%
+                      #paste0("BySample")
+
      f_tb <- otu.tree %>%
              dplyr::select(c("label", AbundBySample)) %>% 
              suppressMessages() %>%
@@ -192,7 +191,7 @@ setGeneric("mp_diff_clade", function(.data,
              distinct() %>%
              tidyr::pivot_wider(id_cols="Sample", names_from="label", values_from=abundance.nm) %>%
              tibble::column_to_rownames(var="Sample")
-     f_tb <- f_tb[, !apply(f_tb, 2, function(x)var(x)==0), drop = FALSE]
+     #f_tb <- f_tb[, !apply(f_tb, 2, function(x)var(x)==0), drop = FALSE]
      vars <- f_tb %>% colnames()
 
      datameta <- merge(f_tb, sampleda, by=0) 
@@ -304,7 +303,9 @@ setGeneric("mp_diff_clade", function(.data,
          res <- new("diffAnalysisClass", originalD = f_tb, sampleda = sampleda, taxda = NULL, result = result, kwres = first.res,
                    secondvars = second.test.sig.vars, mlres = ml.res, someparams = params)
          return(res)
-     }else if (action=="only"){
+     }
+     result <- .combine_others(result, first.res)
+     if (action=="only"){
          return(result)
      }else if (action=="add"){
          newgroup <- paste0("Sign_", rlang::as_name(.group))
@@ -622,3 +623,9 @@ setMethod("mp_diff_clade", signature(.data="grouped_df_mpse"), .internal_mp_diff
 ## #' @aliases mp_plot_diff_res,grouped_df_mpse
 ## #' @export mp_plot_diff_res
 ## setMethod("mp_plot_diff_res", signature(.data="grouped_df_mpse"), .internal_mp_plot_diff_res)
+
+.combine_others <- function(x, y){
+    y %<>% dplyr::filter(!.data$f %in% as.vector(x$f))
+    x %<>% dplyr::bind_rows(y)
+    return(x)
+}
