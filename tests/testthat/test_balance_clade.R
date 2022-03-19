@@ -73,7 +73,7 @@ Node2.gm.mean <- log((dat %>% magrittr::extract(Node2.up, ) %>% apply(., 2, gm.m
 
 test_that("balance score with mean",{
     expect_equal(tbl1 %>% 
-           unnest(BalanceByAbundanceBySample) %>%
+           unnest(BalanceByAbundance) %>%
            filter(label == 'Node1') %>%
            pull(BalanceByAbundance, name = Sample),
            Node1.mean
@@ -81,7 +81,7 @@ test_that("balance score with mean",{
 
     expect_equal(
            tbl1 %>%
-           unnest(BalanceByAbundanceBySample) %>%	
+           unnest(BalanceByAbundance) %>%	
            filter(label == 'Node2') %>% 
            pull(BalanceByAbundance, name = Sample),
            Node2.mean
@@ -92,7 +92,7 @@ test_that("balance score with mean",{
 
 test_that("balance score with median",{
     expect_equal(tbl2 %>%
-           unnest(BalanceByAbundanceBySample) %>%
+           unnest(BalanceByAbundance) %>%
            filter(label == 'Node1') %>%
            pull(BalanceByAbundance, name = Sample),
            Node1.median
@@ -100,7 +100,7 @@ test_that("balance score with median",{
 
     expect_equal(
         tbl2 %>%
-        unnest(BalanceByAbundanceBySample) %>%
+        unnest(BalanceByAbundance) %>%
         filter(label == 'Node2') %>%
         pull(BalanceByAbundance, name = Sample),
         Node2.median
@@ -110,7 +110,7 @@ test_that("balance score with median",{
 
 test_that("balance score with geometric mean",{
     expect_equal(tbl3 %>%
-                 unnest(BalanceByAbundanceBySample) %>%
+                 unnest(BalanceByAbundance) %>%
                  filter(label == 'Node1') %>%
                  pull(BalanceByAbundance, name = Sample),
                  Node1.gm.mean
@@ -118,7 +118,7 @@ test_that("balance score with geometric mean",{
 
     expect_equal(
         tbl3 %>%
-        unnest(BalanceByAbundanceBySample) %>%
+        unnest(BalanceByAbundance) %>%
         filter(label == 'Node2') %>%
         pull(BalanceByAbundance, name = Sample),
         Node2.gm.mean
