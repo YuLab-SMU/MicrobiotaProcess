@@ -6,7 +6,7 @@
 #' @param force logical whether calculate the (relative) abundance forcibly when the abundance
 #' is not be rarefied, default is FALSE.
 #' @param relative logical whether calculate the relative abundance.
-#' @param aggregate_fun function the method to calculate the (relative) abundance of internal nodes
+#' @param balance_fun function the method to calculate the (relative) abundance of internal nodes
 #' according to their children tips, default is 'mean', other options are 'median' and 'geometric.mean'.
 #' @param pseudonum numeric add a pseudo numeric to avoid the error of division in calculation, default 
 #' is 0.001 .
@@ -21,7 +21,7 @@ setGeneric("mp_balance_clade",
                     .abundance = NULL, 
                     force = FALSE, 
                     relative = TRUE, 
-                    aggregate_fun = c('mean', 'median', 'geometric.mean'), 
+                    balance_fun = c('mean', 'median', 'geometric.mean'), 
                     pseudonum = .001, 
                     action='get', ...)
                standardGeneric("mp_balance_clade")
@@ -31,9 +31,9 @@ setGeneric("mp_balance_clade",
                            .abundance = NULL,
                            force = FALSE, 
                            relative = TRUE, 
-                           aggregate_fun = c('mean', 'median', 'geometric.mean'), 
+                           balance_fun = c('mean', 'median', 'geometric.mean'), 
                            pseudonum = .001, action = 'get', ...){
-    aggregate_fun %<>% match.arg(c('mean', 'median', 'geometric.mean'))
+    balance_fun %<>% match.arg(c('mean', 'median', 'geometric.mean'))
     otu.tree <- .data %>% mp_extract_otutree() %>% suppressMessages()
     if (is.null(otu.tree)){
         warning_wrap("The object did not contain otutree slot.")
@@ -86,11 +86,11 @@ setGeneric("mp_balance_clade",
     if (is.null(otu.tree@phylo$node.label)){
         otu.tree@phylo <- ape::makeNodeLabel(otu.tree@phylo)
     }
-    #if (is.character(aggregate_fun)){
-    #    aggregate_fun <- rlang::as_function(aggregate_fun)
+    #if (is.character(balance_fun)){
+    #    balance_fun <- rlang::as_function(balance_fun)
     #}
     sample.da <- .data %>% mp_extract_sample() %>% remove_MP_internal_res()
-    index.name <- paste0('BalanceBy', rlang::as_name(.abundance), 'BySample')
+    index.name <- paste0('BalanceBy', rlang::as_name(.abundance))
     inodes <- otu.tree %>% .extract_nodes()
      
     inodes2binary <- extract_binary_offspring(otu.tree, inodes)
@@ -102,7 +102,7 @@ setGeneric("mp_balance_clade",
          inodes2binary,
          .internal_balance_clade,
          x = da,
-         fun = aggregate_fun,
+         fun = balance_fun,
          abundance = rlang::as_name(.abundance),
          pseudonum = pseudonum
       ) %>%
