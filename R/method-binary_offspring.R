@@ -7,7 +7,7 @@
 #' is not be rarefied, default is FALSE.
 #' @param relative logical whether calculate the relative abundance.
 #' @param balance_fun function the method to calculate the (relative) abundance of internal nodes
-#' according to their children tips, default is 'mean', other options are 'median' and 'geometric.mean'.
+#' according to their children tips, default is 'geometric.mean', other options are 'mean' and 'median'.
 #' @param pseudonum numeric add a pseudo numeric to avoid the error of division in calculation, default 
 #' is 0.001 .
 #' @param action character, "add" joins the new information to the otutree slot if it exists (default).
@@ -21,7 +21,7 @@ setGeneric("mp_balance_clade",
                     .abundance = NULL, 
                     force = FALSE, 
                     relative = TRUE, 
-                    balance_fun = c('mean', 'median', 'geometric.mean'), 
+                    balance_fun = c('geometric.mean', 'mean', 'median'), 
                     pseudonum = .001, 
                     action='get', ...)
                standardGeneric("mp_balance_clade")
@@ -31,9 +31,9 @@ setGeneric("mp_balance_clade",
                            .abundance = NULL,
                            force = FALSE, 
                            relative = TRUE, 
-                           balance_fun = c('mean', 'median', 'geometric.mean'), 
+                           balance_fun = c('geometric.mean', 'mean', 'median'), 
                            pseudonum = .001, action = 'get', ...){
-    balance_fun %<>% match.arg(c('mean', 'median', 'geometric.mean'))
+    balance_fun %<>% match.arg(c('geometric.mean', 'mean', 'median'))
     otu.tree <- .data %>% mp_extract_otutree() %>% suppressMessages()
     if (is.null(otu.tree)){
         warning_wrap("The object did not contain otutree slot.")
@@ -68,7 +68,7 @@ setGeneric("mp_balance_clade",
     da <- .data %>% mp_extract_assays(.abundance = !!.abundance)
     if (relative){
         da <- apply(da, 2, function(x)x/sum(x) * 100)
-        .abundance <- as.symbol(paste0("Rel", rlang::as_name(.abundance)))
+        .abundance <- as.symbol(paste0("Rel", rlang::as_name(.abundance), 'BySample'))
     }
     da %<>%
         tibble::as_tibble(rownames='OTU') %>%
@@ -206,9 +206,9 @@ extract_binary_offspring.treedata <- function(.data, .node, type = 'all', ...) {
             )
          }
     )
-    
+    weight.s <- .weight.subtree.count(node2binary)
     res2 <- data.frame(Sample=res[[1]][,1,drop=TRUE]) 
-    res2[[newnm]] <- log((res[[1]][,2,drop=TRUE] + pseudonum) / (res[[2]][,2,drop=TRUE] + pseudonum))
+    res2[[newnm]] <- weight.s * log((res[[1]][,2,drop=TRUE] + pseudonum) / (res[[2]][,2,drop=TRUE] + pseudonum))
     res2 %<>% select('Sample', newnm)
     return(res2)
 }
@@ -229,4 +229,10 @@ geometric.mean <- function(x, pseudonum, na.rm = TRUE){
         geometric.mean = geometric.mean(x, pseudonum=pseudonum)
     )
     return(xx)
+}
+
+.weight.subtree.count <- function(x){
+    x <- lapply(x, length)
+    x <- do.call(`*`, x) / do.call(`+`, x)
+    return(sqrt(x))
 }
