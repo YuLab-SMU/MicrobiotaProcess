@@ -1,5 +1,9 @@
-# MicrobiotaProcess 1.7.8.991
+# MicrobiotaProcess 1.7.8.992
 
++ add `mp_balance_clade` to calculate the balance score of internal nodes according to their tip nodes abundances. (2022-03-22)
++ add `extract_binary_offspring` to find the descendant tip/internal/all (with `type` parameter) nodes. (2022-03-17)
++ add `mp_aggregate_clade` and `mp_diff_clade` to calculate and test the abundance (differential signals) of 
+  internal node according to their tip nodes abundance. (2022-03-16)
 + add `mp_select_as_tip` and fix the bug of `mp_diff_analysis` with specific `tip.level` (not `OTU`) argument. (2022-03-02, Mon)
 + fix the `replace_na` bug of new `tidyr`. (2022-03-04, Fri)
 + update `mp_import_metaphlan` to better parse the output of `MetaPhlAn2`. (2022-03-11, Fri)

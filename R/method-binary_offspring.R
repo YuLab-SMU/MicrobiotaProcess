@@ -173,7 +173,7 @@ extract_binary_offspring.phylo <- function(.data, .node, type = 'tips', ...){
 
 ##' @method extract_binary_offspring treedata
 ##' @export
-extract_binary_offspring.treedata <- function(.data, .node, type = 'all', ...) {
+extract_binary_offspring.treedata <- function(.data, .node, type = 'tips', ...) {
     extract_binary_offspring(
          .data = as.phylo(.data),
          .node,
@@ -181,9 +181,9 @@ extract_binary_offspring.treedata <- function(.data, .node, type = 'all', ...) {
          ...)
 }
 
-.internl_extract_binary <- function(.data, .node, type = 'all'){
+.internl_extract_binary <- function(.data, .node, type = 'tips'){
     child.nodes <- treeio::child(.data = .data, .node = .node)
-    res <- lapply(child.nodes, function(i)treeio::offspring(.data, .node = i, tiponly = TRUE)) %>%
+    res <- lapply(child.nodes, function(i)treeio::offspring(.data, .node = i, tiponly = TRUE, type=type)) %>%
         suppressMessages() %>%
         stats::setNames(child.nodes)
 
@@ -217,7 +217,7 @@ is_binary_tree <- function(x){
     all(lapply(x, length) == 2)
 }
 
-geometric.mean <- function(x, pseudonum, na.rm = TRUE){
+geometric.mean <- function(x, pseudonum = 0, na.rm = TRUE){
     y <- exp(mean(log(x + pseudonum), na.rm = na.rm)) - pseudonum
     return(y)
 }
