@@ -15,7 +15,7 @@ mp_balance_clade(
   .abundance = NULL,
   force = FALSE,
   relative = TRUE,
-  balance_fun = c("mean", "median", "geometric.mean"),
+  balance_fun = c("geometric.mean", "mean", "median"),
   pseudonum = 0.001,
   action = "get",
   ...
@@ -26,7 +26,7 @@ mp_balance_clade(
   .abundance = NULL,
   force = FALSE,
   relative = TRUE,
-  balance_fun = c("mean", "median", "geometric.mean"),
+  balance_fun = c("geometric.mean", "mean", "median"),
   pseudonum = 0.001,
   action = "get",
   ...
@@ -37,7 +37,7 @@ mp_balance_clade(
   .abundance = NULL,
   force = FALSE,
   relative = TRUE,
-  balance_fun = c("mean", "median", "geometric.mean"),
+  balance_fun = c("geometric.mean", "mean", "median"),
   pseudonum = 0.001,
   action = "get",
   ...
@@ -48,7 +48,7 @@ mp_balance_clade(
   .abundance = NULL,
   force = FALSE,
   relative = TRUE,
-  balance_fun = c("mean", "median", "geometric.mean"),
+  balance_fun = c("geometric.mean", "mean", "median"),
   pseudonum = 0.001,
   action = "get",
   ...
@@ -65,7 +65,7 @@ is not be rarefied, default is FALSE.}
 \item{relative}{logical whether calculate the relative abundance.}
 
 \item{balance_fun}{function the method to calculate the (relative) abundance of internal nodes
-according to their children tips, default is 'mean', other options are 'median' and 'geometric.mean'.}
+according to their children tips, default is 'geometric.mean', other options are 'mean' and 'median'.}
 
 \item{pseudonum}{numeric add a pseudo numeric to avoid the error of division in calculation, default 
 is 0.001 .}

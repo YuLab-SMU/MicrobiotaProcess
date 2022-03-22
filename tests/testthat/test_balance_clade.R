@@ -49,6 +49,9 @@ Node1.down <- tr %>% as_tibble %>%
         dplyr::filter(node %in% binary2nodes[[1]][[2]]) %>%
         dplyr::pull(.data$label)
 
+Node1.up.len <- length(binary2nodes[[1]][[1]])
+Node1.down.len <- length(binary2nodes[[1]][[2]])
+Node1.w <- sqrt((Node1.up.len * Node1.down.len)/(Node1.up.len + Node1.down.len))
 
 Node2.up <- tr %>% as_tibble %>%
         dplyr::filter(node %in% binary2nodes[[2]][[1]]) %>% 
@@ -58,17 +61,21 @@ Node2.down <- tr %>% as_tibble %>%
         dplyr::filter(node %in% binary2nodes[[2]][[2]]) %>% 
         dplyr::pull(.data$label)
 
-Node1.mean <- log((dat %>% magrittr::extract(Node1.up, ) %>% apply(., 2, mean))/(dat %>% magrittr::extract(Node1.down, ) %>% apply(.,2, mean)))
+Node2.up.len <- length(binary2nodes[[2]][[1]])
+Node2.down.len <- length(binary2nodes[[2]][[2]])
+Node2.w <- sqrt((Node2.up.len * Node2.down.len)/(Node2.up.len + Node2.down.len))
 
-Node1.median <- log((dat %>% magrittr::extract(Node1.up, ) %>% apply(., 2, median))/(dat %>% magrittr::extract(Node1.down, ) %>% apply(.,2, median)))
+Node1.mean <- Node1.w * log((dat %>% magrittr::extract(Node1.up, ) %>% apply(., 2, mean))/(dat %>% magrittr::extract(Node1.down, ) %>% apply(.,2, mean)))
 
-Node1.gm.mean <- log((dat %>% magrittr::extract(Node1.up, ) %>% apply(., 2, gm.mean))/(dat %>% magrittr::extract(Node1.down, ) %>% apply(.,2, gm.mean)))
+Node1.median <- Node1.w * log((dat %>% magrittr::extract(Node1.up, ) %>% apply(., 2, median))/(dat %>% magrittr::extract(Node1.down, ) %>% apply(.,2, median)))
 
-Node2.mean <- log((dat %>% magrittr::extract(Node2.up, ) %>% apply(., 2, mean))/(dat %>% magrittr::extract(Node2.down, ) %>% apply(.,2, mean)))
+Node1.gm.mean <- Node1.w * log((dat %>% magrittr::extract(Node1.up, ) %>% apply(., 2, gm.mean))/(dat %>% magrittr::extract(Node1.down, ) %>% apply(.,2, gm.mean)))
 
-Node2.median <- log((dat %>% magrittr::extract(Node2.up, ) %>% apply(., 2, median))/(dat %>% magrittr::extract(Node2.down, ) %>% apply(.,2, median)))
+Node2.mean <- Node2.w * log((dat %>% magrittr::extract(Node2.up, ) %>% apply(., 2, mean))/(dat %>% magrittr::extract(Node2.down, ) %>% apply(.,2, mean)))
 
-Node2.gm.mean <- log((dat %>% magrittr::extract(Node2.up, ) %>% apply(., 2, gm.mean))/(dat %>% magrittr::extract(Node2.down, ) %>% apply(.,2, gm.mean)))
+Node2.median <- Node2.w * log((dat %>% magrittr::extract(Node2.up, ) %>% apply(., 2, median))/(dat %>% magrittr::extract(Node2.down, ) %>% apply(.,2, median)))
+
+Node2.gm.mean <- Node2.w * log((dat %>% magrittr::extract(Node2.up, ) %>% apply(., 2, gm.mean))/(dat %>% magrittr::extract(Node2.down, ) %>% apply(.,2, gm.mean)))
 
 
 test_that("balance score with mean",{
