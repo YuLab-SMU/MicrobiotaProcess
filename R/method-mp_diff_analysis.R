@@ -346,27 +346,24 @@ setGeneric("mp_diff_analysis", function(.data,
          newgroup <- paste0("Sign_", rlang::as_name(.group))
          result %<>% dplyr::rename(label="f", !!newgroup:=!!.group)
          if (is.null(taxatree)){
-             otu_tb <- .data %>% 
-                       mp_extract_feature() 
-             #result %<>% dplyr::select(c("label",setdiff(colnames(result), colnames(otu_tb))))
-             otu_tb %<>% 
-                 dplyr::left_join(result %<>% dplyr::rename(OTU="label"), by="OTU", suffix=c("", ".y")) %>% 
-                 tibble::column_to_rownames(var="OTU") %>%
-                 S4Vectors::DataFrame(check.names=FALSE)
-             SummarizedExperiment::rowData(.data) <- otu_tb
+             if (!is.null(otutree(.data))){
+                 otu.tree <- .data %>% mp_extract_otutree() %>%
+                             treeio::full_join(result, by="label", suffix=c("", ".y"))
+                 otutree(.data) <- otu.tree
+             }else{             
+                 otu_tb <- .data %>% 
+                           mp_extract_feature() 
+                 #result %<>% dplyr::select(c("label",setdiff(colnames(result), colnames(otu_tb))))
+                 otu_tb %<>% 
+                     dplyr::left_join(result %<>% dplyr::rename(OTU="label"), by="OTU", suffix=c("", ".y")) %>% 
+                     tibble::column_to_rownames(var="OTU") %>%
+                     S4Vectors::DataFrame(check.names=FALSE)
+                 SummarizedExperiment::rowData(.data) <- otu_tb
+             }
          }else{
-             #result %<>% dplyr::select(setdiff(colnames(result), 
-             #                          c(colnames(taxatree@data), 
-             #                            colnames(taxatree@extraInfo)))
-             #                         )
              taxatree %<>% treeio::full_join(result, by="label", suffix=c("", ".y"))
              taxatree(.data) <- taxatree
          }
-         #if (!is.null(.data@otutree)){
-         #    otutree <- .data@otutree
-         #    otutree %<>% treeio::full_join(result, by="label", suffix=c("", ".y"))
-         #    otutree(.data) <- otutree
-         #}
          return(.data)
      }
 }

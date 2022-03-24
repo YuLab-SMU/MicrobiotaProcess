@@ -71,8 +71,8 @@ according to their children tips, default is 'geometric.mean', other options are
 is 0.001 .}
 
 \item{action}{character, "add" joins the new information to the otutree slot if it exists (default).
-In addition, "only" return a non-redundant tibble with the just new information. "get" return 'otutree'
-slot, which is a treedata object.}
+In addition, "only" return a non-redundant tibble with the just new information. "get" return a new 'MPSE' 
+object, and the 'OTU' column is the internal nodes and 'Abundance' column is the balance scores.}
 
 \item{...}{additional parameters, meaningless now.}
 }

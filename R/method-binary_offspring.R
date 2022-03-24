@@ -11,8 +11,8 @@
 #' @param pseudonum numeric add a pseudo numeric to avoid the error of division in calculation, default 
 #' is 0.001 .
 #' @param action character, "add" joins the new information to the otutree slot if it exists (default).
-#' In addition, "only" return a non-redundant tibble with the just new information. "get" return 'otutree'
-#' slot, which is a treedata object.
+#' In addition, "only" return a non-redundant tibble with the just new information. "get" return a new 'MPSE' 
+#' object, and the 'OTU' column is the internal nodes and 'Abundance' column is the balance scores.
 #' @param ... additional parameters, meaningless now.
 #' @return a object according to 'action' argument.
 #' @export
@@ -106,7 +106,27 @@ setGeneric("mp_balance_clade",
          abundance = rlang::as_name(.abundance),
          pseudonum = pseudonum
       ) %>%
-      dplyr::bind_rows(.id = 'node') %>%
+      dplyr::bind_rows(.id = 'node')
+
+    node2offspring <- .balance_offspring_node(inodes2binary, otu.tree)
+
+    if (action == 'get'){
+        node2label <- otu.tree %>% dplyr::select(.data$node, .data$label, keep.td=FALSE)
+        da %<>% tidyr::pivot_wider(id_cols='node', names_from='Sample', values_from=index.name) %>%
+            dplyr::mutate_at("node", as.integer) %>%
+            dplyr::left_join(y = node2label, by = 'node') %>%
+            dplyr::select(-.data$node) %>% 
+            tibble::column_to_rownames(var='label')
+        
+        mpse <- MPSE(assays=list(Abundance=da), colData=sample.da %>% tibble::column_to_rownames(var='Sample'))
+        mpse %<>% dplyr::left_join(node2label %>% 
+                                   left_join(node2offspring, by='node'), 
+                                   by=c('OTU'='label'))
+        message_wrap('The new MPSE object (internal nodes as features) will be created.')
+        return(mpse)
+    }
+
+    da %<>%
       dplyr::left_join(sample.da, by = "Sample") %>%
       tidyr::nest(!!rlang::sym(index.name) := - .data$node) %>%
       dplyr::mutate_at("node", as.integer)
@@ -115,24 +135,24 @@ setGeneric("mp_balance_clade",
         da <- otu.tree %>% 
               dplyr::filter(!.data$isTip, keep.td = FALSE) %>%
               select('node', 'label') %>%
-              dplyr::left_join(da, by='node')
+              dplyr::left_join(da, by='node') %>%
+              dplyr::left_join(node2offspring, by='node')
         return (da)
     }
+
     if (index.name %in% treeio::get.fields(otu.tree)){
         otu.tree %<>% dplyr::select(- index.name, keep.td = TRUE)
     }
-    otu.tree %<>% left_join(da, by='node')
+    otu.tree %<>% left_join(da, by='node') %>% left_join(node2offspring, by='node')
 
-    if (action == 'get'){
-        return(otu.tree)
-    }else if (action == 'add'){
+    if (action == 'add'){
         if (inherits(.data, 'MPSE')){
             otutree(.data) <- otu.tree
         }else{
             attr(.data, 'otutree') <- otu.tree
         }
         return(.data)
-    }    
+    } 
 }
 
 #' @rdname mp_balance_clade-methods
@@ -235,4 +255,20 @@ geometric.mean <- function(x, pseudonum = 0, na.rm = TRUE){
     x <- lapply(x, length)
     x <- do.call(`*`, x) / do.call(`+`, x)
     return(sqrt(x))
+}
+
+.balance_offspring_node <- function(x, otu.tree){
+    otu.tree %<>% select(.data$node, .data$label)
+    x <- lapply(x,function(i)lapply(i, function(j)otu.tree %>% dplyr::filter(.data$node %in% j) %>% pull(.data$label)))
+    #x %<>% purrr::map_depth(2,function(j)otu.tree %>% dplyr::filter(.data$node %in% j) %>% pull(.data$label))
+    res <- x %>% lapply(., function(x) do.call('cbind', list(x)) %>% 
+                 as.data.frame() %>% 
+                 setNames('offspringTiplabel') %>% 
+                 tibble::rownames_to_column(var='Children') %>% 
+                 dplyr::mutate(Clade=c('up', 'down'))) %>% 
+           dplyr::bind_rows(.id='node') %>% 
+           tibble::as_tibble() %>% 
+           dplyr::mutate_at('node', as.integer) %>%
+           tidyr::nest(Balance_offspring=-.data$node)
+    res
 }

@@ -64,7 +64,7 @@ Suggests:
   ggupset,
   ggVennDiagram,
   gghalves,
-  ggalluvial,
+  ggalluvial (>= 0.11.1),
   forcats,
   cli,
   phyloseq,
