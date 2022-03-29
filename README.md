@@ -1,6 +1,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# MicrobiotaProcess: an R package for analysis, visualization and biomarker discovery of microbiome
+# MicrobiotaProcess: A comprehensive R package for managing and analyzing microbiome and other ecological data within the tidy framework
 
 This package has many unique features:
 
@@ -19,7 +19,7 @@ This package has many unique features:
 
 <div class="figure" style="text-align: center">
 
-<img src="./inst/figures/mpse.png" alt="The structure of the MPSE class." width="915" />
+<img src="./inst/figures/mpse.png" alt="The structure of the MPSE class." width="883" />
 
 <p class="caption">
 
