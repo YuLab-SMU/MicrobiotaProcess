@@ -82,3 +82,26 @@ a object according to 'action' argument.
 \description{
 Calculating the balance score of internal nodes (clade) according to the mean/median abundance of their binary children tips.
 }
+\examples{
+\dontrun{
+  suppressPackageStartupMessages(library(curatedMetagenomicData))
+  xx <- curatedMetagenomicData('ZellerG_2014.relative_abundance', dryrun=F)
+  xx[[1]] \%>\% as.mpse -> mpse
+  mpse.balance.clade <- mpse \%>\%
+    mp_balance_clade(
+      .abundance = Abundance,
+      force = TRUE,
+      relative = FALSE,
+      action = 'get',
+      pseudonum = .01
+    )
+  mpse.balance.clade 
+  mpse.balance.clade \%>\% mp_diff_analysis(
+      .abundance = Abundance,
+      force = TRUE,
+      relative = FALSE,
+      .group = disease,
+      fc.method = 'compare_mean'
+  )
+}
+}

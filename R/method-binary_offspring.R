@@ -16,6 +16,28 @@
 #' @param ... additional parameters, meaningless now.
 #' @return a object according to 'action' argument.
 #' @export
+#' @examples
+#' \dontrun{
+#'   suppressPackageStartupMessages(library(curatedMetagenomicData))
+#'   xx <- curatedMetagenomicData('ZellerG_2014.relative_abundance', dryrun=F)
+#'   xx[[1]] %>% as.mpse -> mpse
+#'   mpse.balance.clade <- mpse %>%
+#'     mp_balance_clade(
+#'       .abundance = Abundance,
+#'       force = TRUE,
+#'       relative = FALSE,
+#'       action = 'get',
+#'       pseudonum = .01
+#'     )
+#'   mpse.balance.clade 
+#'   mpse.balance.clade %>% mp_diff_analysis(
+#'       .abundance = Abundance,
+#'       force = TRUE,
+#'       relative = FALSE,
+#'       .group = disease,
+#'       fc.method = 'compare_mean'
+#'   )
+#' }
 setGeneric("mp_balance_clade",
            function(.data, 
                     .abundance = NULL, 
@@ -264,11 +286,16 @@ geometric.mean <- function(x, pseudonum = 0, na.rm = TRUE){
     res <- x %>% lapply(., function(x) do.call('cbind', list(x)) %>% 
                  as.data.frame() %>% 
                  setNames('offspringTiplabel') %>% 
-                 tibble::rownames_to_column(var='Children') %>% 
-                 dplyr::mutate(Clade=c('up', 'down'))) %>% 
+                 tibble::rownames_to_column(var='Children') %>%
+                 dplyr::mutate_at('Children', as.integer) %>% 
+                 dplyr::mutate(Clade=c('down', 'up'))) %>% 
            dplyr::bind_rows(.id='node') %>% 
-           tibble::as_tibble() %>% 
+           tibble::as_tibble() %>%
+           dplyr::mutate(pseudolabel=unlist(lapply(.data$offspringTiplabel, function(x)paste0(unlist(x), collapse=';')))) %>%
+           dplyr::group_by(.data$node) %>%
+           dplyr::mutate(pseudolabel=paste0(.data$node, ":", paste0(.data$pseudolabel, collapse='/'))) %>%
+           dplyr::ungroup() %>% 
            dplyr::mutate_at('node', as.integer) %>%
            tidyr::nest(Balance_offspring=-.data$node)
-    res
+    return(res)
 }

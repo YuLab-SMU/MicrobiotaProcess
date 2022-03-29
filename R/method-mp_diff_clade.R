@@ -51,6 +51,28 @@
 #' @return update object according to the action argument.
 #' @author Shuangbin Xu
 #' @export
+#' @examples
+#' \dontrun{
+#'   suppressPackageStartupMessages(library(curatedMetagenomicData))
+#'   xx <- curatedMetagenomicData('ZellerG_2014.relative_abundance', dryrun=F)
+#'   xx[[1]] %>% as.mpse -> mpse
+#'   mpse.agg.clade <- mpse %>%
+#'     mp_aggregate_clade(
+#'       .abundance = Abundance,
+#'       force = TRUE,
+#'       relative = FALSE,
+#'       action = 'add' # other option is 'get' or 'only'.
+#'     )
+#'   mpse.agg.clade %>% mp_diff_clade(
+#'       .abundance = Abundance,
+#'       force = TRUE,
+#'       relative = FALSE,
+#'       .group = disease,
+#'       fc.method = "compare_mean"
+#'     ) %>%
+#'   mp_extract_otutree() %>%
+#'   dplyr::filter(!is.na(Sign_disease), keep.td = FALSE)
+#' }
 setGeneric("mp_diff_clade", function(.data, 
                                      .abundance, 
                                      .group, 

@@ -15,7 +15,7 @@
 #' @export
 #' @examples
 #' \dontrun{
-#'   library(curatedMetagenomicData) 
+#'   suppressPackageStartupMessages(library(curatedMetagenomicData))
 #'   xx <- curatedMetagenomicData('ZellerG_2014.relative_abundance', dryrun=F)
 #'   xx[[1]] %>% as.mpse -> mpse
 #'   otu.tree <- mpse %>% 

@@ -217,6 +217,29 @@ update object according to the action argument.
 \description{
 Differential internal and tip nodes (clades) analysis for MPSE or tbl_mpse object
 }
+\examples{
+\dontrun{
+  suppressPackageStartupMessages(library(curatedMetagenomicData))
+  xx <- curatedMetagenomicData('ZellerG_2014.relative_abundance', dryrun=F)
+  xx[[1]] \%>\% as.mpse -> mpse
+  mpse.agg.clade <- mpse \%>\%
+    mp_aggregate_clade(
+      .abundance = Abundance,
+      force = TRUE,
+      relative = FALSE,
+      action = 'add' # other option is 'get' or 'only'.
+    )
+  mpse.agg.clade \%>\% mp_diff_clade(
+      .abundance = Abundance,
+      force = TRUE,
+      relative = FALSE,
+      .group = disease,
+      fc.method = "compare_mean"
+    ) \%>\%
+  mp_extract_otutree() \%>\%
+  dplyr::filter(!is.na(Sign_disease), keep.td = FALSE)
+}
+}
 \author{
 Shuangbin Xu
 }
