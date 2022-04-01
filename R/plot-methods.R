@@ -351,7 +351,7 @@ setMethod("mp_plot_abundance", signature(.data="grouped_df_mpse"), .internal_plo
 #' @rdname mp_plot_alpha-methods
 #' @param .data MPSE or tbl_mpse object
 #' @param .group the column name of sample group information
-#' @param .alpha the column name of alpha index after run mp_cal_alpha or mp_cal_NRI_NTI.
+#' @param .alpha the column name of alpha index after run mp_cal_alpha or mp_cal_pd_metric.
 #' @param test the name of the statistical test, default is 'wilcox.test'
 #' @param comparisons A list of length-2 vectors. The entries in the vector are
 #' either the names of 2 values on the x-axis or the 2 integers that 

@@ -55,7 +55,7 @@ mp_plot_alpha(
 
 \item{.group}{the column name of sample group information}
 
-\item{.alpha}{the column name of alpha index after run mp_cal_alpha or mp_cal_NRI_NTI.}
+\item{.alpha}{the column name of alpha index after run mp_cal_alpha or mp_cal_pd_metric.}
 
 \item{test}{the name of the statistical test, default is 'wilcox.test'}
 

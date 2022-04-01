@@ -96,6 +96,21 @@ Calculating the balance score of internal nodes (clade) according to the mean/me
       pseudonum = .01
     )
   mpse.balance.clade 
+
+  # Performing the Euclidean distance or PCA.
+
+  mpse.balance.clade \%>\%
+    mp_cal_dist(.abundance = Abundance, distmethod = 'euclidean') \%>\%
+    mp_plot_dist(.distmethod = 'euclidean', .group = disease, group.test = T)
+
+  mpse.balance.clade \%>\%
+    mp_adonis(.abundance = Abundance, distmethod = 'euclidean', permutation = 9999)
+
+  mpse.balance.clade \%>\%
+    mp_cal_pca(.abundance = Abundance) \%>\% 
+    mp_plot_ord(.group = disease)
+
+  # Detecting the signal balance nodes.
   mpse.balance.clade \%>\% mp_diff_analysis(
       .abundance = Abundance,
       force = TRUE,
@@ -104,4 +119,14 @@ Calculating the balance score of internal nodes (clade) according to the mean/me
       fc.method = 'compare_mean'
   )
 }
+}
+\references{
+Morton JT, Sanders J, Quinn RA, McDonald D, Gonzalez A, Vázquez-Baeza Y, 
+Navas-Molina JA, Song SJ, Metcalf JL, Hyde ER, Lladser M, Dorrestein PC, 
+Knight R. 2017. Balance trees reveal microbial niche differentiation. 
+mSystems 2:e00162-16. https://doi.org/10.1128/mSystems.00162-16.
+
+Justin D Silverman, Alex D Washburne, Sayan Mukherjee, Lawrence A David. 
+A phylogenetic transform enhances analysis of compositional microbiota data. 
+eLife 2017;6:e21887. https://doi.org/10.7554/eLife.21887.001.
 }
