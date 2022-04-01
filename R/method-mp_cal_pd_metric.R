@@ -1,20 +1,18 @@
-#' @title NRI (Nearest Relative Index) and NTI (Nearest Taxon Index)
-#' 
-#' @description
-#' calculate NRT and NTI of sample. It is a wrapper method of picante::ses.mpd
-#' and picante::ses.mntd
+#' @title calculating related phylogenetic alpha metric 
 #' @param obj object, data.frame of (nrow sample * ncol taxonomy(feature)) 
 #' or phyloseq.
 #' @param mindepth numeric, Subsample size for rarefying community.
 #' @param sampleda data.frame, sample information, row sample * column factors.
 #' @param tree tree object, it can be phylo object or treedata object.
+#' @param metric the related phylogenetic metric, options is 'NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'all',
+#' default is 'all', meaning all the metrics ('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED').
 #' @param abundance.weighted logical, whether calculate mean nearest taxon distances for each species 
-#' weighted by species abundance, default is TRUE.
+#' weighted by species abundance, default is FALSE.
 #' @param force logical whether calculate the index even the count of otu is
 #' not rarefied, default is FALSE. If it is TRUE, meaning the rarefaction is not be
 #' performed automatically.
 #' @param seed integer a random seed to make the result reproducible, default is 123.
-#' @param ... additional arguments see also "ses.mpd" and "ses.mntd" of "picante".
+#' @param ... additional arguments, meaningless now.
 #' @return alphasample object contained NRT and NTI.
 #' @rdname get_NRI_NTI-methods
 #' @author Shuangbin Xu
@@ -24,29 +22,36 @@ setGeneric("get_NRI_NTI", function(obj, ...){standardGeneric("get_NRI_NTI")})
 #' @aliases get_NRI_NTI,matrix
 #' @rdname get_NRI_NTI-methods
 #' @export
-setMethod("get_NRI_NTI", "matrix", function(obj, mindepth, sampleda, tree, abundance.weighted=TRUE, force=FALSE, seed=123, ...){
+setMethod("get_NRI_NTI", "matrix", function(obj, mindepth, sampleda, tree, metric=c('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'all'),
+                                            abundance.weighted=FALSE, force=FALSE, seed=123, ...){
     if (missing(mindepth) || is.null(mindepth)){
            mindepth <- min(rowSums(obj))
     }
     if (obj %>% rowSums %>% var != 0 && !force){
         obj <- vegan::rrarefy(obj, mindepth)
     }
-    treedist <- cal_treedist(tree=tree)
-    resnri <- withr::with_seed(seed, picante::ses.mpd(samp = obj, dis = treedist, abundance.weighted = abundance.weighted, ...))
-    resnti <- withr::with_seed(seed, picante::ses.mntd(samp = obj, dis = treedist, abundance.weighted = abundance.weighted, ...))
-    respd <- picante::pd(samp = obj, tree = tree)
+    metric <- match.arg(metric, c('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'all'))
+    if (metric == 'all'){
+        res <- .internal_cal_all_pd_metric(obj, tree, weighted.abund = abundance.weighted, seed = seed, ...)
+    }
 
-    resda <- data.frame(
-                 NRI = resnri$mpd.obs.z * -1,
-                 NTI = resnti$mntd.obs.z * -1,
-                 PD = respd$PD
-               ) %>% magrittr::set_rownames(rownames(resnri))
-    
+    res <- switch(metric,
+        NRI = withr::with_seed(seed, .internal_cal_nri(obj, cal_treedist(tree), weighted.abund = abundance.weighted, ...)),
+        NTI = withr::with_seed(seed, .internal_cal_nti(obj, cal_treedist(tree), weighted.abund = abundance.weighted, ...)),
+        PD  = .internal_cal_pd(obj, tree),
+        PAE = .internal_cal_pae(obj, tree),
+        HAED = .internal_cal_haed(obj, tree, ...),
+        EAED = .internal_cal_eaed(obj, tree)
+    )  
+    if (metric != 'all'){
+        res <- data.frame(res) %>% 
+               magrittr::set_colnames(metric)
+    }
     if (missing(sampleda)){
         sampleda <- NULL
     }
     res <- new("alphasample",
-               alpha=resda,
+               alpha=res,
                sampleda=sampleda)
     return(res)
 })     
@@ -90,12 +95,15 @@ cal_treedist <- function(tree){
     return (treedist)
 }
 
-#' Calculating NRI (Nearest Relative Index) and NTI (Nearest Taxon Index) with MPSE or tbl_mpse object
+#' @title Calculating related phylogenetic alpha metric with MPSE or tbl_mpse object
+#'
 #' @param .data object, MPSE or tbl_mpse object
 #' @param .abundance The column name of OTU abundance column to be calculate.
 #' @param action character it has three options, "add" joins the new information
 #' to the input tbl (default), "only" return a non-redundant tibble with the just
 #' new information, ang 'get' return a 'alphasample' object.
+#' @param metric the related phylogenetic metric, options is 'NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'all',
+#' default is 'PAE', meaning all the metrics ('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED').
 #' @param abundance.weighted logical, whether calculate mean nearest taxon distances for each species
 #' weighted by species abundance, default is TRUE.
 #' @param force logical whether calculate the alpha index even the '.abundance' is
@@ -103,20 +111,67 @@ cal_treedist <- function(tree){
 #' @param seed integer a random seed to make the result reproducible, default is 123.
 #' @param ... additional arguments see also "ses.mpd" and "ses.mntd" of "picante".
 #' @return update object.
-#' @rdname mp_cal_NRI_NTI-methods
+#' @rdname mp_cal_pd_metric-methods
 #' @author Shuangbin Xu
 #' @export
-setGeneric("mp_cal_NRI_NTI", function(.data, .abundance, action="add", abundance.weighted=TRUE, force=FALSE, seed=123, ...)standardGeneric("mp_cal_NRI_NTI"))
+#'
+#' @references Cadotte, M.W., Jonathan Davies, T., Regetz, J., Kembel, S.W., Cleland,
+#' E. and Oakley, T.H. (2010), Phylogenetic diversity metrics for ecological communities:
+#' integrating species richness, abundance and evolutionary history. Ecology Letters,
+#' 13: 96-105. https://doi.org/10.1111/j.1461-0248.2009.01405.x.
+#' 
+#' Webb, C. O. (2000). Exploring the phylogenetic structure of ecological communities: 
+#' an example for rain forest trees. The American Naturalist, 156(2), 145-155.
+#' https://doi.org/10.1086/303378.
+#' @examples
+#' \dontrun{
+#'   suppressPackageStartupMessages(library(curatedMetagenomicData))
+#'   xx <- curatedMetagenomicData('ZellerG_2014.relative_abundance', dryrun=F)
+#'   xx[[1]] %>% as.mpse -> mpse
+#'   mpse %<>% 
+#'     mp_cal_pd_metric(
+#'       .abundance = Abundance, 
+#'       force = TRUE,
+#'       metric = 'PAE'
+#'     )
+#'   mpse %>% 
+#'     mp_plot_alpha(
+#'       .alpha = PAE,
+#'       .group = disease
+#'   )
+#' }
+setGeneric("mp_cal_pd_metric", function(
+    .data, 
+    .abundance, 
+    action = "add", 
+    metric = c('PAE', 'NRI', 'NTI', 'PD', 'HAED', 'EAED', 'all'),
+    abundance.weighted = FALSE, 
+    force = FALSE, 
+    seed = 123, 
+    ...)
+standardGeneric("mp_cal_pd_metric")
+)
 
-#' @rdname mp_cal_NRI_NTI-methods
-#' @aliases mp_cal_NRI_NTI,MPSE
-#' @exportMethod mp_cal_NRI_NTI
-setMethod("mp_cal_NRI_NTI", signature(.data="MPSE"), function(.data, .abundance, action="add", abundance.weighted=TRUE, force=FALSE, seed=123, ...){
+#' @rdname mp_cal_pd_metric-methods
+#' @aliases mp_cal_pd_metric,MPSE
+#' @exportMethod mp_cal_pd_metric
+setMethod("mp_cal_pd_metric", signature(.data = "MPSE"), function(
+    .data, 
+    .abundance, 
+    action = "add", 
+    metric = c('PAE', 'NRI', 'NTI', 'PD', 'HAED', 'EAED', 'all'),
+    abundance.weighted = FALSE, 
+    force = FALSE, 
+    seed = 123, 
+    ...){
     action %<>% match.arg(c("add", "only", "get"))
-
-    res <- .internal_cal_NRI_NTI(.data=.data,
+    metric <- rlang::enquo(metric)
+    metric <- quo.vect_to_str.vect(metric)    
+    metric %<>% match.arg(c('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'all'))
+    res <- .internal_cal_pd_metric(.data=.data,
                                  .abundance=!!rlang::enquo(.abundance),
                                  abundance.weighted=abundance.weighted,
+                                 metric = metric,
                                  force=force,
                                  seed = seed,
                                  ...)
@@ -144,7 +199,7 @@ setMethod("mp_cal_NRI_NTI", signature(.data="MPSE"), function(.data, .abundance,
 
 })
           
-.internal_cal_NRI_NTI <- function(.data, .abundance, abundance.weighted=TRUE, force=FALSE, seed=123, ...){
+.internal_cal_pd_metric <- function(.data, .abundance, abundance.weighted = FALSE, metric = 'NRI', force=FALSE, seed=123, ...){
 
     .abundance <- rlang::enquo(.abundance)
     if (rlang::quo_is_null(.abundance)){
@@ -181,16 +236,29 @@ setMethod("mp_cal_NRI_NTI", signature(.data="MPSE"), function(.data, .abundance,
     indexda <- .data %>% 
                mp_extract_assays(.abundance=!!.abundance, byRow=FALSE) %>%
                as.matrix() %>%
-               get_NRI_NTI(tree=otutree@phylo, force=TRUE, abundance.weighted=abundance.weighted, seed=seed, ...)
+               get_NRI_NTI(tree=otutree@phylo, force=TRUE, metric = metric, abundance.weighted=abundance.weighted, seed=seed, ...)
 
     return(indexda)
 }
 
-.internal_cal_NRI_NTI_ <- function(.data, .abundance, action="add", abundance.weighted=TRUE, force=FALSE, seed=123, ...){
+.internal_cal_pd_metric_ <- function(
+    .data, 
+    .abundance, 
+    action = "add", 
+    metric = c('PAE', 'NRI', 'NTI', 'PD', 'HAED', 'EAED', 'all'), 
+    abundance.weighted = TRUE, 
+    force = FALSE, 
+    seed = 123, 
+    ...){
     action %<>% match.arg(c("add", "only", "get"))
-    res <- .internal_cal_NRI_NTI(.data=.data,
-                                 .abundance=!!rlang::enquo(.abundance),
-                                 force=force,
+    metric <- rlang::enquo(metric)
+    metric <- quo.vect_to_str.vect(metric) 
+    metric %<>% match.arg(c('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'all'))
+    res <- .internal_cal_pd_metric(.data = .data,
+                                 .abundance = !!rlang::enquo(.abundance),
+                                 abundance.weighted = abundance.weighted, 
+                                 metric = metric,
+                                 force = force,
                                  seed = seed,
                                  ...)
     if (action=="get"){
@@ -218,12 +286,12 @@ setMethod("mp_cal_NRI_NTI", signature(.data="MPSE"), function(.data, .abundance,
     }
 }
 
-#' @rdname mp_cal_NRI_NTI-methods
-#' @aliases mp_cal_NRI_NTI,tbl_mpse
-#' @exportMethod mp_cal_NRI_NTI
-setMethod("mp_cal_NRI_NTI", signature(.data="tbl_mpse"), .internal_cal_NRI_NTI_)
+#' @rdname mp_cal_pd_metric-methods
+#' @aliases mp_cal_pd_metric,tbl_mpse
+#' @exportMethod mp_cal_pd_metric
+setMethod("mp_cal_pd_metric", signature(.data="tbl_mpse"), .internal_cal_pd_metric_)
 
-#' @rdname mp_cal_NRI_NTI-methods
-#' @aliases mp_cal_NRI_NTI,grouped_df_mpse
-#' @exportMethod mp_cal_NRI_NTI
-setMethod("mp_cal_NRI_NTI", signature(.data="grouped_df_mpse"), .internal_cal_NRI_NTI_)
+#' @rdname mp_cal_pd_metric-methods
+#' @aliases mp_cal_pd_metric,grouped_df_mpse
+#' @exportMethod mp_cal_pd_metric
+setMethod("mp_cal_pd_metric", signature(.data="grouped_df_mpse"), .internal_cal_pd_metric_)

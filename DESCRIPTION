@@ -48,7 +48,6 @@ Suggests:
   knitr,
   nlme,
   phangorn,
-  picante,
   plyr,
   DECIPHER,
   randomForest,
