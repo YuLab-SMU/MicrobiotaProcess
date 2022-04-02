@@ -1,5 +1,7 @@
-# MicrobiotaProcess 1.7.8.992
+# MicrobiotaProcess 1.7.9
 
++ add `mp_cal_pd_metric` to calculate the related phylogenetic diversity metrics. (2022-04-02)
+  including `NRI`, `NTI`, `PD`, `PAE`, `HAED`, `EAED`, `IAC`.
 + add `mp_balance_clade` to calculate the balance score of internal nodes according to their tip nodes abundances. (2022-03-22)
 + add `extract_binary_offspring` to find the descendant tip/internal/all (with `type` parameter) nodes. (2022-03-17)
 + add `mp_aggregate_clade` and `mp_diff_clade` to calculate and test the abundance (differential signals) of 
