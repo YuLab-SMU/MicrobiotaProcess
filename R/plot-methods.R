@@ -463,7 +463,9 @@ setGeneric("mp_plot_alpha",
                                     fill = NA,
                                     position=ggplot2::position_nudge(x=.22),
                                     size = 0.6,
-                                    width=0.2) +
+                                    width = 0.2,
+                                    outlier.shape = NA
+                                    ) +
               ggsignif::geom_signif(comparisons=comparisons, test=test, step_increase=step_increase, ...) +
               ggplot2::scale_fill_manual(values=get_cols(tbl %>% pull(!!rlang::sym(gp[1])) %>% unique() %>% length())) +
               ggplot2::scale_color_manual(values=get_cols(tbl %>% pull(!!rlang::sym(gp[1])) %>% unique() %>% length()))

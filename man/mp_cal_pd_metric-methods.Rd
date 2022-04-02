@@ -63,8 +63,8 @@ mp_cal_pd_metric(
 to the input tbl (default), "only" return a non-redundant tibble with the just
 new information, ang 'get' return a 'alphasample' object.}
 
-\item{metric}{the related phylogenetic metric, options is 'NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'all',
-default is 'PAE', meaning all the metrics ('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED').}
+\item{metric}{the related phylogenetic metric, options is 'NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'IAC', 'all',
+default is 'PAE', 'all' meaning all the metrics ('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'IAC').}
 
 \item{abundance.weighted}{logical, whether calculate mean nearest taxon distances for each species
 weighted by species abundance, default is TRUE.}

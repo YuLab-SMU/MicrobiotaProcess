@@ -17,7 +17,7 @@ get_NRI_NTI(obj, ...)
   mindepth,
   sampleda,
   tree,
-  metric = c("NRI", "NTI", "PD", "PAE", "HAED", "EAED", "all"),
+  metric = c("PAE", "NRI", "NTI", "PD", "HAED", "EAED", "IAC", "all"),
   abundance.weighted = FALSE,
   force = FALSE,
   seed = 123,
@@ -40,8 +40,8 @@ or phyloseq.}
 
 \item{tree}{tree object, it can be phylo object or treedata object.}
 
-\item{metric}{the related phylogenetic metric, options is 'NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'all',
-default is 'all', meaning all the metrics ('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED').}
+\item{metric}{the related phylogenetic metric, options is 'NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'IAC', 'all',
+default is 'PAE', meaning all the metrics ('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'IAC').}
 
 \item{abundance.weighted}{logical, whether calculate mean nearest taxon distances for each species 
 weighted by species abundance, default is FALSE.}

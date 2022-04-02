@@ -12,7 +12,8 @@
         PD = .internal_cal_pd(x, tree),
         PAE = .internal_cal_pae(x, tree),
         HAED = HAED,
-        EAED = HAED / log(rowSums(x)) 
+        EAED = HAED / log(rowSums(x)),
+        IAC = .internal_cal_iac(x, tree) 
     ) 
     res <- do.call(cbind, res)
     return (res)
@@ -157,19 +158,11 @@ cal_treedist <- function(tree){
 }
 
 .internal_cal_haed <- function(x, tree, method='multi.abund', ...){
-    #AED <- .internal_cal_aed(x = x, tree = tree, action = 'get')
     AED <- .internal_cal_aed(x = x, tree = tree)
     PD <- .internal_cal_pd(x, tree)
     if (method == 'multi.abund' || !all.equal(round(x), x)){
-        tmp <- as.matrix(AED) * x / PD
-        #tmp <- apply(tmp,1,function(i)i[i>0])
-        tmp2 <- log(tmp)
-        tmp2[is.infinite(as.matrix(tmp2))] <- 0
-        res <- - rowSums(tmp * tmp2)
-        #tmp <- lapply(seq_len(nrow(x)), function(i){
-        #           unname(as.matrix(AED[i,])) * unname(as.vector(x[i, names(AED[i,])]))/PD[[i]]
-        #         }
-        #       )
+        tmp <- AED * x / PD
+        res <- - rowSums(tmp * log(tmp), na.rm = TRUE)
     }else{
         tmp <- lapply(seq_len(nrow(x)), function(i){
                    rep(unname(as.matrix(AED[i,])), unname(as.vector(x[i, names(AED[i,])])))/PD[[i]]
@@ -181,9 +174,34 @@ cal_treedist <- function(tree){
     return(res)
 }
 
-.internal_cal_eaed <- function(x, tree){
-    Haed <- .internal_cal_haed(x, tree)
+.internal_cal_eaed <- function(x, tree, method = 'multi.abund', ...){
+    Haed <- .internal_cal_haed(x, tree, method = method)
     Eaed <- Haed/log(rowSums(x))
+}
+
+.internal_cal_iac <- function(x, tree){
+    tree <- .internal_drop_zero_tip(x, tree)
+    alldenom <- lapply(tree, .internal_denom) %>%
+        dplyr::bind_rows() %>%
+        data.frame(check.names=FALSE) %>%
+        magrittr::set_rownames(rownames(x))
+
+    x <- x[,match(colnames(alldenom), colnames(x))]
+    allnodes <- lapply(tree, treeio::Nnode) %>% unlist()
+    e <- rowSums(x, na.rm = TRUE) / alldenom
+    rowSums(abs(e - x), na.rm = TRUE) / allnodes
+}
+
+.internal_denom <- function(tree){
+    int.nodes <- .nodeId(tree, type='internal')
+    n.splits <- lapply(int.nodes, function(x)length(treeio::child(tree, x))) %>%
+       unlist() %>% stats::setNames(int.nodes)
+
+    res <- lapply(.nodeId(tree, type='tips'), treeio::ancestor, .data=tree) %>%
+           lapply(function(i)prod(n.splits[as.character(i)])) %>%
+           unlist() %>%
+           stats::setNames(tree$tip.label)
+    return(res)
 }
 
 .internal_cal_aed <- function(x, tree, action='only', ...){
@@ -200,9 +218,10 @@ cal_treedist <- function(tree){
     res <- lapply(seq_len(nrow(x)), function(i){
         sp <- x[i, match(rownames(tips2ancestor[[i]]), colnames(x))]
         xx <- sp * tips2ancestor[[i]]
-        AEDi <- tcrossprod(x=edge.len[[i]], y=prop.table(xx, margin=2))
+        AEDi <- tcrossprod(x=edge.len[[i]], y=prop.table(xx, margin=2))[1,]
         AEDi <- AEDi / sp
-        apply(AEDi, 2, function(i)i)
+        return(AEDi)
+        #apply(AEDi, 2, function(i)i)
       }
     )
     if (action == 'get'){
@@ -225,7 +244,7 @@ cal_treedist <- function(tree){
     return(res)
 }
 
-.convert_tips2ancestors_sbp <- function(tree, include.root = FALSE){
+.convert_tips2ancestors_sbp <- function(tree, include.root = FALSE, type = 'all', include.self = TRUE){
     all.nodes <- .nodeId(tree)
     if (!include.root){
         all.nodes <- setdiff(all.nodes, treeio::rootnode(tree))
@@ -236,9 +255,15 @@ cal_treedist <- function(tree){
     }else{
         tiplabels <- tree$tip.label
     }
-    lapply(tip.nodes, treeio::ancestor, .data=tree) %>% 
-        mapply(append, tip.nodes, ., SIMPLIFY=FALSE) %>% 
-        lapply(.,function(i) all.nodes %in% i) %>%
+    .internal_anc <- switch(type,
+            all = treeio::ancestor,
+            parent = treeio::parent
+        )
+    ancestor <- lapply(tip.nodes, .internal_anc, .data=tree)
+    if (include.self){
+        ancestor %<>% mapply(append, tip.nodes, ., SIMPLIFY=FALSE)
+    }
+    ancestor %>% lapply(.,function(i) all.nodes %in% i) %>%
         stats::setNames(tip.nodes) %>%
         do.call(rbind, .) %>%
         magrittr::set_colnames(all.nodes) %>%

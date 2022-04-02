@@ -4,8 +4,8 @@
 #' @param mindepth numeric, Subsample size for rarefying community.
 #' @param sampleda data.frame, sample information, row sample * column factors.
 #' @param tree tree object, it can be phylo object or treedata object.
-#' @param metric the related phylogenetic metric, options is 'NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'all',
-#' default is 'all', meaning all the metrics ('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED').
+#' @param metric the related phylogenetic metric, options is 'NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'IAC', 'all',
+#' default is 'PAE', meaning all the metrics ('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'IAC').
 #' @param abundance.weighted logical, whether calculate mean nearest taxon distances for each species 
 #' weighted by species abundance, default is FALSE.
 #' @param force logical whether calculate the index even the count of otu is
@@ -22,7 +22,7 @@ setGeneric("get_NRI_NTI", function(obj, ...){standardGeneric("get_NRI_NTI")})
 #' @aliases get_NRI_NTI,matrix
 #' @rdname get_NRI_NTI-methods
 #' @export
-setMethod("get_NRI_NTI", "matrix", function(obj, mindepth, sampleda, tree, metric=c('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'all'),
+setMethod("get_NRI_NTI", "matrix", function(obj, mindepth, sampleda, tree, metric=c('PAE', 'NRI', 'NTI', 'PD', 'HAED', 'EAED', 'IAC', 'all'),
                                             abundance.weighted=FALSE, force=FALSE, seed=123, ...){
     if (missing(mindepth) || is.null(mindepth)){
            mindepth <- min(rowSums(obj))
@@ -30,7 +30,7 @@ setMethod("get_NRI_NTI", "matrix", function(obj, mindepth, sampleda, tree, metri
     if (obj %>% rowSums %>% var != 0 && !force){
         obj <- vegan::rrarefy(obj, mindepth)
     }
-    metric <- match.arg(metric, c('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'all'))
+    metric <- match.arg(metric, c('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'IAC', 'all'))
     if (metric == 'all'){
         res <- .internal_cal_all_pd_metric(obj, tree, weighted.abund = abundance.weighted, seed = seed, ...)
     }
@@ -41,7 +41,8 @@ setMethod("get_NRI_NTI", "matrix", function(obj, mindepth, sampleda, tree, metri
         PD  = .internal_cal_pd(obj, tree),
         PAE = .internal_cal_pae(obj, tree),
         HAED = .internal_cal_haed(obj, tree, ...),
-        EAED = .internal_cal_eaed(obj, tree)
+        EAED = .internal_cal_eaed(obj, tree, ...),
+        IAC = .internal_cal_iac(obj, tree)
     )  
     if (metric != 'all'){
         res <- data.frame(res) %>% 
@@ -102,8 +103,8 @@ cal_treedist <- function(tree){
 #' @param action character it has three options, "add" joins the new information
 #' to the input tbl (default), "only" return a non-redundant tibble with the just
 #' new information, ang 'get' return a 'alphasample' object.
-#' @param metric the related phylogenetic metric, options is 'NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'all',
-#' default is 'PAE', meaning all the metrics ('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED').
+#' @param metric the related phylogenetic metric, options is 'NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'IAC', 'all',
+#' default is 'PAE', 'all' meaning all the metrics ('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'IAC').
 #' @param abundance.weighted logical, whether calculate mean nearest taxon distances for each species
 #' weighted by species abundance, default is TRUE.
 #' @param force logical whether calculate the alpha index even the '.abundance' is
@@ -167,7 +168,7 @@ setMethod("mp_cal_pd_metric", signature(.data = "MPSE"), function(
     action %<>% match.arg(c("add", "only", "get"))
     metric <- rlang::enquo(metric)
     metric <- quo.vect_to_str.vect(metric)    
-    metric %<>% match.arg(c('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'all'))
+    metric %<>% match.arg(c('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'IAC', 'all'))
     res <- .internal_cal_pd_metric(.data=.data,
                                  .abundance=!!rlang::enquo(.abundance),
                                  abundance.weighted=abundance.weighted,
@@ -253,7 +254,7 @@ setMethod("mp_cal_pd_metric", signature(.data = "MPSE"), function(
     action %<>% match.arg(c("add", "only", "get"))
     metric <- rlang::enquo(metric)
     metric <- quo.vect_to_str.vect(metric) 
-    metric %<>% match.arg(c('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'all'))
+    metric %<>% match.arg(c('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'IAC', 'all'))
     res <- .internal_cal_pd_metric(.data = .data,
                                  .abundance = !!rlang::enquo(.abundance),
                                  abundance.weighted = abundance.weighted, 
