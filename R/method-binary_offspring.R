@@ -231,7 +231,7 @@ extract_binary_offspring <- function(.data, .node, type = 'tips', ...){
 ##' @export
 extract_binary_offspring.phylo <- function(.data, .node, type = 'tips', ...){
     res <- lapply(.node,
-                  function(i).internl_extract_binary(.data = .data, .node = i, type = type)
+                  function(i).internal_extract_binary(.data = .data, .node = i, type = type)
            ) %>%
            stats::setNames(.node)
     return(res)
@@ -247,7 +247,7 @@ extract_binary_offspring.treedata <- function(.data, .node, type = 'tips', ...) 
          ...)
 }
 
-.internl_extract_binary <- function(.data, .node, type = 'tips'){
+.internal_extract_binary <- function(.data, .node, type = 'tips'){
     child.nodes <- treeio::child(.data = .data, .node = .node)
     res <- lapply(child.nodes, function(i)treeio::offspring(.data, .node = i, tiponly = TRUE, type=type)) %>%
         suppressMessages() %>%

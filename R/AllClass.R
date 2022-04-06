@@ -163,7 +163,7 @@ setOldClass("pcoa")
 setClassUnion("prcompOrNull", c("prcomp", "pcoa", "NULL"))
 
 #' @keywords internal
-setClassUnion("dataframeOrNull", c("data.frame", "NULL"))
+setClassUnion("dataframeOrNull", c("data.frame", 'matrix', "NULL"))
 
 #' @title alphasample class
 #' @docType class

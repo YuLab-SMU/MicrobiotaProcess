@@ -30,7 +30,7 @@ setMethod("get_NRI_NTI", "matrix", function(obj, mindepth, sampleda, tree, metri
     if (obj %>% rowSums %>% var != 0 && !force){
         obj <- vegan::rrarefy(obj, mindepth)
     }
-    metric <- match.arg(metric, c('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'IAC', 'all'))
+    metric %<>% match.arg(c('NRI', 'NTI', 'PD', 'PAE', 'HAED', 'EAED', 'IAC', 'all'))
     if (metric == 'all'){
         res <- .internal_cal_all_pd_metric(obj, tree, weighted.abund = abundance.weighted, seed = seed, ...)
     }
@@ -42,7 +42,8 @@ setMethod("get_NRI_NTI", "matrix", function(obj, mindepth, sampleda, tree, metri
         PAE = .internal_cal_pae(obj, tree),
         HAED = .internal_cal_haed(obj, tree, ...),
         EAED = .internal_cal_eaed(obj, tree, ...),
-        IAC = .internal_cal_iac(obj, tree)
+        IAC = .internal_cal_iac(obj, tree),
+        all = res
     )  
     if (metric != 'all'){
         res <- data.frame(res) %>% 
