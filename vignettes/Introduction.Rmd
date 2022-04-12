@@ -568,7 +568,7 @@ p5 <- p4 +
 p6 <- p5 +
       ggnewscale::new_scale("size") +
       geom_point(
-         data=td_filter(!is.na(fdr)),
+         data=td_filter(!is.na(Sign_time)),
          mapping = aes(size = -log10(fdr),
                        fill = Sign_time,
                        ),

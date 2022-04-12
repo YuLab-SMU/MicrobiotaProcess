@@ -640,7 +640,7 @@ setGeneric("mp_plot_diff_res",
             p4 +
             ggnewscale::new_scale("size") +
             geom_point(
-               data=td_filter(!is.na(!!rlang::sym("fdr"))),
+               data=td_filter(!is.na(!!rlang::sym(sign.field))),
                mapping = aes(size = -log10(!!rlang::sym("fdr")),
                               fill = !!rlang::sym(sign.field),
                              ),

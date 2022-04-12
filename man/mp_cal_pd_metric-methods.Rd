@@ -25,7 +25,7 @@ mp_cal_pd_metric(
   .data,
   .abundance,
   action = "add",
-  metric = c("PAE", "NRI", "NTI", "PD", "HAED", "EAED", "all"),
+  metric = c("PAE", "NRI", "NTI", "PD", "HAED", "EAED", "IAC", "all"),
   abundance.weighted = FALSE,
   force = FALSE,
   seed = 123,

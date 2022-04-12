@@ -295,4 +295,5 @@ remove_MP_internal_res <- function(x){
 
 MP_internal_res <- c("Observe", "Chao1", "ACE", "Shannon", 
                      "Simpson", "Pielou", 'PC', 'PCo', 
-                     'CA', 'NMDS', 'RDA', 'CCA')
+                     'CA', 'NMDS', 'RDA', 'CCA', "PAE", "NRI", 
+                     "NTI", "PD", 'IAC', "HAED", "EAED")

@@ -65,6 +65,10 @@ if (!requireNamespace("remotes", quietly=TRUE))
 remotes::install_github("YuLab-SMU/MicrobiotaProcess")
 ```
 
+# :book: Vignette
+
+For more details, please refer to the [online vignette](https://bioconductor.org/packages/release/bioc/vignettes/MicrobiotaProcess/inst/doc/Introduction.html).
+
 ## :sparkling_heart: Contributing
 
 We welcome any contributions! By participating in this project you agree to abide 

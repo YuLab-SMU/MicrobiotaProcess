@@ -78,6 +78,5 @@ BugReports: https://github.com/YuLab-SMU/MicrobiotaProcess/issues
 VignetteBuilder: knitr
 ByteCompile: true 
 Encoding: UTF-8
-LazyData: false
 biocViews: Visualization, Microbiome, Software, MultipleComparison, FeatureExtraction
 RoxygenNote: 7.1.2

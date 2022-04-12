@@ -15,7 +15,7 @@ mp_aggregate_clade(
   .abundance = NULL,
   force = FALSE,
   relative = TRUE,
-  aggregate_fun = mean,
+  aggregate_fun = c("mean", "median", "geometric.mean"),
   action = "get",
   ...
 )
@@ -25,7 +25,7 @@ mp_aggregate_clade(
   .abundance = NULL,
   force = FALSE,
   relative = TRUE,
-  aggregate_fun = mean,
+  aggregate_fun = c("mean", "median", "geometric.mean"),
   action = "get",
   ...
 )
@@ -35,7 +35,7 @@ mp_aggregate_clade(
   .abundance = NULL,
   force = FALSE,
   relative = TRUE,
-  aggregate_fun = mean,
+  aggregate_fun = c("mean", "median", "geometric.mean"),
   action = "get",
   ...
 )
@@ -45,7 +45,7 @@ mp_aggregate_clade(
   .abundance = NULL,
   force = FALSE,
   relative = TRUE,
-  aggregate_fun = mean,
+  aggregate_fun = c("mean", "median", "geometric.mean"),
   action = "get",
   ...
 )
@@ -61,11 +61,11 @@ is not be rarefied, default is FALSE.}
 \item{relative}{logical whether calculate the relative abundance.}
 
 \item{aggregate_fun}{function the method to calculate the (relative) abundance of internal nodes
-according to their children tips, default is mean.}
+according to their children tips, default is 'mean', other options are 'median', 'geometric.mean'.}
 
 \item{action}{character, "add" joins the new information to the otutree slot if it exists (default). 
-In addition, "only" return a non-redundant tibble with the just new information. "get" return 'otutree'
-slot, which is a treedata object.}
+In addition, "only" return a non-redundant tibble with the just new information. "get" return a new 'mpse',
+which the features is the internal nodes.}
 
 \item{...}{additional parameters, meaningless now.}
 }

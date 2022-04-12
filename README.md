@@ -33,7 +33,7 @@ The structure of the MPSE class.
 
 <div class="figure" style="text-align: center">
 
-<img src="./inst/figures/mp-design.png" alt="The Overview of the design of MicrobiotaProcess package" width="731" />
+<img src="./inst/figures/mp-design.png" alt="The Overview of the design of MicrobiotaProcess package" width="1078" />
 
 <p class="caption">
 
@@ -70,6 +70,11 @@ if (!requireNamespace("remotes", quietly=TRUE))
     install.packages("remotes")
 remotes::install_github("YuLab-SMU/MicrobiotaProcess")
 ```
+
+# :book: Vignette
+
+For more details, please refer to the [online
+vignette](https://bioconductor.org/packages/release/bioc/vignettes/MicrobiotaProcess/inst/doc/Introduction.html).
 
 ## :sparkling\_heart: Contributing
 
