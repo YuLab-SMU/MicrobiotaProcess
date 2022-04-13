@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.7.10
+
++ optimizing the `mp_aggregate_clade` and `mp_balance_clade`. (2022-04-13)
+
 # MicrobiotaProcess 1.7.9
 
 + add `mp_cal_pd_metric` to calculate the related phylogenetic diversity metrics. (2022-04-02)

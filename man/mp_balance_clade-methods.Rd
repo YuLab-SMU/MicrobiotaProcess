@@ -8,7 +8,7 @@
 \alias{mp_balance_clade,tbl_mpse}
 \alias{mp_balance_clade,grouped_df_mpse-method}
 \alias{mp_balance_clade,grouped_df_mpse}
-\title{Calculating the balance score of internal nodes (clade) according to the mean/median abundance of their binary children tips.}
+\title{Calculating the balance score of internal nodes (clade) according to the geometric.mean/mean/median abundance of their binary children tips.}
 \usage{
 mp_balance_clade(
   .data,
@@ -80,7 +80,7 @@ object, and the 'OTU' column is the internal nodes and 'Abundance' column is the
 a object according to 'action' argument.
 }
 \description{
-Calculating the balance score of internal nodes (clade) according to the mean/median abundance of their binary children tips.
+Calculating the balance score of internal nodes (clade) according to the geometric.mean/mean/median abundance of their binary children tips.
 }
 \examples{
 \dontrun{
@@ -104,7 +104,7 @@ Calculating the balance score of internal nodes (clade) according to the mean/me
     mp_plot_dist(.distmethod = 'euclidean', .group = disease, group.test = T)
 
   mpse.balance.clade \%>\%
-    mp_adonis(.abundance = Abundance, distmethod = 'euclidean', permutation = 9999)
+    mp_adonis(.abundance = Abundance, .formula=~disease, distmethod = 'euclidean', permutation = 9999)
 
   mpse.balance.clade \%>\%
     mp_cal_pca(.abundance = Abundance) \%>\% 

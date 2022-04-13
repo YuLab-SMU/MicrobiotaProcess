@@ -1,4 +1,4 @@
-#' Calculating the balance score of internal nodes (clade) according to the mean/median abundance of their binary children tips.
+#' Calculating the balance score of internal nodes (clade) according to the geometric.mean/mean/median abundance of their binary children tips.
 #'
 #' @rdname mp_balance_clade-methods
 #' @param .data MPSE object which must contain otutree slot, required
@@ -47,7 +47,7 @@
 #'     mp_plot_dist(.distmethod = 'euclidean', .group = disease, group.test = T)
 #'
 #'   mpse.balance.clade %>%
-#'     mp_adonis(.abundance = Abundance, distmethod = 'euclidean', permutation = 9999)
+#'     mp_adonis(.abundance = Abundance, .formula=~disease, distmethod = 'euclidean', permutation = 9999)
 #' 
 #'   mpse.balance.clade %>%
 #'     mp_cal_pca(.abundance = Abundance) %>% 
@@ -85,6 +85,15 @@ setGeneric("mp_balance_clade",
         warning_wrap("The object did not contain otutree slot.")
         return (NULL)
     }
+    if (!ape::is.binary(otu.tree@phylo)){
+        warning_wrap("The otutree is not a binary tree, it would be converted to 
+                     binary tree using multi2di of ape automatically!")
+        otu.tree@phylo <- ape::multi2di(otu.tree@phylo)
+        if (!ape::is.binary(otu.tree@phylo)){
+            stop_wrap('The multi2di can not convert the otutree to a binary tree automatically, 
+                      please convert it to binary tree manually !')
+        }
+    }
     action %<>% match.arg(c("add", "get", "only"))
 
     .abundance <- rlang::enquo(.abundance)
@@ -116,55 +125,30 @@ setGeneric("mp_balance_clade",
         da <- apply(da, 2, function(x)x/sum(x) * 100)
         .abundance <- as.symbol(paste0("Rel", rlang::as_name(.abundance), 'BySample'))
     }
-    da %<>%
-        tibble::as_tibble(rownames='OTU') %>%
-        tidyr::pivot_longer(
-          cols = !.data$OTU,
-          names_to = 'Sample',
-          values_to = rlang::as_name(.abundance)
-        ) %>%
-        dplyr::left_join(
-          otu.tree %>%
-            select('node', 'label'),
-          by=c('OTU'='label')
-        ) %>%
-        select(-'OTU')
+    if (any(da<0)){
+        stop_wrap('The ', rlang::as_name(.abundance), ' can not contain negative value.')
+    }
+    da <- da + pseudonum
+    
     if (is.null(otu.tree@phylo$node.label)){
         otu.tree@phylo <- ape::makeNodeLabel(otu.tree@phylo)
     }
-    #if (is.character(balance_fun)){
-    #    balance_fun <- rlang::as_function(balance_fun)
-    #}
     sample.da <- .data %>% mp_extract_sample() %>% remove_MP_internal_res()
     index.name <- paste0('BalanceBy', rlang::as_name(.abundance))
-    inodes <- otu.tree %>% .extract_nodes()
-     
-    inodes2binary <- extract_binary_offspring(otu.tree, inodes)
-    if (!is_binary_tree(inodes2binary)){
-        stop_wrap("The otutree is not a binary tree")
-    }
+    inodes <- .nodeId(otu.tree, type = 'internal')
 
-    da <- lapply(
-         inodes2binary,
-         .internal_balance_clade,
-         x = da,
-         fun = balance_fun,
-         abundance = rlang::as_name(.abundance),
-         pseudonum = pseudonum
-      ) %>%
-      dplyr::bind_rows(.id = 'node')
-
-    node2offspring <- .balance_offspring_node(inodes2binary, otu.tree)
+    tip2ances <- .convert_balance_tip2ancestors(otu.tree@phylo, inodes)
+    inode.balance <- .internal_balance(x = da, tip2ances = tip2ances, fun = balance_fun)
+    
+    node2offspring <- .balance_offspring_node(tip2ances, inodes, otu.tree)
 
     if (action == 'get'){
         node2label <- otu.tree %>% dplyr::select(.data$node, .data$label, keep.td=FALSE)
-        da %<>% tidyr::pivot_wider(id_cols='node', names_from='Sample', values_from=index.name) %>%
-            dplyr::mutate_at("node", as.integer) %>%
-            dplyr::left_join(y = node2label, by = 'node') %>%
-            dplyr::select(-.data$node) %>% 
-            tibble::column_to_rownames(var='label')
-        
-        mpse <- MPSE(assays=list(Abundance=da), colData=sample.da %>% tibble::column_to_rownames(var='Sample'))
+        node2name <- treeio::nodeid(otu.tree, otu.tree@phylo$node.label)
+        names(node2name) <- otu.tree@phylo$node.label
+        node2name <- node2name[match(colnames(inode.balance), node2name)]
+        colnames(inode.balance) <- names(node2name)
+        mpse <- MPSE(assays=list(Abundance=t(inode.balance)), colData=sample.da %>% tibble::column_to_rownames(var='Sample'))
         mpse %<>% dplyr::left_join(node2label %>% 
                                    left_join(node2offspring, by='node'), 
                                    by=c('OTU'='label'))
@@ -172,16 +156,22 @@ setGeneric("mp_balance_clade",
         return(mpse)
     }
 
-    da %<>%
-      dplyr::left_join(sample.da, by = "Sample") %>%
-      tidyr::nest(!!rlang::sym(index.name) := - .data$node) %>%
-      dplyr::mutate_at("node", as.integer)
+    inode.balance %<>%
+        as_tibble(rownames = 'Sample') %>%
+        tidyr::pivot_longer(
+          cols = !.data$Sample,
+          names_to = 'node',
+          values_to = index.name
+        ) %>%
+        dplyr::left_join(sample.da, by = 'Sample') %>%
+        tidyr::nest(!!rlang::sym(index.name) := - .data$node) %>%
+        dplyr::mutate_at("node", as.integer)    
 
     if (action == 'only'){
         da <- otu.tree %>% 
               dplyr::filter(!.data$isTip, keep.td = FALSE) %>%
               select('node', 'label') %>%
-              dplyr::left_join(da, by='node') %>%
+              dplyr::left_join(inode.balance, by='node') %>%
               dplyr::left_join(node2offspring, by='node')
         return (da)
     }
@@ -189,7 +179,7 @@ setGeneric("mp_balance_clade",
     if (index.name %in% treeio::get.fields(otu.tree)){
         otu.tree %<>% dplyr::select(- index.name, keep.td = TRUE)
     }
-    otu.tree %<>% left_join(da, by='node') %>% left_join(node2offspring, by='node')
+    otu.tree %<>% left_join(inode.balance, by='node') %>% left_join(node2offspring, by='node')
 
     if (action == 'add'){
         if (inherits(.data, 'MPSE')){
@@ -258,68 +248,136 @@ extract_binary_offspring.treedata <- function(.data, .node, type = 'tips', ...) 
     return(res)
 }
 
-.internal_balance_clade <- function(node2binary, x, fun, abundance, pseudonum=.001){
-    newnm <- paste0('BalanceBy', abundance)
-    res <- lapply(node2binary, function(i){
-            x %>% 
-            dplyr::filter(.data$node %in% i) %>%
-            dplyr::group_by(.data$Sample) %>%
-            dplyr::summarize(Abun = .internal.aggregate(
-                   x = .data[[abundance]],
-                   fun = fun, 
-                   pseudonum = pseudonum 
-              )
-            )
-         }
-    )
-    weight.s <- .weight.subtree.count(node2binary)
-    res2 <- data.frame(Sample=res[[1]][,1,drop=TRUE]) 
-    res2[[newnm]] <- weight.s * log((res[[1]][,2,drop=TRUE] + pseudonum) / (res[[2]][,2,drop=TRUE] + pseudonum))
-    res2 %<>% select('Sample', newnm)
-    return(res2)
-}
-
-is_binary_tree <- function(x){
-    all(lapply(x, length) == 2)
-}
+#.internal_balance_clade <- function(node2binary, x, fun, abundance, pseudonum=.001){
+#    newnm <- paste0('BalanceBy', abundance)
+#    res <- lapply(node2binary, function(i){
+#            x %>% 
+#            dplyr::filter(.data$node %in% i) %>%
+#            dplyr::group_by(.data$Sample) %>%
+#            dplyr::summarize(Abun = .internal.aggregate(
+#                   x = .data[[abundance]],
+#                   fun = fun, 
+#                   pseudonum = pseudonum 
+#              )
+#            )
+#         }
+#    )
+#    weight.s <- .weight.subtree.count(node2binary)
+#    res2 <- data.frame(Sample=res[[1]][,1,drop=TRUE]) 
+#    res2[[newnm]] <- weight.s * log((res[[1]][,2,drop=TRUE] + pseudonum) / (res[[2]][,2,drop=TRUE] + pseudonum))
+#    res2 %<>% select('Sample', newnm)
+#    return(res2)
+#}
+# 
+# is_binary_tree <- function(x){
+#     all(lapply(x, length) == 2)
+# }
 
 geometric.mean <- function(x, pseudonum = 0, na.rm = TRUE){
     y <- exp(mean(log(x + pseudonum), na.rm = na.rm)) - pseudonum
     return(y)
 }
 
-.internal.aggregate <- function(x, fun, pseudonum = 0.01){
-    xx <- switch(fun,
-        mean = mean(x, na.rm=TRUE),
-        median = median(x, na.rm=TRUE),
-        geometric.mean = geometric.mean(x, pseudonum=pseudonum)
-    )
-    return(xx)
-}
+#.internal.aggregate <- function(x, fun, pseudonum = 0.01){
+#    xx <- switch(fun,
+#        mean = mean(x, na.rm=TRUE),
+#        median = median(x, na.rm=TRUE),
+#        geometric.mean = geometric.mean(x, pseudonum=pseudonum)
+#    )
+#    return(xx)
+#}
+#
+#.weight.subtree.count <- function(x){
+#    x <- lapply(x, length)
+#    x <- do.call(`*`, x) / do.call(`+`, x)
+#    return(sqrt(x))
+#}
 
-.weight.subtree.count <- function(x){
-    x <- lapply(x, length)
-    x <- do.call(`*`, x) / do.call(`+`, x)
-    return(sqrt(x))
-}
-
-.balance_offspring_node <- function(x, otu.tree){
-    otu.tree %<>% select(.data$node, .data$label)
-    x <- lapply(x,function(i)lapply(i, function(j)otu.tree %>% dplyr::filter(.data$node %in% j) %>% pull(.data$label)))
-    #x %<>% purrr::map_depth(2,function(j)otu.tree %>% dplyr::filter(.data$node %in% j) %>% pull(.data$label))
-    res <- x %>% lapply(., function(x) do.call('cbind', list(x)) %>% 
-                 as.data.frame() %>% 
-                 setNames('offspringTiplabel') %>% 
-                 tibble::rownames_to_column(var='Children') %>%
-                 dplyr::mutate_at('Children', as.integer) %>% 
-                 dplyr::mutate(Clade=c('down', 'up'))) %>% 
-           dplyr::bind_rows(.id='node') %>% 
-           tibble::as_tibble() %>%
-           dplyr::mutate(pseudolabel=unlist(lapply(.data$offspringTiplabel, function(x)paste0(unlist(x), collapse=';')))) %>%
-           dplyr::group_by(.data$node) %>%
-           dplyr::mutate(pseudolabel=paste0(.data$node, ":", paste0(.data$pseudolabel, collapse='/'))) %>%
-           dplyr::ungroup() %>% 
+.balance_offspring_node <- function(x, inode, tree){
+    children <- lapply(inode, function(i)treeio::child(tree, i)) %>%
+                stats::setNames(inode) %>%
+                dplyr::bind_cols() %>%
+                dplyr::mutate(Clade=c('down', 'up')) %>%
+                tidyr::pivot_longer(cols = !.data$Clade, names_to='node', values_to='Children')
+    offspringtips <- x %>% tibble::as_tibble(rownames='offspringTiplabel') %>%
+        tidyr::pivot_longer(cols = !.data$offspringTiplabel, names_to='node', values_to='Clade') %>%
+        dplyr::filter(!is.na(.data$Clade)) %>%
+        dplyr::mutate(Clade=ifelse(.data$Clade==1, 'down', 'up')) %>%
+        dplyr::group_by(.data$node, .data$Clade) %>%
+        dplyr::mutate(offspringTiplabel = list(.data$offspringTiplabel)) %>%
+        dplyr::distinct() %>%
+        dplyr::ungroup(.data$Clade) %>%
+        dplyr::mutate(pseudolabel=paste0(.data$node, ':', paste0(lapply(.data$offspringTiplabel, paste0, collapse=';'), collapse='/')))
+    res <- dplyr::left_join(children, offspringtips, by=c('node'='node', 'Clade'='Clade')) %>%
            dplyr::mutate_at('node', as.integer) %>%
-           tidyr::nest(Balance_offspring=-.data$node)
+           tidyr::nest(Balance_offspring = -.data$node)
+    return(res)    
+}
+
+.convert_balance_tip2ancestors <- function(tree, inode){
+    tmp <- treeio::nodeid(tree, tree$tip.label)
+    names(tmp) <- tree$tip.label
+    res <- lapply(inode, function(x){
+        children <- treeio::child(tree, x)
+        unlist(mapply(.build_up_and_down,
+               children, c(1, -1),
+               MoreArgs=list(tree = tree),
+               SIMPLIFY = FALSE
+        ))
+    }) %>%
+    stats::setNames(inode)
+    res <- as.matrix(dplyr::bind_rows(res))
+    rownames(res) <- inode
+    colnames(res) <- names(tmp[match(colnames(res), tmp)])
+    return (t(res))
+}
+
+.build_up_and_down <- function(x, y, tree){
+    newx <- treeio::offspring(tree, x, tiponly = TRUE)
+    if (length(newx)==0){
+        newx <- x
+    }
+    res <- rep(y, length(newx))
+    names(res) <- newx
     return(res)
+}
+
+.internal_balance <- function(x, tip2ances, fun){
+    x <- x[match(rownames(tip2ances), rownames(x)), ,drop=FALSE]
+    res <- lapply(seq_len(ncol(x)), function(i){
+       res <- x[, i] * tip2ances
+       res <- switch(fun,
+            mean = apply(res, 2, .balance_mean, na.rm = TRUE),
+            median = apply(res, 2, .balance_median, na.rm = TRUE),
+            geometric.mean = apply(res, 2, .balance_geometric.mean, na.rm = TRUE)
+          )
+       }
+    ) %>%
+    do.call('rbind', .)
+    rownames(res) <- colnames(x)
+    return(res)
+}
+
+.balance_mean <- function(x, pseudonum = 0, na.rm = TRUE){
+    if (na.rm) x <- x[!is.na(x)]
+    weights <- .weight.subtree(x)
+    weights * log(mean(x[x > 0]) / mean(abs(x[x<0])))
+}
+
+.balance_median <- function(x, pseudonum = 0, na.rm = TRUE){
+    if (na.rm) x <- x[!is.na(x)]
+    weights <- .weight.subtree(x)
+    weights * log(median(x[x > 0]) / median(abs(x[x<0])))
+}
+
+.balance_geometric.mean <- function(x, pseudonum = 0, na.rm = TRUE){
+    if (na.rm) x <- x[!is.na(x)]
+    weights <- .weight.subtree(x)
+    weights * log(geometric.mean(x[x > 0])  / geometric.mean(abs(x[x<0])))
+}
+
+.weight.subtree <- function(x){
+    i <- sum(x>0)
+    j <- sum(x<0)
+    sqrt((i * j) / (i + j))
 }
