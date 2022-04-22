@@ -1,7 +1,7 @@
 Package: MicrobiotaProcess
 Type: Package
 Title: A comprehensive R package for managing and analyzing microbiome and other ecological data within the tidy framework 
-Version: 1.7.10
+Version: 1.7.11
 Authors@R: c(person("Shuangbin", "Xu", email = "xshuangbin@163.com", role = c("aut", "cre"), comment=c(ORCID="0000-0003-3513-5362")),
              person("Guangchuang", "Yu", email = "guangchuangyu@gmail.com", role = c("aut", "ctb"), comment = c(ORCID = "0000-0002-6485-8781")))
 Description: MicrobiotaProcess is an R package for analysis, visualization and 
@@ -22,7 +22,7 @@ Imports:
   vegan,
   zoo,
   ggtree,
-  tidytree (>= 0.3.5),
+  tidytree (>= 0.3.9),
   MASS,
   methods,
   rlang,

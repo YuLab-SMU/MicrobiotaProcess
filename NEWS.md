@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.7.11
+
++ add `mp_plot_diff_cladogram` to plot the result of `mp_diff_analysis`. (2022-04-19)
+
 # MicrobiotaProcess 1.7.10
 
 + optimizing the `mp_aggregate_clade` and `mp_balance_clade`. (2022-04-13)

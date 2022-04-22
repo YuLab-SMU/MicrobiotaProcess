@@ -81,11 +81,22 @@
 #'                   "#A65628", "#F781BF", "#999999")
 #'      )
 #' p
-#' ### visualizing the differential taxa with cladogram
-#' f <- mouse.time.mpse %>% 
-#'      mp_plot_diff_cladogram(label.size = 2.5) + 
-#'      scale_fill_diff_cladogram(values = c('skyblue', 'orange'))
-#' f
+#' \dontrun{
+#'   ### visualizing the differential taxa with cladogram
+#'   f <- mouse.time.mpse %>% 
+#'        mp_plot_diff_cladogram(
+#'          label.size = 2.5, 
+#'          hilight.alpha = .3, 
+#'          bg.tree.size = .5, 
+#'          bg.point.size = 2, 
+#'          bg.point.stroke = .25
+#'        ) + 
+#'        scale_fill_diff_cladogram(
+#'          values = c('skyblue', 'orange')
+#'        ) +
+#'        scale_size_continuous(range = c(1, 4))
+#'   f
+#' }
 setGeneric("mp_diff_analysis", function(.data, 
                                         .abundance, 
                                         .group, 
@@ -693,19 +704,54 @@ setMethod("mp_plot_diff_res", signature(.data="grouped_df_mpse"), .internal_mp_p
 #' the one level above ‘OTU’.
 #' @param removeUnknown logical, whether mask the unknown taxonomy information but differential species,
 #' default is FALSE.
-#' @param layout the layout of tree, default is 'radial', see also the 'layout' of 'ggtree'.
-#' @param line.size the line size (width) of tree, default is 0.12 .
-#' @param label.size the label size of differential taxa, default is 3.
-#' @param point.size the point size of undifferential taxa (background tree), default is 1.5,
+#' @param layout character, the layout of tree, default is 'radial', see also the 'layout' of 'ggtree'.
+#' @param hilight.alpha numeric, the transparency of high light clade, default is 0.3.
+#' @param hilight.size numeric, the margin thickness of high light clade, default is 0.2.
+#' @param bg.tree.size numeric, the line size (width) of tree, default is 0.15.
+#' @param bg.tree.color character, the line color of tree, default is '#bed0d1'.
+#' @param bg.point.color character, the color of margin of background node points of tree, default is '#bed0d1'.
+#' @param bg.point.fill character, the point fill (since point shape is 21) of background nodes of 
+#' tree, default is 'white'.
+#' @param bg.point.stroke numeric, the margin thickness of point of background nodes of tree,
+#' default is 0.2 .
+#' @param bg.point.size numeric, the point size of background nodes of tree, default is 2.
+#' @param label.size numeric, the label size of differential taxa, default is 2.6.
 #' @param tip.annot logcial whether to replace the differential tip labels with shorthand,
 #' default is TRUE.
-#' @param as.tiplab logical whether to display the differential tip labels with 'geom_tiplab' 
+#' @param as.tiplab logical, whether to display the differential tip labels with 'geom_tiplab' 
 #' of 'ggtree', default is TRUE, if it is FALSE, it will use 'geom_text_repel' of 'ggrepel'.
 #' @param ... additional parameters, meaningless now.
 #' @export
 #' @details
 #' The color scale of differential group can be designed by 'scale_fill_diff_cladogram'
 #' @importFrom ggtree td_mutate td_filter
+#' @examples
+#' \dontrun{
+#'   data(mouse.time.mpse)
+#'   mouse.time.mpse %<>%
+#'     mp_rrarefy()
+#'   mouse.time.mpse
+#'   mouse.time.mpse %<>%
+#'     mp_diff_analysis(.abundance=RareAbundance,
+#'                      .group=time,
+#'                      first.test.alpha=0.01,
+#'                      action="add")
+#'   #' ### visualizing the differential taxa with cladogram
+#'   library(ggplot2)
+#'   f <- mouse.time.mpse %>%
+#'        mp_plot_diff_cladogram(
+#'          label.size = 2.5,
+#'          hilight.alpha = .3,
+#'          bg.tree.size = .5,
+#'          bg.point.size = 2,
+#'          bg.point.stroke = .25
+#'        ) +
+#'        scale_fill_diff_cladogram(
+#'          values = c('skyblue', 'orange')
+#'        ) +
+#'        scale_size_continuous(range = c(1, 4))
+#'   f
+#' }
 mp_plot_diff_cladogram <- function(
     .data, 
     .group, 
@@ -713,28 +759,45 @@ mp_plot_diff_cladogram <- function(
     taxa.class, 
     removeUnknown = FALSE,
     layout = 'radial', 
-    line.size = .12, 
-    label.size = 2.5,
-    point.size = 1.5, 
+    hilight.alpha = .3,
+    hilight.size = .2,
+    bg.tree.size = .15, 
+    bg.tree.color = '#bed0d1',
+    bg.point.color = '#bed0d1',
+    bg.point.fill = 'white',
+    bg.point.stroke = .2,
+    bg.point.size = 2, 
+    label.size = 2.6,
     tip.annot = TRUE, 
     as.tiplab = TRUE,
     ...){
         .group <- rlang::enquo(.group)
         taxa.class <- rlang::enquo(taxa.class)
-		.size <- rlang::enquo(.size)
-        if (!c(inherits(.data, 'MPSE') || inherits(.data, 'treedata') || inherits(.data, 'tbl_mpse') || inherits(.data, 'grouped_df_mpse'))){
+        .size <- rlang::enquo(.size)
+        if (!(inherits(.data, 'MPSE') || inherits(.data, 'treedata') || inherits(.data, 'tbl_mpse') || inherits(.data, 'grouped_df_mpse'))){
             stop("The .data should be an MPSE or treedata object after running mp_diff_analysis ")
         }
-        if (inherits(.data, 'MPSE')){
+        if (inherits(.data, 'MPSE') || inherits(.data, 'tbl_mpse') || inherits(.data, 'grouped_df_mpse')){
             .data %<>% mp_extract_taxatree()
         }
         .data %<>% as_tibble()
+        nmda <- colnames(.data)
         if (rlang::quo_is_missing(.group)){
-            .group <- rlang::sym(colnames(.data)[grepl('^Sign_', colnames(.data))][1])
+            if (any(grepl('^Sign_', nmda))){
+                .group <- rlang::sym(nmda[grepl('^Sign_', nmda)][1])
+            }else{
+                stop_wrap('The .group name should be specified manually.')
+            }
         }else{
             .group <- rlang::as_name(.group)
-            if (grepl('^Sign_', .group)){
-                .group <- rlang::sym(paste0('Sign_', .group))
+            if (!grepl('^Sign_', .group)){
+                if (paste0('Sign_', .group) %in% nmda){
+                    .group <- rlang::sym(paste0('Sign_', .group))
+                }else{
+                    .group <- rlang::sym(.group)
+                }
+            }else{
+                .group <- rlang::sym(.group)
             }
         }
         if (!rlang::quo_is_missing(taxa.class)){
@@ -746,10 +809,20 @@ mp_plot_diff_cladogram <- function(
         }
         annot.index <- .get_annot_index(x = .data, taxa.class = taxa.class, tip.annot = tip.annot)
 	    
-        .data <- .generate_annot_df(x = .data, annot.index, .group, removeUnknown) %>%
-           as.treedata()
-        p <- ggtree(.data, layout = layout, size = line.size) +
-             geom_point(aes_(x = ~x, y = ~y), fill='white', size = point.size, shape = 21, stroke = 0.1) +
+        .data <- .generate_annot_df(x = .data, annot.index, .group, removeUnknown) %>% as.treedata()
+
+        p <- ggtree(.data, layout = layout, size = bg.tree.size, color = bg.tree.color) +
+             geom_point(
+                data = ifelse(removeUnknown, td_filter(is.na(!!.group) | grepl('__un_', .data$label)),
+                         td_filter(is.na(!!.group))
+                       ),
+                mapping = aes_(x = ~x, y = ~y), 
+                color = bg.point.color,
+                fill = bg.point.fill, 
+                size = bg.point.size, 
+                shape = 21, 
+                stroke = bg.point.stroke,
+             ) +
              ggtree::geom_hilight(
                 data = td_mutate(
                          extend = (9 - .data$nodeDepth) * 1,
@@ -757,7 +830,9 @@ mp_plot_diff_cladogram <- function(
                                 td_filter(!is.na(!!.group) & !.data$isTip))
                        ),
                 mapping = aes_string(node = "node", fill = rlang::as_name(.group), color = rlang::as_name(.group), extend = "extend"),
-                size = .2
+                size = hilight.size,
+                alpha = hilight.alpha,
+                show.legend = FALSE,
              ) +
              ggtree::geom_cladelab(
                 data = td_mutate(
@@ -790,7 +865,9 @@ mp_plot_diff_cladogram <- function(
                mapping = aes_string(size = paste0("-log10(", rlang::as_name(.size), ")"), fill = rlang::as_name(.group)),
                shape = 21,
                stroke = .1,
-             ) 
+               #show.legend = c(fill = FALSE)
+             )
+         
         if (!as.tiplab){
             p <- p + 
                  ggrepel::geom_text_repel(
@@ -804,13 +881,13 @@ mp_plot_diff_cladogram <- function(
         }else{
 	        p <- p +
                  ggtree::geom_tiplab(
-                    data = ifelse(removeUnknown, td_filter(!is.na(!!.group) & .data$isTip & !grepl("__un_", .data$label)),
-                             td_filter(!is.na(!!.group) & .data$isTip)),
+                    data = ifelse(removeUnknown, td_filter(!is.na(!!.group) & !grepl("__un_", .data$label)),
+                             td_filter(!is.na(!!.group))),
                     offset = .1,
                     size = label.size,
                     geom = 'shadowtext',
 					color = 'black',
-	                bg.colour = 'white'			
+                    bg.colour = 'white'			
                  )
 	    
 	    }
@@ -818,10 +895,11 @@ mp_plot_diff_cladogram <- function(
           legend.key.width = unit(.3, 'cm'),
           legend.key.height = unit(.3, 'cm'),
           legend.text = element_text(size=6),
-          legend.title = element_text(size=8)
+          legend.title = element_text(size=8),
+          legend.margin = ggplot2::margin(-.25, 0, 0, 0, 'cm')
         )
-		p <- p + scale_fill_diff_cladogram()
-	    return (p)
+        p <- p + scale_fill_diff_cladogram()
+        return (p)
 }
 
 
@@ -898,14 +976,25 @@ ggplot_add.ScaleDiffClade <- function(object, plot, object_name){
 	params <- object$params
     object$params <- NULL
     object <- c(object, params)
-	new.fill.scale <- do.call('scale_fill_manual', object)
-    original.color <- scale_color_manual(values=object$values, aesthetics='colour_new')
+    if (!'guide' %in% names(object)){
+        object$guide <- ggplot2::guide_legend(order = 1, override.aes = list(alpha=1, size=3, shape=22))
+    }else{
+        if (object$guide$order %in% c(0, 2)){
+            object$guide$order <- 1
+        }
+    }
+    new.fill.scale <- do.call('scale_fill_manual', object)
+    object$aesthetics <- 'colour_new'
+    object$guide <- 'none'
+    original.color <- do.call(scale_color_manual, object)
     color.label <- .build_color_values(plot, values=object$values)
     object$values <- color.label
+    object$aesthetics <- 'colour'
     object$labels <- waiver()
-	object$guide <- ggplot2::guide_legend(
+    object$guide <- ggplot2::guide_legend(
                        ncol = ifelse(length(color.label) > 30, 2, 1), 
-                       override.aes = list(size = 2)
+                       override.aes = list(size = 3),
+                       order = 2
                     )
     new.color.scale <- do.call('scale_color_manual', c(list(name = NULL), object))
     if (original.fill){
@@ -913,11 +1002,12 @@ ggplot_add.ScaleDiffClade <- function(object, plot, object_name){
     }else{
         object <- list(new.fill.scale, original.color, new.color.scale) 
     }
-    ggplot_add(object, plot, object_name='list')
+    ggplot_add(object, plot, object_name)
 }
 
 .build_color_values <- function(plot, values){
-    group <- plot$layers[[3]]$mapping$fill
+    idx <- which(unlist(lapply(plot$layers, function(x) any(grepl('GeomHilightRect', class(x[['geom']]))))))
+    group <- plot$layers[[idx]]$mapping$fill    
     group.cols <- plot$data %>%
         dplyr::filter(!is.na(!!group)) %>%	
         dplyr::select(!!group) %>% 

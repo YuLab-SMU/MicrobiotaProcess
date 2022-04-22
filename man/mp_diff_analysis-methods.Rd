@@ -252,11 +252,22 @@ p <- p +
                   "#A65628", "#F781BF", "#999999")
      )
 p
-### visualizing the differential taxa with cladogram
-f <- mouse.time.mpse \%>\% 
-     mp_plot_diff_cladogram(label.size = 2.5) + 
-     scale_fill_diff_cladogram(values = c('skyblue', 'orange'))
-f
+\dontrun{
+  ### visualizing the differential taxa with cladogram
+  f <- mouse.time.mpse \%>\% 
+       mp_plot_diff_cladogram(
+         label.size = 2.5, 
+         hilight.alpha = .3, 
+         bg.tree.size = .5, 
+         bg.point.size = 2, 
+         bg.point.stroke = .25
+       ) + 
+       scale_fill_diff_cladogram(
+         values = c('skyblue', 'orange')
+       ) +
+       scale_size_continuous(range = c(1, 4))
+  f
+}
 }
 \author{
 Shuangbin Xu

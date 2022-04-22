@@ -11,9 +11,15 @@ mp_plot_diff_cladogram(
   taxa.class,
   removeUnknown = FALSE,
   layout = "radial",
-  line.size = 0.12,
-  label.size = 2.5,
-  point.size = 1.5,
+  hilight.alpha = 0.3,
+  hilight.size = 0.2,
+  bg.tree.size = 0.15,
+  bg.tree.color = "#bed0d1",
+  bg.point.color = "#bed0d1",
+  bg.point.fill = "white",
+  bg.point.stroke = 0.2,
+  bg.point.size = 2,
+  label.size = 2.6,
   tip.annot = TRUE,
   as.tiplab = TRUE,
   ...
@@ -33,18 +39,32 @@ the one level above ‘OTU’.}
 \item{removeUnknown}{logical, whether mask the unknown taxonomy information but differential species,
 default is FALSE.}
 
-\item{layout}{the layout of tree, default is 'radial', see also the 'layout' of 'ggtree'.}
+\item{layout}{character, the layout of tree, default is 'radial', see also the 'layout' of 'ggtree'.}
 
-\item{line.size}{the line size (width) of tree, default is 0.12 .}
+\item{hilight.alpha}{numeric, the transparency of high light clade, default is 0.3.}
 
-\item{label.size}{the label size of differential taxa, default is 3.}
+\item{hilight.size}{numeric, the margin thickness of high light clade, default is 0.2.}
 
-\item{point.size}{the point size of undifferential taxa (background tree), default is 1.5,}
+\item{bg.tree.size}{numeric, the line size (width) of tree, default is 0.15.}
+
+\item{bg.tree.color}{character, the line color of tree, default is '#bed0d1'.}
+
+\item{bg.point.color}{character, the color of margin of background node points of tree, default is '#bed0d1'.}
+
+\item{bg.point.fill}{character, the point fill (since point shape is 21) of background nodes of 
+tree, default is 'white'.}
+
+\item{bg.point.stroke}{numeric, the margin thickness of point of background nodes of tree,
+default is 0.2 .}
+
+\item{bg.point.size}{numeric, the point size of background nodes of tree, default is 2.}
+
+\item{label.size}{numeric, the label size of differential taxa, default is 2.6.}
 
 \item{tip.annot}{logcial whether to replace the differential tip labels with shorthand,
 default is TRUE.}
 
-\item{as.tiplab}{logical whether to display the differential tip labels with 'geom_tiplab' 
+\item{as.tiplab}{logical, whether to display the differential tip labels with 'geom_tiplab' 
 of 'ggtree', default is TRUE, if it is FALSE, it will use 'geom_text_repel' of 'ggrepel'.}
 
 \item{...}{additional parameters, meaningless now.}
@@ -54,4 +74,32 @@ Visualizing the result of mp_diff_analysis with cladogram.
 }
 \details{
 The color scale of differential group can be designed by 'scale_fill_diff_cladogram'
+}
+\examples{
+\dontrun{
+  data(mouse.time.mpse)
+  mouse.time.mpse \%<>\%
+    mp_rrarefy()
+  mouse.time.mpse
+  mouse.time.mpse \%<>\%
+    mp_diff_analysis(.abundance=RareAbundance,
+                     .group=time,
+                     first.test.alpha=0.01,
+                     action="add")
+  #' ### visualizing the differential taxa with cladogram
+  library(ggplot2)
+  f <- mouse.time.mpse \%>\%
+       mp_plot_diff_cladogram(
+         label.size = 2.5,
+         hilight.alpha = .3,
+         bg.tree.size = .5,
+         bg.point.size = 2,
+         bg.point.stroke = .25
+       ) +
+       scale_fill_diff_cladogram(
+         values = c('skyblue', 'orange')
+       ) +
+       scale_size_continuous(range = c(1, 4))
+  f
+}
 }
