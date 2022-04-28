@@ -19,6 +19,7 @@ mp_diff_analysis(
   tip.level = "OTU",
   force = FALSE,
   relative = TRUE,
+  taxa.class = "all",
   first.test.method = "kruskal.test",
   first.test.alpha = 0.05,
   p.adjust = "fdr",
@@ -51,6 +52,7 @@ mp_diff_analysis(
   tip.level = "OTU",
   force = FALSE,
   relative = TRUE,
+  taxa.class = "all",
   first.test.method = "kruskal.test",
   first.test.alpha = 0.05,
   p.adjust = "fdr",
@@ -83,6 +85,7 @@ mp_diff_analysis(
   tip.level = "OTU",
   force = FALSE,
   relative = TRUE,
+  taxa.class = "all",
   first.test.method = "kruskal.test",
   first.test.alpha = 0.05,
   p.adjust = "fdr",
@@ -115,6 +118,7 @@ mp_diff_analysis(
   tip.level = "OTU",
   force = FALSE,
   relative = TRUE,
+  taxa.class = "all",
   first.test.method = "kruskal.test",
   first.test.alpha = 0.05,
   p.adjust = "fdr",
@@ -158,6 +162,9 @@ object.}
 is not be rarefied, default is FALSE.}
 
 \item{relative}{logical whether calculate the relative abundance.}
+
+\item{taxa.class}{character if taxa class is not 'all', only the specified taxa class will
+be identified, default is 'all'.}
 
 \item{first.test.method}{the method for first test, option is "kruskal.test", "oneway.test", 
 "lm", "glm", or "glm.nb", "kruskal_test", "oneway_test" of "coin" package. default is "kruskal.test".}

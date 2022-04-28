@@ -26,11 +26,11 @@ filter.MPSE <- function(.data, ..., .preserve = FALSE, keep.mpse = TRUE){
         flag <- valid_names(res, type="tbl_mpse")
         xm <- tbl_mpse_return_message(flag)
         if (flag){
-           xm <- c(xm, keep_mpse_message)
+           xm <- c(xm, keep_mpse_message())
         }else{
            res %<>% tibble::as_tibble()
         }
-        writeLines(xm)
+        message_wrap(xm)
     }else{
         if (valid_names(res)){
             res %<>% as.MPSE()
@@ -95,11 +95,11 @@ select.MPSE <- function(.data, ..., keep.mpse = FALSE){
         flag <- valid_names(res, type="tbl_mpse")
         xm <- tbl_mpse_return_message(flag)
         if (flag){
-           xm <- c(xm, keep_mpse_message)
+           xm <- c(xm, keep_mpse_message())
         }else{
            res %<>% tibble::as_tibble()
         }
-        writeLines(xm)
+        message_wrap(xm)
     }else{
         if (valid_names(res)){
             res %<>% as.MPSE()
@@ -149,7 +149,7 @@ internal_select <- function(x, dots, ...){
 ##' @method group_by MPSE
 ##' @export
 group_by.MPSE <- function(.data, ..., .add = FALSE, .drop = group_by_drop_default(.data)){
-    writeLines(tbl_mpse_return_message(TRUE))
+    message_wrap(tbl_mpse_return_message(TRUE))
     .data %<>% as_tibble()
     res <- group_by(.data=.data, ..., .add = .add, .drop=.drop)
     res <- add_attr.tbl_mpse(x1=res, x2=.data)
@@ -193,11 +193,11 @@ mutate.MPSE <- function(.data, keep.mpse = TRUE, ...){
         flag <- valid_names(res, type="tbl_mpse")
         xm <- tbl_mpse_return_message(flag)
         if (flag){
-           xm <- c(xm, keep_mpse_message)
+           xm <- c(xm, keep_mpse_message())
         }else{
            res %<>% tibble::as_tibble()
         }
-        writeLines(xm)
+        message_wrap(xm)
     }else{
         if (valid_names(res)){
             res %<>% as.MPSE()
@@ -235,7 +235,7 @@ mutate.grouped_df_mpse <- function(.data, ...){
 ##' @method distinct MPSE
 ##' @export
 distinct.MPSE <- function(.data, ..., .keep_all = FALSE){
-    writeLines(tbl_mpse_return_message(TRUE))
+    message_wrap(tbl_mpse_return_message(TRUE))
     .data %<>%  as_tibble()
     res <- distinct(.data=.data, ..., .keep_all = .keep_all)
     res <- add_attr.tbl_mpse(x1 = res, x2 = .data)
@@ -278,9 +278,9 @@ rename.MPSE <- function(.data, ..., keep.mpse = TRUE){
         flag <- valid_names(res, type="tbl_mpse")
         xm <- tbl_mpse_return_message(flag)
         if (flag){
-           xm <- c(xm, keep_mpse_message)
+           xm <- c(xm, keep_mpse_message())
         }
-        writeLines(xm)    
+        message_wrap(xm)    
     }else{
         if (valid_names(res)){
             res %<>% as.MPSE()
@@ -329,9 +329,9 @@ arrange.MPSE <- function(.data, ..., by_group = FALSE, keep.mpse=FALSE){
         flag <- valid_names(res, type="tbl_mpse")
         xm <- tbl_mpse_return_message(flag)
         if (flag){
-           xm <- c(xm, keep_mpse_message)
+           xm <- c(xm, keep_mpse_message())
         }
-        writeLines(xm)    
+        message_wrap(xm)    
     }else{
         if (valid_names(res)){
             res %<>% as.MPSE()
@@ -467,7 +467,7 @@ pull.MPSE <- function(.data, var = -1, name = NULL, ...){
 ##' @method slice MPSE
 ##' @export
 slice.MPSE <- function(.data, ..., .preserve = FALSE){
-    writeLines(tbl_mpse_return_message(TRUE))
+    message_wrap(tbl_mpse_return_message(TRUE))
     dots <- rlang::quos(...)
     da <- .data %>% 
           as_tibble() %>%

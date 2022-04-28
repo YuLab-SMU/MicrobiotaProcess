@@ -1,3 +1,11 @@
+# MicrobiotaProcess 1.9.0.990
+
++ add `taxa.class` argument in `mp_diff_analysis` to test the specified taxa level. (2022-04-28)
+
+# MicrobiotaProcess 1.8.0
+
++ Bioconductor 3.15 release. (2022-04-27)
+
 # MicrobiotaProcess 1.7.11
 
 + add `mp_plot_diff_cladogram` to plot the result of `mp_diff_analysis`. (2022-04-19)

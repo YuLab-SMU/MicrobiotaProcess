@@ -256,6 +256,8 @@ get_gfc_wilc <- function(datasample, classlevelsnum, fun1='generalizedFC',
         rownames(pvaluetmp) <- vars
         resgfoldC <- merge(resgfoldC, pvaluetmp, by=0)
         colnames(resgfoldC) <- c("f", "gfc", "pvalue")
+    }else if (classlevelsnum < minnum){
+        stop_wrap('The sample number of each groups is smaller than ', minnum, '.')
     }else{
         resgfoldC <- data.frame(f=rownames(resgfoldC), gfc=resgfoldC[,1], pvalue=0)
     }

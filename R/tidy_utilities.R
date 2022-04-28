@@ -2,7 +2,7 @@ formatted_out <- function(x){
     #x1 <- "\033[38;5;246m"
     #x2 <- "\033[39m"
     #mg <- paste0(c(x1, x, x2), collapse="") %>% 
-    mg <- x %>% pillar::style_subtle()
+    mg <- pillar::style_subtle(x)
     return(mg)
 }
 
@@ -18,7 +18,9 @@ tbl_mpse_return_message <- function(flag){
     formatted_out(x)
 }
 
-keep_mpse_message <- formatted_out("# \tA new MPSE object can be returned by setting keep.mpse = TRUE.")
+keep_mpse_message <- function(x = '\nA new MPSE object can be returned by setting keep.mpse = TRUE.'){
+    formatted_out(x)
+}
 
 
 drop_class <- function(x, class){

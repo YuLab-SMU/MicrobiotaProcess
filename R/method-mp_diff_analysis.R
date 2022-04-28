@@ -12,6 +12,8 @@
 #' @param force logical whether to calculate the relative abundance forcibly when the abundance
 #' is not be rarefied, default is FALSE.
 #' @param relative logical whether calculate the relative abundance.
+#' @param taxa.class character if taxa class is not 'all', only the specified taxa class will
+#' be identified, default is 'all'.
 #' @param first.test.method the method for first test, option is "kruskal.test", "oneway.test", 
 #' "lm", "glm", or "glm.nb", "kruskal_test", "oneway_test" of "coin" package. default is "kruskal.test".
 #' @param first.test.alpha numeric the alpha value for the first test, default is 0.05.
@@ -105,6 +107,7 @@ setGeneric("mp_diff_analysis", function(.data,
                                         tip.level="OTU",
                                         force=FALSE,
                                         relative=TRUE,
+                                        taxa.class = 'all',
                                         first.test.method="kruskal.test",
                                         first.test.alpha=0.05,
                                         p.adjust="fdr",
@@ -139,6 +142,7 @@ setGeneric("mp_diff_analysis", function(.data,
               tip.level="OTU",
               force=FALSE,
               relative=TRUE,
+              taxa.class = 'all',
               first.test.method="kruskal.test",
               first.test.alpha=0.05,
               p.adjust="fdr",
@@ -167,6 +171,8 @@ setGeneric("mp_diff_analysis", function(.data,
      .group <- rlang::enquo(.group)
      .sec.group <- rlang::enquo(.sec.group)
      tip.level <- rlang::enquo(tip.level)
+     taxa.class <- rlang::enquo(taxa.class)
+     taxa.class <- rlang::as_name(taxa.class)
 
      if (rlang::quo_is_missing(.group)){
          rlang::abort("The .group is required, please provide it!")
@@ -225,15 +231,19 @@ setGeneric("mp_diff_analysis", function(.data,
                           paste0("BySample")
          f_tb <- taxatree %>%
                  as_tibble() %>%
-                 dplyr::filter(.data$nodeClass!="Root") %>%
-                 dplyr::select(c("label", AbundBySample)) %>% 
+                 dplyr::filter(.data$nodeClass!="Root")
+         if (any(taxa.class %in% unique(f_tb$nodeClass))){
+             f_tb %<>% dplyr::filter(.data$nodeClass %in% taxa.class)
+         }
+         f_tb %<>% dplyr::select(c("label", AbundBySample)) %>% 
                  tidyr::unnest(cols=AbundBySample) %>%
                  dplyr::select(c("label", "Sample", abundance.nm)) %>% 
                  distinct() %>%
                  tidyr::pivot_wider(id_cols="Sample", names_from="label", values_from=abundance.nm) %>%
                  tibble::column_to_rownames(var="Sample")
+         
      }
-     f_tb <- f_tb[, !apply(f_tb, 2, function(x)var(x)==0), drop = FALSE]
+     #f_tb <- f_tb[, !apply(f_tb, 2, function(x)var(x)==0), drop = FALSE]
      vars <- f_tb %>% colnames()
 
      datameta <- merge(f_tb, sampleda, by=0) 
