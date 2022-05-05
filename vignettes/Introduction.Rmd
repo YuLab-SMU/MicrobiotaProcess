@@ -81,7 +81,6 @@ library(MicrobiotaProcess)
 seqtabfile <- system.file("extdata", "seqtab.nochim.rds", package="MicrobiotaProcess")
 seqtab <- readRDS(seqtabfile)
 taxafile <- system.file("extdata", "taxa_tab.rds", package="MicrobiotaProcess")
-seqtab <- readRDS(seqtabfile)
 taxa <- readRDS(taxafile)
 # the seqtab and taxa are output of dada2
 sampleda <- system.file("extdata", "mouse.time.dada2.txt", package="MicrobiotaProcess")
