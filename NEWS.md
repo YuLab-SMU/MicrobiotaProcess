@@ -1,5 +1,8 @@
-# MicrobiotaProcess 1.9.0.990
+# MicrobiotaProcess 1.9.0.991
 
++ add `mp_plot_diff_cladogram` in `vignetters`. (2022-05-14)
++ fixed a bug when the total counts of sample is less than `chunks` in `mp_plot_rarecurve`. (2022-05-14)
++ add `rm.zero` argument in `mp_plot_abundance` to control whether mask the zero abundance of species. (2022-05-06)
 + add `taxa.class` argument in `mp_diff_analysis` to test the specified taxa level. (2022-04-28)
 
 # MicrobiotaProcess 1.8.0
