@@ -610,6 +610,24 @@ p <- mouse.time.mpse %>%
 p
 ```
 
+We also developed `mp_plot_diff_cladogram` to visualize the result.
+
+```{r, fig.width = 9, fig.height=9, fig.align="center", fig.cap="The cladogram of differential species "}
+f <- mouse.time.mpse %>%
+     mp_plot_diff_cladogram(
+       label.size = 2.5,
+       hilight.alpha = .3,
+       bg.tree.size = .5,
+       bg.point.size = 2,
+       bg.point.stroke = .25
+     ) +
+     scale_fill_diff_cladogram( # set the color of different group.
+       values = c('deepskyblue', 'orange')
+     ) +
+     scale_size_continuous(range = c(1, 4))
+f
+```
+
 # 4. Need helps?
 
 If you have questions/issues, please visit [github issue tracker](https://github.com/YuLab-SMU/MicrobiotaProcess/issues).

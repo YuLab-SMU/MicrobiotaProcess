@@ -34,6 +34,8 @@
 #' 'geom_tile' of 'ggplot2'.
 #' @param rmun logical whether to remove the unknown taxa, such as "g__un_xxx",
 #' default is FALSE (the unknown taxa class will be considered as 'Others').
+#' @param rm.zero logical whether to display the zero abundance, which only work with geom='heatmap'
+#' default is TRUE.
 #' @author Shuangbin Xu
 #' @export
 #' @examples
@@ -93,6 +95,7 @@ setGeneric("mp_plot_abundance",
               sample.hclust = "average",
               .sec.group = NULL,
               rmun = FALSE,
+              rm.zero = TRUE,
               ...
            )
            standardGeneric("mp_plot_abundance")
@@ -113,6 +116,7 @@ setGeneric("mp_plot_abundance",
                                 sample.hclust = "average",
                                 .sec.group = NULL,
                                 rmun = FALSE,
+                                rm.zero = TRUE,
                                 ...
                                 ){
     .abundance <- rlang::enquo(.abundance)
@@ -255,11 +259,16 @@ setGeneric("mp_plot_abundance",
                          y = rlang::as_name(taxa.class),
                          fill = abundance.nm
                      )
-               ) +
-               ggplot2::geom_tile(
+               ) 
+         if (rm.zero) {
+             p <- p + ggplot2::geom_tile(
                    data = td_filter(!!rlang::sym(abundance.nm)!=0),
                    ...
-               ) +
+               )
+         }else{
+             p <- p + ggplot2::geom_tile(...)
+         }
+         p <- p +
                theme(axis.text.x=element_text(angle=-45, hjust=0), 
                      panel.background=element_blank(), 
                      panel.border=element_rect(size=1, fill=NA)) + 

@@ -31,6 +31,10 @@
 import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL, 
                           refseqqza=NULL, treeqza=NULL,
                           parallel=FALSE, ...){
+    params <- list(...)
+    if ('sampledata' %in% names(params) && is.null(mapfilename)){
+        sampleda <- params[['sampledata']]
+    }    
     res <- .internal_import_qiime2(otuqza=otuqza, 
                                    taxaqza=taxaqza, 
                                    mapfilename=mapfilename, 
@@ -45,7 +49,10 @@ import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
 #' @export
 mp_import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
                           refseqqza=NULL, treeqza=NULL, parallel=FALSE, ...){
-
+    params <- list(...)
+    if ('sampledata' %in% names(params) && is.null(mapfilename)){
+        mapfilename <- params[['sampledata']]
+    }
     res <- .internal_import_qiime2(otuqza=otuqza,
                                    taxaqza=taxaqza,
                                    mapfilename=mapfilename,
@@ -89,7 +96,10 @@ mp_import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
 import_dada2 <- function(seqtab, taxatab=NULL, reftree=NULL, 
                          sampleda=NULL, 
                          ...){
-
+    params <- list(...)
+    if ('sampledata' %in% names(params) && is.null(sampleda)){
+        sampleda <- params[['sampledata']]
+    }
     res <- .internal_import_dada2(seqtab=seqtab,
                                   taxatab=taxatab,
                                   reftree=reftree,
@@ -107,6 +117,10 @@ mp_import_dada2 <- function(seqtab,
                              reftree=NULL,
                              sampleda=NULL,
                              ...){
+    params <- list(...)
+    if ('sampledata' %in% names(params) && is.null(sampleda)){
+        sampleda <- params[['sampledata']]
+    }
 
     res <- .internal_import_dada2(seqtab=seqtab,
                                   taxatab=taxatab,
@@ -139,6 +153,10 @@ mp_import_qiime <- function(otufilename,
                             otutree = NULL, 
                             refseq = NULL,
                             ...){
+    params <- list(...)
+    if ('sampledata' %in% names(params) && is.null(mapfilename)){
+        sampleda <- params[['sampledata']]
+    }
 
     res <- .internal_import_qiime(
                                   otufilename = otufilename,

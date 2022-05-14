@@ -26,6 +26,7 @@ mp_plot_abundance(
   sample.hclust = "average",
   .sec.group = NULL,
   rmun = FALSE,
+  rm.zero = TRUE,
   ...
 )
 
@@ -45,6 +46,7 @@ mp_plot_abundance(
   sample.hclust = "average",
   .sec.group = NULL,
   rmun = FALSE,
+  rm.zero = TRUE,
   ...
 )
 
@@ -64,6 +66,7 @@ mp_plot_abundance(
   sample.hclust = "average",
   .sec.group = NULL,
   rmun = FALSE,
+  rm.zero = TRUE,
   ...
 )
 
@@ -83,6 +86,7 @@ mp_plot_abundance(
   sample.hclust = "average",
   .sec.group = NULL,
   rmun = FALSE,
+  rm.zero = TRUE,
   ...
 )
 }
@@ -131,6 +135,9 @@ default is NULL, this argument will be deprecated in the next version.}
 
 \item{rmun}{logical whether to remove the unknown taxa, such as "g__un_xxx",
 default is FALSE (the unknown taxa class will be considered as 'Others').}
+
+\item{rm.zero}{logical whether to display the zero abundance, which only work with geom='heatmap'
+default is TRUE.}
 
 \item{...}{additional parameters, when the geom = "flowbar", it can specify the parameters of 
 'geom_stratum' of 'ggalluvial', when the geom = 'bar', it can specify the parameters of 

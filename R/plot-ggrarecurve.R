@@ -179,6 +179,10 @@ stat_rare <- function(data,
 samplealpha <- function(data, chunks=200, seed=123){
     sdepth <- sum(data)
     step <- trunc(sdepth/chunks)
+    if (step == 0){
+        warning_wrap("The total counts of some samples is less than chunks = ", chunks, "!")
+        step = 2
+    }
     n <- seq(0, sdepth, by=step)[-1]
     n <- c(n, sdepth)
     out <- lapply(n, function(x){
