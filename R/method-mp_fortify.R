@@ -23,12 +23,12 @@ mp_fortify.envfit <- function(model, ...){
     return(da)
 }
 
-#' @method mp_fortify adonis
+#' @method mp_fortify anova.cca
 #' @export
-mp_fortify.adonis <- function(model, ...){
-    da <- model$aov.tab %>% 
-          as.matrix() %>% 
-          tibble::as_tibble(rownames="factors")
+mp_fortify.anova.cca <- function(model, ...){
+    da <- model %>% 
+          base::as.data.frame() %>% 
+          tibble::as_tibble(rownames = "factors")
     return(da)
 }
 

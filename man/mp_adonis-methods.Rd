@@ -73,7 +73,7 @@ be analyzed using the related vegan funtion.}
 
 \item{seed}{a random seed to make the adonis analysis reproducible, default is 123.}
 
-\item{...}{additional parameters see also 'adonis' of vegan.}
+\item{...}{additional parameters see also 'adonis2' of vegan.}
 }
 \value{
 update object according action argument

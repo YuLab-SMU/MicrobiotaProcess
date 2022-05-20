@@ -11,7 +11,7 @@
 #' be analyzed using the related vegan funtion.
 #' @param permutations the number of permutations required, default is 999.
 #' @param seed a random seed to make the adonis analysis reproducible, default is 123.
-#' @param ... additional parameters see also 'adonis' of vegan.
+#' @param ... additional parameters see also 'adonis2' of vegan.
 #' @return update object according action argument
 #' @export
 #' @author Shuangbin Xu
@@ -49,7 +49,7 @@ setGeneric("mp_adonis", function(.data, .abundance, .formula, distmethod="bray",
 
         .formula <- paste0(c("x", .formula), collapse=" ") %>% as.formula()
 
-        res <- withr::with_seed(seed, vegan::adonis(.formula, data=sampleda, method=distmethod, permutations=permutations, ...))
+        res <- withr::with_seed(seed, vegan::adonis2(.formula, data=sampleda, method=distmethod, permutations=permutations, ...))
 
     }else{
         if(! distmethod %in% colnames(.data %>% mp_extract_sample())){
@@ -70,7 +70,7 @@ setGeneric("mp_adonis", function(.data, .abundance, .formula, distmethod="bray",
                     tibble::column_to_rownames(var="Sample")        
 
         .formula <- paste0(c("distobj", .formula), collapse=" ") %>% as.formula()
-        res <- withr::with_seed(seed, vegan::adonis(.formula, data=sampleda, permutations=permutations, ...))
+        res <- withr::with_seed(seed, vegan::adonis2(.formula, data=sampleda, permutations=permutations, ...))
     }
 
     if (action == "get"){
