@@ -820,6 +820,7 @@ mp_plot_diff_cladogram <- function(
         annot.index <- .get_annot_index(x = .data, taxa.class = taxa.class, tip.annot = tip.annot)
 	    
         .data <- .generate_annot_df(x = .data, annot.index, .group, removeUnknown) %>% as.treedata()
+        offset.max <- max(dplyr::pull(.data, .data$nodeDepth)) 
 
         p <- ggtree(.data, layout = layout, size = bg.tree.size, color = bg.tree.color) +
              geom_point(
@@ -835,9 +836,9 @@ mp_plot_diff_cladogram <- function(
              ) +
              ggtree::geom_hilight(
                 data = td_mutate(
-                         extend = (9 - .data$nodeDepth) * 1,
-                         .f = ifelse(removeUnknown, td_filter(!is.na(!!.group) & !.data$isTip & !grepl('__un_', .data$label)), 
-                                td_filter(!is.na(!!.group) & !.data$isTip))
+                         extend = (offset.max + 1 - .data$nodeDepth) * 1,
+                         .f = ifelse(removeUnknown, td_filter(!is.na(!!.group) & !grepl('__un_', .data$label)), 
+                                     td_filter(!is.na(!!.group)))
                        ),
                 mapping = aes_string(node = "node", fill = rlang::as_name(.group), color = rlang::as_name(.group), extend = "extend"),
                 size = hilight.size,
@@ -846,7 +847,7 @@ mp_plot_diff_cladogram <- function(
              ) +
              ggtree::geom_cladelab(
                 data = td_mutate(
-                         offset = (9 - .data$nodeDepth) * 0.88,
+                         offset = (offset.max + 1 - .data$nodeDepth) * 0.88,
                          .f = ifelse(removeUnknown, td_filter(!is.na(!!.group) & !.data$isTip & !grepl('__un_', .data$label)),
 									 td_filter(!is.na(!!.group) & !.data$isTip))
                        ),
@@ -893,7 +894,7 @@ mp_plot_diff_cladogram <- function(
                  ggtree::geom_tiplab(
                     data = ifelse(removeUnknown, td_filter(!is.na(!!.group) & !grepl("__un_", .data$label)),
                              td_filter(!is.na(!!.group))),
-                    offset = .1,
+                    offset = 0.78,
                     size = label.size,
                     geom = 'shadowtext',
 					color = 'black',
