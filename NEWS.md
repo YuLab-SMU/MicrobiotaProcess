@@ -1,5 +1,6 @@
-# MicrobiotaProcess 1.9.0.991
+# MicrobiotaProcess 1.9.1
 
++ fix the color of legend in `mp_plot_diff_cladogram`. (2022-05-25)
 + add `mp_plot_diff_cladogram` in `vignetters`. (2022-05-14)
 + fixed a bug when the total counts of sample is less than `chunks` in `mp_plot_rarecurve`. (2022-05-14)
 + add `rm.zero` argument in `mp_plot_abundance` to control whether mask the zero abundance of species. (2022-05-06)
