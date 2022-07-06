@@ -15,8 +15,7 @@
 NA
 
 #' @title (Data) Genomic analysis identifies association of Fusobacterium 
-#'               with colorectal carcinoma (2012)
-#'
+#'   with colorectal carcinoma (2012)
 #'
 #' @description This dataset was from the a study on colorectal cancer, 
 #' publised in Genome Research (2012). This dataset had been removed samples 
@@ -32,7 +31,6 @@ NA
 NA
 
 #' @title (Data) simulated dataset.
-#' 
 #'
 #' @description This dataset was simulated. And it also was MPSE class, 
 #' contained otu_table and sample_data
@@ -47,9 +45,7 @@ NA
 
 #' @title (Data) An example data
 #'
-#'
 #' @description This is a MPSE object example data.
-#'
 #' @name mouse.time.mpse
 #' @aliases mouse.time.mpse
 #' @docType data

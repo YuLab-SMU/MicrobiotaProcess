@@ -5,7 +5,7 @@
 \alias{data-kostic2012crc}
 \alias{kostic2012crc}
 \title{(Data) Genomic analysis identifies association of Fusobacterium 
-              with colorectal carcinoma (2012)}
+  with colorectal carcinoma (2012)}
 \description{
 This dataset was from the a study on colorectal cancer, 
 publised in Genome Research (2012). This dataset had been removed samples 
