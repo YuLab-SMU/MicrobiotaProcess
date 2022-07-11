@@ -98,6 +98,7 @@ MPSE <- function(assays,
 
     if (!is.null(colData)){
         colData %<>% avoid_conflict_names()
+        colData <- colData[match(colnames(assays[[1]]), rownames(colData)),,drop = FALSE]
         se <- SummarizedExperiment::SummarizedExperiment(assays=assays, colData=colData, ...)
     }else{
         se <- SummarizedExperiment::SummarizedExperiment(assays=assays, ...)
@@ -112,6 +113,7 @@ MPSE <- function(assays,
                 taxatree = taxatree,
                 refseq = refseq
                )
+    return (mpse)
 }
 
 .valid.MPSE <- function(object){
