@@ -171,6 +171,48 @@ mp_import_qiime <- function(otufilename,
     return(mpse)
 }
 
+
+#' @title building MPSE object from biom-format file.
+#' @param biomfilename character the biom-format file path.
+#' @inheritParams mp_import_qiime
+#' @param ... additional parameter, which is meaningless now.
+#' @return MPSE-class
+#' @export
+mp_import_biom <- function(biomfilename, mapfilename = NULL, otutree = NULL, refseq = NULL, ...){
+    x <- .internal_biom(biomfilename)
+    mpse <- as.MPSE(x)
+    if (!is.null(mapfilename)){
+        sample.da <- read_qiime_sample(mapfilename) %>%
+                     avoid_conflict_names() %>%
+                     tibble::as_tibble(rownames = 'Sample')
+        mpse <- mpse %>% left_join(sample.da, by='Sample')
+    }
+    if (!is.null(otutree)){
+        if (file.exists(otutree)){
+            rlang::warn(c("The reftree is a tree file, it is parsing by read.tree function.",
+                     "It is better to parse it with the function of treeio",
+                     "then the treedata or phylo result all can be supported."))
+            otutree <- ape::read.tree(otutree) %>% treeio::as.treedata()
+        }else if (inherits(otutree, "phylo")){
+            otutree <- otutree %>% treeio::as.treedata()
+        }else if (!inherits(otutree, "treedata")){
+            otutree <- NULL
+        }
+    }
+    otutree(mpse) <- otutree
+    if (!is.null(refseq)){
+        if (file.exists(refseq)){
+            refseq <- seqmagick::fa_read(refseq)
+        }else if (inherits(refseq, "character")){
+            refseq <- build_tree(refseq)
+        }else if (!inherits(refseq, "XStringSet")){
+            refseq <- NULL
+        }
+    }
+    refsequence(mpse) <- refseq
+    return(mpse)
+}
+
 #' Import function to load the output of MetaPhlAn.
 #' @param profile the output file (text format) of MetaPhlAn.
 #' @param mapfilename the sample information file or data.frame,

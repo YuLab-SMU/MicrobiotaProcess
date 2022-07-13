@@ -1,6 +1,7 @@
-# MicrobiotaProcess 1.9.1.990
+# MicrobiotaProcess 1.9.1.991
 
 + fixed the local vignettes. (2022-07-06, Wed)
++ add `mp_import_biom` to build `MPSE` class from `biom-format` file. (2022-07-13, Wed)
 
 # MicrobiotaProcess 1.9.1
 

@@ -352,6 +352,36 @@ read_qiime_otu <- function(otufilename){
     return(list(otutab = x, taxatab=taxatab, sampleda=sampleda))
 }
 
+# This function was refer to the biom of biomformat packages, but this packages
+# was not maintained.
+.internal_biom <- function(biomfilename){
+    trash = try(silent = TRUE, expr = {
+        x <- jsonlite::fromJSON(biomfilename, simplifyDataFrame = FALSE, simplifyMatrix = FALSE)
+        }
+    )
+    if (inherits(trash, "try-error")) {
+        trash = try(silent = TRUE, expr = {
+            x <- biomformat::read_hdf5_biom(biomfilename)
+        })
+    }
+    if (inherits(trash, "try-error")) {
+        stop_wrap("Both attempts to read input file:\n", biomfilename,
+              "either as JSON (BIOM-v1) or HDF5 (BIOM-v2). ", 
+              "Check file path, file name, file itself, then try again.")
+    }
+
+    biom.type = c("OTU table", "Pathway table", "Function table",
+                  "Ortholog table", "Gene table", "Metabolite table", "Taxon table")
+
+    if (!x$type %in% biom.type){
+       if (any(grepl(x$type, biom.type, ignore.case = TRUE))) {
+           x$type <- biom.type[1]
+       }
+    }
+    return(biomformat::biom(x))
+
+}
+
 taxaclass <- c("Kingdom", 
                "Phylum", 
                "Class", 
@@ -365,7 +395,10 @@ taxaclass <- c("Kingdom",
 
 read_qiime_sample <- function(samplefile){
     sep <- guess_sep(samplefile)    
-    sampleda <- utils::read.table(samplefile, header=TRUE, sep=sep, row.names=1, comment.char="")
+    sampleda <- utils::read.table(
+                  samplefile, header=TRUE, sep=sep, row.names=1, 
+                  comment.char="", quote=""
+                )
     return(sampleda)
 }
 
