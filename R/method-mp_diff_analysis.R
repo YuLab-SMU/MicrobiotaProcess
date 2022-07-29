@@ -913,6 +913,219 @@ mp_plot_diff_cladogram <- function(
         return (p)
 }
 
+#' displaying the differential result contained abundance and LDA with 
+#' boxplot (abundance) and error bar (LDA).
+#' @rdname mp_plot_diff_boxplot-methods
+#' @param .data MPSE or tbl_mpse after run mp_diff_analysis with 'action="add"'.
+#' @param .group the column name for mapping the different color.
+#' @param .size the column name for mapping the size of points or numeric, default is 2.
+#' @param taxa.class the taxonomy class features will be displayed, default is 'all'.
+#' @param group.abun logical whether plot the abundance in each group with bar plot,
+#' default is FALSE.
+#' @param removeUnknown logical whether mask the unknown taxonomy information but 
+#' differential species, default is FALSE.
+#' @param ... additional params, see also the 'geom_boxplot', 'geom_errorbarh' and 'geom_point'.
+#' @export
+#' @examples
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %<>%
+#'   mp_rrarefy()
+#' mouse.time.mpse
+#' mouse.time.mpse %<>%
+#'   mp_diff_analysis(.abundance=RareAbundance,
+#'                    .group=time,
+#'                    first.test.alpha=0.01,
+#'                    action="add")
+#' library(ggplot2)
+#' p1 <- mouse.time.mpse %>% 
+#'         mp_plot_diff_boxplot(.group = time) %>%
+#'         set_diff_boxplot_color(
+#'           values = c("deepskyblue", "orange"),
+#'           guide = guide_legend(title=NULL)
+#'         )
+#' p1
+#' p2 <- mouse.time.mpse %>% 
+#'         mp_plot_diff_boxplot(
+#'           taxa.class = c(Genus, OTU),
+#'           group.abun = TRUE, 
+#'           removeUnknown = TRUE,
+#'         ) %>%
+#'         set_diff_boxplot_color(
+#'           values = c("deepskyblue", "orange"),
+#'           guide = guide_legend(title=NULL)
+#'         )
+#' p2 
+setGeneric("mp_plot_diff_boxplot",
+  function(
+    .data,
+    .group,
+    .size = 2,
+    taxa.class = 'all',
+    group.abun = FALSE,
+    removeUnknown = FALSE,
+    ...
+  )
+  standardGeneric('mp_plot_diff_boxplot')
+)
+
+.internal_mp_plot_diff_boxplot <- function(.data, .group, .size = 2, taxa.class = 'all', group.abun = FALSE, removeUnknown=FALSE, ...){
+    taxa.class <- rlang::enquo(taxa.class)
+    .group <- rlang::enquo(.group)
+    .size <- rlang::enquo(.size)
+    params <- list(...)
+    tbl <- .data %>% mp_extract_abundance(taxa.class = 'all')
+    taxa.class <- quo.vect_to_str.vect(taxa.class)
+    if (! any(taxa.class %in% c('all', 'ALL', 'All'))){
+       tbl %<>% dplyr::filter(.data$nodeClass %in% taxa.class)
+    }
+    if (removeUnknown){
+        tbl %<>% dplyr::filter(!grepl('__un_', .data$label))
+    }
+    nmda <- colnames(tbl)
+    tbl %<>% tidyr::unnest(nmda[grepl('BySample', nmda)][1])
+    nmda <- colnames(tbl)
+    if (rlang::quo_is_missing(.group)){
+        if (any(grepl('^Sign_', nmda))){
+            sign.group <- nmda[grepl('^Sign_', nmda)][1]
+            .group <- gsub('Sign_', "", sign.group)
+        }else{
+            stop_wrap('The .group name should be specified manually.')
+        }
+    }else{
+        .group <- rlang::as_name(.group)
+        if (!grepl('^Sign_', .group)){
+            if (paste0('Sign_', .group) %in% nmda){
+                sign.group <- paste0('Sign_', .group)
+            }else{
+                stop('Please check the mp_diff_analysis(..., action="add") has been run.')
+            }
+        }else{
+            sign.group <- .group
+            .group <- gsub('Sign_', "", .group)
+        }
+    }
+
+    tbl %<>% dplyr::filter(!is.na(!!rlang::sym(sign.group)))
+
+    if (any(grepl('LDA', nmda))){
+        xlabtext <- bquote(paste(Log[10],"(",.("LDA"), ")"))
+        xtext <- "LDAmean"
+        xmintext <- "LDAlower"
+        xmaxtext <- "LDAupper"
+    }else{
+        xlabtext <- "MDA"
+        xtext <- "MDAmean"
+        xmintext <- "MDAlower"
+        xmaxtext <- "MDAupper"
+    }
+
+    abunda <- nmda[grepl('Rel.*BySample', nmda)]
+    if (group.abun){
+        mapping1 <- aes(x = !!rlang::sym(abunda), 
+                        y = !!rlang::sym("label"),
+                        group = !!rlang::sym(.group),
+                        fill = !!rlang::sym(.group)
+        )
+        panel1.geom <- 'geom_bar'
+        panel1.args <- .extract_args(geom = 'geom_bar')
+        panel1.args <- params[names(params) %in% panel1.args]
+        panel1.args <- panel1.args[!names(panel1.args) %in% c('fill', 'group')]
+        panel1.args$fun <- mean
+        panel1.args$stat <- "summary"
+        panel1.args$position <- "dodge"
+        panel1.args$orientation <- 'y'
+    }else{
+        mapping1 <- aes(
+                  x = !!rlang::sym(abunda),
+                  y = !!rlang::sym("label"),
+                  fill = !!rlang::sym(.group)
+                )
+        panel1.geom <- 'geom_boxplot'
+        panel1.args <- .extract_args(geom="geom_boxplot")
+        panel1.args <- params[names(params) %in% panel1.args]
+        panel1.args <- panel1.args <- panel1.args[!names(panel1.args) %in% c('fill')]
+    }
+
+    mapping2 <- aes(
+              xmin = !!rlang::sym(xmintext),
+              xmax = !!rlang::sym(xmaxtext),
+              y = !!rlang::sym('label')
+    )
+    
+    mapping3 <- aes_string(
+                    x = xtext, 
+                    y = 'label', 
+                    color = sign.group#, 
+                    #size = paste0("-log10(", rlang::as_name(.size), ")")
+                )
+
+    error.bar.args <- .extract_args(geom='geom_errorbarh')
+    point.args <- .extract_args(geom='geom_point')
+    error.bar.args <- params[names(params) %in% error.bar.args]
+    point.args <- params[names(params) %in% point.args]
+    
+    error.bar.args <- error.bar.args[!names(error.bar.args) %in% c('height')]
+    error.bar.args$height <- .3
+    point.args <- point.args[!names(point.args) %in% c("color", "shape")]
+    
+    panel1.args$mapping <- mapping1
+    error.bar.args$mapping <- mapping2
+    point.args$mapping <- mapping3
+    point.args$show.legend <- c(colour=FALSE)
+
+    if (is.quo.numeric(.size)){
+        point.args$size <- .size
+        point.args <- point.args[!names(point.args) %in% c("size")]
+    }else{
+        mapping3 <- modifyList(mapping3, aes_string(size=paste0("-log10(", rlang::as_name(.size), ")")))
+    }
+    p <- ggplot(tbl)
+
+    panel1.geom <- do.call(panel1.geom, panel1.args)
+    p1 <- p + 
+          panel1.geom + 
+          ylab(NULL) + 
+          xlab('Abundance') +
+          scale_x_continuous(expand = c(0, 0, 0, .2))
+    p1 <- p1 + theme_stamp(axis.ticks.y=element_blank())
+
+    error.bar.geom <- do.call(geom_errorbarh, error.bar.args)
+    point.geom <- do.call(geom_point, point.args)
+    p2 <- p + 
+          error.bar.geom + 
+          point.geom +
+          ylab(NULL) +
+          xlab(xlabtext) +
+          theme(
+            axis.text.y = element_blank(),
+            axis.ticks.y = element_blank()
+          )
+    p2 <- p2 + theme_stamp()
+
+    p <- p1 %>% aplot::insert_right(p2, width = .8)
+    return(p)
+}
+
+.extract_args <- function(geom){
+    xx <- do.call(geom, list())
+    c(names(xx$geom_params), names(xx$geom$default_aes))
+}
+
+#' @rdname mp_plot_diff_boxplot-methods
+#' @aliases mp_plot_diff_boxplot,MPSE
+#' @export mp_plot_diff_boxplot
+setMethod("mp_plot_diff_boxplot", signature(.data='MPSE'), .internal_mp_plot_diff_boxplot)
+
+#' @rdname mp_plot_diff_boxplot-methods
+#' @aliases mp_plot_diff_boxplot,tbl_mpse
+#' @export mp_plot_diff_boxplot
+setMethod("mp_plot_diff_boxplot", signature(.data="tbl_mpse"), .internal_mp_plot_diff_boxplot)
+
+#' @rdname mp_plot_diff_boxplot-methods
+#' @aliases mp_plot_diff_boxplot,grouped_df_mpse
+#' @export mp_plot_diff_boxplot
+setMethod("mp_plot_diff_boxplot", signature(.data="grouped_df_mpse"), .internal_mp_plot_diff_boxplot)
+
 
 .get_annot_index <- function(x, taxa.class, tip.annot = TRUE){
     start.annot <- x %>%                 
@@ -972,6 +1185,24 @@ scale_fill_diff_cladogram  <- function(
     structure(scl, class = 'ScaleDiffClade')
     
 }
+
+#' set the color scale of plot generated by mp_plot_diff_boxplot
+#' @param .data the aplot object generated by mp_plot_diff_boxplot.
+#' @param values the color vector, required.
+#' @param ... additional parameters, see also the 'scale_fill_manual' of 'ggplot2'
+#' @export
+set_diff_boxplot_color <- function(
+    .data,
+    values,
+    ...){
+
+    .data$plotlist[[1]] <- .data$plotlist[[1]] + 
+                           scale_fill_manual(values = values, aesthetics='fill_new', ...)
+    .data$plotlist[[2]] <- .data$plotlist[[2]] +
+                           scale_color_manual(values = values)
+     return(.data)
+}
+
 
 #' @importFrom ggplot2 ggplot_add
 #' @method ggplot_add ScaleDiffClade

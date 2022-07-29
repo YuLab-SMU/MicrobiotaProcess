@@ -628,6 +628,32 @@ f <- mouse.time.mpse %>%
 f
 ```
 
+The result also can be visualized with `mp_plot_diff_boxplot`.
+
+```{r, fig.width = 12, fig.height = 5, fig.align = 'center', fig.cap = 'The abundance and LDA effect size of differential taxa'}
+f.box <- mouse.time.mpse %>%
+         mp_plot_diff_boxplot(
+           .group = time,
+         ) %>%
+         set_diff_boxplot_color(
+           values = c("deepskyblue", "orange"),
+           guide = guide_legend(title=NULL)
+         )
+
+f.bar <- mouse.time.mpse %>%
+         mp_plot_diff_boxplot(
+           taxa.class = c(Genus, OTU), # select the taxonomy level to display
+           group.abun = TRUE, # display the mean abundance of each group
+           removeUnknown = TRUE, # whether mask the unknown taxa.
+         ) %>%
+         set_diff_boxplot_color(
+           values = c("deepskyblue", "orange"),
+           guide = guide_legend(title=NULL)
+         )
+
+aplot::plot_list(f.box, f.bar)
+```
+
 # 4. Need helps?
 
 If you have questions/issues, please visit [github issue tracker](https://github.com/YuLab-SMU/MicrobiotaProcess/issues).
