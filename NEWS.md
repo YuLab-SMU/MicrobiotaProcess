@@ -1,7 +1,8 @@
-# MicrobiotaProcess 1.9.1.991
+# MicrobiotaProcess 1.9.2
 
 + fixed the local vignettes. (2022-07-06, Wed)
 + add `mp_import_biom` to build `MPSE` class from `biom-format` file. (2022-07-13, Wed)
++ add 'mp_plot_diff_boxplot' to replace `ggdiffbox`. (2022-07-29, Fri)
 
 # MicrobiotaProcess 1.9.1
 
