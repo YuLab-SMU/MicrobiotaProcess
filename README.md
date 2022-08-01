@@ -4,53 +4,33 @@
 
 This package has many unique features:
 
-  - **MicrobiotaProcess** introduces **MPSE** class, which make this
+-   **MicrobiotaProcess** introduces **MPSE** class, which make this
     package more interoperable with the existing computing ecosystem.
-  - **MicrobiotaProcess** can bridge several common tools of microbiome
+-   **MicrobiotaProcess** can bridge several common tools of microbiome
     analysis with several parsing functions.
-  - **MicrobiotaProcess** introduces a tidy microbiome data structure
+-   **MicrobiotaProcess** introduces a tidy microbiome data structure
     paradigm and analysis grammar via formatted output avoiding memory
     consumption.
-  - **MicrobiotaProcess** provides a wide variety of microbiome analysis
+-   **MicrobiotaProcess** provides a wide variety of microbiome analysis
     procedures under the unified and common framework (tidy-like
     framework). This will make the related analysis easier.
 
 ## Anatomy of a **MPSE**
 
-<div class="figure" style="text-align: center">
-
-<img src="./inst/figures/mpse.png" alt="The structure of the MPSE class." width="883" />
-
-<p class="caption">
-
-The structure of the MPSE class.
-
-</p>
-
-</div>
+<img src="./inst/figures/mpse.png" title="The structure of the MPSE class." alt="The structure of the MPSE class." style="display: block; margin: auto;" />
 
 ## Overview of the design of **MicrobiotaProcess** package
 
-<div class="figure" style="text-align: center">
+<img src="./inst/figures/mp-design.png" title="The Overview of the design of MicrobiotaProcess package" alt="The Overview of the design of MicrobiotaProcess package" style="display: block; margin: auto;" />
 
-<img src="./inst/figures/mp-design.png" alt="The Overview of the design of MicrobiotaProcess package" width="1078" />
-
-<p class="caption">
-
-The Overview of the design of MicrobiotaProcess package
-
-</p>
-
-</div>
-
-## :writing\_hand: Authors
+## :writing_hand: Authors
 
 [Shuangbin Xu](https://github.com/xiangpin) and [Guangchuang
 Yu](https://guangchuangyu.github.io)
 
 School of Basic Medical Sciences, Southern Medical University
 
-## :arrow\_double\_down: Installation
+## :arrow_double_down: Installation
 
 Get the released version from
 [Bioconductor](https://bioconductor.org/packages/release/bioc/html/MicrobiotaProcess.html):
@@ -74,10 +54,10 @@ remotes::install_github("YuLab-SMU/MicrobiotaProcess")
 # :book: Vignette
 
 For more details, please refer to the [online
-vignette](https://bioconductor.org/packages/devel/bioc/vignettes/MicrobiotaProcess/inst/doc/Introduction.html).
+vignette](https://bioconductor.org/packages/devel/bioc/vignettes/MicrobiotaProcess/inst/doc//MicrobiotaProcess.html).
 
-## :sparkling\_heart: Contributing
+## :sparkling_heart: Contributing
 
-We welcome any contributions\! By participating in this project you
-agree to abide by the terms outlined in the [Contributor Code of
+We welcome any contributions! By participating in this project you agree
+to abide by the terms outlined in the [Contributor Code of
 Conduct](CONDUCT.md).
