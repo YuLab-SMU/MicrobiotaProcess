@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.9.2.990
+
++ fix a bug of `mp_plot_diff_boxplot` when `taxatree` slot is NULL. (2022-08-22, Mon)
+
 # MicrobiotaProcess 1.9.2
 
 + fixed the local vignettes. (2022-07-06, Wed)
