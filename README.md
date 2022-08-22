@@ -2,6 +2,11 @@
 
 # MicrobiotaProcess: A comprehensive R package for managing and analyzing microbiome and other ecological data within the tidy framework
 
+[![](https://img.shields.io/badge/release%20version-1.8.1-green.svg)](https://www.bioconductor.org/packages/MicrobiotaProcess)
+[![](https://img.shields.io/badge/devel%20version-1.9.2-green.svg)](https://github.com/YuLab-SMU/MicrobiotaProcess)
+[![Bioc](http://www.bioconductor.org/shields/years-in-bioc/MicrobiotaProcess.svg)](https://www.bioconductor.org/packages/devel/bioc/html/MicrobiotaProcess.html#since)
+[![platform](http://www.bioconductor.org/shields/availability/devel/MicrobiotaProcess.svg)](https://www.bioconductor.org/packages/devel/bioc/html/MicrobiotaProcess.html#archives)
+
 This package has many unique features:
 
   - **MicrobiotaProcess** introduces **MPSE** class, which make this
@@ -13,7 +18,7 @@ This package has many unique features:
     consumption.
   - **MicrobiotaProcess** provides a wide variety of microbiome analysis
     procedures under the unified and common framework (tidy-like
-    framework). This will make the related analysis easier.
+    framework). This will make the related analysis become easier.
 
 ## Anatomy of a **MPSE**
 

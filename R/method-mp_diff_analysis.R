@@ -973,9 +973,13 @@ setGeneric("mp_plot_diff_boxplot",
     .group <- rlang::enquo(.group)
     .size <- rlang::enquo(.size)
     params <- list(...)
-    tbl <- .data %>% mp_extract_abundance(taxa.class = 'all')
+    if (!is.null(suppressMessages(taxatree(.data)))){
+        tbl <- .data %>% mp_extract_abundance(taxa.class = 'all')
+    }else{
+        tbl <- .data %>% mp_extract_feature() %>% dplyr::rename(label = 'OTU')
+    }
     taxa.class <- quo.vect_to_str.vect(taxa.class)
-    if (! any(taxa.class %in% c('all', 'ALL', 'All'))){
+    if (!any(taxa.class %in% c('all', 'ALL', 'All')) && !is.null(suppressMessages(taxatree(.data)))){
        tbl %<>% dplyr::filter(.data$nodeClass %in% taxa.class)
     }
     if (removeUnknown){

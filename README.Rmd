@@ -10,6 +10,7 @@ html_preview: false
 # MicrobiotaProcess: A comprehensive R package for managing and analyzing microbiome and other ecological data within the tidy framework
 
 ```{r, echo=FALSE, results="hide", message=FALSE}
+library(badger)
 Biocpkg <- function (pkg) {
     sprintf("[%s](http://bioconductor.org/packages/%s)", pkg, pkg)
 }
@@ -18,6 +19,11 @@ conflicted::conflict_prefer("filter", "dplyr")
 knitr::opts_chunk$set(fig.path = "inst/figures/README-")
 ```
 
+`r badge_bioc_release("MicrobiotaProcess", "green")`
+`r badge_devel("YuLab-SMU/MicrobiotaProcess", "green")`
+[![Bioc](http://www.bioconductor.org/shields/years-in-bioc/MicrobiotaProcess.svg)](https://www.bioconductor.org/packages/devel/bioc/html/MicrobiotaProcess.html#since)
+[![platform](http://www.bioconductor.org/shields/availability/devel/MicrobiotaProcess.svg)](https://www.bioconductor.org/packages/devel/bioc/html/MicrobiotaProcess.html#archives)
+
 This package has many unique features:
 
 + **MicrobiotaProcess** introduces **MPSE** class, which make this package more interoperable with the existing computing ecosystem.
@@ -25,7 +31,7 @@ This package has many unique features:
 + **MicrobiotaProcess** introduces a tidy microbiome data structure paradigm and analysis grammar via formatted output 
   avoiding memory consumption.
 + **MicrobiotaProcess** provides a wide variety of microbiome analysis procedures under the unified and common framework 
-  (tidy-like framework). This will make the related analysis easier.
+  (tidy-like framework). This will make the related analysis become easier.
 
 ## Anatomy of a **MPSE** 
 
