@@ -1441,7 +1441,7 @@ insert_left <- getFromNamespace("insert_left", "aplot")
 #' @param colour character the color of theme stamp.
 #' @param axis character which grid of axis will be filled, default is 'y'.
 #' @param ... additional parameter, see also 'theme' of 'ggplot2'.
-#' @export
+#' @keywords internal
 theme_stamp <- function(colour=c('white', 'grey90'), axis = 'y', ...){
     params <- list(...)
     axis <- match.arg(axis, c('x', 'y'))
@@ -1464,7 +1464,6 @@ theme_stamp <- function(colour=c('white', 'grey90'), axis = 'y', ...){
 }
 
 #' @method ggplot_add theme_stamp 
-#' @export
 #' @importFrom ggplot2 element_line geom_tile 
 ggplot_add.theme_stamp <- function(object, plot, object_name){
     gb <- ggplot2::ggplot_build(plot)

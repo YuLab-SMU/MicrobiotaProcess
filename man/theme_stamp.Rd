@@ -16,3 +16,4 @@ theme_stamp(colour = c("white", "grey90"), axis = "y", ...)
 \description{
 set the theme of ggplot object with the STAMP style.
 }
+\keyword{internal}
