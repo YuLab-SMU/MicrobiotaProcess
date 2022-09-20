@@ -190,9 +190,15 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
     }
 
     if (is.function(distmethod)){
-        distfun <- distmethod
         f <- match.call()
-        distmethod <- gsub(".*::", "\\2", rlang::call_args(f)$distmethod)
+        distfun <- distmethod
+        distmethod <- gsub(".*::", "\\2", rlang::quo_name(rlang::call_args(f)$distmethod))
+        distmethod <- paste0(distmethod, '.fun')
+        fn <- rlang::fn_fmls(distfun)
+        if ('method' %in% names(fn) && 'method' %in% names(dotargs)){
+            distmethod <- dotargs$method
+            dotargs$method <- NULL
+        }
     }else if (distmethod %in% distMethods$vegdist){
         distfun <- vegan::vegdist 
     }else if (distmethod %in% distMethods$betadiver){
@@ -252,7 +258,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
         distsampley <- paste0(distmethod, "Sampley")
     }
 
-    if (distmethod %in% distMethods$UniFrac){
+    if (grepl('\\.fun$', distmethod) || distmethod %in% distMethods$UniFrac){
         if (!rlang::quo_is_null(.env)){
             rlang::abort("The distance of sample based on environment factor is not calculated via UniFrac method.")
         }
@@ -260,7 +266,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
     }else{
         params <- c(list(da, method=distmethod), dotargs)
     }
-
+    
     da <- do.call(distfun, params)
 
     if (action=="get"){
@@ -272,7 +278,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
     }
 
     dat <- da %>% 
-        as.matrix %>% 
+        as.matrix() %>% 
         corrr::as_cordf(diagonal=0) %>%
         corrr::shave() %>% 
         corrr::stretch(na.rm=TRUE) %>%
@@ -317,9 +323,15 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
     otutree <- .data %>% attr("otutree")
 
     if (is.function(distmethod)){
-        distfun <- distmethod
         f <- match.call()
-        distmethod <- gsub(".*::", "\\2", rlang::call_args(f)$distmethod)
+        distfun <- distmethod
+        distmethod <- gsub(".*::", "\\2", rlang::quo_name(rlang::call_args(f)$distmethod))
+        distmethod <- paste0(distmethod, '.fun')
+        fn <- rlang::fn_fmls(distfun)
+        if ('method' %in% names(fn) && 'method' %in% names(dotargs)){
+            distmethod <- dotargs$method
+            dotargs$method <- NULL
+        }        
     }else if (distmethod %in% distMethods$vegdist){
         distfun <- vegan::vegdist
     }else if (distmethod %in% distMethods$betadiver){

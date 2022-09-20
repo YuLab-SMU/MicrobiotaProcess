@@ -1284,3 +1284,31 @@ rename_tiplab <- function(treedata, oldname, newname){
     }
     return (otutree)
 }
+
+.dist2tbl <- function(x, y){
+    distmethod <- 'DistFromOutSide'
+    if (inherits(x, 'list')){
+        if (!is.null(names(x))){
+            distmethod <- names(x)
+        }
+        x <- x[[1]]
+    }
+    x <- as.matrix(x)
+    flag <- match(unique(dim(x)), dim(y))
+    if (is.na(flag)){
+        stop_wrap('The y is a dist object, but the dimension is different with the x (mpse).')
+    }
+    if (flag == 1){
+        x.name <- 'OTU'
+    }else{
+        x.name <- 'Sample'
+    }
+    distsampley <- paste0(distmethod, x.name, 'y')
+    x <- x %>%
+        corrr::as_cordf(diagonal=0) %>%
+        corrr::shave() %>%
+        corrr::stretch(na.rm=TRUE) %>%
+        dplyr::rename(!!distmethod:="r", !!distsampley:="y", !!x.name:='x') %>%
+        tidyr::nest(!!distmethod:=c(!!as.symbol(distsampley), !!as.symbol(distmethod)))
+    return(x)
+}

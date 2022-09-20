@@ -1,3 +1,8 @@
+# MicrobiotaProcess 1.9.3.990
+
++ update `mp_cal_dist` to support specifying `distmethod` to a function. (2022-09-20, Tue)
++ update `left_join` to support joining the `dist` class. (2022-09-20, Tue)
+
 # MicrobiotaProcess 1.9.3
 
 + fix a bug of `mp_plot_diff_boxplot` when `taxatree` slot is NULL. (2022-08-22, Mon)

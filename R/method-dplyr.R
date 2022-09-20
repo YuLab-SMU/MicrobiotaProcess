@@ -367,6 +367,9 @@ arrange.grouped_df_mpse <- function(.data, ..., by_group = FALSE){
 ##' @method left_join MPSE
 ##' @export
 left_join.MPSE <- function(x, y, by=NULL, copy=FALSE, ...){
+    if (inherits(y, 'dist') || all(unlist(lapply(y, function(i)inherits(i, 'dist'))))){
+        y <- .dist2tbl(y, x)
+    }
     dots <- rlang::quos(...)
     suffix <- c("", ".y")
     if ("suffix" %in% names(dots)){
@@ -443,6 +446,9 @@ left_join.MPSE <- function(x, y, by=NULL, copy=FALSE, ...){
 ##' @method left_join tbl_mpse
 ##' @export
 left_join.tbl_mpse <- function(x, y, by=NULL, copy=FALSE, suffix = c("", ".y"), ...){
+    if (inherits(y, 'dist') || all(unlist(lapply(y, function(i)inherits(i, 'dist'))))){
+        y <- .dist2tbl(y, x)
+    }
     res <- NextMethod()
     if (valid_names(res, type="tbl_mpse")){
         res <- add_attr.tbl_mpse(x1 = res, x2 = x) 
