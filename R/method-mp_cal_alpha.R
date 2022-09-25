@@ -291,6 +291,123 @@ setMethod("mp_cal_alpha", signature(.data="tbl_mpse"), .internal_mp_cal_alpha)
 #' @exportMethod mp_cal_alpha
 setMethod("mp_cal_alpha", signature(.data="grouped_df_mpse"), .internal_mp_cal_alpha)
 
+#' @title calculate the divergence with MPSE or tbl_mpse
+#' @docType methods
+#' @rdname mp_cal_divergence-methods
+#' @param .data MPSE or tbl_mpse object
+#' @param .abundance The column name of OTU abundance column to be calculate.
+#' @param .name the colname name of the divergence results, default is 'divergence'.
+#' @param reference a no-empty character, either 'median' or 'mean' or the sample 
+#' name, or a numeric vector which has length equal to the number of features,
+#' default is 'mean'. 
+#' @param distFUN the function to calculate the distance between the reference and
+#' samples, default is 'vegan::vegdist'. 
+#' @param method the method to calculate the distance, which will pass to the function
+#' that is specified in 'distFUN', default is 'bray'.
+#' @param action character it has three options, "add" joins the new information
+#' to the input tbl (default), "only" return a non-redundant tibble with the just
+#' new information, ang 'get' return a 'alphasample' object.
+#' @param ... additional arguments, see also the arguments of 'distFUN' function.
+#' @return update object or other (refer to action)
+#' @seealso [mp_plot_alpha()]
+#' @export
+#' @author Shuangbin Xu
+#' @examples
+#' \dontrun{
+#' # example(mp_cal_divergence, run.dontrun = TRUE) to run the example.
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %>% 
+#'   mp_cal_divergence(
+#'     .abundance = Abundance,
+#'     .name = 'divergence.mean',
+#'     distFUN = vegan::vegdist,
+#'     method = 'bray'
+#'   ) %>% 
+#'   mp_plot_alpha(
+#'     .alpha = divergence.mean,
+#'     .group = time,
+#'   )
+#' }
+setGeneric('mp_cal_divergence', 
+           function(.data,
+                    .abundance, 
+                    .name = 'divergence',
+                    reference = 'mean', 
+                    distFUN = vegan::vegdist, 
+                    method = 'bray',
+                    action = 'add', ...)
+    standardGeneric('mp_cal_divergence')
+)
+
+.internal_cal_divergence <- function(.data, 
+                                     .abundance, 
+                                     .name = 'divergence',
+                                     reference = 'mean', 
+                                     distFUN = vegan::vegdist, 
+                                     method = 'bray', 
+                                     action = 'add', 
+                                     ...){
+    .abundance <- rlang::enquo(.abundance)
+    .name <- rlang::enquo(.name)
+    
+    stop_msg <- "The reference must be one of 'median' or 'mean' meaning 
+                 the 'median' or 'mean' of all sample. Or it must a numeric 
+                 vector which has length equal to the number of features.
+                 Or it must be a integer value smaller than the number of 
+                 features. Or it must be a character of sample name.
+                 "
+    
+    dat <- .data %>% mp_extract_assays(!!.abundance)
+
+    if (is.character(reference) && 
+        !(reference %in% c('median', 'mean') || reference %in% colnames(dat)) && 
+        !length(reference)==1){
+        stop_wrap(stop_msg)
+    }else if(is.numeric(reference) && !(length(reference) == nrow(dat) || length(reference)==1)){
+        stop_wrap(stop_msg)
+    }else if (! (is.numeric(reference) || is.character(reference))){
+        stop_wrap(stop_msg)
+    }
+
+    if (reference %in% c('median', 'mean')){
+        reference <- apply(dat, 1, reference)
+    }else if ((is.numeric(reference) && length(reference)==1 && reference < ncol(dat)) || reference %in% colnames(dat)){
+        reference <- dat[,reference]
+    }
+    
+    res <- unlist(lapply(seq_len(ncol(dat)), 
+                  function(i) distFUN(rbind(dat[,i], reference), method = method, ...)
+             ))
+ 
+    res <- tibble::tibble(Sample=colnames(dat), !!.name:=res)
+    
+    if (action == 'get'){
+        return(res)
+    }else if (action == 'only'){
+        sample.da <- .data %>% mp_extract_sample()
+        res <- sample.da %>% left_join(res, by = 'Sample')
+    }else if (action == 'add'){
+        res <- .data %>% left_join(res, by = 'Sample')
+    }
+    return(res)
+}
+
+#' @rdname mp_cal_divergence-methods
+#' @aliases mp_cal_divergence,MPSE
+#' @exportMethod mp_cal_divergence
+setMethod('mp_cal_divergence', signature(.data = 'MPSE'), .internal_cal_divergence)
+
+#' @rdname mp_cal_divergence-methods
+#' @aliases mp_cal_divergence,tbl_mpse
+#' @exportMethod mp_cal_divergence
+setMethod('mp_cal_divergence', signature(.data = 'tbl_mpse'), .internal_cal_divergence)
+
+#' @rdname mp_cal_divergence-methods
+#' @aliases mp_cal_divergence,grouped_df_mpse
+#' @exportMethod mp_cal_divergence
+setMethod('mp_cal_divergence', signature(.data = 'grouped_df_mpse'), .internal_cal_divergence)
+
+
 valid_rare <- function(.data, ...){
     UseMethod("valid_rare")
 }
@@ -300,7 +417,7 @@ valid_rare.MPSE <- function(.data, .abundance=NULL){
     #.abundance <- ifelse(is.null(.abundance), "RareAbundance", .abundance)
     .abundance <- rlang::as_name(.abundance)
     if (.abundance %in% assaysvar){
-        flag <- SummarizedExperiment::assays(.data)@listData[[.abundance]] %>% colSums %>% var == 0
+        flag <- SummarizedExperiment::assay(.data, .abundance) %>% colSums() %>% var() == 0
         return(flag)
         #return(TRUE)
     }else{

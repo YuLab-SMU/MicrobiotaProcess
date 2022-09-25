@@ -329,3 +329,148 @@ setMethod("mp_mrpp", signature(.data="grouped_df_mpse"),
                                      ...)
     return(res)
 })
+
+#' Fit Dirichlet-Multinomial models to MPSE or tbl_mpse
+#' @rdname mp_dmn-methods
+#' @param .data MPSE or tbl_mpse object
+#' @param .abundance The column name of OTU abundance column to be calculate.
+#' @param k the number of Dirichlet components to fit, default is 1.
+#' @param seed random number seed to be reproducible, default is 123. 
+#' @param mc.cores The number of cores to use, default is 2.
+#' @param action character it has three options, 'get' return a 'list' contained 
+#' DMN (default), "add" joins the new information to the input (can be extracted
+#' with mp_extract_internal_attr(name='DMN')), "only" return a non-redundant tibble 
+#' with the just new information a column  contained 'DMN'.
+#' @param ... additional parameters, see also the \code{\link[parallel]{mclapply}}
+#' and \code{\link[DirichletMultinomial]{dmn}}.
+#' @export
+#' @return update object or other (refer to action)
+#' @examples
+#' \dontrun{
+#' data(mouse.time.mpse)
+#' res <- mouse.time.mpse %>% 
+#'        mp_dmn(.abundance = Abundance, 
+#'               k = seq_len(2), 
+#'               mc.cores = 4, 
+#'               action = 'get')
+#' res
+#' }
+setGeneric('mp_dmn', 
+    function(.data, .abundance, k = 1, seed = 123, mc.cores = 2, action = 'get', ...)
+    standardGeneric('mp_dmn')
+)
+
+.internal_cal_dmn <- function(.data, .abundance, k = 1, seed = 123, mc.cores = 2, action = 'get', ...){
+    action %<>% match.arg(c('get', 'only', 'add'))
+    .abundance <- rlang::enquo(.abundance)
+    dat <- .data %>% mp_extract_assays(!!.abundance)
+    res <- parallel::mclapply(k, FUN=DirichletMultinomial::dmn, 
+                              count = t(dat), 
+                              seed = seed, 
+                              mc.cores = mc.cores, 
+                              ...)
+    if (action == 'get'){
+        return(res)
+    }else if (action == 'only'){
+        res <- tibble::tibble(k = k, DMNfit = res)
+        return(res)
+    }else if (action == 'add'){
+        resname <- as.character(class(res[[1]]))
+        message(paste0("The result of ", resname," has been integrated to the internal attribute !"))
+        message(paste0("It can be extracted using this-object %>% mp_extract_internal_attr(name='",resname,"')"))
+        .data %<>% add_internal_attr(res,  name = resname)
+        return(.data)
+    }
+}
+
+#' @rdname mp_dmn-methods
+#' @aliases mp_dmn,MPSE
+#' @exportMethod mp_dmn
+setMethod('mp_dmn', signature(.data = 'MPSE'), .internal_cal_dmn)
+
+#' @rdname mp_dmn-methods
+#' @aliases mp_dmn,tbl_mpse
+#' @exportMethod mp_dmn
+setMethod('mp_dmn', signature(.data = 'tbl_mpse'), .internal_cal_dmn)
+
+#' @rdname mp_dmn-methods
+#' @aliases mp_dmn,grouped_df_mpse
+#' @exportMethod mp_dmn 
+setMethod('mp_dmn', signature(.data = 'grouped_df_mpse'), .internal_cal_dmn)
+          
+#' Dirichlet-Multinomial generative classifiers to MPSE or tbl_mpse
+#' @rdname mp_dmngroup-methods
+#' @param .data MPSE or tbl_mpse object
+#' @param .abundance The column name of OTU abundance column to be calculate.
+#' @param .group the column name of group variable.
+#' @param k the number of Dirichlet components to fit, default is 1.
+#' @param action character it has three options, 'get' return a 'list' contained
+#' DMN (default), "add" joins the new information to the input (can be extracted
+#' with mp_extract_internal_attr(name='DMNGroup')), "only" return a non-redundant tibble
+#' with the just new information a column contained 'DMNGroup'.
+#' @param ... additional parameters, see also the \code{\link[parallel]{mclapply}}
+#' and \code{\link[DirichletMultinomial]{dmngroup}}.
+#' @return update object or others (refer to action argument)
+#' @export
+#' @examples
+#' \dontrun{
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %>% 
+#'   mp_dmngroup(
+#'     .abundance = Abundance,
+#'     .group = time,
+#'     k=seq_len(2),
+#'     action = 'get'
+#'   )
+#' }
+setGeneric('mp_dmngroup', function(.data, .abundance, .group, k = 1, action = 'get', ...)
+    standardGeneric("mp_dmngroup")
+)
+
+.internal_cal_dmngroup <- function(.data, .abundance, .group, k = 1, action = 'get', ...){
+    action %<>% match.arg(c('get', 'only', 'add'))
+    .abundance <- rlang::enquo(.abundance)
+    .group <- rlang::enquo(.group)
+    dat <- .data %>% mp_extract_assays(!!.abundance)
+    variable <- .data %>% mp_extract_sample() %>% dplyr::pull(!!.group)
+
+    res <- DirichletMultinomial::dmngroup(count = t(dat), 
+                                          group = variable, 
+                                          k = k, 
+                                          ...)
+    if (action == 'get'){
+        return(res)
+    }else if (action == 'only'){
+        if (inherits(res, 'list')){
+            res <- tibble::tibble(k = k, DMNGroup = res)
+        }else{
+            res <- tibble::tibble(k = 'best', DMNGroup = list(res))
+        }
+        return(res)
+    }else if (action == 'add'){
+        if (inherits('res', 'list')){
+            resname <- as.character(class(res[[1]]))
+        }else{
+            resname <- as.character(class(res))
+        }
+        message(paste0("The result of ", resname," has been integrated to the internal attribute !"))
+        message(paste0("It can be extracted using this-object %>% mp_extract_internal_attr(name='",resname,"')"))        
+        .data %<>% add_internal_attr(res, name = resname)
+        return(.data)
+    }
+}
+
+#' @rdname mp_dmngroup-methods
+#' @aliases mp_dmngroup,MPSE
+#' @exportMethod mp_dmngroup
+setMethod('mp_dmngroup', signature(.data = 'MPSE'), .internal_cal_dmngroup)
+
+#' @rdname mp_dmngroup-methods
+#' @aliases mp_dmngroup,tbl_mpse
+#' @exportMethod mp_dmngroup
+setMethod('mp_dmngroup', signature(.data = 'tbl_mpse'), .internal_cal_dmngroup)
+
+#' @rdname mp_dmngroup-methods
+#' @aliases mp_dmngroup,grouped_df_mpse
+#' @exportMethod mp_dmngroup
+setMethod('mp_dmngroup', signature(.data = 'grouped_df_mpse'), .internal_cal_dmngroup)
