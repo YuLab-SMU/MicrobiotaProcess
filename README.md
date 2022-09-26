@@ -2,40 +2,60 @@
 
 # MicrobiotaProcess: A comprehensive R package for managing and analyzing microbiome and other ecological data within the tidy framework
 
-[![](https://img.shields.io/badge/release%20version-1.8.1-green.svg)](https://www.bioconductor.org/packages/MicrobiotaProcess)
-[![](https://img.shields.io/badge/devel%20version-1.9.2.990-green.svg)](https://github.com/YuLab-SMU/MicrobiotaProcess)
+[![](https://img.shields.io/badge/release%20version-1.8.2-green.svg)](https://www.bioconductor.org/packages/MicrobiotaProcess)
+[![](https://img.shields.io/badge/devel%20version-1.9.3.991-green.svg)](https://github.com/YuLab-SMU/MicrobiotaProcess)
 [![Bioc](http://www.bioconductor.org/shields/years-in-bioc/MicrobiotaProcess.svg)](https://www.bioconductor.org/packages/devel/bioc/html/MicrobiotaProcess.html#since)
 [![platform](http://www.bioconductor.org/shields/availability/devel/MicrobiotaProcess.svg)](https://www.bioconductor.org/packages/devel/bioc/html/MicrobiotaProcess.html#archives)
 
 This package has many unique features:
 
--   **MicrobiotaProcess** introduces **MPSE** class, which make this
+  - **MicrobiotaProcess** introduces **MPSE** class, which make this
     package more interoperable with the existing computing ecosystem.
--   **MicrobiotaProcess** can bridge several common tools of microbiome
+  - **MicrobiotaProcess** can bridge several common tools of microbiome
     analysis with several parsing functions.
--   **MicrobiotaProcess** introduces a tidy microbiome data structure
+  - **MicrobiotaProcess** introduces a tidy microbiome data structure
     paradigm and analysis grammar via formatted output avoiding memory
     consumption.
--   **MicrobiotaProcess** provides a wide variety of microbiome analysis
+  - **MicrobiotaProcess** provides a wide variety of microbiome analysis
     procedures under the unified and common framework (tidy-like
     framework). This will make the related analysis become easier.
 
 ## Anatomy of a **MPSE**
 
-<img src="./inst/figures/mpse.png" title="The structure of the MPSE class." alt="The structure of the MPSE class." style="display: block; margin: auto;" />
+<div class="figure" style="text-align: center">
+
+<img src="./inst/figures/mpse.png" alt="The structure of the MPSE class." width="883" />
+
+<p class="caption">
+
+The structure of the MPSE class.
+
+</p>
+
+</div>
 
 ## Overview of the design of **MicrobiotaProcess** package
 
-<img src="./inst/figures/mp-design.png" title="The Overview of the design of MicrobiotaProcess package" alt="The Overview of the design of MicrobiotaProcess package" style="display: block; margin: auto;" />
+<div class="figure" style="text-align: center">
 
-## :writing_hand: Authors
+<img src="./inst/figures/mp-design.png" alt="The Overview of the design of MicrobiotaProcess package" width="1078" />
+
+<p class="caption">
+
+The Overview of the design of MicrobiotaProcess package
+
+</p>
+
+</div>
+
+## :writing\_hand: Authors
 
 [Shuangbin Xu](https://github.com/xiangpin) and [Guangchuang
 Yu](https://guangchuangyu.github.io)
 
 School of Basic Medical Sciences, Southern Medical University
 
-## :arrow_double_down: Installation
+## :arrow\_double\_down: Installation
 
 Get the released version from
 [Bioconductor](https://bioconductor.org/packages/release/bioc/html/MicrobiotaProcess.html):
@@ -61,8 +81,8 @@ remotes::install_github("YuLab-SMU/MicrobiotaProcess")
 For more details, please refer to the [online
 vignette](https://bioconductor.org/packages/devel/bioc/vignettes/MicrobiotaProcess/inst/doc//MicrobiotaProcess.html).
 
-## :sparkling_heart: Contributing
+## :sparkling\_heart: Contributing
 
-We welcome any contributions! By participating in this project you agree
-to abide by the terms outlined in the [Contributor Code of
+We welcome any contributions\! By participating in this project you
+agree to abide by the terms outlined in the [Contributor Code of
 Conduct](CONDUCT.md).
