@@ -15,6 +15,9 @@ mp_plot_diff_boxplot(
   .data,
   .group,
   .size = 2,
+  errorbar.xmin = NULL,
+  errorbar.xmax = NULL,
+  point.x = NULL,
   taxa.class = "all",
   group.abun = FALSE,
   removeUnknown = FALSE,
@@ -25,6 +28,9 @@ mp_plot_diff_boxplot(
   .data,
   .group,
   .size = 2,
+  errorbar.xmin = NULL,
+  errorbar.xmax = NULL,
+  point.x = NULL,
   taxa.class = "all",
   group.abun = FALSE,
   removeUnknown = FALSE,
@@ -35,6 +41,9 @@ mp_plot_diff_boxplot(
   .data,
   .group,
   .size = 2,
+  errorbar.xmin = NULL,
+  errorbar.xmax = NULL,
+  point.x = NULL,
   taxa.class = "all",
   group.abun = FALSE,
   removeUnknown = FALSE,
@@ -45,6 +54,9 @@ mp_plot_diff_boxplot(
   .data,
   .group,
   .size = 2,
+  errorbar.xmin = NULL,
+  errorbar.xmax = NULL,
+  point.x = NULL,
   taxa.class = "all",
   group.abun = FALSE,
   removeUnknown = FALSE,
@@ -57,6 +69,12 @@ mp_plot_diff_boxplot(
 \item{.group}{the column name for mapping the different color.}
 
 \item{.size}{the column name for mapping the size of points or numeric, default is 2.}
+
+\item{errorbar.xmin}{the column name for 'xmin' mapping of error barplot layer, default is NULL.}
+
+\item{errorbar.xmax}{the column name for 'xmax' mapping of error barplot layer, default is NULL.}
+
+\item{point.x}{the column name for 'x' mapping of point layer (right panel), default is NULL.}
 
 \item{taxa.class}{the taxonomy class features will be displayed, default is 'all'.}
 

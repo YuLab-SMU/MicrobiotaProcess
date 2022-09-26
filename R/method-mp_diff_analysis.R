@@ -789,6 +789,9 @@ mp_plot_diff_cladogram <- function(
         }
         if (inherits(.data, 'MPSE') || inherits(.data, 'tbl_mpse') || inherits(.data, 'grouped_df_mpse')){
             .data %<>% mp_extract_taxatree()
+            if (is.null(.data)){
+                stop_wrap('The .data object does not have the taxatree slot.')
+            }
         }
         .data %<>% as_tibble()
         nmda <- colnames(.data)
@@ -813,14 +816,32 @@ mp_plot_diff_cladogram <- function(
         if (!rlang::quo_is_missing(taxa.class)){
             taxa.class <- rlang::as_name(taxa.class)
         }else{
-            taxa.class <- .data %>% 
-	           dplyr::filter(.data$nodeDepth == (max(.data$nodeDepth) - 2)) %>% 
-               dplyr::pull(.data$nodeClass) %>% unique()
+            if (any(is.na(.data$nodeDepth))){
+                dat <- .data %>% dplyr::filter(!is.na(.data$nodeDepth)) 
+            }else{
+                dat <- .data
+            }
+            if (length(unique(dat$nodeClass))==1){
+                taxa.class <- unique(dat$nodeClass)
+            }else{
+                taxa.class <- dat %>% 
+	               dplyr::filter(.data$nodeDepth == (max(.data$nodeDepth) - 2)) %>%
+                   dplyr::pull(.data$nodeClass) %>% unique()
+
+            }
         }
         annot.index <- .get_annot_index(x = .data, taxa.class = taxa.class, tip.annot = tip.annot)
 	    
         .data <- .generate_annot_df(x = .data, annot.index, .group, removeUnknown) %>% as.treedata()
-        offset.max <- max(dplyr::pull(.data, .data$nodeDepth)) 
+        offset.max <- max(dplyr::pull(.data, .data$nodeDepth), na.rm = TRUE) 
+        
+        if (inherits(rlang::quo_get_expr(.size), "call")){
+            mapping.point <- aes_string(size = rlang::as_label(.size), 
+                                        fill = rlang::as_name(.group))
+        }else{
+            mapping.point <- aes_string(size = paste0("-log10(", gsub("^\"|\"$", "", rlang::as_name(.size)), ")"), 
+                                        fill = rlang::as_name(.group))
+        }
 
         p <- ggtree(.data, layout = layout, size = bg.tree.size, color = bg.tree.color) +
              geom_point(
@@ -844,7 +865,16 @@ mp_plot_diff_cladogram <- function(
                 size = hilight.size,
                 alpha = hilight.alpha,
                 show.legend = FALSE,
-             ) +
+             )
+        
+        if (removeUnknown){
+            flag.clade <- td_filter(!is.na(!!.group) & !.data$isTip & !grepl('__un_', .data$label))(p$data)
+        }else{
+            flag.clade <- td_filter(!is.na(!!.group) & !.data$isTip)(p$data)
+        }
+        
+        if (nrow(flag.clade) > 0){
+            p <- p +
              ggtree::geom_cladelab(
                 data = td_mutate(
                          offset = (offset.max + 1 - .data$nodeDepth) * 0.88,
@@ -860,7 +890,9 @@ mp_plot_diff_cladogram <- function(
                 barsize = 0,
                 barcolor = NA,
                 bg.colour = 'white'
-             ) +    
+             ) 
+        }
+        p <- p + 
              ggnewscale::new_scale_color() + 
              geom_point(
                 data = td_mutate(
@@ -873,7 +905,7 @@ mp_plot_diff_cladogram <- function(
              ) +
              geom_point(
                data = ifelse(removeUnknown, td_filter(!grepl("__un_", .data$label) & !is.na(!!.group)), td_filter(!is.na(!!.group))),
-               mapping = aes_string(size = paste0("-log10(", rlang::as_name(.size), ")"), fill = rlang::as_name(.group)),
+               mapping = mapping.point,
                shape = 21,
                stroke = .1,
                #show.legend = c(fill = FALSE)
@@ -919,6 +951,9 @@ mp_plot_diff_cladogram <- function(
 #' @param .data MPSE or tbl_mpse after run mp_diff_analysis with 'action="add"'.
 #' @param .group the column name for mapping the different color.
 #' @param .size the column name for mapping the size of points or numeric, default is 2.
+#' @param errorbar.xmin the column name for 'xmin' mapping of error barplot layer, default is NULL.
+#' @param errorbar.xmax the column name for 'xmax' mapping of error barplot layer, default is NULL.
+#' @param point.x the column name for 'x' mapping of point layer (right panel), default is NULL.
 #' @param taxa.class the taxonomy class features will be displayed, default is 'all'.
 #' @param group.abun logical whether plot the abundance in each group with bar plot,
 #' default is FALSE.
@@ -960,6 +995,9 @@ setGeneric("mp_plot_diff_boxplot",
     .data,
     .group,
     .size = 2,
+    errorbar.xmin = NULL,
+    errorbar.xmax = NULL,
+    point.x = NULL,
     taxa.class = 'all',
     group.abun = FALSE,
     removeUnknown = FALSE,
@@ -968,10 +1006,18 @@ setGeneric("mp_plot_diff_boxplot",
   standardGeneric('mp_plot_diff_boxplot')
 )
 
-.internal_mp_plot_diff_boxplot <- function(.data, .group, .size = 2, taxa.class = 'all', group.abun = FALSE, removeUnknown=FALSE, ...){
+.internal_mp_plot_diff_boxplot <- function(.data, .group, .size = 2, 
+                                           errorbar.xmin = NULL, 
+                                           errorbar.xmax = NULL,
+                                           point.x = NULL, 
+                                           taxa.class = 'all', group.abun = FALSE, removeUnknown=FALSE, ...){
     taxa.class <- rlang::enquo(taxa.class)
     .group <- rlang::enquo(.group)
     .size <- rlang::enquo(.size)
+    errorbar.xmin <- rlang::enquo(errorbar.xmin)
+    errorbar.xmax <- rlang::enquo(errorbar.xmax)
+    point.x <- rlang::enquo(point.x)
+
     params <- list(...)
     if (!is.null(suppressMessages(taxatree(.data)))){
         tbl <- .data %>% mp_extract_abundance(taxa.class = 'all')
@@ -1001,7 +1047,8 @@ setGeneric("mp_plot_diff_boxplot",
             if (paste0('Sign_', .group) %in% nmda){
                 sign.group <- paste0('Sign_', .group)
             }else{
-                stop('Please check the mp_diff_analysis(..., action="add") has been run.')
+                #stop('Please check the mp_diff_analysis(..., action="add") has been run.')
+                sign.group <- .group
             }
         }else{
             sign.group <- .group
@@ -1016,11 +1063,22 @@ setGeneric("mp_plot_diff_boxplot",
         xtext <- "LDAmean"
         xmintext <- "LDAlower"
         xmaxtext <- "LDAupper"
-    }else{
+    }else if ('MDA' %in% nmda){
         xlabtext <- "MDA"
         xtext <- "MDAmean"
         xmintext <- "MDAlower"
         xmaxtext <- "MDAupper"
+    }else if (!rlang::quo_is_null(errorbar.xmin) && !rlang::quo_is_null(errorbar.xmax) && !rlang::quo_is_null(point.x)){
+        xlabtext <- gsub("^\"|\"$", "", rlang::as_label(point.x))
+        xtext <- xlabtext
+        xmintext <- gsub("^\"|\"$", "", rlang::as_label(errorbar.xmin))
+        xmaxtext <- gsub("^\"|\"$", "", rlang::as_label(errorbar.xmax))
+
+    }else if (!rlang::quo_is_null(point.x) && any(rlang::quo_is_null(errorbar.xmin) || rlang::quo_is_null(errorbar.xmax))){
+        xlabtext <- gsub("^\"|\"$", "", rlang::as_label(point.x))
+        xtext <- xlabtext
+        xmintext <- NULL
+        xmaxtext <- NULL
     }
 
     abunda <- nmda[grepl('Rel.*BySample', nmda)]
@@ -1049,13 +1107,32 @@ setGeneric("mp_plot_diff_boxplot",
         panel1.args <- params[names(params) %in% panel1.args]
         panel1.args <- panel1.args <- panel1.args[!names(panel1.args) %in% c('fill')]
     }
-
-    mapping2 <- aes(
-              xmin = !!rlang::sym(xmintext),
-              xmax = !!rlang::sym(xmaxtext),
-              y = !!rlang::sym('label')
-    )
     
+    if (!is.null(xmintext)){
+        mapping2 <- aes(
+                  xmin = !!rlang::sym(xmintext),
+                  xmax = !!rlang::sym(xmaxtext),
+                  y = !!rlang::sym('label')
+        )
+        panel2.geom <- 'geom_errorbarh'
+    }else{
+        mapping2 <- aes(x = 0, 
+                        xend = !!rlang::sym(xtext), 
+                        y = !!rlang::sym('label'),
+                        yend = !!rlang::sym('label')
+        )
+        panel2.geom <- 'geom_segment'
+    }
+    
+    panel2.args <- .extract_args(geom = panel2.geom)
+    panel2.args <- params[names(params) %in% panel2.args]
+    if (panel2.geom == 'geom_errorbarh'){
+        panel2.args$height <- .3
+        if ('height' %in% names(params)){
+            panel2.args$height <- params$height        
+        }
+    }
+
     mapping3 <- aes_string(
                     x = xtext, 
                     y = 'label', 
@@ -1063,26 +1140,28 @@ setGeneric("mp_plot_diff_boxplot",
                     #size = paste0("-log10(", rlang::as_name(.size), ")")
                 )
 
-    error.bar.args <- .extract_args(geom='geom_errorbarh')
     point.args <- .extract_args(geom='geom_point')
-    error.bar.args <- params[names(params) %in% error.bar.args]
     point.args <- params[names(params) %in% point.args]
     
-    error.bar.args <- error.bar.args[!names(error.bar.args) %in% c('height')]
-    error.bar.args$height <- .3
-    point.args <- point.args[!names(point.args) %in% c("color", "shape")]
+    point.args <- point.args[!names(point.args) %in% c("color", 'colour', "shape")]
     
     panel1.args$mapping <- mapping1
-    error.bar.args$mapping <- mapping2
+    panel2.args$mapping <- mapping2
     point.args$mapping <- mapping3
     point.args$show.legend <- c(colour=FALSE)
 
     if (is.quo.numeric(.size)){
-        point.args$size <- .size
         point.args <- point.args[!names(point.args) %in% c("size")]
+        point.args$size <- as.numeric(rlang::as_label(.size))
     }else{
-        mapping3 <- modifyList(mapping3, aes_string(size=paste0("-log10(", rlang::as_name(.size), ")")))
+        if (inherits(rlang::quo_get_expr(.size), 'call')){
+            size.mapping <- rlang::as_label(.size)
+        }else{
+            size.mapping <- paste0("-log10(", gsub("^\"|\"$", "", rlang::as_label(.size)), ")")
+        }
+        point.args$mapping <- modifyList(point.args$mapping, aes_string(size = size.mapping))
     }
+    
     p <- ggplot(tbl)
 
     panel1.geom <- do.call(panel1.geom, panel1.args)
@@ -1091,12 +1170,12 @@ setGeneric("mp_plot_diff_boxplot",
           ylab(NULL) + 
           xlab('Abundance') +
           scale_x_continuous(expand = c(0, 0, 0, .2))
-    p1 <- p1 + theme_stamp(axis.ticks.y=element_blank())
+    p1 <- p1 + theme_stamp(colour = c("grey90", "white"), axis.ticks.y=element_blank())
 
-    error.bar.geom <- do.call(geom_errorbarh, error.bar.args)
+    panel2.geom <- do.call(panel2.geom, panel2.args)
     point.geom <- do.call(geom_point, point.args)
     p2 <- p + 
-          error.bar.geom + 
+          panel2.geom +
           point.geom +
           ylab(NULL) +
           xlab(xlabtext) +
@@ -1104,7 +1183,7 @@ setGeneric("mp_plot_diff_boxplot",
             axis.text.y = element_blank(),
             axis.ticks.y = element_blank()
           )
-    p2 <- p2 + theme_stamp()
+    p2 <- p2 + theme_stamp(colour = c("grey90", "white"))
 
     p <- p1 %>% aplot::insert_right(p2, width = .8)
     return(p)
@@ -1135,8 +1214,8 @@ setMethod("mp_plot_diff_boxplot", signature(.data="grouped_df_mpse"), .internal_
     start.annot <- x %>%                 
        dplyr::filter(.data$nodeClass == taxa.class) %>%
        dplyr::pull(.data$nodeDepth) %>%      
-       unique()                              
-    end.annot <- x %>% dplyr::pull(.data$nodeDepth) %>% max()
+       max(na.rm = TRUE)
+    end.annot <- x %>% dplyr::pull(.data$nodeDepth) %>% max(na.rm = TRUE)
     if (tip.annot){                          
         annot.index <- seq(start.annot, end.annot)
     }else{                                   

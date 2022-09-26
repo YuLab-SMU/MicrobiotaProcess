@@ -65,12 +65,13 @@ default is NULL.}
 \item{distmethod}{character the method to calculate distance.
 option is "manhattan", "euclidean", "canberra", "bray", "kulczynski", 
 "jaccard", "gower", "altGower", "morisita", "horn", "mountford", "raup",
-"binomial", "chao", "cao", "mahalanobis", "chisq", "chord" (implemented in vegdist of 
-vegan), and "w", "-1", "c", "wb", "r", "I", "e", "t", "me", "j", "sor", "m", "-2", "co"
-"cc", "g", "-3", "l", "19", "hk", "rlb", "sim", "gl", "z" (implemented in 
-betadiver of vegan), "maximum", "binary", "minkowski" (implemented in dist 
+"binomial", "chao", "cao", "mahalanobis", "chisq", "chord", "aitchison", 
+"robust.aitchison" (implemented in vegdist of vegan), and "w", "-1", "c",
+"wb", "r", "I", "e", "t", "me", "j", "sor", "m", "-2", "co", "cc", "g", 
+"-3", "l", "19", "hk", "rlb", "sim", "gl", "z" (implemented in betadiver of 
+vegan), "maximum", "binary", "minkowski" (implemented in dist 
 of stats), "unifrac", "weighted unifrac" (implemented in phyloseq), "cor", "abscor", 
-"cosangle", "abscosangle" (implemented in hopach).}
+"cosangle", "abscosangle" (implemented in hopach), or other customized distance function.}
 
 \item{action}{character, "add" joins the distance data to the object, "only" return
 a non-redundant tibble with the distance information. "get" return 'dist' object.}
