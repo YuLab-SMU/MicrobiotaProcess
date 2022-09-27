@@ -237,6 +237,7 @@ print2.MPSE <- function(x, ..., n = NULL, width = NULL, max_extra_cols = NULL, m
     header <- pillar::tbl_format_header(tmpx, formatted_mpse_setup) %>%
               append(subtitle, after=1)
     body <- pillar::tbl_format_body(tmpx, formatted_mpse_setup)
+    length(formatted_mpse_setup$extra_cols) <- 0
     footer <- pillar::tbl_format_footer(tmpx, formatted_mpse_setup)
     writeLines(c(header, body, footer))
     invisible(x)

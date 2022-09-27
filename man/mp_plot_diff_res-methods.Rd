@@ -12,9 +12,13 @@
 \usage{
 mp_plot_diff_res(
   .data,
+  .group,
   layout = "radial",
   tree.type = "taxatree",
   .taxa.class = NULL,
+  barplot.x = NULL,
+  point.size = NULL,
+  sample.num = 50,
   tiplab.size = 2,
   offset.abun = 0.04,
   pwidth.abun = 0.8,
@@ -27,9 +31,13 @@ mp_plot_diff_res(
 
 \S4method{mp_plot_diff_res}{MPSE}(
   .data,
+  .group,
   layout = "radial",
   tree.type = "taxatree",
   .taxa.class = NULL,
+  barplot.x = NULL,
+  point.size = NULL,
+  sample.num = 50,
   tiplab.size = 2,
   offset.abun = 0.04,
   pwidth.abun = 0.8,
@@ -42,9 +50,13 @@ mp_plot_diff_res(
 
 \S4method{mp_plot_diff_res}{tbl_mpse}(
   .data,
+  .group,
   layout = "radial",
   tree.type = "taxatree",
   .taxa.class = NULL,
+  barplot.x = NULL,
+  point.size = NULL,
+  sample.num = 50,
   tiplab.size = 2,
   offset.abun = 0.04,
   pwidth.abun = 0.8,
@@ -57,9 +69,13 @@ mp_plot_diff_res(
 
 \S4method{mp_plot_diff_res}{grouped_df_mpse}(
   .data,
+  .group,
   layout = "radial",
   tree.type = "taxatree",
   .taxa.class = NULL,
+  barplot.x = NULL,
+  point.size = NULL,
+  sample.num = 50,
   tiplab.size = 2,
   offset.abun = 0.04,
   pwidth.abun = 0.8,
@@ -73,6 +89,10 @@ mp_plot_diff_res(
 \arguments{
 \item{.data}{MPSE or tbl_mpse after run mp_diff_analysis with \code{action="add"}}
 
+\item{.group}{the column name for mapping the different color, default is the 
+column name has 'Sign_' prefix, which contains the enriched group name, but the insignificant
+should be NA.}
+
 \item{layout}{the type of tree layout, should be one of "rectangular", "roundrect", "ellipse", 
 "circular", "slanted", "radial", "inward_circular".}
 
@@ -81,6 +101,15 @@ mp_plot_diff_res(
 
 \item{.taxa.class}{character the name of taxonomy class level, default is NULL, meaning it will
 extract the phylum annotation automatically.}
+
+\item{barplot.x}{the column name of continuous value mapped to barplot, default is NULL, 
+meaning the 'LDAmean' will be used internally.}
+
+\item{point.size}{the column name of continuous value mapped to the size of point in the tree,
+default is NULL, meaning the 'fdr' will be used internally.}
+
+\item{sample.num}{integer when it is smaller than the sample number of '.data', the abundance 
+of '.group' will replace the abundance of sample, default is 50.}
 
 \item{tiplab.size}{numeric the size of tiplab, default is 2.}
 

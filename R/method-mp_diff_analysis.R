@@ -413,10 +413,19 @@ setMethod("mp_diff_analysis", signature(.data="grouped_df_mpse"), .internal_mp_d
 #' The visualization of result of mp_diff_analysis
 #' @rdname mp_plot_diff_res-methods
 #' @param .data MPSE or tbl_mpse after run mp_diff_analysis with \code{action="add"}
+#' @param .group the column name for mapping the different color, default is the 
+#' column name has 'Sign_' prefix, which contains the enriched group name, but the insignificant
+#' should be NA.
 #' @param layout the type of tree layout, should be one of "rectangular", "roundrect", "ellipse", 
 #' "circular", "slanted", "radial", "inward_circular".
 #' @param tree.type one of 'taxatree' and 'otutree', taxatree is the taxonomy class tree
 #' 'otutree' is the phylogenetic tree built with the representative sequences.
+#' @param barplot.x the column name of continuous value mapped to barplot, default is NULL, 
+#' meaning the 'LDAmean' will be used internally.
+#' @param point.size the column name of continuous value mapped to the size of point in the tree,
+#' default is NULL, meaning the 'fdr' will be used internally.
+#' @param sample.num integer when it is smaller than the sample number of '.data', the abundance 
+#' of '.group' will replace the abundance of sample, default is 50.
 #' @param .taxa.class character the name of taxonomy class level, default is NULL, meaning it will
 #' extract the phylum annotation automatically.
 #' @param tiplab.size numeric the size of tiplab, default is 2.
@@ -436,10 +445,14 @@ setMethod("mp_diff_analysis", signature(.data="grouped_df_mpse"), .internal_mp_d
 #' @export
 setGeneric("mp_plot_diff_res", 
                 function(
-                    .data, 
+                    .data,
+                    .group, 
                     layout = "radial", 
                     tree.type = "taxatree", 
                     .taxa.class = NULL, 
+                    barplot.x = NULL,
+                    point.size = NULL,
+                    sample.num = 50,
                     tiplab.size = 2,
                     offset.abun = 0.04,
                     pwidth.abun = 0.8,
@@ -455,9 +468,13 @@ setGeneric("mp_plot_diff_res",
 #' @importFrom ggplot2 geom_col
 #' @importFrom ggtreeExtra geom_fruit
 .internal_mp_plot_diff_res <- function(.data,
+                                       .group,
                                        layout = "radial",
                                        tree.type = "taxatree",
                                        .taxa.class = NULL,
+                                       barplot.x = NULL,
+                                       point.size = NULL,
+                                       sample.num = 50,
                                        tiplab.size = 2,
                                        offset.abun = 0.04,
                                        pwidth.abun = 0.8,
@@ -468,6 +485,10 @@ setGeneric("mp_plot_diff_res",
                                        ...
                                       ){
     .taxa.class <- rlang::enquo(.taxa.class)
+    .group <- rlang::enquo(.group)
+    barplot.x <- rlang::enquo(barplot.x)
+    point.size <- rlang::enquo(point.size)
+
     layout %<>% match.arg(c("rectangular", "roundrect", "ellipse", "circular", 
                             "slanted", "radial", "inward_circular"))
 
@@ -507,20 +528,56 @@ setGeneric("mp_plot_diff_res",
 
     nsample <- .data %>% mp_extract_sample() %>% nrow()
     field.da.nm <- tidytree::get.fields(anno.tree)
-    if ("LDAmean" %in% field.da.nm){
+
+    if (any(grepl("LDAmean", field.da.nm)) && rlang::quo_is_null(barplot.x)){
         x.bar <- 'LDAmean'
         x.bar.title <- "log10(LDA)"
-    }else{
+    }else if (any(grepl("MDAmean", field.da.nm)) && rlang::quo_is_null(barplot.x)){
         x.bar <- "MDAmean"
         x.bar.title <- "MDA"
+    }else if (!rlang::quo_is_null(barplot.x)){
+        x.bar <- x.bar.title <- gsub("^\"|\"$", "", rlang::as_label(barplot.x))
+    }else{
+        stop_wrap("Please provide barplot.x or verify the 'mp_diff_analysis' is done.")
+    }
+   
+    if (rlang::quo_is_missing(.group)){
+        if (any(grepl('^Sign_', field.da.nm))){
+            sign.field <- field.da.nm[grepl('^Sign_', field.da.nm)][1]
+            group.nm <- gsub('Sign_', "", sign.field)
+        }else{
+            stop_wrap('The .group name should be specified manually.')
+        }
+    }else{
+        group.nm <- rlang::as_name(.group)
+        if (!grepl('^Sign_', group.nm)){
+            if (paste0('Sign_', group.nm) %in% field.da.nm){
+                sign.field <- paste0('Sign_', group.nm)
+            }else{
+                #stop('Please check the mp_diff_analysis(..., action="add") has been run.')
+                sign.field <- group.nm
+            }
+        }else{
+            sign.field <- .group
+            group.nm <- gsub('Sign_', "", group.nm)
+        }
     }
     
-    sign.field <- field.da.nm[grep("^Sign_", field.da.nm)][1]
+    if (rlang::quo_is_null(point.size) && 'fdr' %in% field.da.nm){
+        size.mapping <- '-log10(fdr)'
+    }else if (!rlang::quo_is_null(point.size)){
+        if (inherits(rlang::quo_get_expr(point.size), 'call')){
+            size.mapping <- rlang::as_label(point.size)
+        }else{
+            size.mapping <- paste0("-log10(", gsub("^\"|\"$", "", rlang::as_label(point.size)), ")")
+        }
+    }else{
+        stop_wrap("Please specify the 'point.size' argument manually !")
+    }
 
-    group.nm <- gsub("^Sign_", "", sign.field)
     flag <- grepl(paste0("By", group.nm), field.da.nm)
 
-    if (nsample > 50 || group.abun){
+    if (nsample > sample.num || group.abun){
         if (!any(flag)){
             stop_wrap("The relative abundance of each group will be displayed, but the
                        relative abundance of each group is not calculated, please run 
@@ -587,7 +644,7 @@ setGeneric("mp_plot_diff_res",
               )
     }
 
-    if (nsample > 50 || group.abun){
+    if (nsample > sample.num || group.abun){
          mapping <- aes(x=!!rlang::sym(group.nm), size = !!rlang::sym(x.abun.col), 
                         fill = !!rlang::sym(group.nm), subset = !!rlang::sym(x.abun.col) > 0) 
          n.pwidth <- .data %>%
@@ -667,8 +724,9 @@ setGeneric("mp_plot_diff_res",
             ggnewscale::new_scale("size") +
             geom_point(
                data=td_filter(!is.na(!!rlang::sym(sign.field))),
-               mapping = aes(size = -log10(!!rlang::sym("fdr")),
-                              fill = !!rlang::sym(sign.field),
+               mapping = aes_string(
+                              size = size.mapping,
+                              fill = sign.field,
                              ),
                shape = 21
             ) +
@@ -1019,12 +1077,17 @@ setGeneric("mp_plot_diff_boxplot",
     point.x <- rlang::enquo(point.x)
 
     params <- list(...)
+    taxa.class <- quo.vect_to_str.vect(taxa.class)
     if (!is.null(suppressMessages(taxatree(.data)))){
         tbl <- .data %>% mp_extract_abundance(taxa.class = 'all')
-    }else{
-        tbl <- .data %>% mp_extract_feature() %>% dplyr::rename(label = 'OTU')
+    }else if (is.null(suppressMessages(taxatree(.data))) || taxa.class == 'OTU'){
+        tbl <- .data %>% mp_extract_feature()
+        if (!any(grepl("AbundanceBySample$", colnames(tbl)))){
+            tbl <- suppressMessages(mp_cal_abundance(.data, .abundance = "Abundance")) %>% 
+                mp_extract_feature()
+        }
+        tbl %<>% dplyr::rename(label = 'OTU') 
     }
-    taxa.class <- quo.vect_to_str.vect(taxa.class)
     if (!any(taxa.class %in% c('all', 'ALL', 'All')) && !is.null(suppressMessages(taxatree(.data)))){
        tbl %<>% dplyr::filter(.data$nodeClass %in% taxa.class)
     }
@@ -1058,12 +1121,12 @@ setGeneric("mp_plot_diff_boxplot",
 
     tbl %<>% dplyr::filter(!is.na(!!rlang::sym(sign.group)))
 
-    if (any(grepl('LDA', nmda))){
+    if (any(grepl('LDA', nmda)) && any(rlang::quo_is_null(errorbar.xmin) || rlang::quo_is_null(errorbar.xmax))){
         xlabtext <- bquote(paste(Log[10],"(",.("LDA"), ")"))
         xtext <- "LDAmean"
         xmintext <- "LDAlower"
         xmaxtext <- "LDAupper"
-    }else if ('MDA' %in% nmda){
+    }else if ('MDA' %in% nmda && any(rlang::quo_is_null(errorbar.xmin) || rlang::quo_is_null(errorbar.xmax))){
         xlabtext <- "MDA"
         xtext <- "MDAmean"
         xmintext <- "MDAlower"
