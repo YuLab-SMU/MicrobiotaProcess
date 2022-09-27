@@ -1,7 +1,9 @@
-# MicrobiotaProcess 1.9.3.991
+# MicrobiotaProcess 1.9.3.992
 
-+ add `mp_dmn`, `mp_dmngroup` and update `mp_plot_diff_boxplot`, `mp_plot_diff_cladogram` to
-  support the custom style. (2022-09-25, Sun)
++ update `mp_plot_diff_res` to support the custom DAA results. (2022-09-27, Tue)
++ update `show` method of `MPSE` to avoid the `colname` advice. (2022-09-27, Tue)
++ add `mp_dmn`, `mp_dmngroup`, `mp_divergence` and update `mp_plot_diff_boxplot`, 
+  `mp_plot_diff_cladogram` to support the custom style. (2022-09-25, Sun)
 + update `mp_cal_dist` to support specifying `distmethod` to a function. (2022-09-20, Tue)
 + update `left_join` to support joining the `dist` class. (2022-09-20, Tue)
 
