@@ -214,17 +214,20 @@ print2.MPSE <- function(x, ..., n = NULL, width = NULL, max_extra_cols = NULL, m
     }else{
         tmpx <- x[, seq_len(min(round(n/nrow(x))+1, ncol(x))), drop=FALSE]
     }
-
     tmpx %<>% 
         as_tibble() %>% 
-        drop_class(class=c("tbl_mpse", "grouped_df_mpse")) %>%
-        add_class(new="TBL_MPSE")
+        drop_class(class=c("tbl_mpse", "grouped_df_mpse")) #%>%
+        #add_class(new="TBL_MPSE")
+    
+    formatted_mpse_setup <- tbl_format_setup(x = tmpx, width = width, ..., n = n, 
+                                             max_extra_cols = max_extra_cols, 
+                                             max_footer_lines = max_footer_lines
+                            )
 
-    formatted_mpse_setup <- tmpx %>%
-                      tbl_format_setup(width = width, ..., totalX = total_nrows,
-                           n = n, max_extra_cols = max_extra_cols, max_footer_lines = max_footer_lines
-                        )
+    formatted_mpse_setup <- modify_tbl_format_setup(formatted_mpse_setup, totalX = total_nrows)
+    
     format_comment <- getFromNamespace("format_comment", "pillar")
+
     subtitle <- sprintf(" OTU=%s | Samples=%s | Assays=%s | Taxonomy=%s",
                       nrow(x),
                       ncol(x),
@@ -237,35 +240,37 @@ print2.MPSE <- function(x, ..., n = NULL, width = NULL, max_extra_cols = NULL, m
     header <- pillar::tbl_format_header(tmpx, formatted_mpse_setup) %>%
               append(subtitle, after=1)
     body <- pillar::tbl_format_body(tmpx, formatted_mpse_setup)
-    length(formatted_mpse_setup$extra_cols) <- 0
     footer <- pillar::tbl_format_footer(tmpx, formatted_mpse_setup)
+    footer <- modify_tbl_format_footer(footer)
     writeLines(c(header, body, footer))
     invisible(x)
 }
 
-
 #' @importFrom pillar tbl_format_setup
-#' @method tbl_format_setup TBL_MPSE
-#' @export
-tbl_format_setup.TBL_MPSE <- function(x, 
-                                      width = NULL, 
-                                      ..., 
-                                      totalX = NULL,
-                                      n = NULL, 
-                                      max_extra_cols = NULL, 
-                                      max_footer_lines=NULL){
-    xx <- NextMethod()
-    tmpxx <- xx$tbl_sum %>%
+modify_tbl_format_setup <- function(x, totalX, ...){ 
+    tmpxx <- x$tbl_sum %>%
              strsplit(" ") %>%
              unlist()
     tmpxx <- paste(getFromNamespace("big_mark", "pillar")(totalX), tmpxx[2], tmpxx[3])
     names(tmpxx) <- c("A MPSE-tibble (MPSE object) abstraction")
-    xx$tbl_sum <- tmpxx
-    xx$rows_total <- totalX
-    xx$rows_missing <- totalX - nrow(xx$df)
-    return(xx)
+    x$tbl_sum <- tmpxx
+    x$rows_total <- totalX
+    x$rows_missing <- totalX - nrow(x$df)
+    return(x)
 }
 
+modify_tbl_format_footer <- function(x, ...){
+    index.1 <- grepl('colnames\\(\\)', x)
+    index.2 <- which(grepl('print\\(', x))
+    if (any(index.1)){
+        x <- x[!index.1]
+    }
+    if (length(index.2) > 0 && index.2 > length(x)){
+        advice <- paste0("# ", cli::symbol$info, " Use `print(n = ...)` to see more rows.")
+        x <- c(x, pillar::style_subtle(advice))
+    }
+    return(x)
+}
 
 #' @method print tbl_mpse
 #' @rdname print
