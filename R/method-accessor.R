@@ -449,13 +449,15 @@ setMethod("mp_extract_feature", signature(x="MPSE"), function(x, addtaxa=FALSE, 
                      unique()
         taxanm <- x@taxatree %>%
                   dplyr::filter(!.data$nodeClass %in% c(tip.level, "Root"), keep.td=FALSE) %>%
-                  dplyr::pull(.data$nodeClass) %>% unique
+                  dplyr::pull(.data$nodeClass) %>% unique()
         trda <- x@taxatree %>%
-                taxatree_to_tb() %>%
-                tibble::as_tibble(rownames=tip.level)
+                taxatree_to_tb() #%>%
+                #tibble::as_tibble(rownames=tip.level)
         if (!addtaxa){
             trda %<>% dplyr::select(-taxanm)
         }
+        trda %<>% dplyr::select(setdiff(colnames(trda), colnames(da))) %>%
+            tibble::as_tibble(rownames=tip.level)
         da %<>% dplyr::left_join(trda, by=c("OTU"=tip.level)) 
                 
     }

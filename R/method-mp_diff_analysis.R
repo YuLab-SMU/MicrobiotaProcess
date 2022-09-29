@@ -526,6 +526,13 @@ setGeneric("mp_plot_diff_res",
         }
     }
 
+    tbl.f <- .data %>% mp_extract_feature()
+    tbl.f %<>% dplyr::select(c(colnames(tbl.f)[1], 
+                               setdiff(colnames(tbl.f)[-1], tidytree::get.fields(anno.tree)))
+                            )
+
+    anno.tree %<>% dplyr::left_join(tbl.f, by=c('label' = 'OTU'))
+
     nsample <- .data %>% mp_extract_sample() %>% nrow()
     field.da.nm <- tidytree::get.fields(anno.tree)
 
@@ -558,7 +565,7 @@ setGeneric("mp_plot_diff_res",
                 sign.field <- group.nm
             }
         }else{
-            sign.field <- .group
+            sign.field <- group.nm
             group.nm <- gsub('Sign_', "", group.nm)
         }
     }
@@ -593,7 +600,8 @@ setGeneric("mp_plot_diff_res",
                   tidyr::unnest(!!rlang::sym(abun.col)) %>%
                   colnames()
     x.abun.col <- x.abun.col[grepl("^Rel", x.abun.col)]
-
+    gplot.pck <- "ggplot2"
+    require(gplot.pck, character.only=TRUE) %>% suppressMessages()
     if (tree.type == "otutree"){
         p1 <- ggtree(
                 anno.tree,
@@ -700,7 +708,8 @@ setGeneric("mp_plot_diff_res",
             ggnewscale::new_scale_fill() +
             geom_fruit(
                #data = td_filter(!is.na(!!rlang::sym(x.bar))),
-               geom = geom_col,
+               data = td_filter(!is.na(!!rlang::sym(sign.field))),
+               geom = "geom_col",
                mapping = aes(
                              x = !!rlang::sym(x.bar),
                              fill = !!rlang::sym(sign.field)
@@ -846,9 +855,14 @@ mp_plot_diff_cladogram <- function(
             stop("The .data should be an MPSE or treedata object after running mp_diff_analysis ")
         }
         if (inherits(.data, 'MPSE') || inherits(.data, 'tbl_mpse') || inherits(.data, 'grouped_df_mpse')){
+            tbl <- .data %>% mp_extract_feature()
             .data %<>% mp_extract_taxatree()
             if (is.null(.data)){
                 stop_wrap('The .data object does not have the taxatree slot.')
+            }else{
+                tbl %<>% dplyr::select(c(colnames(tbl)[1], 
+                                         setdiff(colnames(tbl)[-1], tidytree::get.fields(.data))))
+                .data %<>% tidytree::left_join(tbl, by=c('label' = 'OTU'))
             }
         }
         .data %<>% as_tibble()
@@ -1080,11 +1094,21 @@ setGeneric("mp_plot_diff_boxplot",
     taxa.class <- quo.vect_to_str.vect(taxa.class)
     if (!is.null(suppressMessages(taxatree(.data)))){
         tbl <- .data %>% mp_extract_abundance(taxa.class = 'all')
+        xx <- .data %>% mp_extract_feature()
+        xx %<>% dplyr::select(setdiff(colnames(xx), colnames(tbl)))
+        tbl %<>% left_join(xx, by = c('label'='OTU'))
     }else if (is.null(suppressMessages(taxatree(.data))) || taxa.class == 'OTU'){
         tbl <- .data %>% mp_extract_feature()
         if (!any(grepl("AbundanceBySample$", colnames(tbl)))){
-            tbl <- suppressMessages(mp_cal_abundance(.data, .abundance = "Abundance")) %>% 
-                mp_extract_feature()
+            trash <- try(silent = TRUE,  
+                         expr = {
+                              .data <- suppressMessages(mp_cal_abundance(.data, .abundance = "Abundance"))  
+                           }
+                        )
+            if (inherits(trash, "try-error")) {
+                .data <- mp_cal_abundance(.data, .abundance = "Abundance", force = TRUE)
+            }
+            tbl <- .data %>% mp_extract_feature()
         }
         tbl %<>% dplyr::rename(label = 'OTU') 
     }
@@ -1120,7 +1144,7 @@ setGeneric("mp_plot_diff_boxplot",
     }
 
     tbl %<>% dplyr::filter(!is.na(!!rlang::sym(sign.group)))
-
+    
     if (any(grepl('LDA', nmda)) && any(rlang::quo_is_null(errorbar.xmin) || rlang::quo_is_null(errorbar.xmax))){
         xlabtext <- bquote(paste(Log[10],"(",.("LDA"), ")"))
         xtext <- "LDAmean"
