@@ -3,7 +3,7 @@
 # MicrobiotaProcess: A comprehensive R package for managing and analyzing microbiome and other ecological data within the tidy framework
 
 [![](https://img.shields.io/badge/release%20version-1.8.2-green.svg)](https://www.bioconductor.org/packages/MicrobiotaProcess)
-[![](https://img.shields.io/badge/devel%20version-1.9.3.992-green.svg)](https://github.com/YuLab-SMU/MicrobiotaProcess)
+[![](https://img.shields.io/badge/devel%20version-1.9.3.993-green.svg)](https://github.com/YuLab-SMU/MicrobiotaProcess)
 [![Bioc](http://www.bioconductor.org/shields/years-in-bioc/MicrobiotaProcess.svg)](https://www.bioconductor.org/packages/devel/bioc/html/MicrobiotaProcess.html#since)
 [![platform](http://www.bioconductor.org/shields/availability/devel/MicrobiotaProcess.svg)](https://www.bioconductor.org/packages/devel/bioc/html/MicrobiotaProcess.html#archives)
 
