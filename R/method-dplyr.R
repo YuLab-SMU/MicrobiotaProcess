@@ -373,8 +373,10 @@ left_join.MPSE <- function(x, y, by=NULL, copy=FALSE, ...){
     dots <- rlang::quos(...)
     suffix <- c("", ".y")
     if ("suffix" %in% names(dots)){
-        dots <- dots[names(dots)!="suffix"]
+        suffix <- quo.vect_to_str.vect(dots[["suffix"]])
+        dots <- dots[names(dots)!= 'suffix']
     }
+       
     if (is.null(by)){
         if (all(c("OTU", "Sample") %in% colnames(y))){
             by <- c("OTU", "Sample")

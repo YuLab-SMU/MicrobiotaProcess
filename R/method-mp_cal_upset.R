@@ -154,16 +154,18 @@ setMethod("mp_cal_upset", signature(.data="MPSE"), function(.data, .group, .abun
 
     da <- xx[[rlang::as_name(.abundance)]] %>% 
           tibble::as_tibble(rownames="OTU") %>%
+          data.table::setDT() %>%
+          dtplyr::lazy_dt(immutable = FALSE) %>%
           tidyr::pivot_longer(!as.symbol("OTU"), 
                               names_to="Sample", 
-                              values_to=rlang::as_name(.abundance)) %>%
-          dtplyr::lazy_dt()
+                              values_to=rlang::as_name(.abundance)) #%>%
+          #dtplyr::lazy_dt(immutable = FALSE)
 
     sampleda <- .data %>%
                 mp_extract_sample()
-    if (ncol(sampleda)==1){
-        sampleda %<>% dplyr::mutate(.DTPLYREXTRA=0)
-    }
+    #if (ncol(sampleda)==1){
+    #    sampleda %<>% dplyr::mutate(.DTPLYREXTRA=0)
+    #}
 
     da %<>% left_join(sampleda, by="Sample", suffix=c("", ".y"))
 
@@ -223,12 +225,14 @@ setMethod("mp_cal_upset", signature(.data="MPSE"), function(.data, .group, .abun
 
     dat <- .data %>% 
            dplyr::ungroup() %>%
-           dplyr::select(!!as.symbol("OTU"), !!.group, !!.abundance) %>%
-           dtplyr::lazy_dt() # %>%
+           data.table::setDT() %>%
+           dtplyr::lazy_dt(immutable = FALSE) %>%
+           dplyr::select(!!as.symbol("OTU"), !!.group, !!.abundance) #%>%
+           #dtplyr::lazy_dt() # %>%
     EXTRA <- .data %>% 
              dplyr::ungroup() %>%
-             dplyr::select("OTU") %>%
-             dplyr::mutate(.DTPLYREXTRA=0)
+             dplyr::select("OTU") #%>%
+             #dplyr::mutate(.DTPLYREXTRA=0)
     dat %<>% 
           dplyr::left_join(EXTRA, by="OTU") %>%
           .internal_cal_upset(.abundance=.abundance, .group=.group) 

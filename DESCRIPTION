@@ -41,7 +41,8 @@ Imports:
   pillar,
   plyr,
   dtplyr,
-  ggtreeExtra
+  ggtreeExtra,
+  data.table
 Suggests:
   rmarkdown,
   prettydoc,

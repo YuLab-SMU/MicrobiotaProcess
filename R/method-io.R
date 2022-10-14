@@ -338,6 +338,8 @@ mp_import_metaphlan <- function(profile, mapfilename=NULL, treefile=NULL, linenu
                  vapply(.,function(x)!is.numeric(x), logical(1)) %>%
                  which() %>%
                  unname()
+                 
+    rowdaindx <- union(rowdaindx, which(grepl("NCBI_tax_id", colnames(assay), ignore.case=TRUE)))
     
     if (length(rowdaindx)>0){
         rowda <- assay %>%

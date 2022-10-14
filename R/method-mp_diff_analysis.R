@@ -1142,15 +1142,15 @@ setGeneric("mp_plot_diff_boxplot",
             .group <- gsub('Sign_', "", .group)
         }
     }
-
     tbl %<>% dplyr::filter(!is.na(!!rlang::sym(sign.group)))
-    
-    if (any(grepl('LDA', nmda)) && any(rlang::quo_is_null(errorbar.xmin) || rlang::quo_is_null(errorbar.xmax))){
+    if (any(grepl('LDA', nmda)) && rlang::quo_is_null(errorbar.xmin) && 
+        rlang::quo_is_null(errorbar.xmax) && rlang::quo_is_null(point.x)){
         xlabtext <- bquote(paste(Log[10],"(",.("LDA"), ")"))
         xtext <- "LDAmean"
         xmintext <- "LDAlower"
         xmaxtext <- "LDAupper"
-    }else if ('MDA' %in% nmda && any(rlang::quo_is_null(errorbar.xmin) || rlang::quo_is_null(errorbar.xmax))){
+    }else if ('MDA' %in% nmda && rlang::quo_is_null(errorbar.xmin) && 
+              rlang::quo_is_null(errorbar.xmax) && rlang::quo_is_null(point.x)){
         xlabtext <- "MDA"
         xtext <- "MDAmean"
         xmintext <- "MDAlower"

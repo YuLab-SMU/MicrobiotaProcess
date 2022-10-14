@@ -139,21 +139,23 @@ setMethod("mp_cal_venn", signature(.data="MPSE"), function(.data, .group, .abund
     da <- .data %>% 
           mp_extract_assays(.abundance=!!.abundance) %>%
           tibble::as_tibble(rownames="OTU") %>%
+          data.table::setDT() %>%
+          dtplyr::lazy_dt(immutable = FALSE) %>%
           tidyr::pivot_longer(!as.symbol("OTU"), 
                               names_to="Sample", 
-                              values_to=rlang::as_name(.abundance)) %>%
-          dtplyr::lazy_dt()
+                              values_to=rlang::as_name(.abundance)) #%>%
+          #dtplyr::lazy_dt()
 
     sampleda <- .data %>%
                 mp_extract_sample()
 
-    if (ncol(sampleda)==1){
-        sampleda %<>% dplyr::mutate(.DTPLYREXTRA=0)
-    }
+    #if (ncol(sampleda)==1){
+    #    sampleda %<>% dplyr::mutate(.DTPLYREXTRA=0)
+    #}
     da %<>% left_join(sampleda, by="Sample", suffix=c("", ".y"))
-    if (".DTPLYREXTRA" %in% colnames(sampleda)){
-        sampleda %<>% dplyr::select(-".DTPLYREXTRA")
-    }
+    #if (".DTPLYREXTRA" %in% colnames(sampleda)){
+    #    sampleda %<>% dplyr::select(-".DTPLYREXTRA")
+    #}
 
     dat <- da %>% 
            .internal_cal_venn(.abundance=.abundance, .group=.group)
@@ -209,12 +211,14 @@ setMethod("mp_cal_venn", signature(.data="MPSE"), function(.data, .group, .abund
 
     dat <- .data %>% 
           dplyr::ungroup() %>%
-          dplyr::select(!!as.symbol("OTU"), !!.group, !!.abundance) %>%
-          dtplyr::lazy_dt() #%>%
+          data.table::setDT() %>%
+          dtplyr::lazy_dt(immutable = FALSE) %>%
+          dplyr::select(!!as.symbol("OTU"), !!.group, !!.abundance) #%>%
+          #dtplyr::lazy_dt() #%>%
     EXTRA <- .data %>%
              dplyr::ungroup() %>%
-             dplyr::select(!!.group) %>%
-             dplyr::mutate(.DTPLYREXTRA=0)
+             dplyr::select(!!.group) #%>%
+             #dplyr::mutate(.DTPLYREXTRA=0)
     dat %<>%
           dplyr::left_join(EXTRA, by=rlang::as_name(.group)) %>%
           .internal_cal_venn(.abundance=.abundance, .group=.group)

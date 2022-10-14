@@ -113,6 +113,7 @@ setMethod("get_taxadf", "data.frame",
 #' @param ... additional parameters.
 #' @return update object or tibble according the 'action'
 #' @seealso [mp_plot_abundance()] and [mp_extract_abundance()]
+#' @importFrom data.table setDT
 #' @author Shuangbin Xu
 #' @export
 #' @examples
@@ -232,18 +233,19 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
 
     da <- xx[[rlang::as_name(.abundance)]] %>%
           tibble::as_tibble(rownames="OTU") %>%
-          tidyr::pivot_longer(!as.symbol("OTU"), names_to="Sample", values_to=rlang::as_name(.abundance)) %>%
-          dtplyr::lazy_dt()
+          data.table::setDT() %>% 
+          dtplyr::lazy_dt(immutable = FALSE) %>%
+          tidyr::pivot_longer(!as.symbol("OTU"), names_to="Sample", values_to=rlang::as_name(.abundance))
 
     sampleda <- .data %>% mp_extract_sample()
-    if (ncol(sampleda)==1){
-        sampleda %<>% dplyr::mutate(.DTPLYREXTRA=0)
-    }
+    #if (ncol(sampleda)==1){
+    #    sampleda %<>% dplyr::mutate(.DTPLYREXTRA=0)
+    #}
 
     da %<>% left_join(sampleda, by="Sample", suffix=c("", ".y"))
-    if (".DTPLYREXTRA" %in% colnames(sampleda)){
-        sampleda %<>% select(-".DTPLYREXTRA")
-    }
+    #if (".DTPLYREXTRA" %in% colnames(sampleda)){
+    #    sampleda %<>% select(-".DTPLYREXTRA")
+    #}
     otumeta <-
         SummarizedExperiment::rowData(.data) %>%
         avoid_conflict_names() %>%
@@ -418,12 +420,15 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
     }else{
         taxavar <- "OTU"    
     }
-    dat <- .data %>% as_tibble %>% dtplyr::lazy_dt()
-    if (ncol(sampleda)==1){
-        sampleda %<>% dplyr::mutate(.DTPLYREXTRA=0)
-        dat %<>% left_join(sampleda, by="Sample", suffix=c("", ".y"))
-        sampleda %<>% select(-".DTPLYREXTRA")
-    }
+    dat <- .data %>% 
+            as_tibble() %>% 
+            data.table::setDT() %>% 
+            dtplyr::lazy_dt(immutable = FALSE)
+    #if (ncol(sampleda)==1){
+    #    sampleda %<>% dplyr::mutate(.DTPLYREXTRA=0)
+    #    dat %<>% left_join(sampleda, by="Sample", suffix=c("", ".y"))
+    #    sampleda %<>% select(-".DTPLYREXTRA")
+    #}
 
     if (!rlang::quo_is_null(.group)){
         da1 <- lapply(rlang::syms(taxavar), 
