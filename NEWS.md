@@ -1,5 +1,7 @@
-# MicrobiotaProcess 1.9.3.992
+# MicrobiotaProcess 1.9.4
 
++ keep the consistent color between the panels of `mp_plot_diff_boxplot`. (2022-10-18, Tue)
++ optimizing the import of `dtplyr`. (2022-10-14, Fri)
 + update `mp_plot_diff_res` to support the custom DAA results. (2022-09-27, Tue)
 + update `show` method of `MPSE` to avoid the `colname` advice. (2022-09-27, Tue)
 + add `mp_dmn`, `mp_dmngroup`, `mp_divergence` and update `mp_plot_diff_boxplot`, 
