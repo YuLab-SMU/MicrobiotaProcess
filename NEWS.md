@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.9.5
+
++ fix the color of `mp_plot_diff_boxplot` and update `mp_plot_abundance`. (2022-10-27, Thu)
+
 # MicrobiotaProcess 1.9.4
 
 + keep the consistent color between the panels of `mp_plot_diff_boxplot`. (2022-10-18, Tue)
