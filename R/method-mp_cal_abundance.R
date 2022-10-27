@@ -361,8 +361,12 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
 
     da %<>% dplyr::group_by(across(!!byID)) %>%
         dplyr::mutate(across(!!.abundance, sum, .names=Totalnm)) %>%
-        dplyr::group_by(!!feature, .add = TRUE) %>%
-        dplyr::mutate(across(!!.abundance, sum, .names=newabun))
+        dplyr::group_by(!!feature, .add = TRUE) #%>%
+    if ((length(byID2) > 1 || !'Sample' %in% byID2) && !relative){
+       da %<>% dplyr::mutate(across(!!.abundance, mean, .names=newabun))
+    }else{
+       da %<>% dplyr::mutate(across(!!.abundance, sum, .names=newabun))
+    }
 
     if (relative){
         newRelabun <- paste0(c("Rel", rlang::as_name(.abundance), "By", paste0(byID2, collapse="And")), collapse="")

@@ -1273,10 +1273,11 @@ setGeneric("mp_plot_diff_boxplot",
     p2 <- p2 + theme_stamp(colour = c("grey90", "white"))
     fix.group <- levels(tbl[[.group]])
     if (is.null(fix.group)){
-        fix.group <- unique(tbl[[.group]])
+        fix.group <- unique(sort(tbl[[.group]]))
     }
     fix.group.color <- p1$scales$get_scales('fill_new')$palette.cache
     names(fix.group.color) <- fix.group
+    fix.group.color <- fix.group.color[match(unique(as.character(tbl[[sign.group]])), names(fix.group.color))]
     p2 <- p2 + scale_color_manual(values=fix.group.color)
 
     p <- p1 %>% aplot::insert_right(p2, width = .8)
@@ -1375,7 +1376,7 @@ set_diff_boxplot_color <- function(
 
     .data[[1]] <- .data[[1]] + scale_fill_manual(values = values, aesthetics='fill_new', ...)
     tmp.group <- .data[[1]]$data %>% dplyr::pull(!!.data[[1]]$layers[[2]]$mapping$fill_new) 
-    fix.group <- unique(tmp.group)
+    fix.group <- unique(sort(tmp.group))
     if (!is.null(levels(tmp.group))){
         fix.group <- levels(tmp.group)
     }
@@ -1383,7 +1384,9 @@ set_diff_boxplot_color <- function(
     if (is.null(names(fix.group.color))){
         names(fix.group.color) <- fix.group 
     }
-    .data[[2]] <- .data$plotlist[[2]] + scale_color_manual(values = fix.group.color)
+    tmp.group2 <- .data[[2]]$data %>% dplyr::pull(!!.data[[2]]$layers[[3]]$mapping$colour)
+    fix.group.color <- fix.group.color[match(unique(as.character(tmp.group2)), names(fix.group.color))]
+    .data[[2]] <- .data[[2]] + scale_color_manual(values = fix.group.color)
     return(.data)
 }
 

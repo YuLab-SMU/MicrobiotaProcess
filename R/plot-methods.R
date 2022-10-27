@@ -139,9 +139,9 @@ setGeneric("mp_plot_abundance",
     
     if (relative){
          if (force){
-             abundance.nm <- paste0("Rel", rlang::as_name(.abundance))
+             abundance.nm <- paste0("Rel", rlang::as_name(.abundance), 'BySample')
          }else{
-             abundance.nm <- "RelRareAbundance"
+             abundance.nm <- "RelRareAbundanceBySample"
          }
          ylabs <- "Relative Abundance (%)"
      }else{
@@ -157,30 +157,81 @@ setGeneric("mp_plot_abundance",
      if (!rlang::quo_is_null(.group) && plot.group){
          gp <- quo.vect_to_str.vect(.group)
          prefixBy <- paste0("By", paste0(gp, collapse="And"))
+         if (!force && grepl('BySample$', abundance.nm)){
+             abundance.nm %<>% gsub('BySample', "", .)
+         }
          axis.x <- rlang::as_name(gp[1])
      }else{
-         if (force){
-             prefixBy <- ""
-         }else{
-             prefixBy <- "BySample"
-         }
+         prefixBy <- ""
          axis.x <- "Sample"
      }
      abundance.nm <- paste0(abundance.nm, prefixBy)
      
-     AbundBy <- abundance.nm %>% gsub("^Rel", "", .)
-     if (!plot.group && force){
-         AbundBy <- paste0(AbundBy, "BySample")
+     if (!(!relative && grepl('^Rel', abundance.nm) && !plot.group)){
+         AbundBy <- abundance.nm %>% gsub("^Rel", "", .)
+     }else{
+         AbundBy <- abundance.nm
      }
-
+     
+     internal.cal <- FALSE
      if (!any(grepl(paste0("^", AbundBy), .data %>% mp_extract_feature() %>% colnames()))){
+         internal.cal <- TRUE
          if (!rlang::quo_is_null(.group) && plot.group){
              .data %<>% mp_cal_abundance(.abundance=!!.abundance, .group=!!.group, force=force, relative=relative)
+             gp <- quo.vect_to_str.vect(.group)
+             prefixBy <- paste0("By", paste0(gp, collapse = "And"))
+             if (relative){
+                 if (force){
+                     AbundBy <- paste0(rlang::as_name(.abundance), prefixBy)
+                 }else{
+                     AbundBy <- paste0("RareAbundance", prefixBy)
+                 }
+                 abundance.nm <- paste0('Rel', AbundBy)
+             }else{
+                 if (force){
+                     AbundBy <- paste0(rlang::as_name(.abundance), prefixBy)
+                 }else{
+                     AbundBy <- paste0("RareAbundance", prefixBy)
+                 }
+                 abundance.nm <- AbundBy
+             }
          }else{
              .data %<>% mp_cal_abundance(.abundance=!!.abundance, force=force, relative=relative)
+             if (relative){
+                 if (force){
+                     AbundBy <- paste0(rlang::as_name(.abundance), 'BySample')
+                 }else{
+                     AbundBy <- "RareAbundanceBySample"
+                 }
+                 abundance.nm <- paste0('Rel', AbundBy)
+             }else{
+                 if (force){
+                     AbundBy <- paste0(rlang::as_name(.abundance), 'BySample')
+                     abundance.nm <- rlang::as_name(.abundance)
+                     if (rlang::as_name(.abundance) %in% c('Abundance', 'RareAbundance')){
+                         abundance.nm <- AbundBy
+                     }
+                 }else{
+                     AbundBy <- "RareAbundanceBySample"
+                     abundance.nm <- "RareAbundance"
+                 }
+             }
          }
      }
-
+     
+     if (!plot.group && !internal.cal){
+         AbundBy %<>% gsub('BySample', "", .) %>% paste0('BySample')
+         flag_prefix1 <- grepl('BySample$', abundance.nm)
+         flag_prefix2 <- grepl("^Rel", abundance.nm)
+         abundance.nm %<>% gsub('BySample', "", .) %>% gsub('Rel', "", .)
+         if (flag_prefix1){
+             abundance.nm %<>% paste0('BySample')
+         }
+         if (flag_prefix2){
+             abundance.nm <- paste0('Rel', abundance.nm)
+         }
+     }
+     
      tbl <- .data %>% 
             mp_extract_abundance(taxa.class=!!taxa.class, topn = topn, rmun = rmun) %>%
             tidyr::unnest(cols=AbundBy) %>% 
@@ -188,12 +239,6 @@ setGeneric("mp_plot_abundance",
             dplyr::rename(!!taxa.class:="label") %>% 
             suppressMessages()
      
-     if (!plot.group && ((force && !relative) || (!force && !relative))){
-         abundance.nm %<>% gsub("BySample", "", .)
-     }else if (!plot.group && (force && relative)){
-         abundance.nm %<>% paste0("BySample")
-     }
-
      if(geom %in% c("bar", 'flowbar')){
          if (geom == "flowbar"){
             p <- ggplot(data = tbl,
