@@ -1,7 +1,6 @@
-# MicrobiotaProcess
+# MicrobiotaProcess 1.11.1
 
-+ Bioconductor RELEASE_3_16 (2022-11-04, Fri)
-
++ update `mp_plot_abundance` to be compatible with the latest ggplot2. (2022-11-08, Tue)
 
 # MicrobiotaProcess 1.9.5
 
