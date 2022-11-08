@@ -38,6 +38,7 @@ CRANpkg <- function(pkg){
 ```{r, echo=FALSE, results="hide", message=FALSE, Loadpackages}
 library(ggplot2)
 library(phyloseq)
+library(shadowtext)
 library(ggtree)
 library(ggtreeExtra)
 library(treeio)

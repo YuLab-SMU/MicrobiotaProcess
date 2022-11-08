@@ -172,7 +172,7 @@ setGeneric("mp_plot_abundance",
      }else{
          AbundBy <- abundance.nm
      }
-     
+
      internal.cal <- FALSE
      if (!any(grepl(paste0("^", AbundBy), .data %>% mp_extract_feature() %>% colnames()))){
          internal.cal <- TRUE
@@ -208,9 +208,9 @@ setGeneric("mp_plot_abundance",
                  if (force){
                      AbundBy <- paste0(rlang::as_name(.abundance), 'BySample')
                      abundance.nm <- rlang::as_name(.abundance)
-                     if (rlang::as_name(.abundance) %in% c('Abundance', 'RareAbundance')){
-                         abundance.nm <- AbundBy
-                     }
+                     #if (rlang::as_name(.abundance) %in% c('Abundance', 'RareAbundance')){
+                     #    abundance.nm <- 
+                     #}
                  }else{
                      AbundBy <- "RareAbundanceBySample"
                      abundance.nm <- "RareAbundance"
@@ -231,6 +231,7 @@ setGeneric("mp_plot_abundance",
              abundance.nm <- paste0('Rel', abundance.nm)
          }
      }
+
      
      tbl <- .data %>% 
             mp_extract_abundance(taxa.class=!!taxa.class, topn = topn, rmun = rmun) %>%
@@ -238,7 +239,7 @@ setGeneric("mp_plot_abundance",
             dplyr::mutate(label=forcats::fct_rev(.data$label)) %>%
             dplyr::rename(!!taxa.class:="label") %>% 
             suppressMessages()
-     
+
      if(geom %in% c("bar", 'flowbar')){
          if (geom == "flowbar"){
             p <- ggplot(data = tbl,
@@ -265,8 +266,7 @@ setGeneric("mp_plot_abundance",
               scale_fill_manual(
                   values = rev(get_cols(tbl %>% pull(!!taxa.class) %>% unique() %>% length())),
                   guide = guide_legend(reverse=TRUE)
-              ) + 
-              scale_y_continuous(expand = c(0, 0, 0, 0.5))
+              ) 
           
          if (!rlang::quo_is_null(.group)){
              gp <- quo.vect_to_str.vect(.group)
@@ -291,8 +291,11 @@ setGeneric("mp_plot_abundance",
          if (!is.null(gpformula)){
              p <- p + ggh4x::facet_nested(gpformula, scales="free_x", space="free")
          }   
-         
-         p <- p + theme_taxbar()
+         gb <- ggplot2::ggplot_build(p)
+         expand.value = max(gb$layout$panel_scales_y[[1]]$range$range) * 0.5 / 100                  
+         p <- p + 
+              scale_y_continuous(expand = c(0, 0, 0, expand.value)) +
+              theme_taxbar()
 
      }else if(geom=="heatmap"){
          lab.sty <- list(xlab(NULL),ylab(NULL))
@@ -342,8 +345,8 @@ setGeneric("mp_plot_abundance",
 
          indexname <- leg.tl
 
-         sample.hclust <- hclust(sample.dist, method = sample.hclust)
-         feature.hclust <- hclust(feature.dist, method = feature.hclust)
+         sample.hclust <- hclust(sample.dist, method = sample.hclust) %>% ape::as.phylo()
+         feature.hclust <- hclust(feature.dist, method = feature.hclust) %>% ape::as.phylo()
 
          if (!rlang::quo_is_null(.group)){
              gp <- quo.vect_to_str.vect(.group)
