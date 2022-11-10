@@ -345,7 +345,7 @@ setGeneric("mp_plot_abundance",
 
          indexname <- leg.tl
 
-         sample.hclust <- hclust(sample.dist, method = sample.hclust) %>% ape::as.phylo()
+         sample.hc <- hclust(sample.dist, method = sample.hclust) %>% ape::as.phylo()
          feature.hclust <- hclust(feature.dist, method = feature.hclust) %>% ape::as.phylo()
 
          if (!rlang::quo_is_null(.group)){
@@ -375,7 +375,7 @@ setGeneric("mp_plot_abundance",
              indexname <- c(indexname, gp)
          }
          p2 <- ggtree(feature.hclust, branch.length = "none", size = 0.8)
-         p3 <- ggtree(sample.hclust, branch.length = "none", size = 0.8, layout = "dendrogram")
+         p3 <- ggtree(sample.hc, branch.length = "none", size = 0.8, layout = "dendrogram")
          p %<>% insert_left(p2, width = 0.1)
          if (!rlang::quo_is_null(.group)){
              p %<>% insert_top(p3, height = 0.1 + 0.01 * length(gp))
@@ -874,7 +874,7 @@ setGeneric("mp_plot_dist",
      dist.mat <- .data %>%
                  mp_extract_dist(distmethod=rlang::as_name(.distmethod))
      
-     sample.hclust <- hclust(dist.mat, method=hclustmethod)
+     sample.hclust <- hclust(dist.mat, method=hclustmethod) %>% ape::as.phylo()
 
      tbl <- dist.mat %>% as.matrix() %>%
             tibble::as_tibble(rownames="Sample") %>%
