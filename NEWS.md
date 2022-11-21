@@ -1,6 +1,7 @@
-# MicrobiotaProcess 1.11.2
+# MicrobiotaProcess 1.11.3
 
 + update `mp_plot_abundance` to be compatible with the latest ggplot2. (2022-11-08, Tue)
++ add `mp_plot_diff_manhattan` to visualize the different results with manhattan plot. (2022-11-21, Mon)
 
 # MicrobiotaProcess 1.9.5
 

@@ -1242,11 +1242,16 @@ setGeneric("mp_plot_diff_boxplot",
         point.args$size <- as.numeric(rlang::as_label(.size))
     }else{
         if (inherits(rlang::quo_get_expr(.size), 'call')){
-            size.mapping <- rlang::as_label(.size)
+            size.mapping <- aes(size=!!.size)
         }else{
-            size.mapping <- paste0("-log10(", gsub("^\"|\"$", "", rlang::as_label(.size)), ")")
+            if(any(grepl("\\(*.\\)$", rlang::quo_get_expr(.size)))){
+                warning_wrap('The .y argument might be a call, you should remove the \' or \\" quote symbols.')
+                size.mapping <- aes_string(size=gsub("^\"|\"$", "", rlang::as_label(.size)))
+            }else{
+                size.mapping <- aes_string(size=paste0("-log10(", gsub("^\"|\"$", "", rlang::as_label(.size)), ")"))
+            }
         }
-        point.args$mapping <- modifyList(point.args$mapping, aes_string(size = size.mapping))
+        point.args$mapping <- modifyList(point.args$mapping, size.mapping)
     }
     
     p <- ggplot(tbl)
@@ -1304,6 +1309,235 @@ setMethod("mp_plot_diff_boxplot", signature(.data="tbl_mpse"), .internal_mp_plot
 #' @export mp_plot_diff_boxplot
 setMethod("mp_plot_diff_boxplot", signature(.data="grouped_df_mpse"), .internal_mp_plot_diff_boxplot)
 
+#' displaying the differential result contained abundance and LDA with
+#' manhattan plot.
+#' @rdname mp_plot_diff_manhattan-methods
+#' @param .data MPSE or tbl_mpse after run 'mp_diff_analysis' with 'action="add"'.
+#' @param .group the column name for mapping the different color.
+#' @param .y the column name for mapping the y axis, default is 'fdr'.
+#' @param .size the column name for mapping the size of points or numeric, default is 2.
+#' @param taxa.class the taxonomy class features will be displayed, default is 'OTU'.
+#' @param anno.taxa.class the taxonomy class to annotate the sign taxa with color, default is
+#' 'Phylum' if 'taxatree' is not empty.
+#' @param removeUnknown logical whether mask the unknown taxonomy information but
+#' differential species, default is FALSE.
+#' @param ... additional params, see also the 'geom_text_repel' and 'geom_point'.
+#' @export
+#' @examples
+#' data(mouse.time.mpse)
+#' mouse.time.mpse %<>%
+#'   mp_rrarefy()
+#' mouse.time.mpse
+#' mouse.time.mpse %<>%
+#'   mp_diff_analysis(.abundance=RareAbundance,
+#'                    .group=time,
+#'                    first.test.alpha=0.01,
+#'                    action="add")
+#' p <- mouse.time.mpse %>% 
+#'        mp_plot_diff_manhattan(
+#'            .group = Sign_time, 
+#'            .y = fdr,
+#'            .size = 2,
+#'            taxa.class = OTU,
+#'            anno.taxa.class = Phylum,
+#'        )
+setGeneric('mp_plot_diff_manhattan', 
+   function(
+     .data, 
+     .group,
+     .y='fdr',
+     .size=2,
+     taxa.class='OTU', 
+     anno.taxa.class=NULL, 
+     removeUnknown=FALSE, ...)
+       standardGeneric('mp_plot_diff_manhattan')
+)
+
+#' @importFrom ggplot2 guide_axis labs element_line geom_hline coord_cartesian scale_x_discrete
+.internal_mp_plot_diff_manhattan <- function(.data,
+                                             .group,
+                                             .y = 'fdr',
+                                             .size = 2,
+                                             taxa.class = 'OTU',
+                                             anno.taxa.class = NULL,
+                                             removeUnknown=FALSE, ...){
+    taxa.class <- rlang::enquo(taxa.class)
+    anno.taxa.class <- rlang::enquo(anno.taxa.class)
+    .group <- rlang::enquo(.group)
+    .size <- rlang::enquo(.size)
+    .y <- rlang::enquo(.y)
+
+    params <- list(...)
+    taxa.class <- quo.vect_to_str.vect(taxa.class)
+    taxa.tree <- suppressMessages(taxatree(.data))
+    if (!is.null(taxa.tree)){
+        tbl <- taxa.tree %>% tibble::as_tibble() %>% dplyr::filter(.data$label!='r__root')
+        if (rlang::quo_is_null(anno.taxa.class)){
+            anno.taxa.class <- tbl %>% dplyr::filter(.data$nodeDepth==2) %>%
+                dplyr::pull(.data$nodeClass) %>% unique()
+        }else{
+            anno.taxa.class <- rlang::as_name(anno.taxa.class)
+        }
+        depth.value <- tbl %>% dplyr::filter(.data$nodeClass == anno.taxa.class) %>%
+            dplyr::pull(.data$nodeDepth) %>% unique()
+        tbl %<>% dplyr::filter(.data$nodeDepth >= depth.value)
+        if (!any(taxa.class %in% c('all', 'ALL', 'All'))){
+            tbl <- tbl %>% dplyr::filter(.data$nodeClass %in% taxa.class)
+        }else{
+            taxa.class <- tbl %>% dplyr::pull(.data$nodeClass) %>% unique()
+        }
+        taxa.da <- .data %>% mp_extract_taxonomy()
+        taxa.da <- lapply(taxa.class, function(i){
+            df <- taxa.da[,colnames(taxa.da) %in% c(i, anno.taxa.class),drop=FALSE]
+            if (i == anno.taxa.class){
+                df <- df %>% dplyr::mutate(.ANNO.TAXA=!!rlang::sym(anno.taxa.class))
+            }else{
+                df <- df %>% dplyr::rename(.ANNO.TAXA=!!rlang::sym(anno.taxa.class))
+            }
+            df %<>% dplyr::rename(label=!!rlang::sym(i)) %>% dplyr::distinct()
+            return(df)
+        }) %>% dplyr::bind_rows()
+        tbl %<>% dplyr::left_join(taxa.da, by='label')
+        if (removeUnknown){
+            tbl %<>% dplyr::filter(!grepl('__un_', .data$label))
+        }
+    }else{
+        tbl <- .data %>% mp_extract_feature() %>%
+                dplyr::rename(label = 'OTU')
+        taxa.da <- NULL
+    }
+    nmda <- colnames(tbl)
+    if (rlang::quo_is_missing(.group)){
+         if (any(grepl('^Sign_', nmda))){
+             sign.group <- nmda[grepl('^Sign_', nmda)][1]
+             .group <- gsub('Sign_', "", sign.group)
+         }else{
+             stop_wrap('The .group name should be specified manually.')
+         }
+     }else{
+         .group <- rlang::as_name(.group)
+         if (!grepl('^Sign_', .group)){
+             if (paste0('Sign_', .group) %in% nmda){
+                 sign.group <- paste0('Sign_', .group)
+             }else{
+                 #stop('Please check the mp_diff_analysis(..., action="add") has been run.')
+                 sign.group <- .group
+             }
+         }else{
+             sign.group <- .group
+             .group <- gsub('Sign_', "", .group)
+         }
+     }
+     tbl %<>% dplyr::filter(!is.na(!!.y))
+     tbl[[sign.group]][is.na(tbl[[sign.group]])] <- 'NoSign'
+     if (!is.null(taxa.da)){
+         tbl %<>% dplyr::group_split(.data$.ANNO.TAXA) %>% dplyr::bind_rows()
+         label.order <- tbl %>% dplyr::pull("label")
+         tbl %<>% dplyr::mutate(label=factor(.data$label, levels=label.order))
+         taxa.da <- tbl %>% dplyr::group_by(.data$.ANNO.TAXA) %>% dplyr::slice(ceiling(dplyr::n()/2)) %>%
+                    dplyr::mutate_at('label', as.character)
+     }
+     mapping1 <- aes(x=!!rlang::sym('label'), shape=!!rlang::sym(sign.group)) 
+     if (inherits(rlang::quo_get_expr(.y), 'call')){
+         y.aes <- aes(y=!!.y)
+     }else{
+         if(any(grepl("\\(*.\\)$", rlang::quo_get_expr(.y)))){
+             warning_wrap('The .y argument might be a call, you should remove the \' or \\" quote symbols.')
+             y.aes <- aes_string(y=gsub("^\"|\"$", "", rlang::as_label(.y)))
+         }else{
+             y.aes <- aes_string(y=paste0("-log10(", gsub("^\"|\"$", "", rlang::as_label(.y)), ")"))
+         }
+     }
+     mapping1 <- modifyList(mapping1, y.aes)
+     if (!is.null(taxa.da)){
+         mapping1 <- modifyList(mapping1, aes_string(color=".ANNO.TAXA"))
+     }
+
+     p <- ggplot(data=tbl)
+     point.args <- params[names(params) %in% setdiff(.extract_args('geom_point'), c('size', 'color'))]
+     point.args$mapping <- mapping1
+     if (is.quo.numeric(.size)){
+         point.args$size <- as.numeric(rlang::as_label(.size))
+     }else{
+         if (inherits(rlang::quo_get_expr(.size), 'call')){
+             size.mapping <- aes(size=!!.size)
+         }else{
+             if(any(grepl("\\(*.\\)$", rlang::quo_get_expr(.size)))){
+                 warning_wrap('The .y argument might be a call, you should remove the \' or \\" quote symbols.')
+                 #size.mapping <- aes_string(size=gsub("^\"|\"$", "", rlang::as_label(.size)))
+             }
+             #size.mapping <- aes_string(size=paste0("-log10(", gsub("^\"|\"$", "", rlang::as_label(.size)), ")"))
+             size.mapping <- aes_string(size=gsub("^\"|\"$", "", rlang::as_label(.size)))
+         }
+         point.args$mapping <- modifyList(point.args$mapping, size.mapping)
+     }
+     point.layer <- do.call('geom_point', point.args)
+     if (!is.null(taxa.da)){
+         axis.x.breaks <- taxa.da %>% dplyr::pull('label')
+         axis.x.labels <- taxa.da %>% dplyr::pull('.ANNO.TAXA')
+         rect.args <- params[names(params) %in% setdiff(.extract_args('geom_rect'), c('fill', 'color', 'alpha'))]
+         rect.args$data <- taxa.da
+         rect.args$mapping <- aes_string(fill=".ANNO.TAXA")
+         rect.args$xmin <- -Inf
+         rect.args$xmax <- Inf
+         rect.args$ymin <- -Inf
+         rect.args$ymax <- Inf
+         rect.args$color <- NA
+         rect.args$alpha <- .3
+         rect.layer <- do.call('geom_rect', rect.args)
+         p <- p +
+              rect.layer +
+              scale_fill_manual(values=rep(c('white', 'grey50'), ceiling(nrow(taxa.da)/2)), guide='none')
+     }
+     p <- p + geom_hline(yintercept=-log10(0.05), color='red', linewidth=.2, linetype=2)
+     p <- p + point.layer
+     text.args <- list(min.segment.length = 0,
+                       max.overlaps = 100,
+                       color = 'black',
+                       bg.color = 'white',
+                       size = 2.5)
+     text.args <- modifyList(text.args, params[names(params) %in% .extract_args('geom_text_repel')])
+     text.args$data <- ggtree::td_filter(!!rlang::sym(sign.group)!='NoSign')
+     text.args$mapping <- modifyList(mapping1, aes_string(label='label', shape=NULL))
+     text.layer <- do.call('geom_text_repel', text.args)
+     p <- p + text.layer
+
+     if (!is.null(taxa.da)){
+         axis.x.breaks <- taxa.da %>% dplyr::pull('label')
+         axis.x.labels <- taxa.da %>% dplyr::pull('.ANNO.TAXA')
+         p <- p +
+              labs(color=anno.taxa.class) +
+              facet_grid(. ~ .ANNO.TAXA, scales='free_x', space='free_x') +
+              scale_x_discrete(breaks=axis.x.breaks, labels=axis.x.labels, guide=guide_axis(angle=-45))
+     }
+     p <- p +
+          labs(x=NULL) +
+          theme(
+            strip.text.x = element_blank(),
+            strip.background = element_blank(),
+            panel.grid = element_blank(),
+            panel.spacing.x = unit(.15, 'cm'),
+            panel.background = element_blank(),
+            axis.line = element_line(linewidth=.2),
+          ) +
+          coord_cartesian(clip = 'off')
+     return(p)
+}     
+     
+#' @rdname mp_plot_diff_manhattan-methods
+#' @aliases mp_plot_diff_manhattan,MPSE
+#' @export mp_plot_diff_manhattan
+setMethod("mp_plot_diff_manhattan", signature(.data='MPSE'), .internal_mp_plot_diff_manhattan)
+
+#' @rdname mp_plot_diff_manhattan-methods
+#' @aliases mp_plot_diff_manhattan,tbl_mpse
+#' @export mp_plot_diff_manhattan
+setMethod("mp_plot_diff_manhattan", signature(.data="tbl_mpse"), .internal_mp_plot_diff_manhattan)
+
+#' @rdname mp_plot_diff_manhattan-methods
+#' @aliases mp_plot_diff_manhattan,grouped_df_mpse
+#' @export mp_plot_diff_manhattan
+setMethod("mp_plot_diff_manhattan", signature(.data="grouped_df_mpse"), .internal_mp_plot_diff_manhattan)
 
 .get_annot_index <- function(x, taxa.class, tip.annot = TRUE){
     start.annot <- x %>%                 

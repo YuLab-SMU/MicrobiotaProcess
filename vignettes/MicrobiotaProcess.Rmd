@@ -655,6 +655,22 @@ f.bar <- mouse.time.mpse %>%
 aplot::plot_list(f.box, f.bar)
 ```
 
+Or visualizing the results with `mp_plot_diff_manhattan`
+
+```{r , fig.width = 10, fig.height = 4.5, fig.align = 'center', fig.cap = 'The mahattan plot of differential taxa'}
+f.mahattan <- mouse.time.mpse %>%
+    mp_plot_diff_manhattan(
+       .group = Sign_time,
+       .y = fdr,
+       .size = 2.4,
+       taxa.class = c('OTU', 'Genus'),
+       anno.taxa.class = Phylum
+    )
+f.mahattan
+```
+
+
+
 # 4. Need helps?
 
 If you have questions/issues, please visit [github issue tracker](https://github.com/YuLab-SMU/MicrobiotaProcess/issues).
