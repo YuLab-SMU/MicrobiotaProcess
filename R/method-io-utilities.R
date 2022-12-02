@@ -129,18 +129,18 @@
         }
         rownames(taxatab) <- refseqnm
         taxatab <- fillNAtax(taxatab) 
-        #taxatab <- phyloseq::tax_table(as.matrix(taxatab))
     }
-    refseq <- build_refseq(refseq)
     if (!is.null(reftree)){
         if (inherits(reftree, "phylo")){
-            reftree <- treeio::as.treedata(reftree)
+            reftree <- .check_tree_tiplab(reftree, refseq, refseqnm)
         }else if(inherits(reftree, "character") && file.exists(reftree)){
             rlang::warn(c("The reftree is a tree file, it is parsing by read.tree function.",
                      "It is better to parse it with the function of treeio", 
                      "then the treedata or phylo result all can be supported."))
-            reftree <- ape::read.tree(reftree) %>% treeio::as.treedata()
+            reftree <- ape::read.tree(reftree)
+            reftree <- .check_tree_tiplab(reftree, refseq, refseqnm)
         }
+        reftree <- treeio::as.treedata(reftree)
     }
     if (!is.null(sampleda)){
         if (inherits(sampleda, "character") && file.exists(sampleda)){
@@ -149,13 +149,22 @@
            rlang::abort("The sampleda should be a file or data.frame contained sample information!")
         }
     }
-
+    refseq <- build_refseq(refseq)
     return (list(otutab=data.frame(t(seqtab),check.names=FALSE),
                 sampleda=sampleda,
                 taxatab=taxatab,
                 refseq=refseq,
                 otutree=reftree))
 }
+
+
+.check_tree_tiplab <- function(tree, oldnm, newnm){
+    if (any(tree$tip.label %in% oldnm)){
+        tree$tip.label <- newnm[match(tree$tip.label, oldnm)]
+    }
+    return(tree)
+}
+
 
 .build_mpse <- function(res){
     

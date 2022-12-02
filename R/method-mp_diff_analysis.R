@@ -596,10 +596,23 @@ setGeneric("mp_plot_diff_res",
     }
     abun.col <- abun.col[1]
     x.abun.col <- anno.tree %>% 
-                  dplyr::select(!!rlang::sym(abun.col)) %>% 
+                  dplyr::select(!!rlang::sym(abun.col)) %>%
                   tidyr::unnest(!!rlang::sym(abun.col)) %>%
                   colnames()
-    x.abun.col <- x.abun.col[grepl("^Rel", x.abun.col)]
+    if (any(grepl('BySample$',  abun.col))){
+        if (any(grepl('^Rel', x.abun.col))){
+            x.abun.col <- paste0('Rel', abun.col)
+        }else{
+            x.abun.col <- gsub('BySample$', '', abun.col)
+        }
+    }else{
+        if (any(grepl("^Rel", x.abun.col))){
+            x.abun.col <- paste0('Rel', abun.col)
+        }else{
+            x.abun.col <- abun.col
+        }
+    }
+    #x.abun.col <- x.abun.col[grepl("^Rel", x.abun.col)]
     gplot.pck <- "ggplot2"
     require(gplot.pck, character.only=TRUE) %>% suppressMessages()
     if (tree.type == "otutree"){
@@ -682,7 +695,7 @@ setGeneric("mp_plot_diff_res",
                grid.params = list(linetype=2)
             ) +  
             scale_size_continuous(
-               name="Relative Abundance (%)",
+               name= ifelse(grepl('^Rel', abun.col), "Relative Abundance (%)", gsub("By.*", "", abun.col)),
                range = c(.5, 3),
                guide = guide_legend(override.aes = list(fill="black"))
             )
@@ -1119,7 +1132,8 @@ setGeneric("mp_plot_diff_boxplot",
         tbl %<>% dplyr::filter(!grepl('__un_', .data$label))
     }
     nmda <- colnames(tbl)
-    tbl %<>% tidyr::unnest(nmda[grepl('BySample', nmda)][1])
+    nm.abun <- nmda[grepl('BySample', nmda)][1]
+    tbl %<>% tidyr::unnest(nm.abun)
     nmda <- colnames(tbl)
     if (rlang::quo_is_missing(.group)){
         if (any(grepl('^Sign_', nmda))){
@@ -1167,8 +1181,11 @@ setGeneric("mp_plot_diff_boxplot",
         xmintext <- NULL
         xmaxtext <- NULL
     }
-
-    abunda <- nmda[grepl('Rel.*BySample', nmda)]
+    if (any(grepl('Rel.*BySample', nmda))){
+        abunda <- nmda[grepl('Rel.*BySample', nmda)]
+    }else{
+        abunda <- gsub('BySample$', '', nm.abun) 
+    }
     if (group.abun){
         mapping1 <- aes(x = !!rlang::sym(abunda), 
                         y = !!rlang::sym("label"),
