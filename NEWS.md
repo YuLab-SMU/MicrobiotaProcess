@@ -1,3 +1,9 @@
+# MicrobiotaProcess 1.11.3.990
+
++ update `mp_plot_diff_res` and `mp_plot_diff_boxplot` to support visualize the `abundance` (not 
+  relative abundance). (2022-12-02, Fri)
++ fix the `tip.label` and `rownames` of `assays` when tree is provided in `mp_import_dada2` (2022-12-02, Fri)
+
 # MicrobiotaProcess 1.11.3
 
 + update `mp_plot_abundance` to be compatible with the latest ggplot2. (2022-11-08, Tue)
