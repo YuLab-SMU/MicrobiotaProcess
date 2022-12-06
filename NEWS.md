@@ -3,6 +3,8 @@
 + update `mp_plot_diff_res` and `mp_plot_diff_boxplot` to support visualize the `abundance` (not 
   relative abundance). (2022-12-02, Fri)
 + fix the `tip.label` and `rownames` of `assays` when tree is provided in `mp_import_dada2` (2022-12-02, Fri)
++ add the message information when the differential features was filtered in the first and
+  second test in `mp_diff_analysis`. (2022-12-06, Tue)
 
 # MicrobiotaProcess 1.11.3
 
