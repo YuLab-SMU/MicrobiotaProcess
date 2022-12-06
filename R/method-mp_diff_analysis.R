@@ -133,6 +133,7 @@ setGeneric("mp_diff_analysis", function(.data,
      standardGeneric("mp_diff_analysis")
 )
 
+#' @importFrom cli cli_inform make_ansi_style
 .internal_mp_diff_analysis <-  function(
               .data,
               .abundance,
@@ -265,10 +266,17 @@ setGeneric("mp_diff_analysis", function(.data,
      first.test.sig.vars <- first.res %>% 
                   dplyr::filter(!!as.symbol(filter.p) <= first.test.alpha & !is.na(!!as.symbol(filter.p))) %>% 
                   dplyr::pull(.data$f)
-
+     
+     msg1 <- function(x){
+                 paste0("There are not significantly discriminative features after internal ", x, " test !")
+             }
+     msg2 <- paste0("The result returned was original input object {.cls ", class(.data)[1], "}.")
+     msg3 <- "If you do not want to identify the differential features with such a conservative"
+     msg4 <- " condition, you can set {.arg filter.p=\"pvalue\"} or {.arg first.test.alpha = .05} or {.arg strict = FALSE}"
+     
      if (!length(first.test.sig.vars)>0){
-          message("There are not significantly discriminative features after internal first test !")
-          return(NULL)
+         cli::cli_inform(cli::make_ansi_style("orange")(c(msg1('first'), msg2, msg3, msg4)))
+         return(.data)
      }
 
      compareclass <- sampleda %>% 
@@ -304,9 +312,11 @@ setGeneric("mp_diff_analysis", function(.data,
                                  ...)
      }
 
-     if (length(second.test.sig.vars)==0){
-         message("There are not significantly discriminative features after internal second test!")
-         return(NULL)
+     if (!all(unlist(lapply(second.test.sig.vars,function(i)nrow(i) > 0)))){
+         cli::cli_inform(cli::make_ansi_style("red")(c(msg1('second'), 
+                                                       msg2, msg3, msg4, 
+                                                       " or {.var second.test.alpha=.05}")))
+         return(.data) 
      }
 
      leaveclasslevels <- unlist(lapply(names(second.test.sig.vars), 

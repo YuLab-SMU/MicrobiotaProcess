@@ -349,30 +349,43 @@ setGeneric('mp_cal_divergence',
                                      ...){
     .abundance <- rlang::enquo(.abundance)
     .name <- rlang::enquo(.name)
+
     
     stop_msg <- "The reference must be one of 'median' or 'mean' meaning 
                  the 'median' or 'mean' of all sample. Or it must a numeric 
                  vector which has length equal to the number of features.
                  Or it must be a integer value smaller than the number of 
-                 features. Or it must be a character of sample name.
+                 sample. Or it must be a character of sample name. Or it
+                 can be a custom function to calculate the reference community.
                  "
     
     dat <- .data %>% mp_extract_assays(!!.abundance)
 
-    if (is.character(reference) && 
-        !(reference %in% c('median', 'mean') || reference %in% colnames(dat)) && 
-        !length(reference)==1){
-        stop_wrap(stop_msg)
-    }else if(is.numeric(reference) && !(length(reference) == nrow(dat) || length(reference)==1)){
-        stop_wrap(stop_msg)
-    }else if (! (is.numeric(reference) || is.character(reference))){
+    if (is.character(reference)){
+        if (!(tryCatch(inherits(rlang::as_function(reference), 'function'), error=function(e)FALSE) || 
+              reference %in% colnames(dat) && length(reference)==1)){
+            stop_wrap(stop_msg)
+        }
+    }else if(is.numeric(reference)){
+        if (!(length(reference) == nrow(dat) || (length(reference)==1 && reference <= ncol(dat)))){
+            stop_wrap(stop_msg)
+        }
+    }else if (!inherits(reference, 'function')){
         stop_wrap(stop_msg)
     }
 
-    if (reference %in% c('median', 'mean')){
+    if (is.numeric(reference) && length(reference)==1 && reference <= ncol(dat)){
+        reference <- dat[, reference]
+    }else if (is.character(reference)){
+        if (reference %in% colnames(dat)){
+            reference <- dat[,colnames(dat) %in% reference]    
+        }else if (inherits(rlang::as_function(reference), 'function')){
+            reference <- apply(dat, 1, reference)
+        }
+    }else if (is.numeric(reference) && length(reference) == nrow(dat)){
+        reference <- reference
+    }else{
         reference <- apply(dat, 1, reference)
-    }else if ((is.numeric(reference) && length(reference)==1 && reference < ncol(dat)) || reference %in% colnames(dat)){
-        reference <- dat[,reference]
     }
     
     res <- unlist(lapply(seq_len(ncol(dat)), 
@@ -406,7 +419,6 @@ setMethod('mp_cal_divergence', signature(.data = 'tbl_mpse'), .internal_cal_dive
 #' @aliases mp_cal_divergence,grouped_df_mpse
 #' @exportMethod mp_cal_divergence
 setMethod('mp_cal_divergence', signature(.data = 'grouped_df_mpse'), .internal_cal_divergence)
-
 
 valid_rare <- function(.data, ...){
     UseMethod("valid_rare")
