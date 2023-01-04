@@ -399,7 +399,7 @@ left_join.MPSE <- function(x, y, by=NULL, copy=FALSE, ...){
         if (idnm=="Sample"){
             sampleda <- x %>% mp_extract_sample()
             ornm <- sampleda %>% colnames() 
-            sampleda <- sampleda %>% left_join(y, by=by, copy=copy, suffix=suffix, !!!dots)
+            sampleda <- rlang::inject(sampleda %>% left_join(y, by=by, copy=copy, suffix=suffix, !!!dots))
             if (any(duplicated(sampleda$Sample))){
                 sampleda %<>% .internal_nest(keepnm=ornm)
             }
@@ -410,7 +410,7 @@ left_join.MPSE <- function(x, y, by=NULL, copy=FALSE, ...){
         if (idnm=="OTU"){
             featureda <- x %>% mp_extract_feature()
             ornm <- featureda %>% colnames()
-            featureda %<>% left_join(y, by=by, copy=copy, suffix=suffix, !!!dots)
+            featureda <- rlang::inject(featureda %>% left_join(y, by=by, copy=copy, suffix=suffix, !!!dots))
             if (any(duplicated(featureda$OTU))){
                 featureda %<>% .internal_nest(keepnm=ornm)
             }
