@@ -13,11 +13,12 @@
 }
 
 MP_citations <- function(){
-    paste(
-        "S Xu, L Zhan, W Tang, Z Dai, L Zhou, T Feng, M Chen, S Liu, X Fu, T Wu, E Hu, G Yu.",
-        "MicrobiotaProcess: A comprehensive R package for managing and analyzing microbiome and other ecological data within the tidy framework.",
-        "04 February 2022, PREPRINT (Version 1) available at Research Square [https://doi.org/10.21203/rs.3.rs-1284357/v1]\n\n"
-        )
+    paste("Shuangbin Xu, Li Zhan, Wenli Tang, Qianwen Wang, Zehan Dai, Land Zhou, Tingze Feng, Meijun Chen, Tianzhi Wu, Erqiang Hu, Guangchuang Yu.",
+          "MicrobiotaProcess: A comprehensive R package for deep mining microbiome.",
+          "The Innovation. 2023, 100388. doi: 10.1016/j.xinn.2023.100388\n\n",
+          "Export the citation to BibTex by citation('MicrobiotaProcess')\n\n"
+    )    
+    
 }
 
 suppressmsg <- function(pkgname){

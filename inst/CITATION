@@ -1,0 +1,28 @@
+citHeader("To cite MicrobiotaProcess package in publications use:")
+
+citEntry(
+    entry  = "article",
+    title  = "MicrobiotaProcess: A comprehensive R package for deep mining microbiome",
+    author = personList(
+        as.person("Shuangbin Xu"),
+        as.person("Li Zhan"),
+        as.person("Wenli Tang"),
+        as.person("Qianwen Wang"),
+        as.person("Zehan Dai"),
+        as.person("Lang Zhou"),
+        as.person("Tingze Feng"),
+        as.person("Meijun Chen"),
+        as.person("Tianzi Wu"),
+        as.person("Erqiang Hu"),
+        as.person("Guangchuang Yu")
+        ),
+    journal = "The Innovation",
+    pages   = "100388",
+    year    = "2023",
+    ISSN    = "2666-6758",
+    doi     = "10.1016/j.xinn.2023.100388",
+    url     = "https://www.sciencedirect.com/science/article/pii/S2666675823000164",
+    textVersion = paste("Shuangbin Xu, Li Zhan, Wenli Tang, Qianwen Wang, Zehan Dai, Land Zhou, Tingze Feng, Meijun Chen, Tianzhi Wu, Erqiang Hu, Guangchuang Yu.",
+                        "MicrobiotaProcess: A comprehensive R package for deep mining microbiome.",
+                        "The Innovation. 2023, 100388. doi: 10.1016/j.xinn.2023.100388")
+)

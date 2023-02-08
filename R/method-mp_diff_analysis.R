@@ -1516,7 +1516,13 @@ setGeneric('mp_plot_diff_manhattan',
               rect.layer +
               scale_fill_manual(values=rep(c('white', 'grey50'), ceiling(nrow(taxa.da)/2)), guide='none')
      }
-     p <- p + geom_hline(yintercept=-log10(0.05), color='red', linewidth=.2, linetype=2)
+     if (utils::packageVersion("ggplot2") >= '3.4.0'){
+         p <- p + geom_hline(yintercept=-log10(0.05), color='red', linewidth = .2, linetype=2)
+         line.theme <- element_line(linewidth = .2)
+     }else{
+         p <- p + geom_hline(yintercept=-log10(0.05), color='red', size = .2, linetype=2)
+         line.theme <- element_line(size = .2)
+     }
      p <- p + point.layer
      text.args <- list(min.segment.length = 0,
                        max.overlaps = 100,
@@ -1545,7 +1551,7 @@ setGeneric('mp_plot_diff_manhattan',
             panel.grid = element_blank(),
             panel.spacing.x = unit(.15, 'cm'),
             panel.background = element_blank(),
-            axis.line = element_line(linewidth=.2),
+            axis.line = line.theme
           ) +
           coord_cartesian(clip = 'off')
      return(p)
