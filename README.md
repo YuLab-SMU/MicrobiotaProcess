@@ -60,7 +60,7 @@ paper:
 **Shuangbin Xu**, Li Zhan, Wenli Tang, Qianwen Wang, Zehan Dai, Land
 Zhou, Tingze Feng, Meijun Chen, Tianzhi Wu, Erqiang Hu, **Guangchuang
 Yu**<sup>\*</sup>. MicrobiotaProcess: A comprehensive R package for deep
-mining microbiome. *The Innovation*. 2023, 100388. doi:
+mining microbiome. __*The Innovation*__. 2023, 4(2):100388. doi:
 [10.1016/j.xinn.2023.100388](https://www.sciencedirect.com/science/article/pii/S2666675823000164).
 
   - [Source code to produce Supplementary

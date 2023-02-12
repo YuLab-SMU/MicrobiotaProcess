@@ -19,10 +19,12 @@ citEntry(
     journal = "The Innovation",
     pages   = "100388",
     year    = "2023",
+    volume  = "4",
+    issue   = "2",
     ISSN    = "2666-6758",
     doi     = "10.1016/j.xinn.2023.100388",
     url     = "https://www.sciencedirect.com/science/article/pii/S2666675823000164",
     textVersion = paste("Shuangbin Xu, Li Zhan, Wenli Tang, Qianwen Wang, Zehan Dai, Land Zhou, Tingze Feng, Meijun Chen, Tianzhi Wu, Erqiang Hu, Guangchuang Yu.",
                         "MicrobiotaProcess: A comprehensive R package for deep mining microbiome.",
-                        "The Innovation. 2023, 100388. doi: 10.1016/j.xinn.2023.100388")
+                        "The Innovation. 2023, 4(2):100388. doi: 10.1016/j.xinn.2023.100388")
 )
