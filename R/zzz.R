@@ -13,7 +13,7 @@
 }
 
 MP_citations <- function(){
-    paste("Shuangbin Xu, Li Zhan, Wenli Tang, Qianwen Wang, Zehan Dai, Land Zhou, Tingze Feng, Meijun Chen, Tianzhi Wu, Erqiang Hu, Guangchuang Yu.",
+    paste("Shuangbin Xu, Li Zhan, Wenli Tang, Qianwen Wang, Zehan Dai, Lang Zhou, Tingze Feng, Meijun Chen, Tianzhi Wu, Erqiang Hu, Guangchuang Yu.",
           "MicrobiotaProcess: A comprehensive R package for deep mining microbiome.",
           "The Innovation. 2023, 4(2):100388. doi: 10.1016/j.xinn.2023.100388\n\n",
           "Export the citation to BibTex by citation('MicrobiotaProcess')\n\n"

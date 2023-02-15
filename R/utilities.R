@@ -104,7 +104,7 @@ filltaxname <- function(taxdf, type="species"){
 }
 
 #' @keywords internal
-addtaxlevel <- function(taxdf){#, type="species"){
+addtaxlevel <- function(taxdf, taxlevelchar){#, type="species"){
     #if (type != "species"){
     #    taxlevelchar <- paste0("d", seq_len(ncol(taxdf)))
     #}else{
@@ -119,10 +119,12 @@ addtaxlevel <- function(taxdf){#, type="species"){
 fillNAtax <- function(taxdf, type="species"){
     #taxdf <- remove_unclassfied(taxdf)
     taxdf <- remove_na_taxonomy_rank(taxdf)
-    if (type!="species"){
-        assign("taxlevelchar", paste0("d", seq_len(ncol(taxdf))), envir = .GlobalEnv)
+    if (type!="species" || ncol(taxdf) >= 9){
+        #assign("taxlevelchar", paste0("d", seq_len(ncol(taxdf))), envir = .GlobalEnv)
+        taxlevelchar <- paste0('d', seq_len(ncol(taxdf)))
     }else{
-        assign("taxlevelchar", c("k", "p", "c", "o", "f", "g", "s", "st"), envir = .GlobalEnv)
+        #assign("taxlevelchar", c("k", "p", "c", "o", "f", "g", "s", "st"), envir = .GlobalEnv)
+        taxlevelchar <- c("k", "p", "c", "o", "f", "g", "s", "st")
     }
 #    if (any(is.na(taxdf[,1]))){
 #        if (type == "species"){
@@ -137,7 +139,7 @@ fillNAtax <- function(taxdf, type="species"){
     	tmpcolnames <- colnames(taxdf)
         taxdf <- t(apply(taxdf, 1, as.character))
         taxdf[is.na(taxdf)] <- ""
-        taxdf <- data.frame(t(apply(taxdf, 1, addtaxlevel)),
+        taxdf <- data.frame(t(apply(taxdf, 1, addtaxlevel, taxlevelchar)),
                             stringsAsFactors=FALSE)
     	rownames(taxdf) <- tmprownames
     	colnames(taxdf) <- tmpcolnames
