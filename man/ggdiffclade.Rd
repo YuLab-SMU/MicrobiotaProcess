@@ -12,21 +12,29 @@ ggdiffclade(obj, ...)
   obj,
   nodedf,
   factorName,
+  size,
   layout = "radial",
   linewd = 0.6,
-  skpointsize = 0.8,
+  bg.tree.color = "#bed0d1",
+  bg.point.color = "#bed0d1",
+  bg.point.stroke = 0.2,
+  bg.point.fill = "white",
+  skpointsize = 2,
+  hilight.size = 0.2,
   alpha = 0.4,
   taxlevel = 5,
-  cladetext = 2,
+  cladetext = 2.5,
+  tip.annot = TRUE,
+  as.tiplab = TRUE,
   factorLevels = NULL,
-  setColors = TRUE,
   xlim = 12,
+  removeUnknown = FALSE,
   reduce = FALSE,
   type = "species",
   ...
 )
 
-\method{ggdiffclade}{diffAnalysisClass}(obj, removeUnknown = TRUE, ...)
+\method{ggdiffclade}{diffAnalysisClass}(obj, size, removeUnknown = TRUE, ...)
 }
 \arguments{
 \item{obj}{object, diffAnalysisClass, the results of diff_analysis 
@@ -40,14 +48,30 @@ information and(or pvalue).}
 
 \item{factorName}{character, the names of factor in nodedf.}
 
+\item{size}{the column name for mapping the size of points, 
+default is 'pvalue'.}
+
 \item{layout}{character, the layout of ggtree, but only "rectangular",
 "roundrect", "ellipse", "radial", "slanted", "inward_circular" and 
 "circular" in here, default is "radial".}
 
 \item{linewd}{numeric, the size of segment of ggtree, default is 0.6.}
 
+\item{bg.tree.color}{character, the line color of tree, default is '#bed0d1'.}
+
+\item{bg.point.color}{character, the color of margin of background node points 
+of tree, default is '#bed0d1'.}
+
+\item{bg.point.stroke}{numeric, the margin thickness of point of background nodes 
+of tree, default is 0.2 .}
+
+\item{bg.point.fill}{character, the point fill (since point shape is 21) of background 
+nodes of tree, default is 'white'.}
+
 \item{skpointsize}{numeric, the point size of skeleton of tree, 
-default is 0.8 .}
+default is 2.}
+
+\item{hilight.size}{numeric, the margin thickness of high light clade, default is 0.2.}
 
 \item{alpha}{numeric, the alpha of clade, default is 0.4.}
 
@@ -55,14 +79,20 @@ default is 0.8 .}
 
 \item{cladetext}{numeric, the size of text of clade, default is 2.}
 
+\item{tip.annot}{logcial whether to replace the differential tip labels with shorthand,
+default is TRUE.}
+
+\item{as.tiplab}{logical, whether to display the differential tip labels with 'geom_tiplab'
+of 'ggtree', default is TRUE, if it is FALSE, it will use 'geom_text_repel' of 'ggrepel'.}
+
 \item{factorLevels}{list, the levels of the factors, default is NULL,
 if you want to order the levels of factor, you can set this.}
 
-\item{setColors}{logical, whether set the color of clade, default is TRUE, 
-or set FALSE,then use 'scale_fill_manual' setting.}
-
 \item{xlim}{numeric, the x limits, only works for 'inward_circular' layout,
 default is 12.}
+
+\item{removeUnknown}{logical, whether do not show unknown taxonomy, 
+default is TRUE.}
 
 \item{reduce}{logical, whether remove the unassigned taxonomy, which will 
 remove the clade of unassigned taxonomy, but the result of `diff_analysis`
@@ -71,9 +101,6 @@ should remove the unknown taxonomy, default is FALSE.}
 \item{type}{character, the type of datasets, default is "species", 
 if the dataset is not about species, such as dataset of kegg function, 
 you should set it to "others".}
-
-\item{removeUnknown}{logical, whether do not show unknown taxonomy, 
-default is TRUE.}
 }
 \value{
 figures of tax clade show the significant different feature.
@@ -102,11 +129,13 @@ diffres <- diff_analysis(kostic2012crc, classgroup="DIAGNOSIS",
 library(ggplot2)
 diffcladeplot <- ggdiffclade(diffres,alpha=0.3, linewd=0.2, 
                         skpointsize=0.4, 
-                        taxlevel=5,
-                        setColors=FALSE) +
-        scale_fill_manual(values=c('#00AED7', 
-                                   '#FD9347', 
-                                   '#C1E168'))
+                        taxlevel=5) +
+                 scale_fill_diff_cladogram(
+                        values=c('#00AED7', 
+                                 '#FD9347'
+                                 )
+                 ) +
+                 scale_size_continuous(range = c(1, 3))
 }
 }
 \author{

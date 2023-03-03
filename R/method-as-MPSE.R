@@ -192,7 +192,7 @@ as.mpse <- as.MPSE
     return(mpse)          
 }
 
-
+#' @importFrom utils getFromNamespace
 .as.MPSE.TSE <- function(.data, ...){
 
     assaysvar <- SummarizedExperiment::assayNames(.data)

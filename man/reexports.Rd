@@ -44,7 +44,7 @@ below to see their documentation.
 
   \item{tibble}{\code{\link[tibble]{as_tibble}}}
 
-  \item{tidyr}{\code{\link[tidyr]{nest}}, \code{\link[tidyr:nest]{unnest}}}
+  \item{tidyr}{\code{\link[tidyr]{nest}}, \code{\link[tidyr]{unnest}}}
 
   \item{tidytree}{\code{\link[tidytree]{as.treedata}}}
 }}

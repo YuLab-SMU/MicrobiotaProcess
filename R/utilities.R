@@ -67,8 +67,8 @@ get_sample <- function(obj){
     return(sampleda)
 }
 
-# #' @keywords internal
-# #taxlevelchar <- c("k", "p", "c", "o", "f", "g", "s", "st")
+#' @keywords internal
+taxlevelchar <- c("k", "p", "c", "o", "f", "g", "s", "st")
 
 newtaxname <- function(x, y){
     y <- as.vector(y)
@@ -134,7 +134,7 @@ fillNAtax <- function(taxdf, type="species"){
 #        }
 #        taxdf[is.na(taxdf[,1]), 1] <- paste0(prefix, "Unknown")
 #    }
-    if (!(grepl("^k__", taxdf[1,1]) || grepl("^d1__", taxdf[1,1]))){
+    if (!(grepl("^k__", taxdf[1,1], ignore.case = TRUE) || grepl("^d1__", taxdf[1,1], ignore.case = TRUE))){
     	tmprownames <- rownames(taxdf)
     	tmpcolnames <- colnames(taxdf)
         taxdf <- t(apply(taxdf, 1, as.character))
@@ -223,8 +223,8 @@ extract_args <- function(obj, arg){
     }
 }
 
-#' @importFrom utils globalVariables
-utils::globalVariables('taxlevelchar')
+# #' @importFrom utils globalVariables
+# utils::globalVariables('taxlevelchar')
 
 #' @importFrom stats sd 
 #' @importFrom plyr ddply
