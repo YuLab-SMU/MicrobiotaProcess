@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.11.4.991
+
++ update `ggdiffclade` using the `geom` layer of `ggtree`. (2023-03-02)
+
 # MicrobiotaProcess 1.11.4
 
 + update `mp_plot_diff_res` and `mp_plot_diff_boxplot` to support visualize the `abundance` (not 
