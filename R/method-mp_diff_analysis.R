@@ -1687,6 +1687,7 @@ ggplot_add.ScaleDiffClade <- function(object, plot, object_name){
     object$values <- color.label
     object$aesthetics <- 'colour'
     object$labels <- waiver()
+    object$breaks <- names(color.label)
     object$guide <- ggplot2::guide_legend(
                        ncol = ifelse(length(color.label) > 30, 2, 1), 
                        override.aes = list(size = 3),
