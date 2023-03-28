@@ -171,10 +171,12 @@ setGeneric("mp_cal_dist", function(.data, .abundance, .env=NULL, distmethod="bra
 #' @exportMethod mp_cal_dist
 setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .env=NULL, distmethod="bray", action="add", scale=FALSE, cal.feature.dist=FALSE, ...){
     if (cal.feature.dist){
-        action="get"
+        #action="get"
         byRow = TRUE
+        prefix = 'Featurey'
     }else{
         byRow = FALSE
+        prefix = 'Sampley'
     }
     
     action %<>% match.arg(c("add", "get", "only"))
@@ -251,12 +253,12 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
         if (scale){
             da %<>% scale()
         }
-        distsampley <- paste0("Env_", distmethod, "Sampley")
+        distsampley <- paste0("Env_", distmethod, prefix)#"Sampley")
     }else{
 
         da <- .data %>% 
               mp_extract_assays(.abundance=!!.abundance, byRow=byRow)
-        distsampley <- paste0(distmethod, "Sampley")
+        distsampley <- paste0(distmethod, prefix)#"Sampley")
     }
 
     if (grepl('\\.fun$', distmethod) || distmethod %in% distMethods$UniFrac){
@@ -278,6 +280,10 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
         distmethod <- paste0("Env_", distmethod)
     }
 
+    if (cal.feature.dist){
+        distmethod <- paste0("Feature_", distmethod)
+    }
+
     dat <- da %>% 
         as.matrix() %>% 
         corrr::as_cordf(diagonal=0) %>%
@@ -285,18 +291,33 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
         corrr::stretch(na.rm=TRUE) %>%
         dplyr::rename(!!distmethod:="r", !!distsampley:="y") %>% 
         tidyr::nest(!!distmethod:=c(!!as.symbol(distsampley), !!as.symbol(distmethod)))
+    
+   # if (cal.feature.dist){
+   #     dat <- .data %>% 
+   #         mp_extract_feature() %>%
 
-    dat <- .data %>% 
-           mp_extract_sample() %>%
-           left_join(dat, by=c("Sample"="x"), suffix=c("", ".y")) 
+   #         
+   # }else{
+   #     dat <- .data %>% 
+   #            mp_extract_sample() %>%
+   #            left_join(dat, by=c("Sample"="x"), suffix=c("", ".y")) 
+   # }
 
     if (action=="only"){
         return(dat)   
+    }
 
-    }else if (action=="add"){
-        .data@colData <- dat %>%
-            column_to_rownames(var="Sample") %>%
-            S4Vectors::DataFrame(check.names=FALSE)
+    if (cal.feature.dist){
+        match.nm <- c('OTU'='x')
+    }else{
+        match.nm <- c('Sample'='x')
+    }
+
+    if (action=="add"){
+        #.data@colData <- dat %>%
+        #    column_to_rownames(var="Sample") %>%
+        #    S4Vectors::DataFrame(check.names=FALSE)
+        .data <- .data %>% left_join(dat, by = match.nm)
         return(.data)
     }
           

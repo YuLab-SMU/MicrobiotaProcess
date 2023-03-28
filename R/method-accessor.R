@@ -723,35 +723,65 @@ setMethod("mp_extract_internal_attr", signature(x="grouped_df_mpse"), .internal_
 #' @rdname mp_extract_dist-methods
 #' @param x MPSE object or tbl_mpse object
 #' @param distmethod character the method of calculated distance.
-#' @param env.flag logical whether extract the distance of samples calculated
-#' based on continuous environment factors, default is FALSE.
-#' @param .group the column name of sample information, default is NULL, when it
-#' is provided, a tibble that can be visualized via ggplot2 will return.
+#' @param type character, which type distance to be extracted, 'sample' represents
+#' the distance between the samples based on feature abundance matrix, 'feature' represents 
+#' the distance between the features based on feature abundance matrix, 'env' represents the
+#' the distance between the samples based on continuous environment factors, default is 'sample'.
+#' @param .group the column name of sample information, which only work with type='sample' or 
+#' type='env', default is NULL, when it is provided, a tibble that can be visualized via ggplot2 
+#' will return.
+#' @param ... additional parameters
 #' @return dist object or tbl_df object when .group is provided.
 #' @export
-setGeneric("mp_extract_dist", function(x, distmethod, env.flag=FALSE, .group=NULL)standardGeneric("mp_extract_dist"))
+setGeneric("mp_extract_dist", function(x, distmethod, type='sample', .group=NULL, ...)standardGeneric("mp_extract_dist"))
 
-.internal_extract_dist <- function(x, distmethod, env.flag=FALSE, .group=NULL){
+.internal_extract_dist <- function(x, distmethod, type='sample', .group=NULL, ...){
     .group <- rlang::enquo(.group)
-    data <- x %>% mp_extract_sample()
-    distmethod <- switch(as.character(env.flag),
-                         "TRUE" = paste0("Env_", distmethod),
-                         "FALSE" = distmethod)
+    dots <- list(...)
+    type %<>% match.arg(c('sample', 'feature', 'env'))
+
+    if ('env.flag' %in% names(dots)){
+        if (dots$env.flag){
+            type <- 'env'
+        }else{
+            type <- 'sample'
+        }
+    }
+
+    if(type == 'feature'){
+        data <- x %>% mp_extract_feature(addtaxa = TRUE)
+        distname <- paste0(distmethod, 'Featurey') %>% as.symbol()
+        distmethod <- paste0('Feature_', distmethod)
+        .group <- rlang::quo(NULL)
+        prefix <- 'OTU'
+    }else{
+        data <- x %>% mp_extract_sample()
+        if (type == 'env'){
+           distmethod <- paste0('Env_', distmethod) 
+        }
+        distname <- paste0(distmethod, "Sampley") %>% as.symbol()
+        prefix <- 'Sample'
+    }
+           
+    #data <- x %>% mp_extract_sample()
+    #distmethod <- switch(as.character(type),
+    #                     "TRUE" = paste0("Env_", distmethod),
+    #                     "FALSE" = distmethod)
     
     if (!distmethod %in% colnames(data)){
         rlang::abort(paste0("There is not ", distmethod, 
                             " distance in the object, please check whether the mp_cal_dist has been performed!"))
     }
     
-    distname <- paste0(distmethod, "Sampley") %>% as.symbol()
+    #distname <- paste0(distmethod, "Sampley") %>% as.symbol()
     
     if (rlang::quo_is_null(.group)){
         distobj <- data %>%
-                select(c("Sample", distmethod)) %>%
+                select(c(prefix, distmethod)) %>%
                 distinct() %>%
                 tidyr::unnest() %>%
                 suppressWarnings() %>%
-                rename(x="Sample", y=distname, r=distmethod) %>%
+                rename(x=prefix, y=distname, r=distmethod) %>%
                 corrr::retract() %>%
                 tibble::column_to_rownames(var=colnames(.)[1]) %>%
                 magrittr::extract(,rownames(.))
@@ -761,17 +791,17 @@ setGeneric("mp_extract_dist", function(x, distmethod, env.flag=FALSE, .group=NUL
                      add_attr(distmethod, "method")
         return(distobj)
     }else{
-        group.y <- paste0(rlang::as_name(.group),".tmp") %>% as.symbol()
+        group.y <- paste0(rlang::as_name(.group), ".tmp") %>% as.symbol()
         dist.tb <- data %>%
-                   dplyr::select(c("Sample", distmethod, !!.group)) %>%
+                   dplyr::select(c(prefix, distmethod, !!.group)) %>%
                    tidyr::unnest(cols=distmethod) %>%
                    dplyr::mutate(dplyr::across(!!.group, 
-                                               ~.x[match(!!as.symbol(distname), !!as.symbol("Sample"))], 
+                                               ~.x[match(!!as.symbol(distname), !!as.symbol(prefix))], 
                                                .names=rlang::as_name(group.y))) %>% 
                    dplyr::rowwise() %>% 
                    dplyr::mutate(GroupsComparison=paste0(sort(c(!!.group, !!group.y)),collapse="-vs-")) %>%
-                   dplyr::filter(.data$Sample != !!as.symbol(distname)) %>%
-                   dplyr::select(c("Sample", distmethod, "GroupsComparison", distname))
+                   dplyr::filter(!!rlang::sym(prefix) != !!as.symbol(distname)) %>%
+                   dplyr::select(c(prefix, distmethod, "GroupsComparison", distname))
         return(dist.tb)
     }
 }

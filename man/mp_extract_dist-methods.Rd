@@ -11,24 +11,29 @@
 \alias{mp_extract_dist,grouped_df_mpse}
 \title{extract the dist object from MPSE or tbl_mpse object}
 \usage{
-mp_extract_dist(x, distmethod, env.flag = FALSE, .group = NULL)
+mp_extract_dist(x, distmethod, type = "sample", .group = NULL, ...)
 
-\S4method{mp_extract_dist}{MPSE}(x, distmethod, env.flag = FALSE, .group = NULL)
+\S4method{mp_extract_dist}{MPSE}(x, distmethod, type = "sample", .group = NULL, ...)
 
-\S4method{mp_extract_dist}{tbl_mpse}(x, distmethod, env.flag = FALSE, .group = NULL)
+\S4method{mp_extract_dist}{tbl_mpse}(x, distmethod, type = "sample", .group = NULL, ...)
 
-\S4method{mp_extract_dist}{grouped_df_mpse}(x, distmethod, env.flag = FALSE, .group = NULL)
+\S4method{mp_extract_dist}{grouped_df_mpse}(x, distmethod, type = "sample", .group = NULL, ...)
 }
 \arguments{
 \item{x}{MPSE object or tbl_mpse object}
 
 \item{distmethod}{character the method of calculated distance.}
 
-\item{env.flag}{logical whether extract the distance of samples calculated
-based on continuous environment factors, default is FALSE.}
+\item{type}{character, which type distance to be extracted, 'sample' represents
+the distance between the samples based on feature abundance matrix, 'feature' represents 
+the distance between the features based on feature abundance matrix, 'env' represents the
+the distance between the samples based on continuous environment factors, default is 'sample'.}
 
-\item{.group}{the column name of sample information, default is NULL, when it
-is provided, a tibble that can be visualized via ggplot2 will return.}
+\item{.group}{the column name of sample information, which only work with type='sample' or 
+type='env', default is NULL, when it is provided, a tibble that can be visualized via ggplot2 
+will return.}
+
+\item{...}{additional parameters}
 }
 \value{
 dist object or tbl_df object when .group is provided.
