@@ -1,7 +1,8 @@
-# MicrobiotaProcess 1.11.4.992
+# MicrobiotaProcess 1.11.4.993
 
-+ update `ggdiffclade` using the `geom` layer of `ggtree`. (2023-03-02)
-+ update `mp_cal_dist` to support storing the distance between the `features` with `action='add'`. (2023-03-28)
++ update `ggdiffclade` using the `geom` layer of `ggtree`. (2023-03-02, Thu)
++ update `mp_cal_dist` to support storing the distance between the `features` with `action='add'`. (2023-03-28, Tue)
++ add `mp_cal_cor` and `mp_extract_cor` to calculate and extract the correlation between the features. (2023-03-29, Wed)
 
 # MicrobiotaProcess 1.11.4
 
