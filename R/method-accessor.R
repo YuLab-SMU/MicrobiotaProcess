@@ -540,6 +540,52 @@ setMethod("mp_extract_rarecurve", signature(x="tbl_mpse"), .internal_extract_rar
 #' @exportMethod mp_extract_rarecurve
 setMethod("mp_extract_rarecurve", signature(x="grouped_df_mpse"), .internal_extract_rarecurve)
 
+#' Extract the correlation result of mp_cal_cor with action='add'
+#' @rdname mp_extract_cor-methods
+#' @param x MPSE or tbl_mpse object.
+#' @param method the method to calculate the correlation, default is 'spearman'
+#' @param addtaxa logical whether add the taxonomy to the nodes
+#' @param ... additional parameters
+#' @return tbl_graph class containing correlation information
+#' @export
+setGeneric("mp_extract_cor", function(x, method='spearman', addtaxa = TRUE, ...)standardGeneric('mp_extract_cor'))
+
+.internal_extract_cor <- function(x, method='spearman', addtaxa = TRUE, ...){
+    data <- x %>% mp_extract_feature(addtaxa = addtaxa)
+    
+    edges <- data %>% 
+             dplyr::select(c("OTU", method)) %>% 
+             tidyr::unnest(method)
+
+    keep.id <- unique(c(edges[[1]], edges[[2]]))
+    
+    nodes <- data %>% dplyr::select(- method) %>% dplyr::filter(.data$OTU %in% keep.id)
+
+    if (!method %in% colnames(data)){
+        rlang::abort(paste0("There is not ", method,
+                            " correlation in the object, please check whether the 'mp_cal_cor' has been performed!"))
+    }
+
+    tg <- tidygraph::tbl_graph(edges=edges, nodes=nodes)
+    return(tg)
+}
+
+#' @rdname mp_extract_cor-methods
+#' @aliases mp_extract_cor,MPSE
+#' @exportMethod mp_extract_cor
+setMethod("mp_extract_cor", signature(x="MPSE"), .internal_extract_cor)
+
+#' @rdname mp_extract_cor-methods
+#' @aliases mp_extract_cor,tbl_mpse
+#' @exportMethod mp_extract_cor
+setMethod("mp_extract_cor", signature(x="tbl_mpse"), .internal_extract_cor)
+
+#' @rdname mp_extract_cor-methods
+#' @aliases mp_extract_cor,grouped_df_mpse
+#' @exportMethod mp_extract_cor
+setMethod("mp_extract_cor", signature(x="grouped_df_mpse"), .internal_extract_cor)
+
+
 #' Extracting the abundance metric from MPSE or tbl_mpse object
 #' @description 
 #' Extracting the abundance metric from the MPSE or tbl_mpse,
