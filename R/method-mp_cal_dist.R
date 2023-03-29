@@ -160,16 +160,13 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
 #'   ggplot(aes(x=GroupsComparison, y=bray)) + 
 #'   geom_boxplot(aes(fill=GroupsComparison)) + 
 #'   geom_jitter(width=0.1) + 
-#'   xlab(NULL) + 
+#'   xlab(NULL) +
 #'   theme(legend.position="none")
 #' }
 setGeneric("mp_cal_dist", function(.data, .abundance, .env=NULL, distmethod="bray", action="add", scale=FALSE, cal.feature.dist=FALSE, ...)standardGeneric("mp_cal_dist"))
 
-#' @rdname mp_cal_dist-methods
-#' @aliases mp_cal_dist,MPSE
 #' @importFrom rlang :=
-#' @exportMethod mp_cal_dist
-setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .env=NULL, distmethod="bray", action="add", scale=FALSE, cal.feature.dist=FALSE, ...){
+.internal_cal_dist <- function(.data, .abundance, .env=NULL, distmethod="bray", action="add", scale=FALSE, cal.feature.dist=FALSE, ...){
     if (cal.feature.dist){
         #action="get"
         byRow = TRUE
@@ -186,7 +183,7 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
 
     dotargs <- list(...)
 
-    otutree <- .data@otutree
+    otutree <- .data %>% mp_extract_otutree()
     if (is.character(distmethod)){
         distmethod <- gsub("^(u.*)*unifrac$", "unifrac", distmethod, ignore.case = TRUE)
         distmethod <- gsub("^w.*unifrac$", "wunifrac", distmethod, ignore.case = TRUE)        
@@ -250,15 +247,19 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
                                   ) %>%
                 column_to_rownames(var="Sample")
         }
-        if (scale){
-            da %<>% scale()
-        }
+        #if (scale){
+        #    da %<>% scale()
+        #}
         distsampley <- paste0("Env_", distmethod, prefix)#"Sampley")
     }else{
 
         da <- .data %>% 
               mp_extract_assays(.abundance=!!.abundance, byRow=byRow)
         distsampley <- paste0(distmethod, prefix)#"Sampley")
+    }
+
+    if (scale){
+        da %<>% scale()
     }
 
     if (grepl('\\.fun$', distmethod) || distmethod %in% distMethods$UniFrac){
@@ -314,141 +315,17 @@ setMethod("mp_cal_dist", signature(.data="MPSE"), function(.data, .abundance, .e
     }
 
     if (action=="add"){
-        #.data@colData <- dat %>%
-        #    column_to_rownames(var="Sample") %>%
-        #    S4Vectors::DataFrame(check.names=FALSE)
         .data <- .data %>% left_join(dat, by = match.nm)
         return(.data)
     }
           
-})
-
-
-.internal_cal_dist <- function(.data, .abundance, .env=NULL, distmethod="bray", action="add", scale=FALSE, cal.feature.dist=FALSE, ...){
-    if (cal.feature.dist){
-        action = "get"
-        byRow = TRUE
-    }else{
-        byRow = FALSE
-    }
-    action %<>% match.arg(c("add", "get", "only"))
-
-    .abundance <- rlang::enquo(.abundance)
-    .env <- rlang::enquo(.env)
-
-    if (is.character(distmethod)){
-        distmethod <- gsub("^(u.*)*unifrac$", "unifrac", distmethod, ignore.case = TRUE)
-        distmethod <- gsub("^w.*unifrac$", "wunifrac", distmethod, ignore.case = TRUE)
-    }
-
-    dotargs <- list(...)
-    otutree <- .data %>% attr("otutree")
-
-    if (is.function(distmethod)){
-        f <- match.call()
-        distfun <- distmethod
-        distmethod <- gsub(".*::", "\\2", rlang::quo_name(rlang::call_args(f)$distmethod))
-        distmethod <- paste0(distmethod, '.fun')
-        fn <- rlang::fn_fmls(distfun)
-        if ('method' %in% names(fn) && 'method' %in% names(dotargs)){
-            distmethod <- dotargs$method
-            dotargs$method <- NULL
-        }        
-    }else if (distmethod %in% distMethods$vegdist){
-        distfun <- vegan::vegdist
-    }else if (distmethod %in% distMethods$betadiver){
-        distfun <- vegan::betadiver
-    }else if (distmethod %in% distMethods$dist){
-        distfun <- stats::dist
-    }else if (distmethod %in% distMethods$hopach){
-        distfun <- cal_dist_hopach
-    }else if (distmethod %in% distMethods$UniFrac){
-        distfun <- cal_Unifrac_dist
-        if (is.null(otutree)){
-            rlang::abort("The otutree slot is required for the UniFrac calculation.")
-        }
-        dotargs <- .internal_append(dotargs, list(tree=otutree@phylo))
-        if (distmethod == "unifrac"){
-            dotargs <- .internal_append(dotargs, list(weighted = FALSE))
-        }
-        if (distmethod == "wunifrac"){
-            dotargs <- .internal_append(dotargs, list(weighted = TRUE))        
-        }
-    }else{
-        distfun <- vegan::designdist
-    }
-
-    if (rlang::quo_is_missing(.abundance) && rlang::quo_is_null(.env)){
-        rlang::abort(c("The one of .abundance and .env should be provided",
-                     "The .abundance should be specified one column name of abundance of feature or",
-                     "The .env should be specified names (>2) of continuous sample environment factor."))
-    }else if(!rlang::quo_is_null(.env)){
-        da <- .data %>%
-              mp_extract_sample() %>%
-              column_to_rownames(var="Sample") %>%
-              dplyr::select(!!.env)
-        if (ncol(da)==1 && da %>% pull(!!.env) %>% rlang::is_list()){
-            da %<>%
-                as_tibble(rownames="Sample") %>%
-                tidyr::unnest() %>%
-                suppressWarnings() %>%
-                tidyr::pivot_wider(id_cols="Sample",
-                                   names_from=vapply(., is.character, logical(1)) %>%
-                                              select_true_nm(rm="Sample"),
-                                   values_from=vapply(., is.numeric, logical(1)) %>%
-                                               select_true_nm()
-                                  ) %>%
-                column_to_rownames(var="Sample")
-        }
-        if (scale){
-            da %<>% scale()
-        }
-        distsampley <- paste0("Env_", distmethod, "Sampley")
-    }else{
-
-        da <- .data %>%
-              mp_extract_assays(.abundance=!!.abundance, byRow=byRow)
-        distsampley <- paste0(distmethod, "Sampley")
-    }    
-
-    if (distmethod %in% distMethods$UniFrac){
-        if (!rlang::quo_is_null(.env)){
-            rlang::abort("The distance of sample based on environment factor is not calculated via UniFrac method.")
-        }
-        params <- c(list(da), dotargs)
-    }else{
-        params <- c(list(da, method=distmethod), dotargs)
-    }
-    
-    da <- do.call(distfun, params)
-    
-    if (action=="get"){
-        return(da)
-    }
-
-    if (!rlang::quo_is_null(.env)){
-        distmethod <- paste0("Env_", distmethod)
-    }    
-
-    dat <- da %>%
-        as.matrix %>%
-        corrr::as_cordf(diagonal=0) %>%
-        corrr::shave() %>%
-        corrr::stretch(na.rm=TRUE) %>%
-        dplyr::rename(!!distmethod:="r", !!distsampley:="y") %>%
-        tidyr::nest(!!distmethod:=c(!!as.symbol(distsampley), !!as.symbol(distmethod)))
-
-    if (action=="only"){
-        dat <- .data %>% 
-               mp_extract_sample() %>%
-               dplyr::left_join(dat, by=c("Sample"="x"), suffix=c("", ".y")) 
-        return(dat)
-    }else if (action=="add"){
-        .data %<>% 
-            dplyr::left_join(dat, by=c("Sample"="x"), suffix=c("", ".y"))
-        return(.data)
-    }
 }
+
+#' @rdname mp_cal_dist-methods
+#' @aliases mp_cal_dist,MPSE
+#' @exportMethod mp_cal_dist
+setMethod("mp_cal_dist", signature(.data="MPSE"), .internal_cal_dist)
+
 
 #' @rdname mp_cal_dist-methods
 #' @aliases mp_cal_dist,tbl_mpse

@@ -148,7 +148,7 @@ tbl \%>\%
   ggplot(aes(x=GroupsComparison, y=bray)) + 
   geom_boxplot(aes(fill=GroupsComparison)) + 
   geom_jitter(width=0.1) + 
-  xlab(NULL) + 
+  xlab(NULL) +
   theme(legend.position="none")
 }
 }
