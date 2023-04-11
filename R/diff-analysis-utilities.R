@@ -287,9 +287,10 @@ get_consistentfeatures <- function(diffsubclassfeature,
                                   classlevels, ...){
     leftfeature <- list()
     for (i in classlevels){
-        tmpindex <- grep(i, names(diffsubclassfeature))
+        tmpindex <- unique(c(grep(paste0("^", check_symbols(i), "-vs"), names(diffsubclassfeature)), 
+                    grep(paste0("vs-", check_symbols(i), "$"), names(diffsubclassfeature))))
         tmpkeepfeature <- diffsubclassfeature[tmpindex]
-        checkflag <- grepl(paste0("^",i, "-vs-"), names(tmpkeepfeature))
+        checkflag <- grepl(paste0("^", check_symbols(i), "-vs-"), names(tmpkeepfeature))
         falseindex <- which(!checkflag) 
         if (length(falseindex)>0){
             for (j in falseindex){
@@ -305,6 +306,16 @@ get_consistentfeatures <- function(diffsubclassfeature,
         }
     }
     return(leftfeature)
+}
+
+check_symbols <- function(x){
+    if (grepl("\\+", x)){
+        x <- gsub("\\+", "\\\\+", x)
+    }
+    if (grepl("\\*", x)){
+        x <- gsub("\\*", "\\\\*", x)
+    }
+    return(x)
 }
 
 #' @keywords internal

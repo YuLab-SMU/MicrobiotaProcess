@@ -134,7 +134,11 @@ fillNAtax <- function(taxdf, type="species"){
 #        }
 #        taxdf[is.na(taxdf[,1]), 1] <- paste0(prefix, "Unknown")
 #    }
-    if (!(grepl("^k__", taxdf[1,1], ignore.case = TRUE) || grepl("^d1__", taxdf[1,1], ignore.case = TRUE))){
+    if (!(grepl("^k__", taxdf[1, 1], ignore.case = TRUE) || 
+          grepl("^d1__", taxdf[1, 1], ignore.case = TRUE) || 
+          grepl("^d__", taxdf[1, 1], ignore.case = TRUE)
+           )
+    ){
     	tmprownames <- rownames(taxdf)
     	tmpcolnames <- colnames(taxdf)
         taxdf <- t(apply(taxdf, 1, as.character))
