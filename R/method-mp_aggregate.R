@@ -36,7 +36,7 @@ setGeneric("mp_aggregate", function(.data, .abundance, .group, fun=sum, keep_col
         dplyr::select(-!!rlang::sym("Sample"))
     colData(.data) <- NULL
     fma <- as.formula(paste0(". ~", rlang::as_name(.group)))
-    assayda <- stats::aggregate(formula=fma, data=assayda, FUN=fun, ...)
+    assayda <- stats::aggregate(fma, data=assayda, FUN=fun, ...)
     assayda %<>% 
              tibble::column_to_rownames(var=rlang::as_name(.group)) %>% 
              t()

@@ -397,7 +397,7 @@ taxaclass <- c("Kingdom",
                "Order", 
                "Family", 
                "Genus", 
-               "Speies", 
+               "Species", 
                "Rank8", 
                "Rank9", 
                "Rank10")
