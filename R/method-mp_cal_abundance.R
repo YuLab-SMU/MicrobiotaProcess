@@ -359,13 +359,20 @@ setMethod("mp_cal_abundance", signature(.data="MPSE"),
         bygroup <- newabun
     }
 
-    da %<>% dplyr::group_by(across(!!byID)) %>%
-        dplyr::mutate(across(!!.abundance, sum, .names=Totalnm)) %>%
-        dplyr::group_by(!!feature, .add = TRUE) #%>%
+    #da %<>% dplyr::group_by(across(!!byID)) %>%
+    #    dplyr::mutate(across(!!.abundance, sum, .names=Totalnm)) %>%
+    #    dplyr::group_by(!!feature, .add = TRUE) #%>%
     if ((length(byID2) > 1 || !'Sample' %in% byID2) && !relative){
-       da %<>% dplyr::mutate(across(!!.abundance, mean, .names=newabun))
+       da %<>% dplyr::group_by(!!as.symbol("Sample"), !!feature) %>%
+           dplyr::mutate(across(!!.abundance, sum, .names=Totalnm))  %>%
+           dplyr::group_by(!!byID, !!feature) %>% 
+           #dplyr::group_by(!!feature, .add=TRUE) 
+           dplyr::mutate(across(!!as.symbol(Totalnm), mean, .names=newabun))
     }else{
-       da %<>% dplyr::mutate(across(!!.abundance, sum, .names=newabun))
+       da %<>% dplyr::group_by(across(!!byID)) %>%
+           dplyr::mutate(across(!!.abundance, sum, .names=Totalnm)) %>%
+           dplyr::group_by(!!feature, .add = TRUE) %>%
+           dplyr::mutate(across(!!.abundance, sum, .names=newabun))
     }
 
     if (relative){
