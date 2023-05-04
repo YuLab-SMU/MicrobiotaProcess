@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.13.1
+
++ fix a bug for the abundance calculation with `force = TRUE` and `relative = FALSE`. (2023-04-28, Fri)
+
 # MicrobiotaProcess 1.11.5
 
 + update `ggdiffclade` using the `geom` layer of `ggtree`. (2023-03-02)
