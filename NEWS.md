@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.13.1.990
+
++ add `mp_import_humann_regroup` function to parsing the output of `humann_regroup_table`. (2023-05-15, Mon)
+
 # MicrobiotaProcess 1.13.1
 
 + fix a bug for the abundance calculation with `force = TRUE` and `relative = FALSE`. (2023-04-28, Fri)
