@@ -361,6 +361,37 @@ mp_import_metaphlan <- function(profile, mapfilename=NULL, treefile=NULL, linenu
 }    
 
 
+#' Import function to load the output of human_regroup_table in HUMAnN.
+#' @param profile the output file (text format) of human_regroup_table in HUMAnN.
+#' @param mapfilename the sample information file or data.frame,
+#' @param rm.unknown logical whether remove the unmapped and ungrouped features.
+#' @param ... additional parameters, meaningless now.
+#' @author Shuangbin Xu
+#' @export
+mp_import_humann_regroup <- function(profile, mapfilename=NULL, rm.unknown=TRUE, ...){
+    da <- read.table(profile, header=TRUE, sep='\t', comment.char="",
+                     check.names=FALSE, row.names=1, quote="")
+    if (rm.unknown){
+        da <- da[!grepl('UNMAPPED|UNGROUPED|unclassified', rownames(da)),,drop=FALSE]
+    }
+    index <- grepl("\\|", rownames(da))
+    feature.meta <- rownames(da[index, ,drop=FALSE])
+    feature.meta <- read.table(text=feature.meta, sep='|')
+    feature.meta$V2 <- gsub('.*s__', "s__", feature.meta$V2)
+    colnames(feature.meta) <- c('OTU', 'contribute.taxa')
+    res <- list(otutab = da[!index, ,drop=FALSE])
+    if (!is.null(mapfilename)){
+        if (inherits(mapfilename, 'data.frame')){
+            res$sampleda <- mapfilename
+        }else{
+            res$sampleda <- read_qiime_sample(mapfilename)
+        }
+    }
+    mpse <- .build_mpse(res)
+    mpse <- dplyr::left_join(mpse, feature.meta, by="OTU")
+    return(mpse)
+}
+
 #' @title read the qza file, output of qiime2.
 #' @description
 #' the function was designed to read the ouput of qiime2.
