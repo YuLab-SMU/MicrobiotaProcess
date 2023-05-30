@@ -25,6 +25,9 @@
 \alias{colData<-}
 \alias{remove_missing}
 \alias{extract}
+\alias{fortify}
+\alias{rowData}
+\alias{colData}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -34,13 +37,13 @@ below to see their documentation.
 \describe{
   \item{dplyr}{\code{\link[dplyr]{arrange}}, \code{\link[dplyr]{distinct}}, \code{\link[dplyr]{filter}}, \code{\link[dplyr]{group_by}}, \code{\link[dplyr:mutate-joins]{left_join}}, \code{\link[dplyr]{mutate}}, \code{\link[dplyr]{pull}}, \code{\link[dplyr]{rename}}, \code{\link[dplyr]{select}}, \code{\link[dplyr]{slice}}, \code{\link[dplyr:group_by]{ungroup}}}
 
-  \item{ggplot2}{\code{\link[ggplot2]{remove_missing}}}
+  \item{ggplot2}{\code{\link[ggplot2]{fortify}}, \code{\link[ggplot2]{remove_missing}}}
 
   \item{ggtree}{\code{\link[ggtree]{td_filter}}, \code{\link[ggtree]{td_unnest}}}
 
   \item{magrittr}{\code{\link[magrittr:compound]{\%<>\%}}, \code{\link[magrittr:pipe]{\%>\%}}, \code{\link[magrittr:aliases]{extract}}}
 
-  \item{SummarizedExperiment}{\code{\link[SummarizedExperiment:SummarizedExperiment-class]{colData<-}}}
+  \item{SummarizedExperiment}{\code{\link[SummarizedExperiment:SummarizedExperiment-class]{colData}}, \code{\link[SummarizedExperiment:SummarizedExperiment-class]{colData<-}}, \code{\link[SummarizedExperiment:SummarizedExperiment-class]{rowData}}}
 
   \item{tibble}{\code{\link[tibble]{as_tibble}}}
 

@@ -85,3 +85,15 @@ ggplot2::remove_missing
 #' @importFrom magrittr extract
 #' @export
 magrittr::extract
+
+#' @importFrom ggplot2 fortify
+#' @export
+ggplot2::fortify
+
+#' @importFrom SummarizedExperiment rowData
+#' @export
+SummarizedExperiment::rowData
+
+#' @importFrom SummarizedExperiment colData
+#' @export
+SummarizedExperiment::colData

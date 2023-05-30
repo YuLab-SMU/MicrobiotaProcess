@@ -684,8 +684,9 @@ setGeneric("mp_plot_diff_res",
                       unique() %>% length()    
     }else{
          mapping <- aes(x=forcats::fct_reorder(!!rlang::sym("Sample"), !!rlang::sym(group.nm), .fun=min),
-                        size = !!rlang::sym(x.abun.col), fill = !!rlang::sym(group.nm), 
-                        fill = !!rlang::sym(group.nm), subset = !!rlang::sym(x.abun.col) > 0
+                        size = !!rlang::sym(x.abun.col), 
+                        fill = !!rlang::sym(group.nm), 
+                        subset = !!rlang::sym(x.abun.col) > 0
                     )
          n.pwidth <- ncol(.data)
     }

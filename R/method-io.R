@@ -445,6 +445,7 @@ read.featuretab <- function(file){
     return(res)
 }
 
+#' @importFrom utils read.table
 #' @keywords internal
 read.taxa <- function(file, parallel=FALSE){
     skipn <- guess_skip_nrow(file)

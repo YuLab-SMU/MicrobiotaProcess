@@ -1,3 +1,53 @@
+#' @method fortify MPSE
+#' @export
+fortify.MPSE <- function(model, data, .slot = "colData", ...){
+    .slot <- rlang::enquo(.slot)
+    .slot <- rlang::as_name(.slot)
+    dt <- .as_tibble.mp.internal(model = model, .slot = .slot, ...)
+    return(dt)
+}
+
+#' @method fortify SummarizedExperiment
+#' @export
+fortify.SummarizedExperiment <- function(model, data, .slot = 'colData', ...){
+    .slot <- rlang::enquo(.slot)
+    .slot <- rlang::as_name(.slot)
+    dt <- .as_tibble.mp.internal(model, .slot, ...)
+    return(dt)
+}
+
+#' @method as_tibble DFrame
+#' @importFrom tibble as_tibble
+#' @export
+as_tibble.DFrame <- function(x, ...){
+    x <- data.frame(x, check.names=FALSE)
+    x <- as_tibble(x, ...)
+
+    return(x)
+}
+
+
+#' @importFrom SummarizedExperiment rowData
+.as_tibble.mp.internal <- function(model, .slot, ...){
+    if (.slot =='colData'){
+        dt <- as_tibble(model@colData, rownames = paste0(.slot,'.ID'))
+    }else if (.slot=='rowData'){
+        if (inherits(model, 'MPSE')){
+            dt <- mp_extract_feature(model, ...)
+        }else{
+            dt <- as_tibble(rowData(model), rownames = paste0(.slot, ".ID"))
+        }
+    }else if(.slot %in% c("taxatree", 'otutree')){
+        tmp.slot <- paste0('model@', .slot)
+        dt <- eval(parse(text = tmp.slot))
+        dt <- fortify(dt, ...)
+    }else if (tolower(.slot) == 'all'){
+        dt <- as_tibble(model, ...)
+    }
+    return (dt)
+}
+
+
 ##' Fortify a model with data in MicrobiotaProcess
 ##' @title mp_fortify
 ##' @param model object
