@@ -77,7 +77,8 @@ Suggests:
   hopach,
   parallel,
   shadowtext,
-  DirichletMultinomial
+  DirichletMultinomial,
+  ggpp
 License: GPL (>= 3.0)
 URL: https://github.com/YuLab-SMU/MicrobiotaProcess/
 BugReports: https://github.com/YuLab-SMU/MicrobiotaProcess/issues

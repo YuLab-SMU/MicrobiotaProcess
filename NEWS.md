@@ -1,5 +1,6 @@
 # MicrobiotaProcess 1.13.1.992
 
++ update `mp_plot_ord` to display the result of `mp_adonis` with `show.adonis = TRUE`. (2023-06-21, Wed)
 + using `theme_blinds` of `ggfun`. (2023-06-20, Tue)
 + add `mp_import_humann_regroup` function to parsing the output of `humann_regroup_table`. (2023-05-15, Mon)
 + add `fortify` method for `MPSE` object. (2023-05-18, Thu)

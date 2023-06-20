@@ -1367,7 +1367,6 @@ setGeneric("mp_plot_ord", function(
     return(p)
 }
 
-#' @importFrom ggpp geom_text_npc
 .add_adonis_layer <- function(plot, data, show.side){
    adonis.res <- data %>% mp_extract_internal_attr(name='adonis') 
    if (is.null(adonis.res)){
@@ -1401,7 +1400,7 @@ setGeneric("mp_plot_ord", function(
 
    df.text <- data.frame(name = label.tmp, x = 1, y =1)
    plot <- plot +
-           geom_text_npc(
+           ggpp::geom_text_npc(
              data = df.text,
              mapping = aes(npcx = .data$x, npcy = .data$y, label = .data$name),
              hjust = hjust,
