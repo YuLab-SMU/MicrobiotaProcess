@@ -696,11 +696,14 @@ setMethod("mp_extract_abundance", signature(x="grouped_df_mpse"), .internal_extr
 setGeneric("mp_extract_internal_attr", function(x, name, ...)standardGeneric("mp_extract_internal_attr"))
 
 .internal_extract_internal_attr <- function(x, name, ...){
-name <- rlang::enquo(name) %>% rlang::as_name()
-dat <- x %>% attr("internal_attr")
-message(paste0("The object contained internal attribute: ",paste0(names(dat), collapse=" ")))
-indx <- grep(paste0(name, "$"), names(dat), ignore.case=TRUE)
-return(dat[[indx]])
+    name <- rlang::enquo(name) %>% rlang::as_name()
+    dat <- x %>% attr("internal_attr")
+    message(paste0("The object contained internal attribute: ",paste0(names(dat), collapse=" ")))
+    indx <- grep(paste0(name, "$"), names(dat), ignore.case=TRUE)
+    if (length(indx)==0){
+        return(NULL)
+    }
+    return(dat[[indx]])
 }
 
 #' @rdname mp_extract_internal_attr-methods

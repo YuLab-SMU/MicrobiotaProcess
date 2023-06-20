@@ -21,6 +21,7 @@ mp_plot_ord(
   .color = "black",
   starstroke = 0.5,
   show.side = TRUE,
+  show.adonis = FALSE,
   ellipse = FALSE,
   show.sample = FALSE,
   show.envfit = FALSE,
@@ -40,6 +41,7 @@ mp_plot_ord(
   .color = "black",
   starstroke = 0.5,
   show.side = TRUE,
+  show.adonis = FALSE,
   ellipse = FALSE,
   show.sample = FALSE,
   show.envfit = FALSE,
@@ -59,6 +61,7 @@ mp_plot_ord(
   .color = "black",
   starstroke = 0.5,
   show.side = TRUE,
+  show.adonis = FALSE,
   ellipse = FALSE,
   show.sample = FALSE,
   show.envfit = FALSE,
@@ -78,6 +81,7 @@ mp_plot_ord(
   .color = "black",
   starstroke = 0.5,
   show.side = TRUE,
+  show.adonis = FALSE,
   ellipse = FALSE,
   show.sample = FALSE,
   show.envfit = FALSE,
@@ -120,6 +124,9 @@ default is NULL, meaning the \code{color} is 'black'.}
 
 \item{show.side}{logical whether display the side boxplot with the specified \code{.dim} 
 dimensions, default is TRUE.}
+
+\item{show.adonis}{logical whether display the result of \code{mp_adonis} with \code{action='all'},
+default is FALSE.}
 
 \item{ellipse}{logical, whether to plot ellipses, default is FALSE. (.group or .color variables 
 according to the 'geom', the default geom is path, so .color can be mapped to the corresponding 

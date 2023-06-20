@@ -1009,6 +1009,8 @@ setMethod("mp_plot_dist", signature(.data="grouped_df_mpse"), .internal_plot_dis
 #' @param starstroke numeric the width of edge of points, default is 0.5.
 #' @param show.side logical whether display the side boxplot with the specified \code{.dim} 
 #' dimensions, default is TRUE.
+#' @param show.adonis logical whether display the result of \code{mp_adonis} with \code{action='all'},
+#' default is FALSE.
 #' @param ellipse logical, whether to plot ellipses, default is FALSE. (.group or .color variables 
 #' according to the 'geom', the default geom is path, so .color can be mapped to the corresponding 
 #' variable).
@@ -1054,6 +1056,7 @@ setGeneric("mp_plot_ord", function(
     .color = "black",
     starstroke = 0.5,
     show.side = TRUE,
+    show.adonis = FALSE,
     ellipse = FALSE,
     show.sample = FALSE,
     show.envfit = FALSE,
@@ -1075,6 +1078,7 @@ setGeneric("mp_plot_ord", function(
     .color = "black",
     starstroke = 0.5,
     show.side = TRUE,
+    show.adonis = FALSE,
     ellipse = FALSE,
     show.sample = FALSE,
     show.envfit = FALSE,
@@ -1356,7 +1360,56 @@ setGeneric("mp_plot_ord", function(
        }
     }
 
+    if (show.adonis){
+        p <- .add_adonis_layer(plot = p, data=.data, show.side = show.side)
+    }
+
     return(p)
+}
+
+#' @importFrom ggpp geom_text_npc
+.add_adonis_layer <- function(plot, data, show.side){
+   adonis.res <- data %>% mp_extract_internal_attr(name='adonis') 
+   if (is.null(adonis.res)){
+       cli::cli_inform(c(
+         "The {.cls {as.character(class(data))}} does not contain the result of {.arg adonis}. Please make sure ",
+         "the {.fn mp_adonis} had been run with {.arg action = 'add'}."
+         )
+       ) 
+       return(plot)
+   }
+   
+   if (show.side){
+       vjust <- 'outward'
+       hjust <- 'outward'
+   }else{
+       vjust <- hjust <- 'inward'
+   }
+   
+   label.tmp <- deparse(
+                  bquote(
+                    atop(
+                     italic("Adonis")~":",
+                    atop(
+                     italic("R")^2~"="~.(round(adonis.res$R2[[1]], 4)),
+                     italic("p")~"  ="~.(round(adonis.res$`Pr(>F)`[[1]], 4))
+                    )
+                  )
+               ),
+               width.cutoff = 200
+             )   
+
+   df.text <- data.frame(name = label.tmp, x = 1, y =1)
+   plot <- plot +
+           geom_text_npc(
+             data = df.text,
+             mapping = aes(npcx = .data$x, npcy = .data$y, label = .data$name),
+             hjust = hjust,
+             vjust = vjust,
+             parse = TRUE
+           ) +
+           ggplot2::coord_cartesian(clip = 'off')
+   return(plot)
 }
 
 #' @rdname mp_plot_ord-methods
