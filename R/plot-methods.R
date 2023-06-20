@@ -1485,75 +1485,75 @@ insert_top <- getFromNamespace("insert_top", "aplot")
 insert_left <- getFromNamespace("insert_left", "aplot")
 
 
-#' set the theme of ggplot object with the STAMP style.
-#' @param colour character the color of theme stamp.
-#' @param axis character which grid of axis will be filled, default is 'y'.
-#' @param ... additional parameter, see also 'theme' of 'ggplot2'.
-#' @keywords internal
-theme_stamp <- function(colour=c('white', 'grey90'), axis = 'y', ...){
-    params <- list(...)
-    axis <- match.arg(axis, c('x', 'y'))
-    if ('color' %in% names(params)){
-        colour <- params$color
-        params$color <- NULL
-    }
-    if (length(colour)!=2){
-        message('The colour is not a vector contained two length.')
-        #colour <- c('white', 'grey90')
-    }
-    structure(
-      list(
-        colour = colour, 
-        axis = axis, 
-        params = params
-      ), 
-      class = 'theme_stamp'
-    )
-}
-
-#' @method ggplot_add theme_stamp 
-#' @importFrom ggplot2 element_line geom_tile 
-ggplot_add.theme_stamp <- function(object, plot, object_name){
-    gb <- ggplot2::ggplot_build(plot)
-    axis <- paste0('panel_scales_', object$axis)
-    df <- data.frame(AXIS=gb$layout[[axis]][[1]]$get_labels())
-    len.ind <- length(object$colour)
-    axis.num <- nrow(df)
-    df$GROUP.GRID <- rep(object$colour, ceiling(axis.num/len.ind))[seq_len(axis.num)]
-    if (object$axis == 'y'){
-        grid.tile <- geom_tile(
-                       data = df,
-                       mapping = aes(x = 1, 
-                                     y = !!as.symbol("AXIS"), 
-                                     fill = I(!!as.symbol("GROUP.GRID")), 
-                                     height = 1,
-                                     width=Inf
-                                ),
-                       inherit.aes = FALSE
-                     )
-    }else{
-        grid.tile <- geom_tile(
-                       data = df, 
-                       mapping = aes(x = !!as.symbol("AXIS"),
-                                     y = 1, 
-                                     fill = I(!!as.symbol("GROUP.GRID")), 
-                                     height = Inf,
-                                     width = 1
-                                 ), 
-                       inherit.aes = FALSE
-                     )
-    }
-    plot <- plot + ggnewscale::new_scale_fill() + grid.tile
-    plot$layers <- c(plot$layers[[length(plot$layers)]], plot$layers[-length(plot$layers)])
-    axis.keep <- paste0('axis.line.', setdiff(c('x', 'y'), object$axis))
-    default.theme <- list(element_blank(), element_line())
-    names(default.theme) <- c('panel.background', axis.keep)
-    if (axis.keep %in% names(object$params)){
-        object$params <- c(object$params, default.theme[[-2]])
-    }else{
-        object$params <- c(object$params, default.theme)
-    }
-    th <- do.call("theme", object$params)
-    plot <- plot + th
-    return(plot)
-}
+# #' set the theme of ggplot object with the STAMP style.
+# #' @param colour character the color of theme stamp.
+# #' @param axis character which grid of axis will be filled, default is 'y'.
+# #' @param ... additional parameter, see also 'theme' of 'ggplot2'.
+# #' @keywords internal
+# theme_stamp <- function(colour=c('white', 'grey90'), axis = 'y', ...){
+#     params <- list(...)
+#     axis <- match.arg(axis, c('x', 'y'))
+#     if ('color' %in% names(params)){
+#         colour <- params$color
+#         params$color <- NULL
+#     }
+#     if (length(colour)!=2){
+#         message('The colour is not a vector contained two length.')
+#         #colour <- c('white', 'grey90')
+#     }
+#     structure(
+#       list(
+#         colour = colour, 
+#         axis = axis, 
+#         params = params
+#       ), 
+#       class = 'theme_stamp'
+#     )
+# }
+# 
+# #' @method ggplot_add theme_stamp 
+# #' @importFrom ggplot2 element_line geom_tile 
+# ggplot_add.theme_stamp <- function(object, plot, object_name){
+#     gb <- ggplot2::ggplot_build(plot)
+#     axis <- paste0('panel_scales_', object$axis)
+#     df <- data.frame(AXIS=gb$layout[[axis]][[1]]$get_labels())
+#     len.ind <- length(object$colour)
+#     axis.num <- nrow(df)
+#     df$GROUP.GRID <- rep(object$colour, ceiling(axis.num/len.ind))[seq_len(axis.num)]
+#     if (object$axis == 'y'){
+#         grid.tile <- geom_tile(
+#                        data = df,
+#                        mapping = aes(x = 1, 
+#                                      y = !!as.symbol("AXIS"), 
+#                                      fill = I(!!as.symbol("GROUP.GRID")), 
+#                                      height = 1,
+#                                      width=Inf
+#                                 ),
+#                        inherit.aes = FALSE
+#                      )
+#     }else{
+#         grid.tile <- geom_tile(
+#                        data = df, 
+#                        mapping = aes(x = !!as.symbol("AXIS"),
+#                                      y = 1, 
+#                                      fill = I(!!as.symbol("GROUP.GRID")), 
+#                                      height = Inf,
+#                                      width = 1
+#                                  ), 
+#                        inherit.aes = FALSE
+#                      )
+#     }
+#     plot <- plot + ggnewscale::new_scale_fill() + grid.tile
+#     plot$layers <- c(plot$layers[[length(plot$layers)]], plot$layers[-length(plot$layers)])
+#     axis.keep <- paste0('axis.line.', setdiff(c('x', 'y'), object$axis))
+#     default.theme <- list(element_blank(), element_line())
+#     names(default.theme) <- c('panel.background', axis.keep)
+#     if (axis.keep %in% names(object$params)){
+#         object$params <- c(object$params, default.theme[[-2]])
+#     }else{
+#         object$params <- c(object$params, default.theme)
+#     }
+#     th <- do.call("theme", object$params)
+#     plot <- plot + th
+#     return(plot)
+# }

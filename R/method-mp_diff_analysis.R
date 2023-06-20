@@ -1056,6 +1056,7 @@ mp_plot_diff_cladogram <- function(
 #' @param removeUnknown logical whether mask the unknown taxonomy information but 
 #' differential species, default is FALSE.
 #' @param ... additional params, see also the 'geom_boxplot', 'geom_errorbarh' and 'geom_point'.
+#' @importFrom ggfun theme_blinds
 #' @export
 #' @examples
 #' data(mouse.time.mpse)
@@ -1290,7 +1291,10 @@ setGeneric("mp_plot_diff_boxplot",
           ylab(NULL) + 
           xlab('Abundance') +
           scale_x_continuous(expand = c(0, 0, 0, .2))
-    p1 <- p1 + theme_stamp(colour = c("grey90", "white"), axis.ticks.y=element_blank())
+    p1 <- p1 + theme_blinds(colour = c("grey90", "white"), axis.ticks.y=element_blank(), 
+                            panel.grid.major.x = element_blank(), 
+                            panel.grid.minor.x = element_blank()
+               )
 
     panel2.geom <- do.call(panel2.geom, panel2.args)
     point.geom <- do.call(geom_point, point.args)
@@ -1300,15 +1304,18 @@ setGeneric("mp_plot_diff_boxplot",
           ylab(NULL) +
           xlab(xlabtext) +
           theme(
+            panel.grid.major.x = element_blank(),
+            panel.grid.minor.x = element_blank(),
             axis.text.y = element_blank(),
             axis.ticks.y = element_blank()
           )
-    p2 <- p2 + theme_stamp(colour = c("grey90", "white"))
+    p2 <- p2 + theme_blinds(colour = c("grey90", "white"))
     fix.group <- levels(tbl[[.group]])
     if (is.null(fix.group)){
         fix.group <- unique(sort(tbl[[.group]]))
     }
-    fix.group.color <- p1$scales$get_scales('fill_new')$palette.cache
+    #fix.group.color <- p1$scales$get_scales('fill')$palette.cache
+    fix.group.color <- scales::hue_pal()(length(fix.group))
     names(fix.group.color) <- fix.group
     fix.group.color <- fix.group.color[match(unique(as.character(tbl[[sign.group]])), names(fix.group.color))]
     p2 <- p2 + scale_color_manual(values=fix.group.color)
@@ -1642,8 +1649,8 @@ set_diff_boxplot_color <- function(
     values,
     ...){
 
-    .data[[1]] <- .data[[1]] + scale_fill_manual(values = values, aesthetics='fill_new', ...)
-    tmp.group <- .data[[1]]$data %>% dplyr::pull(!!.data[[1]]$layers[[2]]$mapping$fill_new) 
+    .data[[1]] <- .data[[1]] + scale_fill_manual(values = values, aesthetics='fill', ...)
+    tmp.group <- .data[[1]]$data %>% dplyr::pull(!!.data[[1]]$layers[[1]]$mapping$fill) 
     fix.group <- unique(sort(tmp.group))
     if (!is.null(levels(tmp.group))){
         fix.group <- levels(tmp.group)
@@ -1652,7 +1659,7 @@ set_diff_boxplot_color <- function(
     if (is.null(names(fix.group.color))){
         names(fix.group.color) <- fix.group 
     }
-    tmp.group2 <- .data[[2]]$data %>% dplyr::pull(!!.data[[2]]$layers[[3]]$mapping$colour)
+    tmp.group2 <- .data[[2]]$data %>% dplyr::pull(!!.data[[2]]$layers[[2]]$mapping$colour)
     fix.group.color <- fix.group.color[match(unique(as.character(tmp.group2)), names(fix.group.color))]
     .data[[2]] <- .data[[2]] + scale_color_manual(values = fix.group.color)
     return(.data)

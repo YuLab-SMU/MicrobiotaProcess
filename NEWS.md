@@ -1,5 +1,6 @@
-# MicrobiotaProcess 1.13.1.991
+# MicrobiotaProcess 1.13.1.992
 
++ using `theme_blinds` of `ggfun`. (2023-06-20, Tue)
 + add `mp_import_humann_regroup` function to parsing the output of `humann_regroup_table`. (2023-05-15, Mon)
 + add `fortify` method for `MPSE` object. (2023-05-18, Thu)
 + fix a bug of mp_plot_diff_res when ggnewscale updated to 0.4.9. (2023-05-30, Tue)
