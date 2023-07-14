@@ -1,6 +1,7 @@
 #' @importFrom utils packageDescription
 .onAttach <- function(libname, pkgname) {
     options(layout.radial.linetype="curved")
+    options('check.tbl_tree.verbose'=FALSE)
     pkgVersion <- packageDescription(pkgname, fields="Version")
     msg <- paste0(pkgname, " v", pkgVersion, "  ",
                   "For help: https://github.com/YuLab-SMU/MicrobiotaProcess/issues", "\n\n")

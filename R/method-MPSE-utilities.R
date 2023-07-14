@@ -41,7 +41,7 @@ convert_to_treedata2 <- function(x){
 }
 
 taxatree_to_tb <- function(x){
-    x %<>% as_tibble(x)
+    x %<>% as_tibble(x) %>% drop_class('tbl_tree')
     extrada <- x %>%
                dplyr::mutate(isTip = ! .data$node %in% .data$parent) %>%
                dplyr::select(-c("parent", "node", "nodeDepth")) %>%
