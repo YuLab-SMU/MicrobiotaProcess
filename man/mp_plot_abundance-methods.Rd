@@ -27,6 +27,7 @@ mp_plot_abundance(
   .sec.group = NULL,
   rmun = FALSE,
   rm.zero = TRUE,
+  order.by.feature = NULL,
   ...
 )
 
@@ -47,6 +48,7 @@ mp_plot_abundance(
   .sec.group = NULL,
   rmun = FALSE,
   rm.zero = TRUE,
+  order.by.feature = NULL,
   ...
 )
 
@@ -67,6 +69,7 @@ mp_plot_abundance(
   .sec.group = NULL,
   rmun = FALSE,
   rm.zero = TRUE,
+  order.by.feature = NULL,
   ...
 )
 
@@ -87,6 +90,7 @@ mp_plot_abundance(
   .sec.group = NULL,
   rmun = FALSE,
   rm.zero = TRUE,
+  order.by.feature = NULL,
   ...
 )
 }
@@ -138,6 +142,9 @@ default is FALSE (the unknown taxa class will be considered as 'Others').}
 
 \item{rm.zero}{logical whether to display the zero abundance, which only work with geom='heatmap'
 default is TRUE.}
+
+\item{order.by.feature}{character adjust the order of axis x, default is NULL, meaning the order
+of axis.x will be visualizing with the order of samples by highest abundance of features.}
 
 \item{...}{additional parameters, when the geom = "flowbar", it can specify the parameters of 
 'geom_stratum' of 'ggalluvial', when the geom = 'bar', it can specify the parameters of 
