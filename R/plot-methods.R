@@ -28,14 +28,16 @@
 #' 'median' and 'mcquitty'.
 #' @param .sec.group the column name of second group to be plotted with nested facet,
 #' default is NULL, this argument will be deprecated in the next version.
-#' @param ... additional parameters, when the geom = "flowbar", it can specify the parameters of 
-#' 'geom_stratum' of 'ggalluvial', when the geom = 'bar', it can specify the parameters of 
-#' 'geom_bar' of 'ggplot2', when the geom = "heatmap", it can specify the parameter of
-#' 'geom_tile' of 'ggplot2'.
 #' @param rmun logical whether to remove the unknown taxa, such as "g__un_xxx",
 #' default is FALSE (the unknown taxa class will be considered as 'Others').
 #' @param rm.zero logical whether to display the zero abundance, which only work with geom='heatmap'
 #' default is TRUE.
+#' @param order.by.feature character adjust the order of axis x, default is FALSE, if it is NULL or TRUE,
+#' meaning the order of axis.x will be visualizing with the order of samples by highest abundance of features.
+#' @param ... additional parameters, when the geom = "flowbar", it can specify the parameters of 
+#' 'geom_stratum' of 'ggalluvial', when the geom = 'bar', it can specify the parameters of 
+#' 'geom_bar' of 'ggplot2', when the geom = "heatmap", it can specify the parameter of
+#' 'geom_tile' of 'ggplot2'.
 #' @author Shuangbin Xu
 #' @export
 #' @examples
@@ -96,6 +98,7 @@ setGeneric("mp_plot_abundance",
               .sec.group = NULL,
               rmun = FALSE,
               rm.zero = TRUE,
+              order.by.feature = FALSE,
               ...
            )
            standardGeneric("mp_plot_abundance")
@@ -117,6 +120,7 @@ setGeneric("mp_plot_abundance",
                                 .sec.group = NULL,
                                 rmun = FALSE,
                                 rm.zero = TRUE,
+                                order.by.feature = FALSE,
                                 ...
                                 ){
     .abundance <- rlang::enquo(.abundance)
@@ -296,6 +300,28 @@ setGeneric("mp_plot_abundance",
          p <- p + 
               scale_y_continuous(expand = c(0, 0, 0, expand.value)) +
               theme_taxbar()
+         
+         if (is.null(order.by.feature) || isTRUE(order.by.feature)){
+             order.by.feature <- p$data %>%
+                 split(.[[rlang::as_name(taxa.class)]]) %>%
+                 lapply(function(x)sum(x[[abundance.nm]])) %>% 
+                 unlist() %>%
+                 sort() %>% 
+                 rev() %>%
+                 magrittr::extract(seq_len(2)) %>% 
+                 names() %>%
+                 setdiff("Others") %>%
+                 magrittr::extract2(1)
+         }
+         
+         if (order.by.feature %in% (p$data %>% dplyr::pull(!!taxa.class) %>% levels())){
+             sample.new.levels <- p$data[p$data[[rlang::as_name(taxa.class)]] == order.by.feature,] %>%
+                 dplyr::arrange(dplyr::desc(!!rlang::sym(abundance.nm))) %>% 
+                 dplyr::pull(.data$Sample) %>% 
+                 as.character() %>%
+                 rev()
+             p$data %<>% dplyr::mutate(!!rlang::sym(axis.x):=factor(!!rlang::sym(axis.x), levels = sample.new.levels)) 
+         }
 
      }else if(geom=="heatmap"){
          lab.sty <- list(xlab(NULL),ylab(NULL))

@@ -103,14 +103,19 @@ f <- mouse.time.mpse \%>\%
 f
 p1 <- mouse.time.mpse \%>\% 
       mp_plot_abundance(.abundance=RelRareAbundanceBySample, 
-                        .group=time, taxa.class="Phylum", topn=20)
+                        .group=time, taxa.class="Phylum", 
+                        topn=20, order.by.feature = "p__Firmicutes",
+                        width = 4/5
+                        )
 p2 <- mouse.time.mpse \%>\% 
       mp_plot_abundance(.abundance = RareAbundance, 
                         .group = time, 
                         taxa.class = Phylum, 
                         topn = 20, 
                         relative = FALSE, 
-                        force = TRUE)
+                        force = TRUE,
+                        order.by.feature = TRUE
+                        )
 p1 / p2
 # Or you can also extract the result and visulize it with ggplot2 and ggplot2-extension
 \dontrun{
