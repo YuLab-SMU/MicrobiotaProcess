@@ -1,6 +1,8 @@
-# MicrobiotaProcess 1.13.2.990
+# MicrobiotaProcess 1.13.2.991
 
++ introduce `order.by.feature` argument in `mp_plot_abundance` to adjust the sample order. (2023-07-24, Mon)
 + update the format of `citation` and suppress the message introduced by `tidytree`. (2023-07-14, Fri)
+
 
 # MicrobiotaProcess 1.13.2
 
