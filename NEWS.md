@@ -1,8 +1,9 @@
-# MicrobiotaProcess 1.13.2.991
+# MicrobiotaProcess 1.13.2.992
 
++ use `rlang::check_installed()` to check if a suggested package is installed, which will offer to 
+  install the package before continuing. (2023-08-02, Wed)
 + introduce `order.by.feature` argument in `mp_plot_abundance` to adjust the sample order. (2023-07-24, Mon)
 + update the format of `citation` and suppress the message introduced by `tidytree`. (2023-07-14, Fri)
-
 
 # MicrobiotaProcess 1.13.2
 
