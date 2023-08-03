@@ -49,6 +49,7 @@ import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
 #' @export
 mp_import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
                           refseqqza=NULL, treeqza=NULL, parallel=FALSE, ...){
+    check_installed(c('yaml', 'biomformat'), reason = 'for `mp_import_qiime2()`.', action = BiocManager::install)
     params <- list(...)
     if ('sampledata' %in% names(params) && is.null(mapfilename)){
         mapfilename <- params[['sampledata']]
@@ -175,10 +176,12 @@ mp_import_qiime <- function(otufilename,
 #' @title building MPSE object from biom-format file.
 #' @param biomfilename character the biom-format file path.
 #' @inheritParams mp_import_qiime
+#' @importFrom rlang check_installed
 #' @param ... additional parameter, which is meaningless now.
 #' @return MPSE-class
 #' @export
 mp_import_biom <- function(biomfilename, mapfilename = NULL, otutree = NULL, refseq = NULL, ...){
+    check_installed("jsonlite", "for `mp_import_biom()`.")
     x <- .internal_biom(biomfilename)
     mpse <- as.MPSE(x)
     if (!is.null(mapfilename)){

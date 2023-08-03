@@ -86,6 +86,7 @@ as_tibble.MPSE <- function(x, ...){
     }
     
     if (!is.null(x@taxatree)){
+        check_installed('purrr', "for `as_tibble()` with MPSE object.")
         taxada <- taxatree_to_tb(x@taxatree) 
         uniqnm <- setdiff(colnames(taxada), colnames(otuda))
         taxada %<>% dplyr::select(uniqnm)

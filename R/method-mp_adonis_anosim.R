@@ -364,6 +364,7 @@ setGeneric('mp_dmn',
     action %<>% match.arg(c('get', 'only', 'add'))
     .abundance <- rlang::enquo(.abundance)
     dat <- .data %>% mp_extract_assays(!!.abundance)
+    check_installed("DirichletMultinomial", "for `mp_dmn()`.", action = BiocManager::install)
     res <- parallel::mclapply(k, FUN=DirichletMultinomial::dmn, 
                               count = t(dat), 
                               seed = seed, 

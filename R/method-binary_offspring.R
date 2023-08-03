@@ -273,8 +273,15 @@ extract_binary_offspring.treedata <- function(.data, .node, type = 'tips', ...) 
 #     all(lapply(x, length) == 2)
 # }
 
-geometric.mean <- function(x, pseudonum = 0, na.rm = TRUE){
-    y <- exp(mean(log(x + pseudonum), na.rm = na.rm)) - pseudonum
+geometric.mean <- function(x, pseudonum = 0, na.rm = TRUE, nozero=FALSE){
+    if (all(x == 0)){
+        return(0)
+    }
+    if (nozero){
+        y <- exp(mean(log(x[x>0]), na.rm = na.rm))
+    }else{
+        y <- exp(mean(log(x + pseudonum), na.rm = na.rm)) - pseudonum
+    }
     return(y)
 }
 

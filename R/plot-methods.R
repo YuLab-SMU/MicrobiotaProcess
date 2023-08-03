@@ -236,7 +236,7 @@ setGeneric("mp_plot_abundance",
          }
      }
 
-     
+     check_installed('forcats', "for `mp_plot_abundance()`.") 
      tbl <- .data %>% 
             mp_extract_abundance(taxa.class=!!taxa.class, topn = topn, rmun = rmun) %>%
             tidyr::unnest(cols=AbundBy) %>% 
@@ -246,6 +246,7 @@ setGeneric("mp_plot_abundance",
 
      if(geom %in% c("bar", 'flowbar')){
          if (geom == "flowbar"){
+            check_installed("ggalluvial", "for `mp_plot_abundance()` with geom='flowbar'.")
             p <- ggplot(data = tbl,
                         mapping = aes_string(
                            x = axis.x,
@@ -293,6 +294,7 @@ setGeneric("mp_plot_abundance",
              gpformula <- NULL
          }
          if (!is.null(gpformula)){
+             check_installed("ggh4x", "for `mp_plot_abundance()` with geom='bar' or geom='flowbar' and .group was also provided.")
              p <- p + ggh4x::facet_nested(gpformula, scales="free_x", space="free")
          }   
          gb <- ggplot2::ggplot_build(p)
@@ -385,10 +387,10 @@ setGeneric("mp_plot_abundance",
              gp %<>% unique()
              for (i in seq_len(length(gp))){
                  sampleda <- .data %>% mp_extract_sample()
-                 f <- ggplot() +
+                 f <- ggplot(data=sampleda, mapping = aes(x=!!rlang::sym("Sample"), y=gp[i], fill=!!rlang::sym(gp[i]))) +
                       ggplot2::geom_tile(
-                         data = sampleda,
-                         mapping = aes(x=!!rlang::sym("Sample"), y=gp[i], fill=!!rlang::sym(gp[i]))
+                         #data = sampleda,
+                         #mapping = aes(x=!!rlang::sym("Sample"), y=gp[i], fill=!!rlang::sym(gp[i]))
                       ) +
                       ggplot2::scale_y_discrete(position="right", expand = c(0, 0), labels=gp[i]) +
                       theme(axis.text.x=element_blank(), 
@@ -402,6 +404,7 @@ setGeneric("mp_plot_abundance",
          }
          p2 <- ggtree(feature.hclust, branch.length = "none", size = 0.8)
          p3 <- ggtree(sample.hc, branch.length = "none", size = 0.8, layout = "dendrogram")
+         check_installed("aplot", "for `mp_plot_abundance()` with geom='heatmap'.")
          p %<>% insert_left(p2, width = 0.1)
          if (!rlang::quo_is_null(.group)){
              p %<>% insert_top(p3, height = 0.1 + 0.01 * length(gp))
@@ -522,7 +525,7 @@ setGeneric("mp_plot_alpha",
     }
 
     p <- ggplot(data=tbl, mapping = mapping)
-
+    check_installed(c("gghalves", "ggsignif", "ggh4x"), "for `mp_plot_alpha()`.")
     if (!is.null(gp)){
         if (is.numeric(tbl[[gp[1]]])){
            if (length(gp) > 1 ){
@@ -617,6 +620,7 @@ setGeneric("mp_plot_venn", function(.data, .group, .venn=NULL, ...) standardGene
     if (rlang::quo_is_null(.venn)){
         .venn <- rlang::sym(paste0("vennOf", rlang::as_name(.group)))
     }
+    check_installed("ggVennDiagram", "for `mp_plot_venn()`.")
     p <- .data %>% 
         mp_extract_sample() %>% 
         dplyr::select(!!.group, !!.venn) %>% 
@@ -668,7 +672,7 @@ setGeneric("mp_plot_upset", function(.data, .group, .upset=NULL, ...) standardGe
     if (rlang::quo_is_null(.upset)){
         .upset <- rlang::sym(paste0("ggupsetOf", rlang::as_name(.group)))
     }
-
+    check_installed('ggupset', 'for `mp_plot_upset()`.')
     p <- .data %>%
          mp_extract_feature() %>%
          dplyr::select(!!rlang::sym("OTU"), !!.upset) %>%
@@ -1233,6 +1237,7 @@ setGeneric("mp_plot_ord", function(
                          )
     if (show.side){
        if ("fill" %in% names(maps) && !is.discrete(tbl, maps, "fill")){
+           check_installed("ggside", "for `mp_plot_ord()` with show.side = TRUE.")
            side.y <- do.call(ggside::geom_xsideboxplot, 
                              list(mapping=aes(y=!!.group), color = "black", orientation = "y", show.legend = FALSE)) %>%
                      suppressMessages()
@@ -1274,6 +1279,7 @@ setGeneric("mp_plot_ord", function(
     }
 
     if (show.sample){
+        check_installed("ggrepel", "for `mp_plot_ord()` with show.sample = TRUE.")
         text.layer <- do.call(ggrepel::geom_text_repel, labelparams) 
         p <- p + text.layer
     }
@@ -1387,6 +1393,7 @@ setGeneric("mp_plot_ord", function(
     }
 
     if (show.adonis){
+        check_installed("ggpp", "for `mp_plot_ord()` with show.adonis=TRUE.")
         p <- .add_adonis_layer(plot = p, data=.data, show.side = show.side)
     }
 

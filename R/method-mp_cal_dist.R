@@ -64,10 +64,10 @@ get_dist.phyloseq <- function(obj, distmethod="euclidean", method="hellinger",..
     	}else{
     		tmpotu <- data.frame(obj@otu_table)
     	}
-    	obj@otu_table <- phyloseq::otu_table(decostand(tmpotu, method=method), 
+    	obj@otu_table <- phyloseq::otu_table(decostand(tmpotu, method=method, ...), 
                                    taxa_are_rows=FALSE)
     }
-    disres <- phyloseq::distance(obj, method=distmethod, type="sample", ...)
+    disres <- phyloseq::distance(obj, method=distmethod, type="sample")
     attr(disres, "distmethod") <- distmethod
     attr(disres, "originalD") <- data.frame(obj@otu_table, check.names=FALSE)
     return(disres)
@@ -167,6 +167,7 @@ setGeneric("mp_cal_dist", function(.data, .abundance, .env=NULL, distmethod="bra
 
 #' @importFrom rlang :=
 .internal_cal_dist <- function(.data, .abundance, .env=NULL, distmethod="bray", action="add", scale=FALSE, cal.feature.dist=FALSE, ...){
+    check_installed(c('vegan', 'corrr'), "for mp_cal_dist().")
     if (cal.feature.dist){
         #action="get"
         byRow = TRUE
@@ -206,6 +207,7 @@ setGeneric("mp_cal_dist", function(.data, .abundance, .env=NULL, distmethod="bra
     }else if (distmethod %in% distMethods$dist){
         distfun <- stats::dist
     }else if (distmethod %in% distMethods$hopach){
+        check_installed("hopach", paste0('for mp_cal_dist() with distmethod="', distmethod,'".'), action = BiocManager::install)
         distfun <- cal_dist_hopach
     }else if (distmethod %in% distMethods$UniFrac){
         distfun <- cal_Unifrac_dist
