@@ -1,5 +1,7 @@
-# MicrobiotaProcess 1.13.2.992
+# MicrobiotaProcess 1.13.2.993
 
++ update `mp_import_humann_regroup()` to keep the abundance of contributed taxa in each sample
+  with `keep.contribute.abundance=TRUE`. (2023-08-15, Tue)
 + use `rlang::check_installed()` to check if a suggested package is installed, which will offer to 
   install the package before continuing. (2023-08-02, Wed)
 + introduce `order.by.feature` argument in `mp_plot_abundance` to adjust the sample order. (2023-07-24, Mon)
