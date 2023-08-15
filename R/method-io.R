@@ -368,20 +368,28 @@ mp_import_metaphlan <- function(profile, mapfilename=NULL, treefile=NULL, linenu
 #' @param profile the output file (text format) of human_regroup_table in HUMAnN.
 #' @param mapfilename the sample information file or data.frame,
 #' @param rm.unknown logical whether remove the unmapped and ungrouped features.
+#' @param keep.contribute.abundance logical whether keep the abundance of contributed taxa,
+#' default is FALSE, it will consume more memory if it set to TRUE.
 #' @param ... additional parameters, meaningless now.
 #' @author Shuangbin Xu
 #' @export
-mp_import_humann_regroup <- function(profile, mapfilename=NULL, rm.unknown=TRUE, ...){
+mp_import_humann_regroup <- function(profile, mapfilename=NULL, rm.unknown=TRUE, keep.contribute.abundance=FALSE, ...){
     da <- read.table(profile, header=TRUE, sep='\t', comment.char="",
                      check.names=FALSE, row.names=1, quote="")
     if (rm.unknown){
         da <- da[!grepl('UNMAPPED|UNGROUPED|unclassified', rownames(da)),,drop=FALSE]
     }
     index <- grepl("\\|", rownames(da))
-    feature.meta <- rownames(da[index, ,drop=FALSE])
-    feature.meta <- read.table(text=feature.meta, sep='|')
+    feature.meta <- da[index, ,drop=FALSE]
+    feature.meta <- read.table(text = rownames(feature.meta), sep='|')
     feature.meta$V2 <- gsub('.*s__', "s__", feature.meta$V2)
     colnames(feature.meta) <- c('OTU', 'contribute.taxa')
+    if(keep.contribute.abundance){
+       feature.meta <- cbind(feature.meta, da[index, ,drop = FALSE])
+       rownames(feature.meta) <- NULL
+       check_installed('tidyr', 'for `mp_import_humann_regroup()` with `keep.contribute.abundance=TRUE`.')
+       feature.meta <- tidyr::nest(feature.meta, contribute.taxa = !'OTU')
+    }
     res <- list(otutab = da[!index, ,drop=FALSE])
     if (!is.null(mapfilename)){
         if (inherits(mapfilename, 'data.frame')){
