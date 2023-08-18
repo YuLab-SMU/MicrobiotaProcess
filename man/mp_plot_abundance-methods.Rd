@@ -137,8 +137,8 @@ based on the '.abundance' of 'taxa.class', default is 'bray', options refer to t
 \item{.sec.group}{the column name of second group to be plotted with nested facet,
 default is NULL, this argument will be deprecated in the next version.}
 
-\item{rmun}{logical whether to remove the unknown taxa, such as "g__un_xxx",
-default is FALSE (the unknown taxa class will be considered as 'Others').}
+\item{rmun}{logical whether to group the unknown taxa to \code{Others} category, 
+such as "g__un_xxx", default is FALSE, meaning do not group them to \code{Others} category.}
 
 \item{rm.zero}{logical whether to display the zero abundance, which only work with geom='heatmap'
 default is TRUE.}

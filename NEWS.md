@@ -1,5 +1,7 @@
 # MicrobiotaProcess 1.13.2.993
 
++ update the doc of `rmun` argument in `mp_plot_abundance` to avoid misunderstanding. (2023-08-18, Fri)
+  <https://github.com/YuLab-SMU/MicrobiotaProcess/issues/99>
 + update `mp_import_humann_regroup()` to keep the abundance of contributed taxa in each sample
   with `keep.contribute.abundance=TRUE`. (2023-08-15, Tue)
 + use `rlang::check_installed()` to check if a suggested package is installed, which will offer to 
