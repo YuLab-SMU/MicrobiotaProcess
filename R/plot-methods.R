@@ -283,7 +283,7 @@ setGeneric("mp_plot_abundance",
                      gp <- append(gp, gp2, after=1)
                  }
              }
-             if (plot.group && length(gp)>1 ){
+             if (plot.group && length(gp) >1 ){
                  gpformula <- as.formula(paste0(". ~ ", paste0(gp[-1], collapse="+")))
              }else if (!plot.group){
                  gpformula <- as.formula(paste0(". ~ ", paste0(gp, collapse="+")))
@@ -317,12 +317,24 @@ setGeneric("mp_plot_abundance",
          }
          
          if (order.by.feature %in% (p$data %>% dplyr::pull(!!taxa.class) %>% levels())){
-             sample.new.levels <- p$data[p$data[[rlang::as_name(taxa.class)]] == order.by.feature,] %>%
-                 dplyr::arrange(dplyr::desc(!!rlang::sym(abundance.nm))) %>% 
-                 dplyr::pull(.data$Sample) %>% 
-                 as.character() %>%
-                 rev()
-             p$data %<>% dplyr::mutate(!!rlang::sym(axis.x):=factor(!!rlang::sym(axis.x), levels = sample.new.levels)) 
+             if (plot.group && !rlang::quo_is_null(.group)){
+                 gp <- quo.vect_to_str.vect(.group)
+                 if (length(gp) >= 1){
+                     new.levels <- p$data[p$data[[rlang::as_name(taxa.class)]]==order.by.feature,] %>%
+                         dplyr::arrange(dplyr::desc(!!rlang::sym(abundance.nm))) %>%
+                         dplyr::pull(gp[[1]]) %>%
+                         as.character() %>%
+                         rev()
+                     p$data %<>% dplyr::mutate(!!rlang::sym(axis.x):=factor(!!rlang::sym(axis.x), levels = new.levels))
+                 }
+             }else{
+                 sample.new.levels <- p$data[p$data[[rlang::as_name(taxa.class)]] == order.by.feature,] %>%
+                     dplyr::arrange(dplyr::desc(!!rlang::sym(abundance.nm))) %>% 
+                     dplyr::pull(.data$Sample) %>% 
+                     as.character() %>%
+                     rev()
+                 p$data %<>% dplyr::mutate(!!rlang::sym(axis.x):=factor(!!rlang::sym(axis.x), levels = sample.new.levels)) 
+             }
          }
 
      }else if(geom=="heatmap"){

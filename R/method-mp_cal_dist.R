@@ -167,7 +167,7 @@ setGeneric("mp_cal_dist", function(.data, .abundance, .env=NULL, distmethod="bra
 
 #' @importFrom rlang :=
 .internal_cal_dist <- function(.data, .abundance, .env=NULL, distmethod="bray", action="add", scale=FALSE, cal.feature.dist=FALSE, ...){
-    check_installed(c('vegan', 'corrr'), "for mp_cal_dist().")
+    check_installed('vegan', "for mp_cal_dist().")
     if (cal.feature.dist){
         #action="get"
         byRow = TRUE
@@ -288,11 +288,8 @@ setGeneric("mp_cal_dist", function(.data, .abundance, .env=NULL, distmethod="bra
     }
 
     dat <- da %>% 
-        as.matrix() %>% 
-        corrr::as_cordf(diagonal=0) %>%
-        corrr::shave() %>% 
-        corrr::stretch(na.rm=TRUE) %>%
-        dplyr::rename(!!distmethod:="r", !!distsampley:="y") %>% 
+        .dist_to_df() %>%
+        dplyr::rename(!!distmethod:="d", !!distsampley:="y") %>% 
         tidyr::nest(!!distmethod:=c(!!as.symbol(distsampley), !!as.symbol(distmethod)))
     
    # if (cal.feature.dist){
