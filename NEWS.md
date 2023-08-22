@@ -1,5 +1,7 @@
-# MicrobiotaProcess 1.13.2.993
+# MicrobiotaProcess 1.13.2.994
 
++ using internal functions to convert `dist` object to `tbl_df` or `tbl_df` to `dist` in `mp_cal_dist` and
+  fix a bug of `mp_extract_abundance` when `rowData` contains list metadata information. (2023-08-21, Mon)
 + update the doc of `rmun` argument in `mp_plot_abundance` to avoid misunderstanding. (2023-08-18, Fri)
   <https://github.com/YuLab-SMU/MicrobiotaProcess/issues/99>
 + update `mp_import_humann_regroup()` to keep the abundance of contributed taxa in each sample
