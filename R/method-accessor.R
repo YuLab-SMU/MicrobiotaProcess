@@ -150,6 +150,7 @@ setReplaceMethod("colData", c("MPSE", "NULL"), function(x, ..., value){
 #' @export
 setGeneric("mp_extract_assays", function(x, .abundance, byRow=TRUE, ...)standardGeneric("mp_extract_assays"))
 
+#' @importFrom methods as
 #' @rdname mp_extract_assays-methods
 #' @aliases mp_extract_assays,MPSE
 #' @exportMethod mp_extract_assays
@@ -166,13 +167,12 @@ setMethod("mp_extract_assays", signature(x="MPSE"), function(x, .abundance, byRo
         return(NULL)
     }
 
-    xx <- SummarizedExperiment::assays(x)@listData
-    dat <- xx[[rlang::as_name(.abundance)]]
+    dat <- SummarizedExperiment::assay(x, rlang::as_name(.abundance))
 
     if (byRow){
-        dat %<>% as.data.frame(check.names=FALSE)
+        dat %<>% as('matrix') %>% as.data.frame(check.names=FALSE)
     }else{
-        dat %<>% t() %>% as.data.frame(check.names=FALSE)
+        dat %<>% t() %>% as('matrix') %>% as.data.frame(check.names=FALSE)
     }
     return(dat)
 })

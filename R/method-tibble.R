@@ -158,10 +158,10 @@ extract_count_data <- function(SE_object){
 
 trans_to_longer <- function(.data, name){
     if (is.null(colnames(.data))){
-        .data %<>% tibble::as_tibble(rownames="OTU") %>% 
+        .data %<>% methods::as('matrix') %>% tibble::as_tibble(rownames="OTU") %>% 
             suppressWarnings()
     }else{
-        .data %<>% 
+        .data %<>% methods::as('matrix') %>% 
            tibble::as_tibble(rownames = "OTU", .name_repair = "minimal")
     }
     .data %<>%
