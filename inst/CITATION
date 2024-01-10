@@ -3,7 +3,7 @@ citHeader("To cite MicrobiotaProcess package in publications use:")
 bibentry(
     bibtype  = "article",
     title  = "MicrobiotaProcess: A comprehensive R package for deep mining microbiome",
-    author = personList(
+    author = c(
         person("Shuangbin", "Xu"),
         person("Li", "Zhan"),
         person("Wenli", "Tang"),
