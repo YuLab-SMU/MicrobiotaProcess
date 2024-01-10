@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.15.0
+
++ Bioconductor 3.18 released and Bioconductor 3.19 (devel) version bump. (2023-10-25, Wed)
+
 # MicrobiotaProcess 1.13.3
 
 + fix the issue when `assays` is `dgCMatrix` other sparse matrix class. (2023-09-12, Tue)
