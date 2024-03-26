@@ -67,7 +67,7 @@
 
 \S4method{colData}{MPSE,DataFrame}(x, ...) <- value
 
-\S4method{colData}{MPSE,`NULL`}(x, ...) <- value
+\S4method{colData}{MPSE,NULL}(x, ...) <- value
 
 tax_table(object)
 
@@ -91,15 +91,15 @@ otutree(x, ...) <- value
 
 \S4method{otutree}{MPSE,phylo}(x, ...) <- value
 
-\S4method{otutree}{MPSE,`NULL`}(x, ...) <- value
+\S4method{otutree}{MPSE,NULL}(x, ...) <- value
 
 \S4method{otutree}{tbl_mpse,treedata}(x, ...) <- value
 
 \S4method{otutree}{grouped_df_mpse,treedata}(x, ...) <- value
 
-\S4method{otutree}{tbl_mpse,`NULL`}(x, ...) <- value
+\S4method{otutree}{tbl_mpse,NULL}(x, ...) <- value
 
-\S4method{otutree}{grouped_df_mpse,`NULL`}(x, ...) <- value
+\S4method{otutree}{grouped_df_mpse,NULL}(x, ...) <- value
 
 taxatree(x, ...)
 
@@ -113,15 +113,15 @@ taxatree(x, ...) <- value
 
 \S4method{taxatree}{MPSE,treedata}(x, ...) <- value
 
-\S4method{taxatree}{MPSE,`NULL`}(x, ...) <- value
+\S4method{taxatree}{MPSE,NULL}(x, ...) <- value
 
 \S4method{taxatree}{tbl_mpse,treedata}(x, ...) <- value
 
-\S4method{taxatree}{tbl_mpse,`NULL`}(x, ...) <- value
+\S4method{taxatree}{tbl_mpse,NULL}(x, ...) <- value
 
 \S4method{taxatree}{grouped_df_mpse,treedata}(x, ...) <- value
 
-\S4method{taxatree}{grouped_df_mpse,`NULL`}(x, ...) <- value
+\S4method{taxatree}{grouped_df_mpse,NULL}(x, ...) <- value
 
 taxonomy(x, ...) <- value
 
@@ -131,7 +131,7 @@ taxonomy(x, ...) <- value
 
 \S4method{taxonomy}{MPSE,taxonomyTable}(x, ...) <- value
 
-\S4method{taxonomy}{MPSE,`NULL`}(x, ...) <- value
+\S4method{taxonomy}{MPSE,NULL}(x, ...) <- value
 
 refsequence(x, ...)
 
@@ -141,7 +141,7 @@ refsequence(x, ...) <- value
 
 \S4method{refsequence}{MPSE,XStringSet}(x, ...) <- value
 
-\S4method{refsequence}{MPSE,`NULL`}(x, ...) <- value
+\S4method{refsequence}{MPSE,NULL}(x, ...) <- value
 
 \S4method{rownames}{MPSE}(x) <- value
 }

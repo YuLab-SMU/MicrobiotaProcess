@@ -928,7 +928,8 @@ mp_plot_diff_cladogram <- function(
         }
         annot.index <- .get_annot_index(x = .data, taxa.class = taxa.class, tip.annot = tip.annot)
 	    
-        .data <- .generate_annot_df(x = .data, annot.index, .group, removeUnknown) %>% as.treedata()
+        .data <- .generate_annot_df(x = .data, annot.index, .group, removeUnknown) %>% 
+                  as.treedata()
         offset.max <- max(dplyr::pull(.data, .data$nodeDepth), na.rm = TRUE) 
         
         if (inherits(rlang::quo_get_expr(.size), "call")){
@@ -1608,7 +1609,7 @@ setMethod("mp_plot_diff_manhattan", signature(.data="grouped_df_mpse"), .interna
         x1$label <- c(abbre, seq_len(nrow(x1) - 52))[seq_len(nrow(x1))]
     }
     x2 <- x %>% dplyr::filter(!.data$node %in% x1$node)
-	x <- dplyr::bind_rows(x1, x2) %>% dplyr::arrange(.data$node)
+	x <- dplyr::bind_rows(x1, x2) %>% dplyr::arrange(.data$node) %>% add_class("tbl_tree") 
 	return (x)
 }
 
