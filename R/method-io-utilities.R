@@ -305,7 +305,7 @@
 read_qiime_otu <- function(otufilename){
     skipn <- guess_skip_nrow(otufilename)
     xx <- utils::read.table(otufilename, sep="\t", skip=skipn, header=TRUE, 
-                            row.names=1, comment.char="", quote="")
+                            row.names=1, comment.char="", quote="", check.names=FALSE)
     indy <- vapply(xx, function(i)is.numeric(i), logical(1)) %>% setNames(NULL)
     otuda <- xx[, indy, drop=FALSE]
     if (!all(indy)){
@@ -406,7 +406,7 @@ read_qiime_sample <- function(samplefile){
     sep <- guess_sep(samplefile)    
     sampleda <- utils::read.table(
                   samplefile, header=TRUE, sep=sep, row.names=1, 
-                  comment.char="", quote=""
+                  comment.char="", quote="", check.names=FALSE
                 )
     return(sampleda)
 }

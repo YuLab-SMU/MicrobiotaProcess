@@ -1,5 +1,6 @@
-# MicrobiotaProcess 1.15.990
+# MicrobiotaProcess 1.15.1
 
++ fix a bug of `mp_import_qiime` when sample metadata has `-` character. (2024-04-12, Fri)
 + update `mp_plot_diff_cladogram` with `tidytree` and `treeio`. (2024-03-26, Tue)
 
 # MicrobiotaProcess 1.15.0

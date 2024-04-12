@@ -257,12 +257,12 @@ mp_import_biom <- function(biomfilename, mapfilename = NULL, otutree = NULL, ref
 mp_import_metaphlan <- function(profile, mapfilename=NULL, treefile=NULL, linenum=NULL, ...){
     skipnrow <- guess_skip_nrow(profile)
     if (!is.null(linenum)){
-        sampleda <- utils::read.table(profile, sep="\t", skip=skipnrow, nrow=linenum, comment.char="", quote="") %>%
+        sampleda <- utils::read.table(profile, sep="\t", skip=skipnrow, nrow=linenum, comment.char="", quote="", check.names=FALSE) %>%
                     dplyr::mutate_at("V1", as.character) %>%
                     dplyr::mutate(V1=tidyr::replace_na(.data$V1, paste0("unknown", seq_len(sum(is.na(.data$V1)))))) %>%
                     tibble::column_to_rownames(var="V1") %>%
                     t() %>% as.data.frame()
-        da <- utils::read.table(profile, sep="\t", skip=linenum + skipnrow, comment.char="", quote="")
+        da <- utils::read.table(profile, sep="\t", skip=linenum + skipnrow, comment.char="", quote="", check.names=FALSE)
         sampleindx <- da %>%
                       vapply(.,function(x)is.numeric(x), logical(1)) %>%
                       which(.) 
@@ -460,7 +460,7 @@ read.featuretab <- function(file){
 #' @keywords internal
 read.taxa <- function(file, parallel=FALSE){
     skipn <- guess_skip_nrow(file)
-    x <- utils::read.table(file, sep="\t", row.names=1, header=TRUE, comment.char="", skip=skipn)
+    x <- utils::read.table(file, sep="\t", row.names=1, header=TRUE, comment.char="", skip=skipn, check.names=FALSE)
     if (ncol(x)>1){
        otu.metada <- x[,-1,drop=FALSE]
     }else{
