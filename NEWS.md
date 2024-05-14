@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.17.0
+
++ Bioconductor 3.19 release, and Biocondutor 3.20 (devel) version bump. (2024-05-14, Tue)
+
 # MicrobiotaProcess 1.15.1
 
 + fix a bug of `mp_import_qiime` when sample metadata has `-` character. (2024-04-12, Fri)
