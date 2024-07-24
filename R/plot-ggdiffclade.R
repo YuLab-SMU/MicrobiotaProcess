@@ -148,10 +148,10 @@ ggdiffclade.data.frame <- function(obj, nodedf, factorName, size, layout="radial
                     .f = ifelse(removeUnknown, td_filter(!is.na(!!sym(factorName)) & !grepl('__un_', .data$label)),
                                 td_filter(!is.na(!!sym(factorName))))
                   ),
-           mapping = aes_string(node = "node", fill = factorName, extend = "extend"),
+           mapping = aes_string(node = "node", fill = factorName, extend = "extend", color = factorName),
            size = hilight.size,
            alpha = alpha,
-           show.legend = FALSE,
+           show.legend = FALSE
         )
 
    if (removeUnknown){

@@ -66,18 +66,23 @@
 #'                    action="add") 
 #' library(ggplot2)
 #' p <- mouse.time.mpse %>% mp_plot_diff_res()
+#' flag <- packageVersion("ggnewscale") >= "0.5.0"
+#' # if flag is TRUE, you can also use p$ggnewscale to view the renamed scales.
+#' new.fill <- ifelse(flag , "fill_ggnewscale_2", "fill_new")
 #' p <- p + 
 #'      scale_fill_manual(
-#'        aesthetics = "fill_new", # The fill aes was renamed to "fill_new" for the abundance dotplot layer
+#'        aesthetics = new.fill, # The fill aes was renamed to `new.fill` for the abundance dotplot layer
 #'        values = c("skyblue", "orange")
 #'      )  + 
 #'      scale_fill_manual(
 #'        values=c("skyblue", "orange") # The LDA barplot layer
 #'      )
-#' ### and the fill aes for hight light layer of tree was renamed to 'fill_new_new'
+#' ### and the fill aes for hight light layer of tree was renamed to `new.fill2`
+#' ### because the layer is the first layer used `fill`
+#' new.fill2 <- ifelse(flag, "fill_ggnewscale_1", "fill_new_new")
 #' p <- p + 
 #'      scale_fill_manual(
-#'        aesthetics = "fill_new_new",
+#'        aesthetics = new.fill2,
 #'        values = c("#E41A1C", "#377EB8", "#4DAF4A", 
 #'                   "#984EA3", "#FF7F00", "#FFFF33", 
 #'                   "#A65628", "#F781BF", "#999999")
@@ -1667,11 +1672,16 @@ set_diff_boxplot_color <- function(
 }
 
 
+#' @importFrom utils packageVersion
 #' @importFrom ggplot2 ggplot_add
 #' @method ggplot_add ScaleDiffClade
 #' @export
 ggplot_add.ScaleDiffClade <- function(object, plot, object_name){
-    index <- which(plot$scales$find('fill'))
+    if (packageVersion("ggnewscale") >= '0.5.0'){
+        index <- which(plot$scales$find("colour_ggnewscale_1"))
+    }else{
+        index <- which(plot$scales$find('fill'))
+    }
     ss <- plot$scales$scales[[index]]
     original.fill <- FALSE
     if (is.null(object$values)){
@@ -1689,7 +1699,7 @@ ggplot_add.ScaleDiffClade <- function(object, plot, object_name){
         }
     }
     new.fill.scale <- do.call('scale_fill_manual', object)
-    object$aesthetics <- 'colour_new'
+    object$aesthetics <- ifelse(packageVersion("ggnewscale") >= '0.5.0' , "colour_ggnewscale_1", 'colour_new')
     object$guide <- 'none'
     original.color <- do.call(scale_color_manual, object)
     color.label <- .build_color_values(plot, values=object$values)

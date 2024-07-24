@@ -591,18 +591,27 @@ The visualization methods of result can be various, you can refer to the article
 ```{r, fig.width=9, fig.height=9, fig.align="center", fig.cap="The different species and the abundance of group"}
 # this object has contained the result of mp_diff_analysis
 mouse.time.mpse
+# Because the released `ggnewscale` modified the internal new aesthetics name,
+# The following code is to obtain the new aesthetics name according to version of
+# `ggnewscale`
+flag <- packageVersion("ggnewscale") >= "0.5.0"
+new.fill <- ifelse(flag, "fill_ggnewscale_1", "fill_new_new")
+new.fill2 <- ifelse(flag , "fill_ggnewscale_2", "fill_new")
+
 p <- mouse.time.mpse %>%
        mp_plot_diff_res(
          group.abun = TRUE,
          pwidth.abun=0.1
-       ) +
+       ) 
+# if version of `ggnewscale` is >= 0.5.0, you can also use p$ggnewscale to view the renamed scales.
+p <- p  +
        scale_fill_manual(values=c("deepskyblue", "orange")) +
        scale_fill_manual(
-         aesthetics = "fill_new", # The fill aes was renamed to "fill_new" for the abundance dotplot layer
+         aesthetics = new.fill2, # The fill aes was renamed to `new.fill` for the abundance dotplot layer
          values = c("deepskyblue", "orange")
        ) +
        scale_fill_manual(
-         aesthetics = "fill_new_new", # The fill aes for hight light layer of tree was renamed to 'fill_new_new'
+         aesthetics = new.fill, # The fill aes for hight light layer of tree was renamed to `new.fill2`
          values = c("#E41A1C", "#377EB8", "#4DAF4A",
                     "#984EA3", "#FF7F00", "#FFFF33",
                      "#A65628", "#F781BF", "#999999"
