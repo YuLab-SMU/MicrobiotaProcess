@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.17.1
+
++ update `scale_fill_diff_cladogram` to be compatible with `ggnewscale` >= 0.5.0 (2024-07-24, Wed)
+
 # MicrobiotaProcess 1.17.0
 
 + Bioconductor 3.19 release, and Biocondutor 3.20 (devel) version bump. (2024-05-14, Tue)
