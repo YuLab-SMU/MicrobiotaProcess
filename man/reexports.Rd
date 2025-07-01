@@ -39,7 +39,7 @@ below to see their documentation.
 
   \item{ggplot2}{\code{\link[ggplot2]{fortify}}, \code{\link[ggplot2]{remove_missing}}}
 
-  \item{ggtree}{\code{\link[ggtree]{td_filter}}, \code{\link[ggtree]{td_unnest}}}
+  \item{ggtree}{\code{\link[ggtree:reexports]{td_filter}}, \code{\link[ggtree:reexports]{td_unnest}}}
 
   \item{magrittr}{\code{\link[magrittr:compound]{\%<>\%}}, \code{\link[magrittr:pipe]{\%>\%}}, \code{\link[magrittr:aliases]{extract}}}
 

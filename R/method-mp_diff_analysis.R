@@ -1676,7 +1676,7 @@ set_diff_boxplot_color <- function(
 #' @importFrom ggplot2 ggplot_add
 #' @method ggplot_add ScaleDiffClade
 #' @export
-ggplot_add.ScaleDiffClade <- function(object, plot, object_name){
+ggplot_add.ScaleDiffClade <- function(object, plot, object_name, ...){
     if (packageVersion("ggnewscale") >= '0.5.0'){
         index <- which(plot$scales$find("colour_ggnewscale_1"))
     }else{
@@ -1718,7 +1718,7 @@ ggplot_add.ScaleDiffClade <- function(object, plot, object_name){
     }else{
         object <- list(new.fill.scale, original.color, new.color.scale) 
     }
-    ggplot_add(object, plot, object_name)
+    ggplot_add(object, plot, object_name, ...)
 }
 
 .build_color_values <- function(plot, values){

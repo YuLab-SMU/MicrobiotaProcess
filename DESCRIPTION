@@ -86,4 +86,4 @@ VignetteBuilder: knitr
 ByteCompile: true 
 Encoding: UTF-8
 biocViews: Visualization, Microbiome, Software, MultipleComparison, FeatureExtraction
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
