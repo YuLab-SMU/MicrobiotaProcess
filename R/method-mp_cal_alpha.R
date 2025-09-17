@@ -145,18 +145,17 @@ setMethod("get_alphaindex", "phyloseq", function(obj, ...){
 #' # Or you can extract the result and visualize it with ggplot2 and ggplot2-extensions
 #' \dontrun{
 #' tbl <- mpse %>% 
-#'        mp_extract_sample
+#'        mp_extract_sample()
 #' tbl
 #' tbl %<>% 
 #'   tidyr::pivot_longer(cols=!c("Sample", "time"), names_to="measure", values_to="alpha")
 #' tbl
 #' library(ggplot2)
 #' library(ggsignif)
-#' library(gghalves)
 #' p <- ggplot(data=tbl, aes(x=time, y=alpha, fill=time)) + 
-#'      geom_half_violin(color=NA, side="l", trim=FALSE) + 
-#'      geom_boxplot(aes(color=time), fill=NA, position=position_nudge(x=.22), width=0.2) + 
-#'      geom_half_point(side="r", shape=21) + 
+#'      geom_violin(color=NA, trim=FALSE) + 
+#'      geom_boxplot(aes(color=time), fill=NA, width=0.2) + 
+#'      geom_jitter(shape=21, width = .1) + 
 #'      geom_signif(comparisons=list(c("Early", "Late")), test="wilcox.test", textsize=2) + 
 #'      facet_wrap(facet=vars(measure), scales="free_y", nrow=1) +
 #'      scale_fill_manual(values=c("#00A087FF", "#3C5488FF")) + 

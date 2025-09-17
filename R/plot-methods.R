@@ -537,7 +537,7 @@ setGeneric("mp_plot_alpha",
     }
 
     p <- ggplot(data=tbl, mapping = mapping)
-    check_installed(c("gghalves", "ggsignif", "ggh4x"), "for `mp_plot_alpha()`.")
+    check_installed(c("ggsignif", "ggh4x"), "for `mp_plot_alpha()`.")
     if (!is.null(gp)){
         if (is.numeric(tbl[[gp[1]]])){
            if (length(gp) > 1 ){
@@ -555,15 +555,14 @@ setGeneric("mp_plot_alpha",
                 do.call(ggplot2::geom_smooth, smoothparam) 
         }else{
            p <- p +
-              gghalves::geom_half_violin(color=NA, side="l", trim=FALSE) +
-              gghalves::geom_half_point(side="r", shape=21, alpha=0.8) +
-              ggplot2::geom_boxplot(aes_string(color=gp[1]),
-                                    fill = NA,
-                                    position=ggplot2::position_nudge(x=.22),
-                                    size = 0.6,
-                                    width = 0.2,
-                                    outlier.shape = NA
-                                    ) +
+              geom_violin(color=NA, trim=FALSE) +
+              ggplot2::geom_boxplot(
+                fill = "white",
+                size = 0.6,
+                width = 0.2,
+                outlier.shape = NA
+              ) +
+              ggplot2::geom_jitter(shape=21, width = .15, alpha=0.8, size=2) +
               ggsignif::geom_signif(comparisons=comparisons, test=test, step_increase=step_increase, ...) +
               ggplot2::scale_fill_manual(values=get_cols(tbl %>% pull(!!rlang::sym(gp[1])) %>% unique() %>% length())) +
               ggplot2::scale_color_manual(values=get_cols(tbl %>% pull(!!rlang::sym(gp[1])) %>% unique() %>% length()))
