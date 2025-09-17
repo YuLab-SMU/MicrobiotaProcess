@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.20.1
+
++ rm `gghalves` since it is not compatible with `ggplot2` `4.0.0`. (2025-09-17, Wed)
+
 # MicrobiotaProcess 1.20.0
 
 + Bioconductor 3.21 released, and Bioconductor 3.22 (devel) bump. (2025-04-17, Thu)
