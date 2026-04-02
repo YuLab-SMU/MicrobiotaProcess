@@ -19,6 +19,7 @@
 #' @export
 #' @author Shuangbin Xu
 #' @examples
+#' \dontrun{
 #' otuqzafile <- system.file("extdata", "table.qza",
 #'                           package="MicrobiotaProcess")
 #' taxaqzafile <- system.file("extdata", "taxa.qza",
@@ -28,6 +29,7 @@
 #' mpse <- mp_import_qiime2(otuqza=otuqzafile, taxaqza=taxaqzafile,
 #'                          mapfilename=mapfile)
 #' mpse
+#' }
 import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL, 
                           refseqqza=NULL, treeqza=NULL,
                           parallel=FALSE, ...){
@@ -49,7 +51,7 @@ import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
 #' @export
 mp_import_qiime2 <- function(otuqza, taxaqza=NULL, mapfilename=NULL,
                           refseqqza=NULL, treeqza=NULL, parallel=FALSE, ...){
-    check_installed(c('yaml', 'biomformat'), reason = 'for `mp_import_qiime2()`.', action = BiocManager::install)
+    check_installed(c('yaml', 'biomformat', 'rhdf5'), reason = 'for `mp_import_qiime2()`.', action = BiocManager::install)
     params <- list(...)
     if ('sampledata' %in% names(params) && is.null(mapfilename)){
         mapfilename <- params[['sampledata']]
@@ -451,7 +453,7 @@ read_qza <- function(qzafile, parallel=FALSE){
 
 #' @keywords internal
 read.featuretab <- function(file){
-    obj <- suppressWarnings(biomformat::read_biom(file))
+    obj <- biomformat::read_biom(file)
     res <- .internal_parse_biom(biomobj = obj)
     return(res)
 }

@@ -53,6 +53,7 @@ The function was designed to import the output of qiime2 and convert them to phy
 class.
 }
 \examples{
+\dontrun{
 otuqzafile <- system.file("extdata", "table.qza",
                           package="MicrobiotaProcess")
 taxaqzafile <- system.file("extdata", "taxa.qza",
@@ -62,6 +63,7 @@ mapfile <- system.file("extdata", "metadata_qza.txt",
 mpse <- mp_import_qiime2(otuqza=otuqzafile, taxaqza=taxaqzafile,
                          mapfilename=mapfile)
 mpse
+}
 }
 \author{
 Shuangbin Xu
