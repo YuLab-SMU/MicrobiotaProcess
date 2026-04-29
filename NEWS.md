@@ -1,3 +1,7 @@
+# MicrobiotaProcess 1.25.0
+
++ Bioconductor 3.23 released, and Bioconductor 3.24 (devel) bump. (2026-04-29, Wed)
+
 # MicrobiotaProcess 1.23.1
 
 + fixed the issue of `mp_import_qiime2` due to the new `biomformat`. (2026-04-02, Thu)
